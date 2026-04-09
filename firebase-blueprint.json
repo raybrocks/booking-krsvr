@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "Experience": {
+      "title": "VR Experience",
+      "description": "A VR game or experience available for booking.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "picture": { "type": "string" },
+        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Quest"] },
+        "age": { "type": "string" },
+        "difficulty": { "type": "string" },
+        "maxPlayers": { "type": "number" },
+        "subtitles": { "type": "array", "items": { "type": "string" } },
+        "pricing": {
+          "type": "object",
+          "description": "Pricing per total group size (e.g., '2': 800, '3': 1100)",
+          "additionalProperties": { "type": "number" }
+        },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["name", "shortDescription", "type", "maxPlayers", "pricing"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "A customer booking for a VR experience.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "experienceId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "players": { "type": "number" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "acceptedTerms": { "type": "boolean" },
+        "acceptedNewsletter": { "type": "boolean" },
+        "paymentType": { "type": "string", "enum": ["full", "reservation"] },
+        "totalPrice": { "type": "number" },
+        "amountPaid": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["experienceId", "date", "time", "players", "firstName", "lastName", "email", "phone", "status"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global settings like opening hours.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "openingHours": {
+          "type": "object",
+          "description": "Map of day of week (0-6, 0=Sunday) to array of timeslots (e.g., ['18:00', '19:30'])",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "reservationFee": { "type": "number" }
+      }
+    }
+  },
+  "firestore": {
+    "/experiences/{experienceId}": {
+      "schema": { "$ref": "#/entities/Experience" },
+      "description": "Collection of VR experiences."
+    },
+    "/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/Booking" },
+      "description": "Collection of customer bookings."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/Settings" },
+      "description": "Global application settings."
+    }
+  }
+}

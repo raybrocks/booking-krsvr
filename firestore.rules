@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == "raymond@krsurban.no";
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidExperience(data) {
+      return hasRequiredFields(['name', 'shortDescription', 'type', 'maxPlayers', 'pricing']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.shortDescription is string && data.shortDescription.size() < 1000 &&
+             data.type in ["Escape Room", "Zombie shooter", "Quest"] &&
+             data.maxPlayers is number && data.maxPlayers > 0 && data.maxPlayers <= 20 &&
+             data.pricing is map;
+    }
+
+    function isValidBooking(data) {
+      return hasRequiredFields(['experienceId', 'date', 'time', 'players', 'firstName', 'lastName', 'email', 'phone', 'status']) &&
+             data.experienceId is string && data.experienceId.size() > 0 && data.experienceId.size() < 100 &&
+             data.date is string && data.date.size() > 0 && data.date.size() < 20 &&
+             data.time is string && data.time.size() > 0 && data.time.size() < 10 &&
+             data.players is number && data.players > 0 && data.players <= 20 &&
+             data.firstName is string && data.firstName.size() > 0 && data.firstName.size() < 50 &&
+             data.lastName is string && data.lastName.size() > 0 && data.lastName.size() < 50 &&
+             isValidEmail(data.email) &&
+             data.phone is string && data.phone.size() > 0 && data.phone.size() < 30 &&
+             data.status in ["pending", "confirmed", "cancelled"];
+    }
+
+    function isValidSettings(data) {
+      return hasRequiredFields(['openingHours']) && data.openingHours is map;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /experiences/{experienceId} {
+      allow read: if true;
+      allow create: if isValidExperience(request.resource.data);
+      allow update, delete: if isAdmin() && isValidExperience(request.resource.data);
+    }
+
+    match /bookings/{bookingId} {
+      allow read: if isAdmin();
+      // Anyone can create a booking, but they must provide valid data
+      allow create: if isValidBooking(request.resource.data);
+      allow update, delete: if isAdmin() && isValidBooking(request.resource.data);
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create: if isValidSettings(request.resource.data);
+      allow update, delete: if isAdmin() && isValidSettings(request.resource.data);
+    }
+  }
+}
