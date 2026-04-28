@@ -5,8 +5,26 @@ export async function seedDatabase() {
   const experiencesRef = collection(db, 'experiences');
   const snapshot = await getDocs(experiencesRef);
   
+  // Always ensure the Test Game is added
+  const testGame = {
+    id: "test-vipps-game",
+    name: "VIPPS Test Game",
+    shortDescription: "A special test game to test the Vipps Checkout flow. Costs 10 NOK.",
+    picture: "https://picsum.photos/seed/test/800/600",
+    type: "Adventure",
+    age: "18+",
+    difficulty: "Easy",
+    maxPlayers: 2,
+    subtitles: ["English"],
+    pricing: {
+      "2": 10 // 10 NOK for 2 people
+    },
+    isActive: true
+  };
+  await setDoc(doc(db, 'experiences', testGame.id), testGame);
+
   if (!snapshot.empty) {
-    return; // Already seeded
+    return; // Already seeded other games
   }
 
   const experiences = [
@@ -57,7 +75,7 @@ export async function seedDatabase() {
       name: "Alice In Wonderland",
       shortDescription: "Step into a magical world and help Alice save Wonderland from the Queen of Hearts.",
       picture: "https://picsum.photos/seed/alice/800/600",
-      type: "Quest",
+      type: "Adventure",
       age: "8+",
       difficulty: "Easy",
       maxPlayers: 4,

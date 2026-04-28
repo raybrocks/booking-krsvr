@@ -9,7 +9,7 @@
         "name": { "type": "string" },
         "shortDescription": { "type": "string" },
         "picture": { "type": "string" },
-        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Quest"] },
+        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Adventure"] },
         "age": { "type": "string" },
         "difficulty": { "type": "string" },
         "maxPlayers": { "type": "number" },
@@ -64,6 +64,20 @@
         "reservationFee": { "type": "number" }
       }
     }
+    "Transaction": {
+      "title": "Transaction",
+      "description": "A payment transaction receipt from Vipps.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "bookingId": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string" },
+        "vippsOrderId": { "type": "string" },
+        "transactionLogHistory": { "type": "array" }
+      },
+      "required": ["bookingId", "amount", "status", "vippsOrderId"]
+    }
   },
   "firestore": {
     "/experiences/{experienceId}": {
@@ -73,6 +87,10 @@
     "/bookings/{bookingId}": {
       "schema": { "$ref": "#/entities/Booking" },
       "description": "Collection of customer bookings."
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Collection of payment transactions."
     },
     "/settings/{settingId}": {
       "schema": { "$ref": "#/entities/Settings" },

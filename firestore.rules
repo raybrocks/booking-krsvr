@@ -12,7 +12,7 @@ service cloud.firestore {
     }
     
     function isAdmin() {
-      return isAuthenticated() && request.auth.token.email == "raymond@krsurban.no";
+      return isAuthenticated() && request.auth.token.email == "post@krsvr.no";
     }
 
     function hasRequiredFields(fields) {
@@ -31,7 +31,7 @@ service cloud.firestore {
       return hasRequiredFields(['name', 'shortDescription', 'type', 'maxPlayers', 'pricing']) &&
              data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
              data.shortDescription is string && data.shortDescription.size() < 1000 &&
-             data.type in ["Escape Room", "Zombie shooter", "Quest"] &&
+             data.type in ["Escape Room", "Zombie shooter", "Adventure"] &&
              data.maxPlayers is number && data.maxPlayers > 0 && data.maxPlayers <= 20 &&
              data.pricing is map;
     }
@@ -50,7 +50,16 @@ service cloud.firestore {
     }
 
     function isValidSettings(data) {
-      return hasRequiredFields(['openingHours']) && data.openingHours is map;
+      return hasRequiredFields(['openingHours']) && data.openingHours is map
+             && (!('specialHours' in data) || data.specialHours is map);
+    }
+
+    function isValidTransaction(data) {
+      return hasRequiredFields(['bookingId', 'amount', 'status', 'vippsOrderId']) &&
+             data.bookingId is string &&
+             data.amount is number &&
+             data.status is string &&
+             data.vippsOrderId is string;
     }
 
     // ===============================================================
@@ -61,6 +70,12 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isValidExperience(request.resource.data);
       allow update, delete: if isAdmin() && isValidExperience(request.resource.data);
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if isAdmin();
+      allow create: if isValidTransaction(request.resource.data);
+      allow update, delete: if isAdmin() && isValidTransaction(request.resource.data);
     }
 
     match /bookings/{bookingId} {

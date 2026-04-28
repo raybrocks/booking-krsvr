@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { format, addDays, isSameDay, getDay } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +11,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { collection, getDocs, doc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { seedDatabase } from "@/lib/seed";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
@@ -34,6 +33,7 @@ type Experience = {
 
 type Settings = {
   openingHours: Record<string, string[]>;
+  specialHours?: Record<string, string[]>;
   reservationFee: number;
 };
 
@@ -69,8 +69,6 @@ export default function BookingFlow() {
   useEffect(() => {
     async function loadData() {
       try {
-        await seedDatabase();
-        
         const expSnapshot = await getDocs(collection(db, "experiences"));
         const expData = expSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Experience));
         setExperiences(expData.filter(e => e.isActive));
@@ -89,7 +87,14 @@ export default function BookingFlow() {
     loadData();
   }, []);
 
-  const availableTimes = selectedDate && settings ? settings.openingHours[getDay(selectedDate).toString()] || [] : [];
+  const availableTimes = useMemo(() => {
+    if (!selectedDate || !settings) return [];
+    const dateString = format(selectedDate, "yyyy-MM-dd");
+    if (settings.specialHours && settings.specialHours[dateString]) {
+      return settings.specialHours[dateString];
+    }
+    return settings.openingHours[getDay(selectedDate).toString()] || [];
+  }, [selectedDate, settings]);
 
   const totalPrice = selectedExperience ? (selectedExperience.pricing[players.toString()] || selectedExperience.pricing["8"]) : 0;
   const amountToPay = paymentType === "full" ? totalPrice : (settings?.reservationFee || 500);
@@ -117,7 +122,8 @@ export default function BookingFlow() {
     
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, "bookings"), {
+      // 1. Create a pending booking in Firebase
+      const bookingRef = await addDoc(collection(db, "bookings"), {
         experienceId: selectedExperience.id,
         date: format(selectedDate, "yyyy-MM-dd"),
         time: selectedTime,
@@ -131,15 +137,36 @@ export default function BookingFlow() {
         paymentType,
         totalPrice,
         amountPaid: amountToPay,
-        status: "confirmed",
+        status: "pending", // Set as pending until payment completes
         createdAt: serverTimestamp()
       });
-      setBookingComplete(true);
+
+      // 2. Call our Vipps API route to initiate checkout
+      const response = await fetch('/api/vipps/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookingId: bookingRef.id,
+          amount: amountToPay,
+          description: `Booking: ${selectedExperience.name} for ${players} players`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.checkoutUrl) {
+        throw new Error(data.error || 'Failed to initialize payment');
+      }
+
+      // 3. Redirect user to Vipps Checkout
+      window.location.href = data.checkoutUrl;
+      
     } catch (error) {
       console.error("Booking failed", error);
-      toast.error("Booking failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      toast.error("Payment initialization failed. Please try again.");
+      setIsSubmitting(false); // Only reset if it fails, otherwise we are redirecting
     }
   };
 
@@ -216,9 +243,16 @@ export default function BookingFlow() {
                       setSelectedTime("");
                     }}
                     disabled={(date) => {
+                      const dateString = format(date, "yyyy-MM-dd");
+                      const isPast = date < new Date(new Date().setHours(0,0,0,0));
+                      if (isPast) return true;
+                      
+                      if (settings?.specialHours && settings.specialHours[dateString]) {
+                        return settings.specialHours[dateString].length === 0;
+                      }
+                      
                       const day = getDay(date);
-                      // Disable days not in opening hours or past days
-                      return !settings?.openingHours[day.toString()] || date < new Date(new Date().setHours(0,0,0,0));
+                      return !settings?.openingHours[day.toString()] || settings.openingHours[day.toString()].length === 0;
                     }}
                     className="rounded-2xl border border-zinc-800 p-4 bg-zinc-950 w-full mx-auto"
                   />
@@ -344,12 +378,13 @@ export default function BookingFlow() {
                         <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.diff")} {exp.difficulty}</span>
                       </div>
                       
-                      <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-between items-start">
-                        <span className="text-sm text-zinc-400 mt-1">{t("step3.total", { players })}</span>
+                      <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end items-start mt-auto">
                         <div className="text-right">
-                          <div className="text-lg font-medium">{exp.pricing[players.toString()] || exp.pricing["8"]} NOK</div>
-                          <div className="text-xs text-zinc-500">
-                            {Math.round((exp.pricing[players.toString()] || exp.pricing["8"]) / players)} NOK {t("step3.perperson")}
+                          <div className="text-lg font-medium text-white">
+                            {Math.round((exp.pricing[players.toString()] || exp.pricing["8"]) / players)} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
+                          </div>
+                          <div className="text-sm text-zinc-500 mt-0.5">
+                            {t("step3.total", { players })}: {exp.pricing[players.toString()] || exp.pricing["8"]} NOK
                           </div>
                         </div>
                       </div>
@@ -548,8 +583,14 @@ export default function BookingFlow() {
                 disabled={isSubmitting}
                 className="bg-[#9C39FF] text-white hover:bg-[#9C39FF]/90 rounded-full px-8 shadow-[0_0_20px_rgba(156,57,255,0.4)]"
               >
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                {t("nav.pay", { amount: amountToPay })}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    {t("nav.processing")}
+                  </>
+                ) : (
+                  t("nav.pay", { amount: amountToPay })
+                )}
               </Button>
             )}
           </div>

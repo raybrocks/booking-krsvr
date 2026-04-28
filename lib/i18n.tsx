@@ -14,8 +14,8 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 const translations: Record<Language, Record<string, string>> = {
   no: {
-    "hero.title1": "Trå inn i ",
-    "hero.title2": "Virkeligheten.",
+    "hero.title1": "VR team ",
+    "hero.title2": "booking",
     "hero.subtitle": "Bestill din premium virtual reality-opplevelse hos Krs VR Arena. Oppslukende verdener, toppmoderne utstyr, uforglemmelige eventyr.",
     "step1.title": "Velg dato og tid",
     "step1.subtitle": "Velg når du vil besøke Krs VR Arena.",
@@ -56,6 +56,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.back": "Tilbake",
     "nav.continue": "Fortsett",
     "nav.pay": "Betal {amount} NOK",
+    "nav.processing": "Behandler...",
     "success.title": "Bestilling bekreftet",
     "success.desc": "Takk, {name}. Din VR-opplevelse er bestilt til {date} kl. {time}. Vi har sendt en bekreftelse til {email}.",
     "success.bookanother": "Bestill en ny økt",
@@ -68,8 +69,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "Du må godta vilkårene."
   },
   en: {
-    "hero.title1": "Step into ",
-    "hero.title2": "Reality.",
+    "hero.title1": "VR team ",
+    "hero.title2": "booking",
     "hero.subtitle": "Book your premium virtual reality experience at Krs VR Arena. Immersive worlds, state-of-the-art equipment, unforgettable adventures.",
     "step1.title": "Select Date & Time",
     "step1.subtitle": "Choose when you'd like to visit Krs VR Arena.",
@@ -110,6 +111,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.back": "Back",
     "nav.continue": "Continue",
     "nav.pay": "Pay {amount} NOK",
+    "nav.processing": "Processing...",
     "success.title": "Booking Confirmed",
     "success.desc": "Thank you, {name}. Your VR experience is booked for {date} at {time}. We've sent a confirmation email to {email}.",
     "success.bookanother": "Book Another Session",
@@ -122,8 +124,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "You must accept the terms of service."
   },
   de: {
-    "hero.title1": "Tritt ein in die ",
-    "hero.title2": "Realität.",
+    "hero.title1": "VR Team ",
+    "hero.title2": "Buchung",
     "hero.subtitle": "Buchen Sie Ihr Premium-Virtual-Reality-Erlebnis in der Krs VR Arena. Immersive Welten, modernste Ausrüstung, unvergessliche Abenteuer.",
     "step1.title": "Datum & Uhrzeit wählen",
     "step1.subtitle": "Wählen Sie, wann Sie die Krs VR Arena besuchen möchten.",
@@ -164,6 +166,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.back": "Zurück",
     "nav.continue": "Weiter",
     "nav.pay": "Zahlen {amount} NOK",
+    "nav.processing": "Wird bearbeitet...",
     "success.title": "Buchung bestätigt",
     "success.desc": "Danke, {name}. Ihr VR-Erlebnis ist für den {date} um {time} gebucht. Wir haben eine Bestätigungs-E-Mail an {email} gesendet.",
     "success.bookanother": "Weitere Sitzung buchen",
@@ -176,8 +179,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "Sie müssen die Nutzungsbedingungen akzeptieren."
   },
   uk: {
-    "hero.title1": "Крок у ",
-    "hero.title2": "Реальність.",
+    "hero.title1": "Командне VR ",
+    "hero.title2": "бронювання",
     "hero.subtitle": "Забронюйте свій преміальний досвід віртуальної реальності в Krs VR Arena. Захоплюючі світи, найсучасніше обладнання, незабутні пригоди.",
     "step1.title": "Виберіть дату та час",
     "step1.subtitle": "Виберіть, коли ви хочете відвідати Krs VR Arena.",
@@ -218,6 +221,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.back": "Назад",
     "nav.continue": "Продовжити",
     "nav.pay": "Оплатити {amount} NOK",
+    "nav.processing": "Обробка...",
     "success.title": "Бронювання підтверджено",
     "success.desc": "Дякуємо, {name}. Ваш VR-досвід заброньовано на {date} о {time}. Ми надіслали електронний лист із підтвердженням на {email}.",
     "success.bookanother": "Забронювати ще один сеанс",
@@ -230,8 +234,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "Ви повинні прийняти умови обслуговування."
   },
   pl: {
-    "hero.title1": "Wejdź w ",
-    "hero.title2": "Rzeczywistość.",
+    "hero.title1": "Rezerwacja VR ",
+    "hero.title2": "dla zespołów",
     "hero.subtitle": "Zarezerwuj swoje doświadczenie wirtualnej rzeczywistości premium w Krs VR Arena. Wciągające światy, najnowocześniejszy sprzęt, niezapomniane przygody.",
     "step1.title": "Wybierz datę i godzinę",
     "step1.subtitle": "Wybierz, kiedy chcesz odwiedzić Krs VR Arena.",
@@ -272,6 +276,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.back": "Wstecz",
     "nav.continue": "Kontynuuj",
     "nav.pay": "Zapłać {amount} NOK",
+    "nav.processing": "Przetwarzanie...",
     "success.title": "Rezerwacja potwierdzona",
     "success.desc": "Dziękujemy, {name}. Twoje doświadczenie VR jest zarezerwowane na {date} o {time}. Wysłaliśmy e-mail z potwierdzeniem na adres {email}.",
     "success.bookanother": "Zarezerwuj kolejną sesję",
@@ -284,8 +289,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "Musisz zaakceptować warunki korzystania z usługi."
   },
   es: {
-    "hero.title1": "Entra en la ",
-    "hero.title2": "Realidad.",
+    "hero.title1": "Reserva VR ",
+    "hero.title2": "para equipos",
     "hero.subtitle": "Reserva tu experiencia de realidad virtual premium en Krs VR Arena. Mundos inmersivos, equipos de última generación, aventuras inolvidables.",
     "step1.title": "Seleccionar fecha y hora",
     "step1.subtitle": "Elige cuándo te gustaría visitar Krs VR Arena.",
@@ -326,6 +331,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.back": "Atrás",
     "nav.continue": "Continuar",
     "nav.pay": "Pagar {amount} NOK",
+    "nav.processing": "Procesando...",
     "success.title": "Reserva confirmada",
     "success.desc": "Gracias, {name}. Tu experiencia de realidad virtual está reservada para el {date} a las {time}. Hemos enviado un correo electrónico de confirmación a {email}.",
     "success.bookanother": "Reservar otra sesión",
