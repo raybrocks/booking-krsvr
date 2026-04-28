@@ -19,6 +19,11 @@ export const metadata: Metadata = {
   title: 'Krs VR Arena Booking',
   description: 'High-end VR experiences',
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
