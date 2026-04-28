@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 import { I18nProvider } from "@/lib/i18n";
 import Header from "@/components/Header";
-import DevFooter from "@/components/DevFooter";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -36,7 +35,6 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           <div className="flex-1">
             {children}
           </div>
-          <DevFooter />
           <Toaster 
             theme="dark" 
             position="top-center" 
