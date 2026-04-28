@@ -14,9 +14,8 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 const translations: Record<Language, Record<string, string>> = {
   no: {
-    "hero.title1": "VR team ",
-    "hero.title2": "booking",
-    "hero.subtitle": "Bestill din premium virtual reality-opplevelse hos Krs VR Arena. Oppslukende verdener, toppmoderne utstyr, uforglemmelige eventyr.",
+    "hero.title1": "Booking",
+    "footer.cancel": "Avbryt booking",
     "step1.title": "Velg dato og tid",
     "step1.subtitle": "Velg når du vil besøke Krs VR Arena.",
     "step1.available": "Tilgjengelige tider",
@@ -69,9 +68,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "Du må godta vilkårene."
   },
   en: {
-    "hero.title1": "VR team ",
-    "hero.title2": "booking",
-    "hero.subtitle": "Book your premium virtual reality experience at Krs VR Arena. Immersive worlds, state-of-the-art equipment, unforgettable adventures.",
+    "hero.title1": "Booking",
+    "footer.cancel": "Cancel booking",
     "step1.title": "Select Date & Time",
     "step1.subtitle": "Choose when you'd like to visit Krs VR Arena.",
     "step1.available": "Available Times",
@@ -124,9 +122,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "You must accept the terms of service."
   },
   de: {
-    "hero.title1": "VR Team ",
-    "hero.title2": "Buchung",
-    "hero.subtitle": "Buchen Sie Ihr Premium-Virtual-Reality-Erlebnis in der Krs VR Arena. Immersive Welten, modernste Ausrüstung, unvergessliche Abenteuer.",
+    "hero.title1": "Buchung",
+    "footer.cancel": "Buchung stornieren",
     "step1.title": "Datum & Uhrzeit wählen",
     "step1.subtitle": "Wählen Sie, wann Sie die Krs VR Arena besuchen möchten.",
     "step1.available": "Verfügbare Zeiten",
@@ -179,9 +176,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "Sie müssen die Nutzungsbedingungen akzeptieren."
   },
   uk: {
-    "hero.title1": "Командне VR ",
-    "hero.title2": "бронювання",
-    "hero.subtitle": "Забронюйте свій преміальний досвід віртуальної реальності в Krs VR Arena. Захоплюючі світи, найсучасніше обладнання, незабутні пригоди.",
+    "hero.title1": "Бронювання",
+    "footer.cancel": "Скасувати бронювання",
     "step1.title": "Виберіть дату та час",
     "step1.subtitle": "Виберіть, коли ви хочете відвідати Krs VR Arena.",
     "step1.available": "Доступний час",
@@ -234,9 +230,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "Ви повинні прийняти умови обслуговування."
   },
   pl: {
-    "hero.title1": "Rezerwacja VR ",
-    "hero.title2": "dla zespołów",
-    "hero.subtitle": "Zarezerwuj swoje doświadczenie wirtualnej rzeczywistości premium w Krs VR Arena. Wciągające światy, najnowocześniejszy sprzęt, niezapomniane przygody.",
+    "hero.title1": "Rezerwacja",
+    "footer.cancel": "Anuluj rezerwację",
     "step1.title": "Wybierz datę i godzinę",
     "step1.subtitle": "Wybierz, kiedy chcesz odwiedzić Krs VR Arena.",
     "step1.available": "Dostępne godziny",
@@ -289,9 +284,8 @@ const translations: Record<Language, Record<string, string>> = {
     "error.terms": "Musisz zaakceptować warunki korzystania z usługi."
   },
   es: {
-    "hero.title1": "Reserva VR ",
-    "hero.title2": "para equipos",
-    "hero.subtitle": "Reserva tu experiencia de realidad virtual premium en Krs VR Arena. Mundos inmersivos, equipos de última generación, aventuras inolvidables.",
+    "hero.title1": "Reserva",
+    "footer.cancel": "Cancelar reserva",
     "step1.title": "Seleccionar fecha y hora",
     "step1.subtitle": "Elige cuándo te gustaría visitar Krs VR Arena.",
     "step1.available": "Horarios disponibles",
