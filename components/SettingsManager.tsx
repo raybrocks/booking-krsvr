@@ -6,6 +6,7 @@ import { db } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
+import Editor from "./Editor";
 
 export default function SettingsManager() {
   const [settings, setSettings] = useState<any>(null);
@@ -205,13 +206,24 @@ export default function SettingsManager() {
       </div>
 
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Reservation Fee (NOK)</label>
-          <input 
-            type="number" 
-            value={settings.reservationFee}
-            onChange={(e) => setSettings({...settings, reservationFee: Number(e.target.value)})}
-            className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">Reservation Fee (NOK)</label>
+            <input 
+              type="number" 
+              value={settings.reservationFee}
+              onChange={(e) => setSettings({...settings, reservationFee: Number(e.target.value)})}
+              className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white w-full focus:outline-none focus:border-[#9C39FF]"
+            />
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Terms of Service Content (Shown in booking step 5)</label>
+          <Editor 
+            value={settings.termsContent || ""} 
+            onChange={(val) => setSettings({...settings, termsContent: val})} 
+            placeholder="Write your terms of service here..."
           />
         </div>
 

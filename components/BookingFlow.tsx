@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { collection, getDocs, doc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Image from "next/image";
@@ -35,6 +36,7 @@ type Settings = {
   openingHours: Record<string, string[]>;
   specialHours?: Record<string, string[]>;
   reservationFee: number;
+  termsContent?: string;
 };
 
 export default function BookingFlow() {
@@ -475,13 +477,27 @@ export default function BookingFlow() {
                     onCheckedChange={(c) => setAcceptedTerms(c as boolean)} 
                     className="mt-1 border-zinc-600 data-[state=checked]:bg-[#9C39FF] data-[state=checked]:border-[#9C39FF] data-[state=checked]:text-white"
                   />
-                  <div className="space-y-1 leading-none">
+                  <div className="space-y-2 leading-none">
                     <Label htmlFor="terms" className="text-sm font-medium leading-relaxed">
                       {t("step5.terms")}
                     </Label>
                     <p className="text-xs text-zinc-400">
                       {t("step5.termsdesc")}
                     </p>
+                    <Dialog>
+                      <DialogTrigger className="text-[#9C39FF] text-xs hover:underline outline-none text-left mt-1">
+                        Les fullstendige vilkår
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Vilkår og betingelser</DialogTitle>
+                        </DialogHeader>
+                        <div 
+                          className="mt-4 text-sm text-zinc-300 space-y-4 [&>h1]:text-2xl [&>h1]:font-semibold [&>h1]:text-white [&>h2]:text-xl [&>h2]:font-semibold [&>h2]:text-white [&>h3]:text-lg [&>h3]:font-medium [&>h3]:text-white [&>p]:leading-relaxed [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5 [&>a]:text-[#9C39FF] [&>a]:underline"
+                          dangerouslySetInnerHTML={{ __html: settings?.termsContent || "<p>Ingen vilkår tilgjengelig.</p>" }}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
                 
