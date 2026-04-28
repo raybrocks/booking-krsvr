@@ -492,10 +492,9 @@ export default function BookingFlow() {
                         <DialogHeader>
                           <DialogTitle>Vilkår og betingelser</DialogTitle>
                         </DialogHeader>
-                        <div 
-                          className="mt-4 text-sm text-zinc-300 space-y-4 [&>h1]:text-2xl [&>h1]:font-semibold [&>h1]:text-white [&>h2]:text-xl [&>h2]:font-semibold [&>h2]:text-white [&>h3]:text-lg [&>h3]:font-medium [&>h3]:text-white [&>p]:leading-relaxed [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5 [&>a]:text-[#9C39FF] [&>a]:underline"
-                          dangerouslySetInnerHTML={{ __html: settings?.termsContent || "<p>Ingen vilkår tilgjengelig.</p>" }}
-                        />
+                        <div className="mt-4 text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                          {settings?.termsContent || "Ingen vilkår tilgjengelig."}
+                        </div>
                       </DialogContent>
                     </Dialog>
                   </div>

@@ -6,7 +6,6 @@ import { db } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
-import Editor from "./Editor";
 
 export default function SettingsManager() {
   const [settings, setSettings] = useState<any>(null);
@@ -220,10 +219,11 @@ export default function SettingsManager() {
 
         <div className="mb-8">
           <label className="block text-sm font-medium text-zinc-300 mb-2">Terms of Service Content (Shown in booking step 5)</label>
-          <Editor 
+          <textarea 
             value={settings.termsContent || ""} 
-            onChange={(val) => setSettings({...settings, termsContent: val})} 
+            onChange={(e) => setSettings({...settings, termsContent: e.target.value})} 
             placeholder="Write your terms of service here..."
+            className="w-full h-64 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
           />
         </div>
 
