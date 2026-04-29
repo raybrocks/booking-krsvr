@@ -489,11 +489,14 @@ export default function BookingFlow() {
                         Les fullstendige vilkår
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
+                        <DialogHeader tabIndex={-1} autoFocus className="outline-none">
                           <DialogTitle>Vilkår og betingelser</DialogTitle>
                         </DialogHeader>
                         <div className="mt-4 text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
                           {settings?.termsContent || "Ingen vilkår tilgjengelig."}
+                        </div>
+                        <div className="mt-6 flex justify-end">
+                          <DialogClose className="bg-[#9C39FF] hover:bg-[#8b33e6] text-white py-2 px-6 rounded-lg text-sm font-medium transition-colors">Lukk</DialogClose>
                         </div>
                       </DialogContent>
                     </Dialog>
