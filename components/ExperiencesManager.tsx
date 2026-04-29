@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { collection, onSnapshot, doc, deleteDoc, setDoc, addDoc } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -85,28 +85,14 @@ export default function ExperiencesManager() {
     setUploadingImage(true);
     try {
       const storageRef = ref(storage, `experiences/${editForm.id}_${Date.now()}_${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          // Progress can be tracked here if needed
-        },
-        (error) => {
-          console.error("Upload error:", error);
-          toast.error("Failed to upload image");
-          setUploadingImage(false);
-        },
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setEditForm({ ...editForm, picture: downloadURL });
-          setUploadingImage(false);
-          toast.success("Image uploaded successfully");
-        }
-      );
-    } catch (error) {
-      console.error("Error starting upload:", error);
-      toast.error("Failed to start upload");
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      setEditForm({ ...editForm, picture: downloadURL });
+      toast.success("Image uploaded successfully");
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(`Upload failed: ${error.message || 'Unknown error'}`);
+    } finally {
       setUploadingImage(false);
     }
   };
