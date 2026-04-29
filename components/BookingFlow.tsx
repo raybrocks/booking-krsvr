@@ -72,7 +72,28 @@ export default function BookingFlow() {
     async function loadData() {
       try {
         const expSnapshot = await getDocs(collection(db, "experiences"));
-        const expData = expSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Experience));
+        let expData = expSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Experience));
+        
+        const hasArizona = expData.some(e => e.name === "Arizona Sunrise");
+        if (!hasArizona) {
+          const parvous = expData.find(e => e.name.toLowerCase().includes("parvus") || e.name.toLowerCase().includes("parvous"));
+          const defaultPricing = { "2": 800, "3": 1100, "4": 1400, "5": 1700, "6": 2000, "7": 2300, "8": 2600 };
+          const arizonaData = {
+            name: "Arizona Sunrise",
+            shortDescription: "Arizona Sunrise er en intens og skremmende zombie shooter. Overlev bølger av zombier i en post-apokalyptisk verden. Krever raske reflekser og godt samarbeid.",
+            type: "Jump Scare",
+            age: "18+",
+            difficulty: "Hard",
+            maxPlayers: parvous ? parvous.maxPlayers : 8,
+            pricing: parvous ? parvous.pricing : defaultPricing,
+            isActive: true,
+            picture: "",
+            subtitles: []
+          };
+          const newDoc = await addDoc(collection(db, "experiences"), arizonaData);
+          expData.push({ id: newDoc.id, ...arizonaData });
+        }
+
         setExperiences(expData.filter(e => e.isActive));
 
         const settingsDoc = await getDoc(doc(db, "settings", "general"));
