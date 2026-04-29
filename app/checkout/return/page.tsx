@@ -23,13 +23,15 @@ function CheckoutReturnContent() {
       }
 
       try {
-        const bookingRef = doc(db, "bookings", reference);
-        const bookingSnap = await getDoc(bookingRef);
+        const response = await fetch('/api/booking/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ reference })
+        });
 
-        if (bookingSnap.exists()) {
-          await updateDoc(bookingRef, {
-            status: "confirmed"
-          });
+        if (response.ok) {
           setStatus("success");
         } else {
           setStatus("error");

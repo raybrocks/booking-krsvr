@@ -495,7 +495,19 @@ export default function BookingFlow() {
                         <div className="mt-4 text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
                           {settings?.termsContent || "Ingen vilkår tilgjengelig."}
                         </div>
-                        <div className="mt-6 flex justify-end">
+                        <div className="mt-6 flex justify-between items-center pt-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              const dialog = e.currentTarget.closest('[role="dialog"]');
+                              if (dialog) {
+                                dialog.scrollTo({ top: 0, behavior: "smooth" });
+                              }
+                            }}
+                            className="text-zinc-500 hover:text-white text-sm font-medium transition-colors outline-none"
+                          >
+                            ↑ Til toppen
+                          </button>
                           <DialogClose className="bg-[#9C39FF] hover:bg-[#8b33e6] text-white py-2 px-6 rounded-lg text-sm font-medium transition-colors">Lukk</DialogClose>
                         </div>
                       </DialogContent>

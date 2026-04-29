@@ -229,7 +229,10 @@ export default function AdminDashboard() {
                       <td className="px-6 py-4">
                         <div className="font-medium text-zinc-200">{booking.firstName} {booking.lastName}</div>
                         <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
-                          <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {booking.email}</span>
+                          <span className="flex items-center gap-1">
+                            <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
+                            {booking.email}
+                          </span>
                           <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
                         </div>
                       </td>

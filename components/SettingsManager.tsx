@@ -217,6 +217,17 @@ export default function SettingsManager() {
           </div>
         </div>
 
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Booking Confirmation Email Text</label>
+          <p className="text-zinc-500 text-xs mb-2">This text will be included in the booking confirmation and receipt email sent to the customer.</p>
+          <textarea 
+            value={settings.bookingConfirmationText || ""} 
+            onChange={(e) => setSettings({...settings, bookingConfirmationText: e.target.value})} 
+            placeholder="Write the custom text for the booking confirmation email..."
+            className="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
+          />
+        </div>
+
         <div className="mb-8">
           <label className="block text-sm font-medium text-zinc-300 mb-2">Terms of Service Content (Shown in booking step 5)</label>
           <textarea 
