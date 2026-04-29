@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, onSnapshot, doc, deleteDoc, setDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, deleteDoc, setDoc, addDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload } from "lucide-react";
@@ -16,13 +16,38 @@ export default function ExperiencesManager() {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "experiences"), (snapshot) => {
+    const unsubscribe = onSnapshot(collection(db, "experiences"), async (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })) as any[];
       setExperiences(data);
       setLoading(false);
+
+      // Auto-seed Arizona Sunrise if missing
+      const hasArizona = data.some(e => e.name === "Arizona Sunrise");
+      if (!hasArizona) {
+        const parvous = data.find(e => e.name.toLowerCase().includes("parvus") || e.name.toLowerCase().includes("parvous"));
+        if (parvous) {
+          try {
+            await addDoc(collection(db, "experiences"), {
+              name: "Arizona Sunrise",
+              shortDescription: "Arizona Sunrise er en intens og skremmende zombie shooter. Overlev bølger av zombier i en post-apokalyptisk verden. Krever raske reflekser og godt samarbeid.",
+              type: "Jump Scare",
+              age: "18+",
+              difficulty: "Hard",
+              maxPlayers: parvous.maxPlayers || 8,
+              pricing: parvous.pricing,
+              isActive: true,
+              picture: "",
+              subtitles: []
+            });
+            console.log("Arizona Sunrise auto-seeded");
+          } catch (e) {
+            console.error("Failed to seed Arizona Sunrise", e);
+          }
+        }
+      }
     }, (error) => {
       console.error("Error fetching experiences:", error);
       setLoading(false);

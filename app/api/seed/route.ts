@@ -10,7 +10,7 @@ export async function GET() {
     const db = getFirestore(app);
 
     const snapshot = await getDocs(collection(db, 'experiences'));
-    let parvous = null;
+    let parvous: any = null;
     let foundArizona = false;
     
     snapshot.forEach(doc => {
