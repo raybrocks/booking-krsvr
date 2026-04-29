@@ -163,7 +163,11 @@ export default function BookingFlow() {
       }
 
       // 3. Redirect user to Vipps Checkout
-      window.location.href = data.checkoutUrl;
+if (window.top) {
+        window.top.location.href = data.checkoutUrl;
+      } else {
+        window.location.href = data.checkoutUrl;
+      }      
       
     } catch (error) {
       console.error("Booking failed", error);

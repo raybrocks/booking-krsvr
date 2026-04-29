@@ -64,11 +64,11 @@ export async function POST(req: Request) {
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    // 2. Create Checkout Session
+// 2. Create ePayment Session
     // Vipps expects amount in øre (1 NOK = 100 øre)
     const amountInOre = Math.round(amount * 100);
 
-    const checkoutResponse = await fetch(`${baseUrl}/checkout/v3/session`, {
+    const epaymentResponse = await fetch(`${baseUrl}/epayment/v1/payments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -77,54 +77,38 @@ export async function POST(req: Request) {
         'Ocp-Apim-Subscription-Key': subscriptionKey,
         'Merchant-Serial-Number': merchantSerialNumber,
         'Authorization': `Bearer ${accessToken}`,
+        'Idempotency-Key': bookingId,
         'Vipps-System-Name': 'KrsVRArena',
         'Vipps-System-Version': '1.0.0',
         'Vipps-System-Plugin-Name': 'KrsVRArena-Checkout',
         'Vipps-System-Plugin-Version': '1.0.0'
       },
       body: JSON.stringify({
-        merchantInfo: {
-          callbackUrl: `${appBaseUrl}/api/vipps/callback`,
-          returnUrl: `${appBaseUrl}/checkout/return?reference=${bookingId}`,
-          callbackAuthorizationToken: process.env.VIPPS_CALLBACK_TOKEN || 'DefaultSecureToken123',
+        amount: {
+          currency: 'NOK',
+          value: amountInOre,
         },
-        transaction: {
-          amount: {
-            currency: 'NOK',
-            value: amountInOre,
-          },
-          reference: bookingId,
-          paymentDescription: 'VR Experience Booking - ' + bookingId,
+        paymentMethod: {
+          type: 'WALLET'
         },
+        reference: bookingId,
+        userFlow: 'WEB_REDIRECT',
+        returnUrl: `${appBaseUrl}/checkout/return?reference=${bookingId}`,
+        paymentDescription: 'VR Booking - ' + bookingId,
       }),
     });
 
-    if (!checkoutResponse.ok) {
-      const errorText = await checkoutResponse.text();
-      console.error('Vipps Checkout Error:', errorText);
-      
-      let parsedError = 'Failed to create payment session';
-      try {
-        const jsonError = JSON.parse(errorText);
-        if (jsonError.errors) {
-            parsedError = JSON.stringify(jsonError.errors);
-        } else if (jsonError.title) {
-            parsedError = jsonError.title;
-        } else if (jsonError.message) {
-            parsedError = jsonError.message;
-        }
-      } catch (e) {}
-
-      return NextResponse.json({ error: parsedError, details: errorText }, { status: 500 });
+    if (!epaymentResponse.ok) {
+      const errorText = await epaymentResponse.text();
+      return NextResponse.json({ error: 'Failed to create payment session', details: errorText }, { status: 500 });
     }
 
-    const checkoutData = await checkoutResponse.json();
+    const paymentData = await epaymentResponse.json();
 
     return NextResponse.json({ 
-      checkoutUrl: checkoutData.checkoutFrontendUrl,
-      token: checkoutData.token 
+      checkoutUrl: paymentData.redirectUrl,
+      token: paymentData.reference 
     });
-
   } catch (error) {
     console.error('Vipps API Route Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

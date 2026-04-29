@@ -40,15 +40,29 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           <div className="flex-1">
             {children}
           </div>
+          <footer className="w-full py-6 text-center text-xs text-zinc-500 border-t border-zinc-800/50 mt-auto">
+            <div className="container mx-auto px-4 leading-relaxed flex flex-wrap justify-center items-center gap-2">
+              <span>Krs VR Arena AS</span>
+              <span className="hidden sm:inline">|</span>
+              <span>Org.nr 936318878</span>
+              <span className="hidden sm:inline">|</span>
+              <span>Industrigata 12, 4632 Kristiansand</span>
+              <span className="hidden sm:inline">|</span>
+              <span>post@krsvr.no</span>
+              <span className="hidden sm:inline">|</span>
+              <span>+47 40828302</span>
+            </div>
+          </footer>
           <Toaster 
             theme="dark" 
             position="top-center" 
             toastOptions={{
               classNames: {
-                error: 'bg-red-600 text-white border-red-700',
-                success: 'bg-emerald-600 text-white border-emerald-700',
-                warning: 'bg-amber-500 text-white border-amber-600',
-                info: 'bg-blue-600 text-white border-blue-700',
+                toast: 'bg-[#9C39FF] text-white border-[#8b32e6] shadow-[0_0_20px_rgba(156,57,255,0.3)]',
+                error: 'bg-[#9C39FF] text-white border-[#8b32e6]',
+                success: 'bg-[#9C39FF] text-white border-[#8b32e6]',
+                warning: 'bg-[#9C39FF] text-white border-[#8b32e6]',
+                info: 'bg-[#9C39FF] text-white border-[#8b32e6]',
               }
             }}
           />
