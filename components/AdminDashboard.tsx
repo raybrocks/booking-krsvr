@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, onSnapshot, query, orderBy, doc, updateDoc } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import SettingsManager from "./SettingsManager";
 import ExperiencesManager from "./ExperiencesManager";
@@ -12,10 +12,11 @@ import TransactionsManager from "./TransactionsManager";
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"bookings" | "experiences" | "transactions" | "settings">("bookings");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "settings">("upcoming");
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
   // Sorting and Filtering State
-  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'dateTime', direction: 'asc' });
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -35,7 +36,12 @@ export default function AdminDashboard() {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    const interval = setInterval(() => setCurrentTime(Date.now()), 5000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   const updateBookingStatus = async (id: string, newStatus: string) => {
@@ -45,6 +51,18 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error("Failed to update status");
+    }
+  };
+
+  const deleteBooking = async (id: string) => {
+    if (window.confirm("Are you sure you want to permanently delete this booking? This action cannot be undone.")) {
+      try {
+        await deleteDoc(doc(db, "bookings", id));
+        toast.success("Booking permanently deleted");
+      } catch (error) {
+        console.error("Error deleting booking:", error);
+        toast.error("Failed to delete booking");
+      }
     }
   };
 
@@ -59,8 +77,20 @@ export default function AdminDashboard() {
   const filteredAndSortedBookings = React.useMemo(() => {
     let result = [...bookings];
 
+    if (activeTab === "upcoming") {
+      const now = new Date(currentTime);
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const todayStr = `${year}-${month}-${day}`;
+
+      result = result.filter(booking => {
+        return booking.status === "confirmed" && booking.date >= todayStr;
+      });
+    }
+
     // Filter by status
-    if (statusFilter !== "all") {
+    if (activeTab === "archive" && statusFilter !== "all") {
       result = result.filter(booking => booking.status === statusFilter);
     }
 
@@ -103,7 +133,7 @@ export default function AdminDashboard() {
     });
 
     return result;
-  }, [bookings, sortConfig, statusFilter, dateFilter, searchQuery]);
+  }, [bookings, sortConfig, statusFilter, dateFilter, searchQuery, activeTab, currentTime]);
 
   if (loading) {
     return (
@@ -123,10 +153,16 @@ export default function AdminDashboard() {
         
         <div className="flex bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 w-fit shrink-0 overflow-x-auto max-w-full">
           <button 
-            onClick={() => setActiveTab("bookings")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'bookings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+            onClick={() => setActiveTab("upcoming")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
-            <ListOrdered className="w-4 h-4" /> Bookings
+            <Clock4 className="w-4 h-4" /> Upcoming
+          </button>
+          <button 
+            onClick={() => setActiveTab("archive")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+          >
+            <ListOrdered className="w-4 h-4" /> Archive
           </button>
           <button 
             onClick={() => setActiveTab("experiences")}
@@ -149,7 +185,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {activeTab === "bookings" && (
+      {(activeTab === "upcoming" || activeTab === "archive") && (
         <div className="space-y-4">
           {/* Filters */}
           <div className="flex flex-col md:flex-row gap-4 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
@@ -169,17 +205,19 @@ export default function AdminDashboard() {
                 onChange={(e) => setDateFilter(e.target.value)}
                 className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
               />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF] appearance-none min-w-[120px]"
-              >
-                <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-              {(searchQuery || dateFilter || statusFilter !== 'all') && (
+              {activeTab === "archive" && (
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF] appearance-none min-w-[120px]"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              )}
+              {(searchQuery || dateFilter || (activeTab === "archive" && statusFilter !== 'all')) && (
                 <button
                   onClick={() => {
                     setSearchQuery("");
@@ -199,14 +237,14 @@ export default function AdminDashboard() {
               <table className="w-full text-left text-sm">
                 <thead className="bg-zinc-900 border-b border-zinc-800 text-zinc-400">
                   <tr>
-                    <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('customer')}>
-                      Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </th>
                     <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('dateTime')}>
                       Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('experienceId')}>
                       Experience {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('customer')}>
+                      Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('totalPrice')}>
                       Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
@@ -227,16 +265,6 @@ export default function AdminDashboard() {
                     filteredAndSortedBookings.map((booking) => (
                     <tr key={booking.id} className="hover:bg-zinc-800/20 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="font-medium text-zinc-200">{booking.firstName} {booking.lastName}</div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
-                          <span className="flex items-center gap-1">
-                            <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
-                            {booking.email}
-                          </span>
-                          <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
                         <div className="flex items-center gap-2 text-zinc-300">
                           <CalendarIcon className="w-4 h-4 text-zinc-500" />
                           {booking.date}
@@ -250,6 +278,16 @@ export default function AdminDashboard() {
                         <div className="text-zinc-300">{booking.experienceId}</div>
                         <div className="flex items-center gap-1 mt-1 text-xs text-zinc-500">
                           <Users className="w-3 h-3" /> {booking.players} Players
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-zinc-200">{booking.firstName} {booking.lastName}</div>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
+                          <span className="flex items-center gap-1">
+                            <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
+                            {booking.email}
+                          </span>
+                          <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -286,6 +324,13 @@ export default function AdminDashboard() {
                               <XCircle className="w-4 h-4" />
                             </button>
                           )}
+                          <button
+                            onClick={() => deleteBooking(booking.id)}
+                            className="text-xs text-zinc-500 hover:text-red-400 hover:bg-red-400/10 px-2 py-1.5 rounded-lg transition-colors ml-1"
+                            title="Permanently Delete Booking"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
