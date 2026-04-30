@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, onSnapshot, doc, deleteDoc, setDoc, addDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, deleteDoc, setDoc, addDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
-import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload } from "lucide-react";
+import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -21,6 +21,13 @@ export default function ExperiencesManager() {
         id: doc.id,
         ...doc.data()
       })) as any[];
+      
+      data.sort((a, b) => {
+        const orderA = typeof a.order === 'number' ? a.order : 999;
+        const orderB = typeof b.order === 'number' ? b.order : 999;
+        return orderA - orderB;
+      });
+
       setExperiences(data);
       setLoading(false);
 
@@ -117,6 +124,29 @@ export default function ExperiencesManager() {
         console.error("Error deleting experience:", error);
         toast.error("Failed to delete experience");
       }
+    }
+  };
+
+  const moveExperience = async (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === experiences.length - 1) return;
+
+    const newExperiences = [...experiences];
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    
+    const temp = newExperiences[index];
+    newExperiences[index] = newExperiences[swapIndex];
+    newExperiences[swapIndex] = temp;
+
+    try {
+      const batch = writeBatch(db);
+      newExperiences.forEach((exp, i) => {
+        batch.update(doc(db, "experiences", exp.id), { order: i });
+      });
+      await batch.commit();
+    } catch (error) {
+      console.error("Error updating order:", error);
+      toast.error("Failed to update order. Make sure 'order' exists in rules if required.");
     }
   };
 
@@ -296,7 +326,7 @@ export default function ExperiencesManager() {
       )}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {experiences.map((exp) => (
+        {experiences.map((exp, index) => (
           <div key={exp.id} className={`bg-zinc-900/50 border ${exp.isActive ? 'border-zinc-800' : 'border-red-900/50 opacity-70'} rounded-2xl overflow-hidden flex flex-col`}>
             {exp.picture ? (
               <div className="relative w-full h-40 bg-zinc-950 border-b border-zinc-800">
@@ -325,6 +355,22 @@ export default function ExperiencesManager() {
               </div>
               
               <div className="flex gap-2 pt-4 border-t border-zinc-800/50">
+                <div className="flex flex-col gap-1 pr-2 border-r border-zinc-800">
+                  <button 
+                    onClick={() => moveExperience(index, 'up')}
+                    disabled={index === 0}
+                    className="p-1 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded disabled:opacity-30 disabled:hover:bg-transparent"
+                  >
+                    <ArrowUp className="w-3 h-3" />
+                  </button>
+                  <button 
+                    onClick={() => moveExperience(index, 'down')}
+                    disabled={index === experiences.length - 1}
+                    className="p-1 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded disabled:opacity-30 disabled:hover:bg-transparent"
+                  >
+                    <ArrowDown className="w-3 h-3" />
+                  </button>
+                </div>
                 <button 
                   onClick={() => handleEdit(exp)}
                   className="flex-1 flex justify-center items-center gap-2 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-sm transition-colors"

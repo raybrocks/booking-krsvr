@@ -30,6 +30,7 @@ type Experience = {
   subtitles: string[];
   pricing: Record<string, number>;
   isActive: boolean;
+  order?: number;
 };
 
 type Settings = {
@@ -74,6 +75,13 @@ export default function BookingFlow() {
         const expSnapshot = await getDocs(collection(db, "experiences"));
         let expData = expSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Experience));
         
+        // Sort by order
+        expData.sort((a, b) => {
+          const orderA = typeof a.order === 'number' ? a.order : 999;
+          const orderB = typeof b.order === 'number' ? b.order : 999;
+          return orderA - orderB;
+        });
+
         setExperiences(expData.filter(e => e.isActive));
 
         const settingsDoc = await getDoc(doc(db, "settings", "general"));
@@ -356,47 +364,67 @@ if (window.top) {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 gap-6">
-                {experiences
-                  .filter(e => e.maxPlayers >= players)
-                  .filter(e => filterType === "All" || e.type === filterType)
-                  .map((exp) => (
-                  <Card 
-                    key={exp.id} 
-                    className={`bg-transparent border cursor-pointer transition-all overflow-hidden ${
-                      selectedExperience?.id === exp.id 
-                        ? "border-[#9C39FF] ring-1 ring-[#9C39FF] shadow-[0_0_20px_rgba(156,57,255,0.15)]" 
-                        : "border-zinc-800 hover:border-zinc-600"
-                    }`}
-                    onClick={() => setSelectedExperience(exp)}
-                  >
-                    <div className="relative h-48 w-full">
-                      <Image src={exp.picture} alt={exp.name} fill className="object-cover" />
-                      <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium border border-zinc-700">
-                        {exp.type}
-                      </div>
+              <div className="space-y-10">
+                {Array.from(new Set(
+                  experiences
+                    .filter(e => e.maxPlayers >= players)
+                    .filter(e => filterType === "All" || e.type === filterType)
+                    .map(e => e.type)
+                )).map(category => (
+                  <div key={category} className="space-y-5">
+                    {/* Category Banner */}
+                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 border border-zinc-700/50 flex items-center justify-center py-5 shadow-lg">
+                      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#9C39FF]/10 to-transparent"></div>
+                      <h3 className="relative text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-white/90 z-10">
+                        {category}
+                      </h3>
                     </div>
-                    <CardContent className="p-5">
-                      <h3 className="text-xl font-medium mb-2">{exp.name}</h3>
-                      <p className="text-zinc-400 text-sm mb-4">{exp.shortDescription}</p>
-                      
-                      <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
-                        <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.age")} {exp.age}</span>
-                        <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.diff")} {exp.difficulty}</span>
-                      </div>
-                      
-                      <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end items-start mt-auto">
-                        <div className="text-right">
-                          <div className="text-lg font-medium text-white">
-                            {Math.round((exp.pricing[players.toString()] || exp.pricing["8"]) / players)} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
+
+                    <div className="grid grid-cols-1 gap-6">
+                      {experiences
+                        .filter(e => e.maxPlayers >= players)
+                        .filter(e => e.type === category)
+                        .map((exp) => (
+                        <Card 
+                          key={exp.id} 
+                          className={`bg-transparent border cursor-pointer transition-all overflow-hidden ${
+                            selectedExperience?.id === exp.id 
+                              ? "border-[#9C39FF] ring-1 ring-[#9C39FF] shadow-[0_0_20px_rgba(156,57,255,0.15)]" 
+                              : "border-zinc-800 hover:border-zinc-600"
+                          }`}
+                          onClick={() => setSelectedExperience(exp)}
+                        >
+                          <div className="relative h-48 w-full">
+                            <Image src={exp.picture} alt={exp.name} fill className="object-cover" />
+                            <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium border border-zinc-700">
+                              {exp.type}
+                            </div>
                           </div>
-                          <div className="text-sm text-zinc-500 mt-0.5">
-                            {t("step3.total", { players })}: {exp.pricing[players.toString()] || exp.pricing["8"]} NOK
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                          <CardContent className="p-5">
+                            <h3 className="text-xl font-medium mb-2">{exp.name}</h3>
+                            <p className="text-zinc-400 text-sm mb-4">{exp.shortDescription}</p>
+                            
+                            <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
+                              <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.age")} {exp.age}</span>
+                              <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.diff")} {exp.difficulty}</span>
+                            </div>
+                            
+                            <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end items-start mt-auto">
+                              <div className="text-right">
+                                <div className="text-lg font-medium text-white">
+                                  {Math.round((exp.pricing[players.toString()] || exp.pricing["8"]) / players)} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
+                                </div>
+                                <div className="text-sm text-zinc-500 mt-0.5">
+                                  {t("step3.total", { players })}: {exp.pricing[players.toString()] || exp.pricing["8"]} NOK
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
               {experiences
