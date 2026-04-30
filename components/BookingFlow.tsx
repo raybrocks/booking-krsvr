@@ -657,9 +657,16 @@ if (window.top) {
                   </div>
                 </div>
                 
-                <div className="flex justify-between items-center text-lg">
-                  <span className="text-zinc-300">{t("step6.total")}</span>
-                  <span className="font-medium">{totalPrice} NOK</span>
+                <div className="flex justify-between items-end text-lg">
+                  <span className="text-zinc-300">{t("step6.price")}</span>
+                  <div className="text-right">
+                    <div className="font-medium text-white">
+                      {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
+                    </div>
+                    <div className="text-sm text-zinc-500 mt-0.5">
+                      {t("step3.total", { players })}: {totalPrice} NOK
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -678,7 +685,8 @@ if (window.top) {
                     <div className="flex items-center space-x-3">
                       <RadioGroupItem value="reservation" id="reservation" className="border-zinc-500 text-[#9C39FF]" />
                       <div className="space-y-1">
-                        <Label htmlFor="reservation" className="cursor-pointer">{t("step6.resfee")}</Label>
+                        <Label htmlFor="reservation" className="cursor-pointer font-medium">{t("step6.resfee")}</Label>
+                        <p className="text-xs text-zinc-400">{t("step6.eq1person")}</p>
                         <p className="text-xs text-zinc-400">{t("step6.payrest")}</p>
                       </div>
                     </div>
