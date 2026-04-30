@@ -466,7 +466,19 @@ if (window.top) {
                               )}
                             </div>
                             
-                            <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end items-start mt-auto">
+                            <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-between items-end mt-auto">
+                              <div>
+                                <Button 
+                                  onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedExperience(exp);
+                                      setStep(4);
+                                  }}
+                                  className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white"
+                                >
+                                  {t("step3.booknow")}
+                                </Button>
+                              </div>
                               <div className="text-right">
                                 <div className="text-lg font-medium text-white">
                                   {Math.round((exp.pricing[players.toString()] || exp.pricing["8"]) / players)} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
