@@ -182,7 +182,7 @@ export default function TransactionsManager() {
   return (
     <div className="space-y-4">
       {/* Search */}
-      <div className="flex bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
+      <div className="flex bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 gap-4">
         <div className="flex-1 relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
@@ -193,6 +193,39 @@ export default function TransactionsManager() {
             className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
           />
         </div>
+        <button
+           onClick={async () => {
+             try {
+                // Find pending transactions from the state
+                const pending = transactions.filter(t => t.status === 'epayment.payment.reserved' || t.status === 'AUTHORIZED');
+                if (pending.length === 0) {
+                    alert("No pending transactions found.");
+                    return;
+                }
+                
+                const payload = pending.map(t => ({ bookingId: t.bookingId, amount: t.amount }));
+                
+                const res = await fetch("/api/vipps/capture", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ transactions: payload })
+                });
+                const data = await res.json();
+                if (data.captured?.length > 0) {
+                   alert("Captured: " + data.captured.join(", "));
+                } else if (data.message) {
+                   alert(data.message);
+                } else if (data.error) {
+                   alert("Error: " + data.error);
+                }
+             } catch (e: any) {
+               alert("Capture failed: " + e.message);
+             }
+           }}
+           className="px-4 py-2 bg-[#9C39FF] text-white text-sm font-medium rounded-lg hover:bg-[#8A2BE2] transition-colors whitespace-nowrap"
+        >
+          Capture Pending
+        </button>
       </div>
 
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">

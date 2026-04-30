@@ -42,6 +42,54 @@ export async function POST(req: Request) {
     // to mark the booking as paid based on body.reference and body.status
     if (paymentStatus === 'transaction.created' || paymentStatus === 'AUTHORIZED' || paymentStatus === 'epayment.payment.reserved' || paymentStatus === 'transaction.state.changed') {
        try {
+         // Automatically attempt to capture the payment if reserved
+         if (paymentStatus === 'epayment.payment.reserved' || paymentStatus === 'AUTHORIZED') {
+            const isTest = process.env.VIPPS_ENV !== 'production';
+            const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
+            const clientId = process.env.VIPPS_CLIENT_ID;
+            const clientSecret = process.env.VIPPS_CLIENT_SECRET;
+            const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
+            const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
+
+            if (clientId && clientSecret && subscriptionKey && merchantSerialNumber) {
+              const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
+                method: 'POST',
+                headers: {
+                  'client_id': clientId,
+                  'client_secret': clientSecret,
+                  'Ocp-Apim-Subscription-Key': subscriptionKey,
+                },
+              });
+              if (tokenResponse.ok) {
+                const tokenData = await tokenResponse.json();
+                
+                const captureResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}/capture`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${tokenData.access_token}`,
+                    'Ocp-Apim-Subscription-Key': subscriptionKey,
+                    'Merchant-Serial-Number': merchantSerialNumber,
+                    'Idempotency-Key': `capture-${reference}`
+                  },
+                  body: JSON.stringify({
+                    modificationAmount: {
+                      currency: 'NOK',
+                      value: amount
+                    }
+                  })
+                });
+                
+                if (!captureResponse.ok) {
+                    const captureErr = await captureResponse.text();
+                    console.error("Failed to automatically capture payment:", captureErr);
+                } else {
+                    console.log(`Payment for ${reference} automatically captured!`);
+                }
+              }
+            }
+         }
+
          const bookingRef = doc(db, 'bookings', reference);
          await updateDoc(bookingRef, {
            status: 'confirmed',
