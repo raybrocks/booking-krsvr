@@ -141,6 +141,10 @@ export default function BookingFlow() {
     fetchBookedTimes();
   }, [selectedDate]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
+
   const availableTimes = useMemo(() => {
     if (!selectedDate || !settings) return [];
     const dateString = format(selectedDate, "yyyy-MM-dd");
