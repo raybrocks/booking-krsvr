@@ -151,7 +151,8 @@ export default function BookingFlow() {
   }, [selectedDate, settings]);
 
   const totalPrice = selectedExperience ? (selectedExperience.pricing[players.toString()] || selectedExperience.pricing["8"]) : 0;
-  const amountToPay = paymentType === "full" ? totalPrice : (settings?.reservationFee || 500);
+  const pricePerPerson = selectedExperience ? Math.round(totalPrice / players) : 0;
+  const amountToPay = paymentType === "full" ? totalPrice : pricePerPerson;
 
   const handleNext = () => {
     if (step === 1 && (!selectedDate || !selectedTime)) return toast.error(t("error.datetime") || "Please select a date and time.");
@@ -681,7 +682,7 @@ if (window.top) {
                         <p className="text-xs text-zinc-400">{t("step6.payrest")}</p>
                       </div>
                     </div>
-                    <span className="font-medium">{settings?.reservationFee} NOK</span>
+                    <span className="font-medium">{pricePerPerson} NOK</span>
                   </div>
                 </RadioGroup>
               </div>
