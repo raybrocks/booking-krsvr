@@ -75,14 +75,18 @@ service cloud.firestore {
     match /transactions/{transactionId} {
       allow read: if isAdmin();
       allow create: if isValidTransaction(request.resource.data);
-      allow update, delete: if isAdmin() && isValidTransaction(request.resource.data);
+      allow update: if isValidTransaction(request.resource.data) || request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'transactionLogHistory']);
+      allow delete: if isAdmin();
     }
 
     match /bookings/{bookingId} {
-      allow read: if isAdmin();
+      allow read: if true;
       // Anyone can create a booking, but they must provide valid data
       allow create: if isValidBooking(request.resource.data);
-      allow update, delete: if isAdmin() && isValidBooking(request.resource.data);
+      allow update: if isAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'amountPaid', 'confirmationEmailSent', 'newsletterAdded'])
+      );
+      allow delete: if isAdmin();
     }
 
     match /settings/{settingId} {
