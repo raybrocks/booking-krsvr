@@ -411,7 +411,7 @@ if (window.top) {
                               <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.age")} {exp.age}</span>
                               <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.diff")} {exp.difficulty}</span>
                               {exp.familyFriendly && (
-                                <span className="bg-zinc-900 px-2 py-1 rounded text-green-400 border border-green-400/20">{t("step3.familyfriendly")}</span>
+                                <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.familyfriendly")}</span>
                               )}
                             </div>
                             

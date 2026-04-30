@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { collection, onSnapshot, doc, deleteDoc, setDoc, addDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
-import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown } from "lucide-react";
+import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -30,31 +30,6 @@ export default function ExperiencesManager() {
 
       setExperiences(data);
       setLoading(false);
-
-      // Auto-seed Arizona Sunrise if missing
-      const hasArizona = data.some(e => e.name === "Arizona Sunrise");
-      if (!hasArizona) {
-        const parvous = data.find(e => e.name.toLowerCase().includes("parvus") || e.name.toLowerCase().includes("parvous"));
-        if (parvous) {
-          try {
-            await addDoc(collection(db, "experiences"), {
-              name: "Arizona Sunrise",
-              shortDescription: "Arizona Sunrise er en intens og skremmende zombie shooter. Overlev bølger av zombier i en post-apokalyptisk verden. Krever raske reflekser og godt samarbeid.",
-              type: "Jump Scare",
-              age: "18+",
-              difficulty: "Hard",
-              maxPlayers: parvous.maxPlayers || 8,
-              pricing: parvous.pricing,
-              isActive: true,
-              picture: "",
-              subtitles: []
-            });
-            console.log("Arizona Sunrise auto-seeded");
-          } catch (e) {
-            console.error("Failed to seed Arizona Sunrise", e);
-          }
-        }
-      }
     }, (error) => {
       console.error("Error fetching experiences:", error);
       setLoading(false);
@@ -125,6 +100,21 @@ export default function ExperiencesManager() {
         console.error("Error deleting experience:", error);
         toast.error("Failed to delete experience");
       }
+    }
+  };
+
+  const handleDuplicate = async (exp: any) => {
+    try {
+      const { id, ...dataToDuplicate } = exp;
+      await addDoc(collection(db, "experiences"), {
+        ...dataToDuplicate,
+        name: `${exp.name} (Copy)`,
+        isActive: false, // Make it inactive by default
+      });
+      toast.success("Experience duplicated as draft");
+    } catch (error) {
+      console.error("Error duplicating experience:", error);
+      toast.error("Failed to duplicate experience");
     }
   };
 
@@ -366,7 +356,7 @@ export default function ExperiencesManager() {
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.age}</span>
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>
                 {exp.familyFriendly && (
-                   <span className="bg-zinc-950 px-2 py-1 rounded border border-green-400/20 text-green-400">Family Friendly</span>
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Family friendly</span>
                 )}
               </div>
               
@@ -394,7 +384,15 @@ export default function ExperiencesManager() {
                   <Edit className="w-3.5 h-3.5" /> Edit
                 </button>
                 <button 
+                  onClick={() => handleDuplicate(exp)}
+                  title="Duplicate"
+                  className="flex justify-center items-center p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-xl transition-colors"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+                <button 
                   onClick={() => handleDelete(exp.id)}
+                  title="Delete"
                   className="flex justify-center items-center p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
