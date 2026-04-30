@@ -20,6 +20,74 @@ export async function POST(req: Request) {
 
     const bookingData = bookingSnap.data();
 
+    // -- Fetch Vipps Payment Status --
+    const isTest = process.env.VIPPS_ENV !== 'production';
+    const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
+    const clientId = process.env.VIPPS_CLIENT_ID;
+    const clientSecret = process.env.VIPPS_CLIENT_SECRET;
+    const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
+    const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
+
+    if (clientId && clientSecret && subscriptionKey && merchantSerialNumber) {
+      // 1. Get Access Token
+      const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
+        method: 'POST',
+        headers: {
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'Ocp-Apim-Subscription-Key': subscriptionKey,
+        },
+      });
+      
+      if (tokenResponse.ok) {
+        const tokenData = await tokenResponse.json();
+        
+        // 2. Get Payment Details
+        const paymentResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}`, {
+           method: 'GET',
+           headers: {
+             'Authorization': `Bearer ${tokenData.access_token}`,
+             'Ocp-Apim-Subscription-Key': subscriptionKey,
+             'Merchant-Serial-Number': merchantSerialNumber
+           }
+        });
+        
+        if (paymentResponse.ok) {
+          const paymentInfo = await paymentResponse.json();
+          const pStatus = paymentInfo.state || paymentInfo.status; // depending on API version
+          
+          const validStates = ['AUTHORIZED', 'epayment.payment.reserved', 'transaction.created'];
+          if (validStates.includes(pStatus)) {
+              // 3. Automatically Capture the Payment
+              const captureResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}/capture`, {
+                 method: 'POST',
+                 headers: {
+                   'Content-Type': 'application/json',
+                   'Authorization': `Bearer ${tokenData.access_token}`,
+                   'Ocp-Apim-Subscription-Key': subscriptionKey,
+                   'Merchant-Serial-Number': merchantSerialNumber,
+                   'Idempotency-Key': `capture-verify-${reference}`
+                 },
+                 body: JSON.stringify({
+                   modificationAmount: {
+                     currency: 'NOK',
+                     value: Math.round(bookingData.amountPaid || paymentInfo.amount?.value || 0) 
+                   }
+                 })
+              });
+              
+              if (!captureResponse.ok) {
+                 console.error("Auto-capture in verify failed:", await captureResponse.text());
+              }
+          } else if (pStatus !== 'TERMINATED' && pStatus !== 'CANCELLED' && pStatus !== 'CAPTURED') {
+             // If not captured and not valid, don't confirm
+             // We can proceed if it was already CAPTURED. 
+             // If it's something weird, maybe log it.
+          }
+        }
+      }
+    }
+
     // If it's already confirmed, we might just need to ensure the email is sent
     if (bookingData.status !== 'confirmed') {
       await updateDoc(bookingRef, {
