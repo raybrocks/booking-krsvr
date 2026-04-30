@@ -71,7 +71,7 @@ export async function POST(req: Request) {
                  body: JSON.stringify({
                    modificationAmount: {
                      currency: 'NOK',
-                     value: Math.round(bookingData.amountPaid || paymentInfo.amount?.value || 0) 
+                     value: paymentInfo.amount?.value || Math.round((bookingData.amountPaid || 0) * 100) 
                    }
                  })
               });

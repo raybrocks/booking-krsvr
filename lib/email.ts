@@ -49,17 +49,25 @@ export async function sendBookingConfirmationEmail(
   `;
 
   try {
-    const data = await resend.emails.send({
-      from: 'Krs Urban <booking@krsurban.no>', // Configure a verified domain in Resend
+    const { data, error } = await resend.emails.send({
+      from: 'Krs Urban <booking@donotreply.krsvr.no>',
       to,
       subject: 'Booking Confirmation & Receipt - Krs Urban',
       html,
     });
+    
+    if (error) {
+      console.error("Resend API returned an error:", error);
+      // We don't throw here to avoid preventing the booking confirmation from saving
+      return null;
+    }
+    
     console.log("Email sent successfully:", data);
     return data;
   } catch (error) {
-    console.error("Failed to send email:", error);
-    throw error;
+    console.error("Failed to send email (exception):", error);
+    // returning null instead of throwing so the booking doesn't get messed up
+    return null;
   }
 }
 

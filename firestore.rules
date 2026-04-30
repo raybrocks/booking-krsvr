@@ -12,7 +12,7 @@ service cloud.firestore {
     }
     
     function isAdmin() {
-      return isAuthenticated() && request.auth.token.email == "post@krsvr.no";
+      return isAuthenticated() && (request.auth.token.email == "post@krsvr.no" || request.auth.token.email.matches(".*@krsurban\\.no"));
     }
 
     function hasRequiredFields(fields) {
