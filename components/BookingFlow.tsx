@@ -390,6 +390,7 @@ if (window.top) {
               
               <div className="bg-zinc-900 rounded-xl p-4 text-sm text-zinc-400">
                 <p>{t("step2.info1")}</p>
+                <p className="mt-2 text-zinc-300 font-medium">{t("info.capacity")}</p>
                 <p className="mt-2">{t("step2.info2")}</p>
               </div>
             </div>
@@ -672,6 +673,10 @@ if (window.top) {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-zinc-900/50 rounded-xl p-4 text-sm text-zinc-300 border border-zinc-800">
+                <p>{t("info.capacity")}</p>
               </div>
 
               <div className="space-y-4">

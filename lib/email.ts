@@ -48,6 +48,11 @@ export async function sendBookingConfirmationEmail(
         <li style="margin-bottom: 10px;"><strong>Players:</strong> ${players}</li>
       </ul>
 
+      <p style="margin-top: 15px; font-size: 14px; background: #fff8e1; padding: 15px; border-radius: 6px; border-left: 4px solid #ffc107; color: #665000;">
+        <strong>Merk:</strong> Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk spillets makskapasitet før dere ankommer arenaen.<br/>
+        <span style="font-size: 12px; opacity: 0.9;"><strong>Note:</strong> You can adjust the number of players right up until the game starts. Please check the game's maximum capacity before arriving.</span>
+      </p>
+
       <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Payment Receipt</h2>
       <ul style="list-style: none; padding: 0;">
         <li style="margin-bottom: 10px;"><strong>Total Price:</strong> NOK ${totalPrice}</li>
