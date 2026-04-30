@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2 } from "lucide-react";
@@ -9,11 +9,40 @@ import SettingsManager from "./SettingsManager";
 import ExperiencesManager from "./ExperiencesManager";
 import TransactionsManager from "./TransactionsManager";
 
+const playDing = () => {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    
+    const context = new AudioContext();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+    
+    // Create a pleasant "ding" sound
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(800, context.currentTime); 
+    oscillator.frequency.exponentialRampToValueAtTime(1200, context.currentTime + 0.1);
+    
+    gainNode.gain.setValueAtTime(0, context.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.5, context.currentTime + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+    
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.5);
+  } catch (error) {
+    console.error("Error playing audio ding:", error);
+  }
+};
+
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "settings">("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const isFirstLoad = useRef(true);
 
   // Sorting and Filtering State
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'dateTime', direction: 'asc' });
@@ -31,6 +60,17 @@ export default function AdminDashboard() {
       }));
       setBookings(data);
       setLoading(false);
+
+      if (!isFirstLoad.current) {
+        // Check if there are any new added docs
+        const hasNewBookings = snapshot.docChanges().some(change => change.type === "added");
+        if (hasNewBookings) {
+          playDing();
+          toast.success("Ny ordre mottatt! / New booking received!");
+        }
+      } else {
+        isFirstLoad.current = false;
+      }
     }, (error) => {
       console.error("Error fetching bookings:", error);
       setLoading(false);
@@ -143,6 +183,120 @@ export default function AdminDashboard() {
     );
   }
 
+  const renderBookingsTable = (tableBookings: any[], title?: string) => (
+    <div className="mb-8 last:mb-0" key={title || 'table'}>
+      {title && <h2 className="text-xl font-medium mb-4 text-zinc-200">{title}</h2>}
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-zinc-900 border-b border-zinc-800 text-zinc-400">
+              <tr>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('dateTime')}>
+                  Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('experienceId')}>
+                  Experience {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('customer')}>
+                  Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('totalPrice')}>
+                  Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('status')}>
+                  Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-800/50">
+              {tableBookings.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-zinc-500">
+                    No bookings yet.
+                  </td>
+                </tr>
+              ) : (
+                tableBookings.map((booking) => (
+                <tr key={booking.id} className="hover:bg-zinc-800/20 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <CalendarIcon className="w-4 h-4 text-zinc-500" />
+                      {booking.date}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 text-zinc-400 text-xs">
+                      <Clock className="w-3 h-3" />
+                      {booking.time}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-zinc-300">{booking.experienceId}</div>
+                    <div className="flex items-center gap-1 mt-1 text-xs text-zinc-500">
+                      <Users className="w-3 h-3" /> {booking.players} Players
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-zinc-200">{booking.firstName} {booking.lastName}</div>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
+                      <span className="flex items-center gap-1">
+                        <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
+                        {booking.email}
+                      </span>
+                      <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-zinc-300">{booking.totalPrice} NOK</div>
+                    <div className="text-xs text-zinc-500 mt-1 capitalize">
+                      {booking.paymentType}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={booking.status}
+                        onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
+                        className={`text-xs font-medium px-2.5 py-1.5 rounded-lg border focus:outline-none appearance-none cursor-pointer ${
+                          booking.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                          booking.status === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                          'bg-red-500/10 text-red-400 border-red-500/20'
+                        }`}
+                      >
+                        <option value="pending" className="bg-zinc-900 text-amber-400">Pending</option>
+                        <option value="confirmed" className="bg-zinc-900 text-emerald-400">Confirmed</option>
+                        <option value="cancelled" className="bg-zinc-900 text-red-400">Cancelled</option>
+                      </select>
+                      
+                      {booking.status !== 'cancelled' && (
+                        <button
+                          onClick={() => {
+                            // TODO: Add email alert integration here later
+                            updateBookingStatus(booking.id, 'cancelled');
+                          }}
+                          className="text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 px-2 py-1.5 rounded-lg transition-colors"
+                          title="Cancel Booking"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => deleteBooking(booking.id)}
+                        className="text-xs text-zinc-500 hover:text-red-400 hover:bg-red-400/10 px-2 py-1.5 rounded-lg transition-colors ml-1"
+                        title="Permanently Delete Booking"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -232,115 +386,32 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-zinc-900 border-b border-zinc-800 text-zinc-400">
-                  <tr>
-                    <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('dateTime')}>
-                      Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </th>
-                    <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('experienceId')}>
-                      Experience {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </th>
-                    <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('customer')}>
-                      Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </th>
-                    <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('totalPrice')}>
-                      Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </th>
-                    <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('status')}>
-                      Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-800/50">
-                  {filteredAndSortedBookings.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-12 text-center text-zinc-500">
-                        No bookings found matching your filters.
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredAndSortedBookings.map((booking) => (
-                    <tr key={booking.id} className="hover:bg-zinc-800/20 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-zinc-300">
-                          <CalendarIcon className="w-4 h-4 text-zinc-500" />
-                          {booking.date}
-                        </div>
-                        <div className="flex items-center gap-2 mt-1 text-zinc-400 text-xs">
-                          <Clock className="w-3 h-3" />
-                          {booking.time}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-zinc-300">{booking.experienceId}</div>
-                        <div className="flex items-center gap-1 mt-1 text-xs text-zinc-500">
-                          <Users className="w-3 h-3" /> {booking.players} Players
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-zinc-200">{booking.firstName} {booking.lastName}</div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
-                          <span className="flex items-center gap-1">
-                            <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
-                            {booking.email}
-                          </span>
-                          <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-zinc-300">{booking.totalPrice} NOK</div>
-                        <div className="text-xs text-zinc-500 mt-1 capitalize">
-                          {booking.paymentType}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <select
-                            value={booking.status}
-                            onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
-                            className={`text-xs font-medium px-2.5 py-1.5 rounded-lg border focus:outline-none appearance-none cursor-pointer ${
-                              booking.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                              booking.status === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                              'bg-red-500/10 text-red-400 border-red-500/20'
-                            }`}
-                          >
-                            <option value="pending" className="bg-zinc-900 text-amber-400">Pending</option>
-                            <option value="confirmed" className="bg-zinc-900 text-emerald-400">Confirmed</option>
-                            <option value="cancelled" className="bg-zinc-900 text-red-400">Cancelled</option>
-                          </select>
-                          
-                          {booking.status !== 'cancelled' && (
-                            <button
-                              onClick={() => {
-                                // TODO: Add email alert integration here later
-                                updateBookingStatus(booking.id, 'cancelled');
-                              }}
-                              className="text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 px-2 py-1.5 rounded-lg transition-colors"
-                              title="Cancel Booking"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => deleteBooking(booking.id)}
-                            className="text-xs text-zinc-500 hover:text-red-400 hover:bg-red-400/10 px-2 py-1.5 rounded-lg transition-colors ml-1"
-                            title="Permanently Delete Booking"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+          {(() => {
+            if (activeTab === "archive") {
+              return renderBookingsTable(filteredAndSortedBookings);
+            }
+
+            // For upcoming tab, split into Today, Tomorrow, Upcoming
+            const now = new Date(currentTime);
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            
+            const tomorrow = new Date(currentTime);
+            tomorrow.setDate(now.getDate() + 1);
+            const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
+            const todayBookings = filteredAndSortedBookings.filter(b => b.date === todayStr);
+            const tomorrowBookings = filteredAndSortedBookings.filter(b => b.date === tomorrowStr);
+            const upcomingBookings = filteredAndSortedBookings.filter(b => b.date > tomorrowStr);
+
+            return (
+              <div className="space-y-8">
+                {renderBookingsTable(todayBookings, "Today")}
+                {renderBookingsTable(tomorrowBookings, "Tomorrow")}
+                {renderBookingsTable(upcomingBookings, "Upcoming")}
+              </div>
+            );
+          })()}
         </div>
-      </div>
       )}
 
       {activeTab === "experiences" && <ExperiencesManager />}
