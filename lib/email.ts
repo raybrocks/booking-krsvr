@@ -1,4 +1,6 @@
 import { Resend } from 'resend';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -12,8 +14,21 @@ export async function sendBookingConfirmationEmail(
     return;
   }
 
-  const { firstName, lastName, date, time, players, totalPrice, amountPaid } = bookingDetails;
+  const { firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId } = bookingDetails;
   
+  let experienceTitle = "VR Experience";
+  if (experienceId) {
+    try {
+      const expRef = doc(db, 'experiences', experienceId);
+      const expSnap = await getDoc(expRef);
+      if (expSnap.exists() && expSnap.data().title) {
+        experienceTitle = expSnap.data().title;
+      }
+    } catch (e) {
+      console.error("Error fetching experience title:", e);
+    }
+  }
+
   // Basic HTML template for the email
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
@@ -27,6 +42,7 @@ export async function sendBookingConfirmationEmail(
 
       <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Booking Details</h2>
       <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 10px;"><strong>Experience:</strong> ${experienceTitle}</li>
         <li style="margin-bottom: 10px;"><strong>Date:</strong> ${date}</li>
         <li style="margin-bottom: 10px;"><strong>Time:</strong> ${time}</li>
         <li style="margin-bottom: 10px;"><strong>Players:</strong> ${players}</li>
@@ -40,19 +56,27 @@ export async function sendBookingConfirmationEmail(
       </ul>
 
       <p style="margin-top: 40px; font-size: 14px; color: #666;">
-        If you have any questions or need to make changes to your booking, please don't hesitate to contact us.
+        If you have any questions or need to make changes to your booking, please don't hesitate to reply to this email, or contact us at post@krsvr.no.
       </p>
       <p style="font-size: 14px; color: #666;">
-        Best regards,<br/>Krs Urban
+        Best regards,<br/>Krs VR Arena
       </p>
+      
+      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999; line-height: 1.5;">
+        <strong>Krs VR Arena AS</strong><br/>
+        Organisasjonsnummer: 936318878 MVA<br/>
+        Kristiansand, Norge<br/>
+        <a href="mailto:post@krsvr.no" style="color: #9C39FF; text-decoration: none;">post@krsvr.no</a>
+      </div>
     </div>
   `;
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Krs Urban <booking@donotreply.krsvr.no>',
+      from: 'Krs VR Arena <booking@donotreply.krsvr.no>',
       to,
-      subject: 'Booking Confirmation & Receipt - Krs Urban',
+      replyTo: 'post@krsvr.no',
+      subject: 'Booking Confirmation & Receipt - Krs VR Arena',
       html,
     });
     
@@ -70,6 +94,7 @@ export async function sendBookingConfirmationEmail(
     return null;
   }
 }
+
 
 export async function addContactToNewsletter(email: string, firstName: string, lastName: string) {
   if (!process.env.RESEND_API_KEY) {
