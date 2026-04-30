@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
-import { collection, getDocs, doc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
@@ -70,6 +70,10 @@ export default function BookingFlow() {
   const [paymentType, setPaymentType] = useState<"full" | "reservation">("full");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
+  
+  // Booked Times
+  const [bookedTimes, setBookedTimes] = useState<string[]>([]);
+  const [loadingTimes, setLoadingTimes] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -99,6 +103,43 @@ export default function BookingFlow() {
     }
     loadData();
   }, []);
+
+  useEffect(() => {
+    async function fetchBookedTimes() {
+      if (!selectedDate) {
+        setBookedTimes([]);
+        return;
+      }
+      setLoadingTimes(true);
+      try {
+        const dateString = format(selectedDate, "yyyy-MM-dd");
+        const q = query(
+          collection(db, "bookings"),
+          where("date", "==", dateString)
+        );
+        const snapshot = await getDocs(q);
+        const existingBookings = snapshot.docs.map(doc => doc.data());
+        
+        // Exclude cancelled bookings (status can be "TERMINATED", "CANCELLED", or lowercased)
+        const activeBookings = existingBookings.filter(b => 
+          b.status?.toLowerCase() !== "terminated" && 
+          b.status?.toLowerCase() !== "cancelled" &&
+          b.status !== "TERMINATED" && b.status !== "CANCELLED"
+        );
+        
+        const times = activeBookings.map(b => b.time as string);
+        setBookedTimes(times);
+        
+        // If selected time is now booked, remove it
+        setSelectedTime(prev => times.includes(prev) ? "" : prev);
+      } catch (error) {
+        console.error("Failed to fetch booked times", error);
+      } finally {
+        setLoadingTimes(false);
+      }
+    }
+    fetchBookedTimes();
+  }, [selectedDate]);
 
   const availableTimes = useMemo(() => {
     if (!selectedDate || !settings) return [];
@@ -281,21 +322,31 @@ if (window.top) {
                     {t("step1.available")}
                   </h3>
                   {selectedDate ? (
-                    availableTimes.length > 0 ? (
+                    loadingTimes ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+                      </div>
+                    ) : availableTimes.length > 0 ? (
                       <div className="grid grid-cols-2 gap-3">
-                        {availableTimes.map((time) => (
-                          <button
-                            key={time}
-                            onClick={() => setSelectedTime(time)}
-                            className={`py-3 px-4 rounded-xl border text-sm font-medium transition-all ${
-                              selectedTime === time 
-                                ? "bg-[#9C39FF] text-white border-[#9C39FF] shadow-[0_0_15px_rgba(156,57,255,0.3)]" 
-                                : "border-zinc-800 hover:border-zinc-600 text-zinc-300"
-                            }`}
-                          >
-                            {time}
-                          </button>
-                        ))}
+                        {availableTimes.map((time) => {
+                          const isBooked = bookedTimes.includes(time);
+                          return (
+                            <button
+                              key={time}
+                              onClick={() => !isBooked && setSelectedTime(time)}
+                              disabled={isBooked}
+                              className={`py-3 px-4 rounded-xl border text-sm font-medium transition-all ${
+                                isBooked
+                                  ? "bg-zinc-900 border-zinc-800 text-zinc-600 opacity-50 cursor-not-allowed"
+                                  : selectedTime === time 
+                                    ? "bg-[#9C39FF] text-white border-[#9C39FF] shadow-[0_0_15px_rgba(156,57,255,0.3)]" 
+                                    : "border-zinc-800 hover:border-zinc-600 text-zinc-300"
+                              }`}
+                            >
+                              {time} {isBooked && (t("step1.booked") || "(Booked)")}
+                            </button>
+                          );
+                        })}
                       </div>
                     ) : (
                       <p className="text-zinc-400 text-sm">{t("step1.notimes")}</p>
