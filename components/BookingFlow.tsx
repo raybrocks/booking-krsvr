@@ -31,6 +31,7 @@ type Experience = {
   pricing: Record<string, number>;
   isActive: boolean;
   order?: number;
+  familyFriendly?: boolean;
 };
 
 type Settings = {
@@ -38,6 +39,7 @@ type Settings = {
   specialHours?: Record<string, string[]>;
   reservationFee: number;
   termsContent?: string;
+  bookingsClosed?: boolean;
 };
 
 export default function BookingFlow() {
@@ -408,6 +410,9 @@ if (window.top) {
                             <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
                               <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.age")} {exp.age}</span>
                               <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.diff")} {exp.difficulty}</span>
+                              {exp.familyFriendly && (
+                                <span className="bg-zinc-900 px-2 py-1 rounded text-green-400 border border-green-400/20">{t("step3.familyfriendly")}</span>
+                              )}
                             </div>
                             
                             <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end items-start mt-auto">
@@ -639,6 +644,15 @@ if (window.top) {
               >
                 {t("nav.continue")}
                 <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            ) : settings?.bookingsClosed ? (
+              <Button
+                disabled
+                variant="outline"
+                className="border-zinc-800 bg-zinc-900/50 opacity-100 cursor-not-allowed hover:bg-zinc-900/50 hover:text-white text-zinc-300 rounded-2xl h-auto py-3 px-8 flex flex-col items-center"
+              >
+                <div className="font-medium">{t("step6.closed.title")}</div>
+                <div className="text-xs text-zinc-500 mt-1">{t("step6.closed.subtitle")}</div>
               </Button>
             ) : (
               <Button 

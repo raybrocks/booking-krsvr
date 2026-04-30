@@ -81,6 +81,7 @@ export default function ExperiencesManager() {
       maxPlayers: 6,
       pricing: { "2": 800, "3": 1100, "4": 1400, "5": 1700, "6": 2000 },
       isActive: true,
+      familyFriendly: false,
       picture: ""
     });
   };
@@ -284,6 +285,18 @@ export default function ExperiencesManager() {
                 <span className="ml-2 text-sm text-zinc-300">Show to customers</span>
               </div>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Family Friendly</label>
+              <div className="flex items-center h-10">
+                <input 
+                  type="checkbox" 
+                  checked={editForm.familyFriendly || false}
+                  onChange={(e) => setEditForm({...editForm, familyFriendly: e.target.checked})}
+                  className="w-5 h-5 accent-[#9C39FF]"
+                />
+                <span className="ml-2 text-sm text-zinc-300">Family Friendly</span>
+              </div>
+            </div>
             
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-zinc-400 mb-2">Pricing (NOK by Group Size)</label>
@@ -352,6 +365,9 @@ export default function ExperiencesManager() {
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Max {exp.maxPlayers}</span>
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.age}</span>
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>
+                {exp.familyFriendly && (
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-green-400/20 text-green-400">Family Friendly</span>
+                )}
               </div>
               
               <div className="flex gap-2 pt-4 border-t border-zinc-800/50">

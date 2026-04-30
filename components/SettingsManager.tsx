@@ -217,6 +217,24 @@ export default function SettingsManager() {
           </div>
         </div>
 
+        <div className="mb-6 bg-red-950/20 border border-red-900/50 p-6 rounded-2xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-medium text-red-400 mb-1">Emergency Booking Kill-Switch</h3>
+              <p className="text-sm text-zinc-400">When enabled, the final checkout button in the booking flow will be replaced with a message saying bookings are temporarily closed. Use this if you need to pause all incoming reservations immediately.</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer ml-4 shrink-0">
+              <input 
+                type="checkbox" 
+                className="sr-only peer" 
+                checked={settings.bookingsClosed || false}
+                onChange={(e) => setSettings({...settings, bookingsClosed: e.target.checked})}
+              />
+              <div className="w-14 h-7 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-500"></div>
+            </label>
+          </div>
+        </div>
+
         <div className="mb-6">
           <label className="block text-sm font-medium text-zinc-300 mb-2">Booking Confirmation Email Text</label>
           <p className="text-zinc-500 text-xs mb-2">This text will be included in the booking confirmation and receipt email sent to the customer.</p>
