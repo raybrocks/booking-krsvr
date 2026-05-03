@@ -38,9 +38,19 @@ export async function POST(req: Request) {
       console.error('Failed to log transaction:', dbErr);
     }
 
+    if (paymentStatus === 'TERMINATED' || paymentStatus === 'CANCELLED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
+       try {
+         const bookingRef = doc(db, 'bookings', reference);
+         await updateDoc(bookingRef, { status: 'cancelled' });
+       } catch (error) {
+         console.error('Error updating booking status cancelled from webhook:', error);
+       }
+       return NextResponse.json({ success: true });
+    }
+
     // Here you would typically update your database (Firebase)
     // to mark the booking as paid based on body.reference and body.status
-    if (paymentStatus === 'transaction.created' || paymentStatus === 'AUTHORIZED' || paymentStatus === 'epayment.payment.reserved' || paymentStatus === 'transaction.state.changed') {
+    if (paymentStatus === 'AUTHORIZED' || paymentStatus === 'epayment.payment.reserved' || paymentStatus === 'CAPTURED' || paymentStatus === 'epayment.payment.captured' || paymentStatus === 'SALE') {
        try {
          // Automatically attempt to capture the payment if reserved
          if (paymentStatus === 'epayment.payment.reserved' || paymentStatus === 'AUTHORIZED') {

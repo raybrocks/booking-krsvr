@@ -43,6 +43,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "settings">("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isFirstLoad = useRef(true);
+  const notifiedBookingIds = useRef<Set<string>>(new Set());
 
   // Sorting and Filtering State
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'dateTime', direction: 'asc' });
@@ -61,16 +62,28 @@ export default function AdminDashboard() {
       setBookings(data);
       setLoading(false);
 
-      if (!isFirstLoad.current) {
-        // Check if there are any new added docs
-        const hasNewBookings = snapshot.docChanges().some(change => change.type === "added");
-        if (hasNewBookings) {
-          playDing();
-          toast.success("Ny ordre mottatt! / New booking received!");
+      let newlyConfirmed = false;
+      let newlyConfirmedCount = 0;
+
+      snapshot.docs.forEach(docSnap => {
+        const docData = docSnap.data();
+        const isConfirmed = docData.status === 'confirmed' || docData.status === 'completed';
+        
+        if (isConfirmed && !notifiedBookingIds.current.has(docSnap.id)) {
+          notifiedBookingIds.current.add(docSnap.id);
+          if (!isFirstLoad.current) {
+            newlyConfirmed = true;
+            newlyConfirmedCount++;
+          }
         }
-      } else {
-        isFirstLoad.current = false;
+      });
+
+      if (newlyConfirmed) {
+        playDing();
+        toast.success(`Ny bestilling bekreftet! / New booking confirmed! (${newlyConfirmedCount})`);
       }
+
+      isFirstLoad.current = false;
     }, (error) => {
       console.error("Error fetching bookings:", error);
       setLoading(false);

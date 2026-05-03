@@ -56,8 +56,14 @@ export async function POST(req: Request) {
           const paymentInfo = await paymentResponse.json();
           const pStatus = paymentInfo.state || paymentInfo.status; // depending on API version
           
-          const validStates = ['AUTHORIZED', 'epayment.payment.reserved', 'transaction.created'];
-          if (validStates.includes(pStatus)) {
+          const successStates = ['AUTHORIZED', 'epayment.payment.reserved', 'CAPTURED', 'epayment.payment.captured', 'SALE'];
+
+          if (!successStates.includes(pStatus)) {
+             await updateDoc(bookingRef, { status: 'cancelled' });
+             return NextResponse.json({ error: `Payment was not successful. Status: ${pStatus}` }, { status: 400 });
+          }
+
+          if (pStatus !== 'CAPTURED') {
               // 3. Automatically Capture the Payment
               const captureResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}/capture`, {
                  method: 'POST',
@@ -79,12 +85,12 @@ export async function POST(req: Request) {
               if (!captureResponse.ok) {
                  console.error("Auto-capture in verify failed:", await captureResponse.text());
               }
-          } else if (pStatus !== 'TERMINATED' && pStatus !== 'CANCELLED' && pStatus !== 'CAPTURED') {
-             // If not captured and not valid, don't confirm
-             // We can proceed if it was already CAPTURED. 
-             // If it's something weird, maybe log it.
           }
+        } else {
+             return NextResponse.json({ error: 'Could not verify payment with Vipps' }, { status: 400 });
         }
+      } else {
+         return NextResponse.json({ error: 'Failed to authenticate with Vipps' }, { status: 500 });
       }
     }
 
