@@ -174,6 +174,9 @@ export default function AdminDashboard() {
       } else if (sortConfig.key === 'dateTime') {
         aValue = new Date(`${a.date}T${a.time}`).getTime();
         bValue = new Date(`${b.date}T${b.time}`).getTime();
+      } else if (sortConfig.key === 'createdAt') {
+        aValue = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        bValue = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
       }
 
       if (aValue < bValue) {
@@ -216,6 +219,9 @@ export default function AdminDashboard() {
                 <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('totalPrice')}>
                   Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('createdAt')}>
+                  Placed At {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
                 <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('status')}>
                   Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
@@ -224,7 +230,7 @@ export default function AdminDashboard() {
             <tbody className="divide-y divide-zinc-800/50">
               {tableBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-zinc-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">
                     No bookings yet.
                   </td>
                 </tr>
@@ -262,6 +268,14 @@ export default function AdminDashboard() {
                     <div className="text-xs text-zinc-500 mt-1 capitalize">
                       {booking.paymentType}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 text-xs text-zinc-400">
+                    {booking.createdAt?.toDate ? (
+                      <div>
+                        <div>{new Intl.DateTimeFormat("no-NO", { dateStyle: "short" }).format(booking.createdAt.toDate())}</div>
+                        <div className="mt-1 flex items-center gap-1"><Clock className="w-3 h-3" />{new Intl.DateTimeFormat("no-NO", { timeStyle: "short" }).format(booking.createdAt.toDate())}</div>
+                      </div>
+                    ) : "N/A"}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
