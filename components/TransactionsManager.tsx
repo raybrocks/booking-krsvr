@@ -17,16 +17,33 @@ export default function TransactionsManager() {
   const [loadingReceipt, setLoadingReceipt] = useState(false);
 
   useEffect(() => {
-    const q = query(collection(db, "transactions"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        // Format timestamp if it exists
-        createdAtDate: doc.data().createdAt?.toDate() || new Date()
-      }));
-      setTransactions(data);
+      const data = snapshot.docs.map(doc => {
+        const bookingData = doc.data();
+        let status = bookingData.status;
+        if (status === 'confirmed' || status === 'completed') {
+           status = 'AUTHORIZED'; // Or captured, just map to visual equivalents used in Receipts view
+        }
+        
+        return {
+          id: doc.id,
+          bookingId: doc.id,
+          vippsOrderId: doc.id,
+          amount: (bookingData.amountPaid || bookingData.totalPrice || 0) * 100, // convert back to ore for receipt calculations
+          status: status,
+          ...bookingData,
+          // Format timestamp if it exists
+          createdAtDate: bookingData.createdAt?.toDate() || new Date()
+        };
+      });
+      
+      // Filter out non-completed/non-vipps if we only want vipps receipts here
+      // But actually, showing all confirmed bookings as receipts is better!
+      const validReceipts = data.filter(b => b.status === 'AUTHORIZED');
+      
+      setTransactions(validReceipts);
       setLoading(false);
     }, (error) => {
       console.error("Error fetching transactions:", error);
