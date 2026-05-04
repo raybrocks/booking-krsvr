@@ -75,7 +75,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-[#9C39FF] transition-colors"
-                placeholder="post@krsvr.no"
+                placeholder="admin@example.com"
               />
             </div>
             <div className="space-y-2">
