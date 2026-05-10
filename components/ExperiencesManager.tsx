@@ -342,9 +342,9 @@ export default function ExperiencesManager() {
             )}
             <div className="p-5 flex flex-col flex-1">
               <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="text-lg font-medium text-white">{exp.name}</h3>
-                  <span className="text-xs text-[#9C39FF]">{exp.type}</span>
+                <div className="flex flex-col items-start gap-1.5">
+                  <h3 className="text-lg font-medium text-white leading-tight">{exp.name}</h3>
+                  <span className="text-[10px] font-medium tracking-wider uppercase bg-[#9C39FF] text-white px-2 py-0.5 rounded">{exp.type}</span>
                 </div>
                 {!exp.isActive && <span className="text-[10px] uppercase tracking-wider bg-red-500/20 text-red-400 px-2 py-1 rounded">Inactive</span>}
               </div>

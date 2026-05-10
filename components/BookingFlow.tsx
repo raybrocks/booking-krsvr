@@ -456,7 +456,7 @@ if (window.top) {
                         >
                           <div className="relative h-48 w-full">
                             <Image src={exp.picture} alt={exp.name} fill className="object-cover" />
-                            <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium border border-zinc-700">
+                            <div className="absolute top-3 right-3 bg-[#9C39FF] px-3 py-1 rounded-full text-xs font-medium text-white shadow-md">
                               {exp.type}
                             </div>
                           </div>
