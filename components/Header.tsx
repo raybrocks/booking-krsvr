@@ -109,7 +109,7 @@ export default function Header() {
 
       {/* BOTTOM ROW: Desktop Pill Nav */}
       <div className="hidden md:flex relative justify-center w-full mt-4 pointer-events-auto">
-        <nav className="flex bg-zinc-900/80 backdrop-blur-xl rounded-full border border-zinc-700/50 p-1.5 shadow-2xl relative">
+        <nav className="flex relative gap-1 md:gap-2">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             
