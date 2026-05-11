@@ -58,7 +58,7 @@ export default function FaqPage() {
            transition={{ delay: 0.1 }}
            className="bg-zinc-950/80 border border-zinc-800/50 rounded-3xl p-6 md:p-10 shadow-2xl backdrop-blur-xl"
         >
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border-b border-white/5 last:border-0 px-2 py-2">
                 <AccordionTrigger className="text-left text-lg md:text-xl font-medium text-zinc-100 hover:text-white hover:no-underline py-4">
