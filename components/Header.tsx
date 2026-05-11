@@ -46,34 +46,8 @@ export default function Header() {
       {/* TOP ROW: Logo & Mobile Actions */}
       <div className="relative w-full px-4 md:px-8 py-4 md:py-2 flex justify-between items-center max-w-[1600px] mx-auto pointer-events-auto">
         
-        {/* Mobile Menu Trigger */}
-        <div className="flex md:hidden flex-1 justify-start gap-2 items-center">
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger render={<button className="text-zinc-200 hover:text-white p-2" />}>
-              <Menu size={24} />
-            </SheetTrigger>
-            <SheetContent side="left" className="bg-zinc-950 border-zinc-800 text-zinc-100 flex flex-col pt-12">
-              <SheetTitle className="sr-only">Navigasjonsmeny</SheetTitle>
-              <nav className="flex flex-col gap-6 mt-8">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`text-xl font-medium transition-colors ${
-                      pathname === link.href ? "text-[#9C39FF]" : "text-zinc-400 hover:text-zinc-200"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
-
-        {/* Empty left spacer for Desktop Logo centering */}
-        <div className="hidden md:flex flex-1" />
+        {/* Left spacer for Logo centering */}
+        <div className="flex flex-1" />
 
         {/* Center Logo */}
         <div className="flex justify-center flex-shrink-0">
@@ -83,27 +57,79 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Right side Language Select (Desktop & Mobile) */}
+        {/* Right side Language Select (Desktop) & Menu Trigger (Mobile) */}
         <div className="flex flex-1 justify-end items-center gap-4">
-          <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
-            <SelectTrigger className="w-[120px] md:w-[140px] md:h-12 bg-zinc-900/50 md:bg-zinc-950/80 md:backdrop-blur-md rounded-full border-zinc-800 md:shadow-xl focus:ring-[#9C39FF] md:px-5">
-              <SelectValue placeholder="Language">
-                <span className="flex items-center">
-                  <span className="mr-2">{languageMap[language]?.flag}</span>
-                  <span className="hidden sm:inline">{languageMap[language]?.name}</span>
-                  <span className="sm:hidden">{language}</span>
-                </span>
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
-              <SelectItem value="no"><span className="mr-2">🇳🇴</span>Norsk</SelectItem>
-              <SelectItem value="en"><span className="mr-2">🇬🇧</span>English</SelectItem>
-              <SelectItem value="de"><span className="mr-2">🇩🇪</span>Deutsch</SelectItem>
-              <SelectItem value="uk"><span className="mr-2">🇺🇦</span>Українська</SelectItem>
-              <SelectItem value="pl"><span className="mr-2">🇵🇱</span>Polski</SelectItem>
-              <SelectItem value="es"><span className="mr-2">🇪🇸</span>Español</SelectItem>
-            </SelectContent>
-          </Select>
+          
+          {/* Desktop Language Select */}
+          <div className="hidden md:block">
+            <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
+              <SelectTrigger className="w-[140px] h-12 bg-zinc-950/80 backdrop-blur-md rounded-full border-zinc-800 shadow-xl focus:ring-[#9C39FF] px-5">
+                <SelectValue placeholder="Language">
+                  <span className="flex items-center">
+                    <span className="mr-2">{languageMap[language]?.flag}</span>
+                    <span>{languageMap[language]?.name}</span>
+                  </span>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                <SelectItem value="no"><span className="mr-2">🇳🇴</span>Norsk</SelectItem>
+                <SelectItem value="en"><span className="mr-2">🇬🇧</span>English</SelectItem>
+                <SelectItem value="de"><span className="mr-2">🇩🇪</span>Deutsch</SelectItem>
+                <SelectItem value="uk"><span className="mr-2">🇺🇦</span>Українська</SelectItem>
+                <SelectItem value="pl"><span className="mr-2">🇵🇱</span>Polski</SelectItem>
+                <SelectItem value="es"><span className="mr-2">🇪🇸</span>Español</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Mobile Menu Trigger */}
+          <div className="flex md:hidden">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger render={<button className="text-zinc-200 hover:text-white p-2" />}>
+                <Menu size={28} />
+              </SheetTrigger>
+              <SheetContent side="right" className="bg-zinc-950 border-zinc-800 text-zinc-100 flex flex-col pt-12">
+                <SheetTitle className="sr-only">Navigasjonsmeny</SheetTitle>
+                <nav className="flex flex-col gap-6 mt-8 flex-1">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`text-xl font-medium transition-colors ${
+                        pathname === link.href ? "text-[#9C39FF]" : "text-zinc-400 hover:text-zinc-200"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+                
+                {/* Mobile Language Select (Bottom of Menu) */}
+                <div className="mt-auto mb-8">
+                  <p className="text-sm text-zinc-500 mb-3 px-1">Språk / Language</p>
+                  <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
+                    <SelectTrigger className="w-full h-14 bg-zinc-900/50 rounded-2xl border-zinc-800 focus:ring-[#9C39FF] px-5">
+                      <SelectValue placeholder="Language">
+                        <span className="flex items-center">
+                          <span className="mr-3 text-lg">{languageMap[language]?.flag}</span>
+                          <span className="text-base">{languageMap[language]?.name}</span>
+                        </span>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                      <SelectItem value="no"><span className="mr-2">🇳🇴</span>Norsk</SelectItem>
+                      <SelectItem value="en"><span className="mr-2">🇬🇧</span>English</SelectItem>
+                      <SelectItem value="de"><span className="mr-2">🇩🇪</span>Deutsch</SelectItem>
+                      <SelectItem value="uk"><span className="mr-2">🇺🇦</span>Українська</SelectItem>
+                      <SelectItem value="pl"><span className="mr-2">🇵🇱</span>Polski</SelectItem>
+                      <SelectItem value="es"><span className="mr-2">🇪🇸</span>Español</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
 

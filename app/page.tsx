@@ -199,7 +199,7 @@ export default function LandingPage() {
                 "To store spillsoner (150 kvm og 75 kvm) med full fri bevegelse.",
                 "Passer perfekt for både nybegynnere og erfarne VR-spillere.",
                 "Førsteklasses, moderne utstyr.",
-                "Lokalt og sentralt plassert i Kristiansand."
+                "Lokalt og sentralt plassert i Kristiansand.",
                 "Gratis parkering."
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-4 bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800/50 hover:border-zinc-700 transition-colors">
