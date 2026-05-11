@@ -8,6 +8,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="KRS VR ARENA" className="h-10 mb-6 object-contain" />
             <p className="text-zinc-400 text-sm leading-relaxed mb-6">
               Sørlandets Råeste VR Opplevelse. Vi tilbyr de nyeste og mest spennende virtual reality-opplevelsene.

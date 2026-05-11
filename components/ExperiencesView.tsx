@@ -35,10 +35,6 @@ function MediaGallery({ experience }: { experience: any }) {
   const [activeSlide, setActiveSlide] = useState<"image" | "video">("image");
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  
-  useEffect(() => {
-    setActiveSlide("image");
-  }, [experience.id]);
 
   const hasVideo = !!experience.videoUrl;
   
@@ -90,7 +86,7 @@ function MediaGallery({ experience }: { experience: any }) {
   return (
     <div className="w-full flex flex-col items-center">
       <div 
-        className="w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl group"
+        className="w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl group"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -341,7 +337,7 @@ export function ExperiencesView() {
       >
         {/* IMAGE / MEDIA GALLERY */}
         <div className="w-full mb-12">
-          <MediaGallery experience={selected} />
+          <MediaGallery key={selected.id} experience={selected} />
         </div>
 
         {/* TITLE */}
@@ -356,77 +352,53 @@ export function ExperiencesView() {
 
         {/* STATS ROW */}
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto">
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2 text-sm md:text-base">
-              <Timer className="w-5 h-5 text-white" />
-              <span>{selected.duration || "45 min"}</span>
-            </div>
-            <span className="text-xs text-zinc-500 uppercase tracking-widest">Varighet</span>
+          <div className="flex items-center gap-2 text-sm md:text-base">
+            <Timer className="w-5 h-5 text-white" />
+            <span>{selected.duration || "45 min"}</span>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2 text-sm md:text-base">
-              <Users className="w-5 h-5 text-white" />
-              <span>{selected.maxPlayers ? `Opptil ${selected.maxPlayers} pers` : "2-4 pers"}</span>
-            </div>
-             <span className="text-xs text-zinc-500 uppercase tracking-widest">Spillere</span>
+          <div className="flex items-center gap-2 text-sm md:text-base">
+            <Users className="w-5 h-5 text-white" />
+            <span>{selected.maxPlayers ? `Opptil ${selected.maxPlayers} pers` : "2-4 pers"}</span>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2 text-sm md:text-base">
-              <UserCheck className="w-5 h-5 text-white" />
-              <span>{selected.age || "Fra 8 år"}</span>
-            </div>
-            <span className="text-xs text-zinc-500 uppercase tracking-widest">Aldersgrense</span>
+          <div className="flex items-center gap-2 text-sm md:text-base">
+            <UserCheck className="w-5 h-5 text-white" />
+            <span>{selected.age || "Fra 8 år"}</span>
           </div>
 
           {selected.difficulty && (
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex items-center gap-2 text-sm md:text-base">
-                <Layers className="w-5 h-5 text-white" />
-                <span>{selected.difficulty}</span>
-              </div>
-              <span className="text-xs text-zinc-500 uppercase tracking-widest">Vanskelighetsgrad</span>
+            <div className="flex items-center gap-2 text-sm md:text-base">
+              <Layers className="w-5 h-5 text-white" />
+              <span>{selected.difficulty}</span>
             </div>
           )}
           
           {/* Custom tags if any exist in the old array format */}
           {selected.tags && Array.isArray(selected.tags) && selected.tags.map((tag: string, i: number) => (
-            <div key={i} className="flex flex-col items-center gap-2 text-sm md:text-base">
-               <div className="flex items-center gap-2 text-sm md:text-base">
-                 <Zap className="w-5 h-5 text-white" />
-                 <span>{tag}</span>
-               </div>
-               <span className="text-xs text-zinc-500 uppercase tracking-widest">Tag</span>
+            <div key={i} className="flex items-center gap-2 text-sm md:text-base">
+               <Zap className="w-5 h-5 text-white" />
+               <span>{tag}</span>
             </div>
           ))}
 
           {/* New specific tags */}
           {selected.familyFriendly && (
-             <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-2 text-sm md:text-base">
-                  <Smile className="w-5 h-5 text-white" />
-                  <span>Familievennlig</span>
-                </div>
-                 <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
+             <div className="flex items-center gap-2 text-sm md:text-base">
+                <Smile className="w-5 h-5 text-white" />
+                <span>Familievennlig</span>
              </div>
           )}
           {selected.teambuilding && (
-             <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-2 text-sm md:text-base">
-                  <Handshake className="w-5 h-5 text-white" />
-                  <span>Teambuilding</span>
-                </div>
-                 <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
+             <div className="flex items-center gap-2 text-sm md:text-base">
+                <Handshake className="w-5 h-5 text-white" />
+                <span>Teambuilding</span>
              </div>
           )}
           {selected.party && (
-             <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-2 text-sm md:text-base">
-                  <PartyPopper className="w-5 h-5 text-white" />
-                  <span>Fest & Moro</span>
-                </div>
-                 <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
+             <div className="flex items-center gap-2 text-sm md:text-base">
+                <PartyPopper className="w-5 h-5 text-white" />
+                <span>Fest & Moro</span>
              </div>
           )}
         </div>
