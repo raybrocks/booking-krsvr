@@ -9,6 +9,7 @@
         "name": { "type": "string" },
         "shortDescription": { "type": "string" },
         "picture": { "type": "string" },
+        "videoUrl": { "type": "string" },
         "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Adventure", "Zombie", "Archer"] },
         "age": { "type": "string" },
         "difficulty": { "type": "string" },

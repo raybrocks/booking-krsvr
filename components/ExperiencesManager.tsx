@@ -59,7 +59,8 @@ export default function ExperiencesManager() {
       familyFriendly: false,
       teambuilding: false,
       party: false,
-      picture: ""
+      picture: "",
+      videoUrl: ""
     });
   };
 
@@ -237,6 +238,16 @@ export default function ExperiencesManager() {
                   </p>
                 </div>
               </div>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Video URL (YouTube/Vimeo) (Optional)</label>
+              <input 
+                type="url" 
+                value={editForm.videoUrl || ""}
+                onChange={(e) => setEditForm({...editForm, videoUrl: e.target.value})}
+                placeholder="https://www.youtube.com/watch?v=..."
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-zinc-400 mb-1">Age Requirement</label>
