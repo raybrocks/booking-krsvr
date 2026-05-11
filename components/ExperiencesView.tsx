@@ -14,12 +14,14 @@ import {
   Skull, 
   Ghost, 
   Crosshair, 
-  Puzzle,
+  Key,
   PlaySquare,
   Swords,
   Timer,
   Zap,
-  Ticket
+  Ticket,
+  Brain,
+  Mountain
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -136,10 +138,10 @@ export function ExperiencesView() {
     const lname = name.toLowerCase();
     const ltype = type ? type.toLowerCase() : "";
     
-    if (lname.includes("arrow")) return <Target className="w-10 h-10" />;
-    if (lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10" />;
+    if (ltype.includes("escape") || lname.includes("escape")) return <Brain className="w-10 h-10" />;
+    if (ltype.includes("zomb") || lname.includes("zomb") || lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10" />;
+    if (ltype.includes("arrow") || lname.includes("arrow")) return <Mountain className="w-10 h-10" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10" />;
-    if (ltype.includes("escape")) return <Puzzle className="w-10 h-10" />;
     return <Gamepad2 className="w-10 h-10" />;
   };
 
@@ -241,26 +243,79 @@ export function ExperiencesView() {
 
         {/* STATS ROW */}
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto">
-          <div className="flex items-center gap-2 text-sm md:text-base">
-            <Timer className="w-5 h-5 text-[#9C39FF]" />
-            <span>{selected.duration || "45 min"}</span>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2 text-sm md:text-base">
+              <Timer className="w-5 h-5 text-[#9C39FF]" />
+              <span>{selected.duration || "45 min"}</span>
+            </div>
+            <span className="text-xs text-zinc-500 uppercase tracking-widest">Varighet</span>
           </div>
-          <div className="flex items-center gap-2 text-sm md:text-base">
-            <Users className="w-5 h-5 text-[#9C39FF]" />
-            <span>{selected.maxPlayers ? `Opptil ${selected.maxPlayers} pers` : "2-4 pers"}</span>
+
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2 text-sm md:text-base">
+              <Users className="w-5 h-5 text-[#9C39FF]" />
+              <span>{selected.maxPlayers ? `Opptil ${selected.maxPlayers} pers` : "2-4 pers"}</span>
+            </div>
+             <span className="text-xs text-zinc-500 uppercase tracking-widest">Spillere</span>
           </div>
-          <div className="flex items-center gap-2 text-sm md:text-base">
-            <Ticket className="w-5 h-5 text-[#9C39FF]" />
-            <span>{selected.age || "Fra 8 år"}</span>
+
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2 text-sm md:text-base">
+              <Ticket className="w-5 h-5 text-[#9C39FF]" />
+              <span>{selected.age || "Fra 8 år"}</span>
+            </div>
+            <span className="text-xs text-zinc-500 uppercase tracking-widest">Aldersgrense</span>
           </div>
+
+          {selected.difficulty && (
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center gap-2 text-sm md:text-base">
+                <Target className="w-5 h-5 text-[#9C39FF]" />
+                <span>{selected.difficulty}</span>
+              </div>
+              <span className="text-xs text-zinc-500 uppercase tracking-widest">Vanskelighetsgrad</span>
+            </div>
+          )}
           
-          {/* Custom tags if any */}
-          {selected.tags && selected.tags.map((tag: string, i: number) => (
-            <div key={i} className="flex items-center gap-2 text-sm md:text-base">
-              <Zap className="w-5 h-5 text-[#9C39FF]" />
-              <span>{tag}</span>
+          {/* Custom tags if any exist in the old array format */}
+          {selected.tags && Array.isArray(selected.tags) && selected.tags.map((tag: string, i: number) => (
+            <div key={i} className="flex flex-col items-center gap-2 text-sm md:text-base">
+               <div className="flex items-center gap-2 text-sm md:text-base">
+                 <Zap className="w-5 h-5 text-[#9C39FF]" />
+                 <span>{tag}</span>
+               </div>
+               <span className="text-xs text-zinc-500 uppercase tracking-widest">Tag</span>
             </div>
           ))}
+
+          {/* New specific tags */}
+          {selected.familyFriendly && (
+             <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-2 text-sm md:text-base">
+                  <span className="text-xl">👪</span>
+                  <span>Familievennlig</span>
+                </div>
+                 <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
+             </div>
+          )}
+          {selected.teambuilding && (
+             <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-2 text-sm md:text-base">
+                  <span className="text-xl">🤝</span>
+                  <span>Teambuilding</span>
+                </div>
+                 <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
+             </div>
+          )}
+          {selected.party && (
+             <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-2 text-sm md:text-base">
+                  <span className="text-xl">🎉</span>
+                  <span>Fest & Moro</span>
+                </div>
+                 <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
+             </div>
+          )}
         </div>
 
         {/* DESCRIPTION */}

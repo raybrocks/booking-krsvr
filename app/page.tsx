@@ -8,7 +8,7 @@ import {
   ArrowRight, 
   MapPin, 
   CheckCircle2, 
-  Puzzle, 
+  Key, 
   Footprints, 
   Users, 
   Glasses, 
@@ -150,7 +150,7 @@ export default function LandingPage() {
               <p className="text-zinc-400 font-light leading-relaxed">Bryt opp arbeidsdagen med en engasjerende teambuilding, garantert et høydepunkt i kalenderen.</p>
             </div>
             <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <Puzzle className="w-10 h-10 text-[#9C39FF]" />
+              <Key className="w-10 h-10 text-[#9C39FF]" />
               <h4 className="text-2xl font-medium text-white">Teambuilding</h4>
               <p className="text-zinc-400 font-light leading-relaxed">Styrk samholdet gjennom utfordrende samarbeid og oppdrag som engasjerer.</p>
             </div>

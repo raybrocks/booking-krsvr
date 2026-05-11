@@ -9,7 +9,7 @@
         "name": { "type": "string" },
         "shortDescription": { "type": "string" },
         "picture": { "type": "string" },
-        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Adventure"] },
+        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Adventure", "Zombie", "Arrows"] },
         "age": { "type": "string" },
         "difficulty": { "type": "string" },
         "maxPlayers": { "type": "number" },

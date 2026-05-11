@@ -57,6 +57,8 @@ export default function ExperiencesManager() {
       pricing: { "2": 800, "3": 1100, "4": 1400, "5": 1700, "6": 2000 },
       isActive: true,
       familyFriendly: false,
+      teambuilding: false,
+      party: false,
       picture: ""
     });
   };
@@ -185,9 +187,9 @@ export default function ExperiencesManager() {
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
               >
                 <option value="Escape Room">Escape Room</option>
-                <option value="Zombie shooter">Zombie shooter</option>
+                <option value="Zombie">Zombie</option>
                 <option value="Adventure">Adventure</option>
-                <option value="Jump Scare">Jump Scare</option>
+                <option value="Arrows">Arrows</option>
               </select>
             </div>
             <div className="md:col-span-2">
@@ -276,15 +278,35 @@ export default function ExperiencesManager() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-1">Family Friendly</label>
-              <div className="flex items-center h-10">
-                <input 
-                  type="checkbox" 
-                  checked={editForm.familyFriendly || false}
-                  onChange={(e) => setEditForm({...editForm, familyFriendly: e.target.checked})}
-                  className="w-5 h-5 accent-[#9C39FF]"
-                />
-                <span className="ml-2 text-sm text-zinc-300">Family Friendly</span>
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Tags</label>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center h-8">
+                  <input 
+                    type="checkbox" 
+                    checked={editForm.familyFriendly || false}
+                    onChange={(e) => setEditForm({...editForm, familyFriendly: e.target.checked})}
+                    className="w-5 h-5 accent-[#9C39FF]"
+                  />
+                  <span className="ml-2 text-sm text-zinc-300">Family Friendly</span>
+                </div>
+                <div className="flex items-center h-8">
+                  <input 
+                    type="checkbox" 
+                    checked={editForm.teambuilding || false}
+                    onChange={(e) => setEditForm({...editForm, teambuilding: e.target.checked})}
+                    className="w-5 h-5 accent-[#9C39FF]"
+                  />
+                  <span className="ml-2 text-sm text-zinc-300">Teambuilding</span>
+                </div>
+                <div className="flex items-center h-8">
+                  <input 
+                    type="checkbox" 
+                    checked={editForm.party || false}
+                    onChange={(e) => setEditForm({...editForm, party: e.target.checked})}
+                    className="w-5 h-5 accent-[#9C39FF]"
+                  />
+                  <span className="ml-2 text-sm text-zinc-300">Party (Bursdag/Utdrikningslag)</span>
+                </div>
               </div>
             </div>
             
@@ -356,7 +378,13 @@ export default function ExperiencesManager() {
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.age}</span>
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>
                 {exp.familyFriendly && (
-                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Family friendly</span>
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Family</span>
+                )}
+                {exp.teambuilding && (
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Teambuilding</span>
+                )}
+                {exp.party && (
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Party</span>
                 )}
               </div>
               
