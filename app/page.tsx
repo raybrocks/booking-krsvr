@@ -8,7 +8,7 @@ import {
   ArrowRight, 
   MapPin, 
   CheckCircle2, 
-  Key, 
+  Handshake, 
   Footprints, 
   Users, 
   Glasses, 
@@ -18,7 +18,9 @@ import {
   Info, 
   Clock, 
   Shirt,
-  UsersRound
+  UsersRound,
+  UserCheck,
+  Crown
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -70,16 +72,16 @@ export default function LandingPage() {
             <span className="text-sm font-medium text-center">Ingen erfaring nødvendig</span>
           </div>
           <div className="flex flex-col items-center gap-2 text-zinc-400 p-2">
-            <Info className="w-6 h-6 text-[#9C39FF]/70" />
+            <UserCheck className="w-6 h-6 text-[#9C39FF]/70" />
             <span className="text-sm font-medium text-center">Dere får en dedikert gamemaster</span>
           </div>
           <div className="flex flex-col items-center gap-2 text-zinc-400 p-2">
             <UsersRound className="w-6 h-6 text-[#9C39FF]/70" />
-            <span className="text-sm font-medium text-center">Perfekt for grupper</span>
+            <span className="text-sm font-medium text-center">Perfekt for små og store grupper</span>
           </div>
           <div className="flex flex-col items-center gap-2 text-zinc-400 p-2">
             <Footprints className="w-6 h-6 text-[#9C39FF]/70" />
-            <span className="text-sm font-medium text-center">Store frie VR-rom</span>
+            <span className="text-sm font-medium text-center">Bruk kroppen til å styre spillet</span>
           </div>
         </motion.div>
       </section>
@@ -117,7 +119,7 @@ export default function LandingPage() {
                 3
               </div>
               <h3 className="text-2xl font-medium text-white mb-4">Del VR opplevelsen sammen</h3>
-              <p className="text-zinc-400 font-light leading-relaxed">Sosial VR som engasjerer.</p>
+              <p className="text-zinc-400 font-light leading-relaxed">En kveld som får gruppa engasjert og dere sent glemmer.</p>
             </div>
           </div>
         </div>
@@ -135,14 +137,14 @@ export default function LandingPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
+              <Handshake className="w-10 h-10 text-[#9C39FF]" />
+              <h4 className="text-2xl font-medium text-white">Teambuilding</h4>
+              <p className="text-zinc-400 font-light leading-relaxed">Styrk samholdet gjennom utfordrende samarbeid og oppdrag som engasjerer.</p>
+            </div>
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
               <Users className="w-10 h-10 text-[#9C39FF]" />
               <h4 className="text-2xl font-medium text-white">Vennegrupper</h4>
               <p className="text-zinc-400 font-light leading-relaxed">Samle gjengen til en annerledes, aktiv og sosial kveld. En garantert kveld utenom det vanlige.</p>
-            </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <CalendarHeart className="w-10 h-10 text-[#9C39FF]" />
-              <h4 className="text-2xl font-medium text-white">Bursdag</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Gi bursdagsbarnet en feiring som skiller seg skikkelig ut fra det vanlige programmet.</p>
             </div>
             <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
               <Briefcase className="w-10 h-10 text-[#9C39FF]" />
@@ -150,14 +152,14 @@ export default function LandingPage() {
               <p className="text-zinc-400 font-light leading-relaxed">Bryt opp arbeidsdagen med en engasjerende teambuilding, garantert et høydepunkt i kalenderen.</p>
             </div>
             <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <Key className="w-10 h-10 text-[#9C39FF]" />
-              <h4 className="text-2xl font-medium text-white">Teambuilding</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Styrk samholdet gjennom utfordrende samarbeid og oppdrag som engasjerer.</p>
-            </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <Smile className="w-10 h-10 text-[#9C39FF]" />
+              <Crown className="w-10 h-10 text-[#9C39FF]" />
               <h4 className="text-2xl font-medium text-white">Utdrikningslag</h4>
               <p className="text-zinc-400 font-light leading-relaxed">En energisk start på feiringen der alle i alle aldre kan delta på lik linje.</p>
+            </div>
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
+              <CalendarHeart className="w-10 h-10 text-[#9C39FF]" />
+              <h4 className="text-2xl font-medium text-white">Bursdag</h4>
+              <p className="text-zinc-400 font-light leading-relaxed">Gi bursdagsbarnet en feiring som skiller seg skikkelig ut fra det vanlige programmet.</p>
             </div>
             <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
               <Glasses className="w-10 h-10 text-[#9C39FF]" />
@@ -194,11 +196,11 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto">
             <ul className="space-y-4">
               {[
-                "Sosial aktivitet som alle kan være med på.",
+                "Uforglemmelig sosial aktivitet som alle kan være med på.",
                 "Opplevelser med enormt fokus på både samarbeid og konkurranse.",
                 "To store spillsoner (150 kvm og 75 kvm) med full fri bevegelse.",
                 "Passer perfekt for både nybegynnere og erfarne VR-spillere.",
-                "Førsteklasses, moderne utstyr.",
+                "Førsteklasses, moderne utstyr og eksklusive spill",
                 "Lokalt og sentralt plassert i Kristiansand.",
                 "Gratis parkering."
               ].map((item, idx) => (
@@ -225,35 +227,35 @@ export default function LandingPage() {
               <Clock className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
               <div>
                 <h4 className="text-xl font-medium text-white mb-2">Møt opp litt før</h4>
-                <p className="text-zinc-400 font-light leading-relaxed">Møt opp 10 minutter før starttiden deres. Slik sikrer vi at vi kommer i gang i tide, og at dere ikke mister spilltid.</p>
+                <p className="text-zinc-400 font-light leading-relaxed">Møt opp 10 minutter før starttiden deres. Slik sikrer vi at dere kommer i gang i tide, og ikke mister spilltid.</p>
               </div>
             </div>
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
               <Shirt className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">Komfortable klær og sko</h4>
-                <p className="text-zinc-400 font-light leading-relaxed">Bruk komfortable klær og flate sko. Dere vil bevege dere fritt rundt på arenaen gjennom hele opplevelsen.</p>
+                <h4 className="text-xl font-medium text-white mb-2">Briller og klær</h4>
+                <p className="text-zinc-400 font-light leading-relaxed">Vi anbefaler å bruke linser fremfor briller. Bruk komfortable klær og flate sko. T-skjorte anbefales. Dere vil bevege dere fritt rundt på arenaen gjennom hele opplevelsen.</p>
               </div>
             </div>
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
               <Info className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">Ingen erfaring nødvendig</h4>
-                <p className="text-zinc-400 font-light leading-relaxed">Det er helt normalt at VR er nytt for mange! Opplevelsene våre er intuitive, og veiledning gis.</p>
+                <h4 className="text-xl font-medium text-white mb-2">48 timer</h4>
+                <p className="text-zinc-400 font-light leading-relaxed">Avbookinger innen 48 timer før oppsatt spill. Se fullstendige vilkår før booking.</p>
               </div>
             </div>
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
-              <Smile className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
+              <Users className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">Vi hjelper dere i gang</h4>
-                <p className="text-zinc-400 font-light leading-relaxed">Våre ansatte hjelper dere med utstyret. Vi gir full opplæring, så alt føles trygt hele veien inni VR.</p>
+                <h4 className="text-xl font-medium text-white mb-2">Grupper større enn 8 personer</h4>
+                <p className="text-zinc-400 font-light leading-relaxed">Bruk kontaktskjema. 8 personer kan spille om gangen. Vi deler større grupper opp i hver sin runde og utstyr desinfiseres mellom brukere.</p>
               </div>
             </div>
           </div>
           
           <div className="mt-12 text-center">
              <p className="text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
-               ✨ Våre VR aktiviteter passer best for grupper som vil gjøre noe aktivt og sosialt sammen i trygge, morsomme omgivelser.
+               ✨ Ved forespørsel får barn til og med 14 år 10%, og studenter 20 %, rabatt alle dager, bortsett fra fredag og lørdag (i grupper på 3+ pers). Om du booker på nett refunderer vi rabatten ved forespørsel.
              </p>
           </div>
         </div>

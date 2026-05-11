@@ -53,7 +53,7 @@ export default function Header() {
         <div className="flex justify-center flex-shrink-0">
           <Link href="/" className="flex items-center justify-center transition-transform hover:scale-105">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="KRS VR ARENA" className="h-[40px] md:h-[64px] lg:h-[72px] object-contain" />
+            <img src="/logo.svg" alt="KRS VR ARENA" className="h-[52px] md:h-[70px] lg:h-[80px] object-contain" />
           </Link>
         </div>
 

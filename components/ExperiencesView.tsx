@@ -47,7 +47,6 @@ function MediaGallery({ experience }: { experience: any }) {
     let embedUrl = url;
     if (url.includes("youtube.com/watch?v=")) {
       embedUrl = url.replace("watch?v=", "embed/");
-      // Strip out anything after & if needed, though most times it's fine
       const ampIndex = embedUrl.indexOf("&");
       if (ampIndex !== -1) {
         embedUrl = embedUrl.substring(0, ampIndex);
@@ -84,69 +83,106 @@ function MediaGallery({ experience }: { experience: any }) {
     }
   };
 
+  const toggleMedia = () => {
+    setActiveSlide(prev => prev === "image" ? "video" : "image");
+  };
+
   return (
-    <div 
-      className="w-full h-full relative group"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {activeSlide === "image" ? (
-        experience.picture ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img 
-            src={experience.picture} 
-            alt={experience.name} 
-            className="w-full h-full object-cover select-none pointer-events-none"
-          />
+    <div className="w-full flex flex-col items-center">
+      <div 
+        className="w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl group"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {activeSlide === "image" ? (
+          experience.picture ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img 
+              src={experience.picture} 
+              alt={experience.name} 
+              className="w-full h-full object-cover select-none pointer-events-none"
+            />
+          ) : (
+            <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+              <Gamepad2 className="w-20 h-20 text-zinc-800" />
+            </div>
+          )
         ) : (
-          <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-            <Gamepad2 className="w-20 h-20 text-zinc-800" />
+          <div className="w-full h-full bg-black relative">
+            <iframe 
+              src={getEmbedUrl(experience.videoUrl)} 
+              className="w-full h-full md:pointer-events-auto"
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe>
           </div>
-        )
-      ) : (
-        <div className="w-full h-full bg-black">
-          <iframe 
-            src={getEmbedUrl(experience.videoUrl)} 
-            className="w-full h-full pointer-events-none md:pointer-events-auto"
-            frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowFullScreen
-          ></iframe>
-        </div>
-      )}
+        )}
 
-      {hasVideo && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-          <button 
-            onClick={() => setActiveSlide("image")}
-            className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "image" ? "bg-[#9C39FF]" : "bg-white/30 hover:bg-white/50"}`}
-            aria-label="View Image"
-          />
-          <button 
-            onClick={() => setActiveSlide("video")}
-            className={`w-3 h-3 rounded-full transition-colors flex items-center justify-center ${activeSlide === "video" ? "bg-[#9C39FF]" : "bg-white/30 hover:bg-white/50"}`}
-            aria-label="Play Video"
-          />
-        </div>
-      )}
+        {/* Desktop Side arrows */}
+        {hasVideo && (
+          <>
+            <button 
+              onClick={toggleMedia}
+              className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-[#9C39FF] hover:bg-[#8A30E0] rounded-full text-white transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] z-10"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={toggleMedia}
+              className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-[#9C39FF] hover:bg-[#8A30E0] rounded-full text-white transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] z-10"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
 
-      {/* Side arrows */}
+            {/* Desktop Dots inside image */}
+            <div className="hidden md:flex absolute bottom-4 left-0 right-0 justify-center gap-3 z-10">
+              <button 
+                onClick={() => setActiveSlide("image")}
+                className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "image" ? "bg-[#9C39FF] scale-125 shadow-[0_0_10px_rgba(156,57,255,0.8)]" : "bg-white/50 hover:bg-white/80"}`}
+                aria-label="View Image"
+              />
+              <button 
+                onClick={() => setActiveSlide("video")}
+                className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "video" ? "bg-[#9C39FF] scale-125 shadow-[0_0_10px_rgba(156,57,255,0.8)]" : "bg-white/50 hover:bg-white/80"}`}
+                aria-label="Play Video"
+              />
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Mobile controls below gallery */}
       {hasVideo && (
-        <>
-          <button 
-            onClick={() => setActiveSlide(prev => prev === "image" ? "video" : "image")}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-[#9C39FF] hover:bg-[#8A30E0] rounded-full text-white transition-opacity shadow-lg"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button 
-            onClick={() => setActiveSlide(prev => prev === "image" ? "video" : "image")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-[#9C39FF] hover:bg-[#8A30E0] rounded-full text-white transition-opacity shadow-lg"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        </>
+        <div className="md:hidden flex items-center justify-center gap-6 mt-6 w-full px-4">
+           <button 
+              onClick={toggleMedia}
+              className="p-3 bg-[#9C39FF] rounded-full text-white transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] active:scale-95"
+            >
+              <ChevronLeft className="w-6 h-6" />
+           </button>
+           
+           <div className="flex gap-3">
+              <button 
+                onClick={() => setActiveSlide("image")}
+                className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "image" ? "bg-[#9C39FF] scale-125 shadow-[0_0_10px_rgba(156,57,255,0.8)]" : "bg-zinc-700"}`}
+                aria-label="View Image"
+              />
+              <button 
+                onClick={() => setActiveSlide("video")}
+                className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "video" ? "bg-[#9C39FF] scale-125 shadow-[0_0_10px_rgba(156,57,255,0.8)]" : "bg-zinc-700"}`}
+                aria-label="Play Video"
+              />
+           </div>
+
+           <button 
+              onClick={toggleMedia}
+              className="p-3 bg-[#9C39FF] rounded-full text-white transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] active:scale-95"
+            >
+              <ChevronRight className="w-6 h-6" />
+           </button>
+        </div>
       )}
     </div>
   );
@@ -304,7 +340,7 @@ export function ExperiencesView() {
         className="w-full max-w-6xl mx-auto flex flex-col items-center"
       >
         {/* IMAGE / MEDIA GALLERY */}
-        <div className="w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl mb-12">
+        <div className="w-full mb-12">
           <MediaGallery experience={selected} />
         </div>
 
@@ -406,9 +442,9 @@ export function ExperiencesView() {
             nativeButton={false} 
             render={<Link href="/booking" />} 
             size="lg" 
-            className="h-14 px-10 text-lg bg-[#9C39FF] hover:bg-[#8A30E0] text-white rounded-md uppercase font-bold shadow-[0_0_20px_rgba(156,57,255,0.6)] transition-all hover:scale-105"
+            className="h-14 px-10 text-lg bg-[#9C39FF] hover:bg-[#8A30E0] text-white rounded-full uppercase font-bold shadow-[0_0_20px_rgba(156,57,255,0.6)] transition-all hover:scale-105"
           >
-            Booke
+            Booking
           </Button>
         </div>
 
