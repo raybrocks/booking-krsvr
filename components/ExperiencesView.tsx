@@ -23,13 +23,18 @@ import {
   Handshake,
   Mountain,
   PartyPopper,
-  Baby
+  Baby,
+  UserCheck,
+  Layers,
+  Smile
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 function MediaGallery({ experience }: { experience: any }) {
   const [activeSlide, setActiveSlide] = useState<"image" | "video">("image");
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
   
   useEffect(() => {
     setActiveSlide("image");
@@ -59,15 +64,40 @@ function MediaGallery({ experience }: { experience: any }) {
     return embedUrl;
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if ((isLeftSwipe || isRightSwipe) && hasVideo) {
+      setActiveSlide(prev => prev === "image" ? "video" : "image");
+    }
+  };
+
   return (
-    <div className="w-full h-full relative group">
+    <div 
+      className="w-full h-full relative group"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {activeSlide === "image" ? (
         experience.picture ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img 
             src={experience.picture} 
             alt={experience.name} 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover select-none pointer-events-none"
           />
         ) : (
           <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
@@ -78,7 +108,7 @@ function MediaGallery({ experience }: { experience: any }) {
         <div className="w-full h-full bg-black">
           <iframe 
             src={getEmbedUrl(experience.videoUrl)} 
-            className="w-full h-full"
+            className="w-full h-full pointer-events-none md:pointer-events-auto"
             frameBorder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowFullScreen
@@ -101,18 +131,18 @@ function MediaGallery({ experience }: { experience: any }) {
         </div>
       )}
 
-      {/* Optional side arrows on hover if hasVideo */}
+      {/* Side arrows */}
       {hasVideo && (
         <>
           <button 
             onClick={() => setActiveSlide(prev => prev === "image" ? "video" : "image")}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/40 hover:bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-[#9C39FF] hover:bg-[#8A30E0] rounded-full text-white transition-opacity shadow-lg"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button 
             onClick={() => setActiveSlide(prev => prev === "image" ? "video" : "image")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/40 hover:bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-[#9C39FF] hover:bg-[#8A30E0] rounded-full text-white transition-opacity shadow-lg"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -292,7 +322,7 @@ export function ExperiencesView() {
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto">
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-center gap-2 text-sm md:text-base">
-              <Timer className="w-5 h-5 text-[#9C39FF]" />
+              <Timer className="w-5 h-5 text-white" />
               <span>{selected.duration || "45 min"}</span>
             </div>
             <span className="text-xs text-zinc-500 uppercase tracking-widest">Varighet</span>
@@ -300,7 +330,7 @@ export function ExperiencesView() {
 
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-center gap-2 text-sm md:text-base">
-              <Users className="w-5 h-5 text-[#9C39FF]" />
+              <Users className="w-5 h-5 text-white" />
               <span>{selected.maxPlayers ? `Opptil ${selected.maxPlayers} pers` : "2-4 pers"}</span>
             </div>
              <span className="text-xs text-zinc-500 uppercase tracking-widest">Spillere</span>
@@ -308,7 +338,7 @@ export function ExperiencesView() {
 
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-center gap-2 text-sm md:text-base">
-              <Ticket className="w-5 h-5 text-[#9C39FF]" />
+              <UserCheck className="w-5 h-5 text-white" />
               <span>{selected.age || "Fra 8 år"}</span>
             </div>
             <span className="text-xs text-zinc-500 uppercase tracking-widest">Aldersgrense</span>
@@ -317,7 +347,7 @@ export function ExperiencesView() {
           {selected.difficulty && (
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2 text-sm md:text-base">
-                <Target className="w-5 h-5 text-[#9C39FF]" />
+                <Layers className="w-5 h-5 text-white" />
                 <span>{selected.difficulty}</span>
               </div>
               <span className="text-xs text-zinc-500 uppercase tracking-widest">Vanskelighetsgrad</span>
@@ -328,7 +358,7 @@ export function ExperiencesView() {
           {selected.tags && Array.isArray(selected.tags) && selected.tags.map((tag: string, i: number) => (
             <div key={i} className="flex flex-col items-center gap-2 text-sm md:text-base">
                <div className="flex items-center gap-2 text-sm md:text-base">
-                 <Zap className="w-5 h-5 text-[#9C39FF]" />
+                 <Zap className="w-5 h-5 text-white" />
                  <span>{tag}</span>
                </div>
                <span className="text-xs text-zinc-500 uppercase tracking-widest">Tag</span>
@@ -339,7 +369,7 @@ export function ExperiencesView() {
           {selected.familyFriendly && (
              <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2 text-sm md:text-base">
-                  <Baby className="w-5 h-5 text-zinc-300" />
+                  <Smile className="w-5 h-5 text-white" />
                   <span>Familievennlig</span>
                 </div>
                  <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
@@ -348,7 +378,7 @@ export function ExperiencesView() {
           {selected.teambuilding && (
              <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2 text-sm md:text-base">
-                  <Handshake className="w-5 h-5 text-zinc-300" />
+                  <Handshake className="w-5 h-5 text-white" />
                   <span>Teambuilding</span>
                 </div>
                  <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
@@ -357,7 +387,7 @@ export function ExperiencesView() {
           {selected.party && (
              <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2 text-sm md:text-base">
-                  <PartyPopper className="w-5 h-5 text-zinc-300" />
+                  <PartyPopper className="w-5 h-5 text-white" />
                   <span>Fest & Moro</span>
                 </div>
                  <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
@@ -372,11 +402,13 @@ export function ExperiencesView() {
 
         {/* BUTTONS */}
         <div className="flex gap-4">
-          <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-14 px-10 text-lg bg-[#0099FF] hover:bg-[#007acc] text-white rounded-md uppercase font-bold shadow-none transition-transform hover:scale-105">
+          <Button 
+            nativeButton={false} 
+            render={<Link href="/booking" />} 
+            size="lg" 
+            className="h-14 px-10 text-lg bg-[#9C39FF] hover:bg-[#8A30E0] text-white rounded-md uppercase font-bold shadow-[0_0_20px_rgba(156,57,255,0.6)] transition-all hover:scale-105"
+          >
             Booke
-          </Button>
-          <Button variant="outline" size="lg" className="h-14 px-10 text-lg bg-[#D42BCA] hover:bg-[#b01e9e] border-none text-white rounded-md uppercase font-bold shadow-none transition-transform hover:scale-105" onClick={() => alert("Video kommer snart!")}>
-            Se Video
           </Button>
         </div>
 
