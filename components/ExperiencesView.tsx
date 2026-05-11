@@ -20,7 +20,7 @@ import {
   Timer,
   Zap,
   Ticket,
-  Brain,
+  Handshake,
   Mountain
 } from "lucide-react";
 import Link from "next/link";
@@ -138,7 +138,7 @@ export function ExperiencesView() {
     const lname = name.toLowerCase();
     const ltype = type ? type.toLowerCase() : "";
     
-    if (ltype.includes("escape") || lname.includes("escape")) return <Brain className="w-10 h-10" />;
+    if (ltype.includes("escape") || lname.includes("escape")) return <Handshake className="w-10 h-10" />;
     if (ltype.includes("zomb") || lname.includes("zomb") || lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10" />;
     if (ltype.includes("arrow") || lname.includes("arrow")) return <Mountain className="w-10 h-10" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10" />;
