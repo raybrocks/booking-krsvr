@@ -21,7 +21,9 @@ import {
   Zap,
   Ticket,
   Handshake,
-  Mountain
+  Mountain,
+  PartyPopper,
+  Baby
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -37,9 +39,24 @@ export function ExperiencesView() {
       try {
         const querySnapshot = await getDocs(collection(db, "experiences"));
         if (!querySnapshot.empty) {
-          const exps = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+          let exps = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+          
+          // Sort by order
+          exps.sort((a, b) => {
+            const orderA = typeof a.order === 'number' ? a.order : 999;
+            const orderB = typeof b.order === 'number' ? b.order : 999;
+            return orderA - orderB;
+          });
+
+          // Filter out inactive
+          exps = exps.filter(e => e.isActive);
+
           setExperiences(exps);
-          setSelectedId(exps[0].id);
+          if (exps.length > 0) {
+            setSelectedId(exps[0].id);
+          } else {
+            setSelectedId("");
+          }
         } else {
           setExperiences([]);
           setSelectedId("");
@@ -76,7 +93,7 @@ export function ExperiencesView() {
     
     if (ltype.includes("escape") || lname.includes("escape")) return <Handshake className="w-10 h-10" />;
     if (ltype.includes("zomb") || lname.includes("zomb") || lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10" />;
-    if (ltype.includes("arrow") || lname.includes("arrow")) return <Mountain className="w-10 h-10" />;
+    if (ltype.includes("archer") || lname.includes("archer")) return <Mountain className="w-10 h-10" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10" />;
     return <Gamepad2 className="w-10 h-10" />;
   };
@@ -138,7 +155,7 @@ export function ExperiencesView() {
                 <span className={`text-base md:text-lg font-medium transition-colors ${isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}>
                   {exp.name}
                 </span>
-                <span className={`text-xs md:text-sm mt-1 transition-colors ${isSelected ? "text-[#9C39FF]" : "text-zinc-600"}`}>
+                <span className={`text-[10px] md:text-xs mt-1 uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-600 bg-zinc-900"}`}>
                   {exp.type}
                 </span>
               </button>
@@ -179,9 +196,14 @@ export function ExperiencesView() {
         </div>
 
         {/* TITLE */}
-        <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-wide uppercase">
-          {selected.name}
-        </h2>
+        <div className="flex flex-col items-center mb-8 gap-4">
+          <h2 className="text-4xl md:text-6xl font-black text-white tracking-wide uppercase text-center">
+            {selected.name}
+          </h2>
+          <span className="text-[10px] md:text-xs uppercase tracking-wider px-3 py-1 rounded bg-[#9C39FF] text-white font-medium">
+            {selected.type}
+          </span>
+        </div>
 
         {/* STATS ROW */}
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto">
@@ -234,7 +256,7 @@ export function ExperiencesView() {
           {selected.familyFriendly && (
              <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2 text-sm md:text-base">
-                  <span className="text-xl">👪</span>
+                  <Baby className="w-5 h-5 text-zinc-300" />
                   <span>Familievennlig</span>
                 </div>
                  <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
@@ -243,7 +265,7 @@ export function ExperiencesView() {
           {selected.teambuilding && (
              <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2 text-sm md:text-base">
-                  <span className="text-xl">🤝</span>
+                  <Handshake className="w-5 h-5 text-zinc-300" />
                   <span>Teambuilding</span>
                 </div>
                  <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>
@@ -252,7 +274,7 @@ export function ExperiencesView() {
           {selected.party && (
              <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2 text-sm md:text-base">
-                  <span className="text-xl">🎉</span>
+                  <PartyPopper className="w-5 h-5 text-zinc-300" />
                   <span>Fest & Moro</span>
                 </div>
                  <span className="text-xs text-zinc-500 uppercase tracking-widest">Passer For</span>

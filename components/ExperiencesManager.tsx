@@ -189,7 +189,7 @@ export default function ExperiencesManager() {
                 <option value="Escape Room">Escape Room</option>
                 <option value="Zombie">Zombie</option>
                 <option value="Adventure">Adventure</option>
-                <option value="Arrows">Arrows</option>
+                <option value="Archer">Archer</option>
               </select>
             </div>
             <div className="md:col-span-2">
