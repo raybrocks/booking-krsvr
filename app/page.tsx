@@ -49,10 +49,10 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-            <Button render={<Link href="/booking" />} size="lg" className="w-full sm:w-auto h-14 px-8 text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105">
+            <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="w-full sm:w-auto h-14 px-8 text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105">
               Book opplevelse <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button render={<Link href="/opplevelser" />} size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-lg border-zinc-700 hover:bg-zinc-800 rounded-full text-white">
+            <Button nativeButton={false} render={<Link href="/opplevelser" />} size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-lg border-zinc-700 hover:bg-zinc-800 rounded-full text-white">
               Se opplevelser
             </Button>
           </div>
@@ -178,7 +178,7 @@ export default function LandingPage() {
             <p className="text-xl text-zinc-300 font-light max-w-3xl mx-auto mb-10 leading-relaxed">
               Ser dere etter en aktivitet som virkelig bygger relasjoner? I våre opplevelser må deltakerne samarbeide, kommunisere, ta raske avgjørelser og løse oppgaver felles.
             </p>
-            <Button render={<Link href="/kontakt" />} size="lg" className="h-14 px-8 text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-transform hover:scale-105">
+            <Button nativeButton={false} render={<Link href="/kontakt" />} size="lg" className="h-14 px-8 text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-transform hover:scale-105">
               Send forespørsel (mer enn 8 pers) <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
@@ -267,10 +267,10 @@ export default function LandingPage() {
           Reserver din tid i dag, og gled deg til en opplevelse gruppa sent vil glemme.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button render={<Link href="/booking" />} size="lg" className="w-full sm:w-auto h-16 px-10 text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105">
+          <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="w-full sm:w-auto h-16 px-10 text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105">
             Book opplevelse
           </Button>
-          <Button render={<Link href="/kontakt" />} size="lg" variant="outline" className="w-full sm:w-auto h-16 px-10 text-xl border-zinc-700 hover:bg-zinc-800 rounded-full text-white">
+          <Button nativeButton={false} render={<Link href="/kontakt" />} size="lg" variant="outline" className="w-full sm:w-auto h-16 px-10 text-xl border-zinc-700 hover:bg-zinc-800 rounded-full text-white">
             Send gruppeforespørsel (8+)
           </Button>
         </div>

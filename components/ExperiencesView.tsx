@@ -270,7 +270,7 @@ export function ExperiencesView() {
 
         {/* BUTTONS */}
         <div className="flex gap-4">
-          <Button render={<Link href="/booking" />} size="lg" className="h-14 px-10 text-lg bg-[#0099FF] hover:bg-[#007acc] text-white rounded-md uppercase font-bold shadow-none transition-transform hover:scale-105">
+          <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-14 px-10 text-lg bg-[#0099FF] hover:bg-[#007acc] text-white rounded-md uppercase font-bold shadow-none transition-transform hover:scale-105">
             Booke
           </Button>
           <Button variant="outline" size="lg" className="h-14 px-10 text-lg bg-[#D42BCA] hover:bg-[#b01e9e] border-none text-white rounded-md uppercase font-bold shadow-none transition-transform hover:scale-105" onClick={() => alert("Video kommer snart!")}>
