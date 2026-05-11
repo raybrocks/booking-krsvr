@@ -26,70 +26,6 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-// Mock data as fallback if DB is empty
-const MOCK_EXPERIENCES = [
-  {
-    id: "arrow",
-    name: "Arrow",
-    shortDescription: "Heftig pil- og buespill! Jobb på lag med å skyte ned troll og hindre dem i å passere portalen på tre ulike arenaer. Dette er en gående opplevelse med begrenset bevegelsesfrihet. Opptil 4 spillere kan være i samme spill. Grupper på flere enn 4 deltakere må spille i separate spill.",
-    picture: "https://images.unsplash.com/photo-1593922987178-57a4128f74ae?q=80&w=1600&auto=format&fit=crop",
-    type: "Action / Lagspill",
-    age: "Fra 8 år",
-    difficulty: "Medium",
-    maxPlayers: 4,
-    duration: "45 min",
-    tags: ["Teambuilding", "Fest", "Familiemoro"]
-  },
-  {
-    id: "house-of-fear",
-    name: "House of Fear",
-    shortDescription: "Klarer dere å komme dere ut av det hjemsøkte huset før tiden renner ut? Utforsk mørke rom, løs gåter, og overlev i denne iskalde og skumle VR Escape Room opplevelsen.",
-    picture: "https://images.unsplash.com/photo-1518005391-72f5394be5b6?q=80&w=1600&auto=format&fit=crop",
-    type: "Escape Room",
-    age: "Fra 12 år",
-    difficulty: "Hard",
-    maxPlayers: 6,
-    duration: "60 min",
-    tags: ["Skummelt", "Teambuilding", "Gåter"]
-  },
-  {
-    id: "call-of-blood",
-    name: "Call of Blood",
-    shortDescription: "Overlev zombie-apokalypsen med venner! Samarbeid for å forsvare dere mot bølger av vandøde i trange korridorer.",
-    picture: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1600&auto=format&fit=crop",
-    type: "Zombie Shooter",
-    age: "Fra 15 år",
-    difficulty: "Medium",
-    maxPlayers: 4,
-    duration: "45 min",
-    tags: ["Action", "Overlevelse", "Samarbeid"]
-  },
-  {
-    id: "sanctum",
-    name: "Sanctum",
-    shortDescription: "Utforsk ruinene av Sanctum, et forlatt fortelling fra en annen dimensjon. Dere må bruke logikk og samarbeid for å avdekke hemmelighetene.",
-    picture: "https://images.unsplash.com/photo-1626387346567-68b6c039bfe8?q=80&w=1600&auto=format&fit=crop",
-    type: "Escape Room",
-    age: "Fra 10 år",
-    difficulty: "Medium",
-    maxPlayers: 6,
-    duration: "60 min",
-    tags: ["Eventyr", "Magi", "Utforskning"]
-  },
-  {
-    id: "smash-point",
-    name: "Smash Point",
-    shortDescription: "Et fargerikt og helt vilt PvP-spill! Perfekt for bursdager og utdrikningslag som ønsker å konkurrere mot hverandre i tegneserie-lignende verdener.",
-    picture: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600&auto=format&fit=crop",
-    type: "PvP Konkurranse",
-    age: "Fra 8 år",
-    difficulty: "Enkel",
-    maxPlayers: 8,
-    duration: "45 min",
-    tags: ["Konkurranse", "Bursdag", "Høyt Tempo"]
-  }
-];
-
 export function ExperiencesView() {
   const [experiences, setExperiences] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
@@ -105,13 +41,13 @@ export function ExperiencesView() {
           setExperiences(exps);
           setSelectedId(exps[0].id);
         } else {
-          setExperiences(MOCK_EXPERIENCES);
-          setSelectedId(MOCK_EXPERIENCES[0].id);
+          setExperiences([]);
+          setSelectedId("");
         }
       } catch (error) {
         console.error("Error fetching experiences:", error);
-        setExperiences(MOCK_EXPERIENCES);
-        setSelectedId(MOCK_EXPERIENCES[0].id);
+        setExperiences([]);
+        setSelectedId("");
       } finally {
         setIsLoading(false);
       }
@@ -153,7 +89,14 @@ export function ExperiencesView() {
     );
   }
 
-  if (!selected) return null;
+  if (experiences.length === 0 || !selected) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <h2 className="text-2xl font-bold text-white mb-4">Ingen opplevelser lagt til enda</h2>
+        <p className="text-zinc-400">Kom tilbake senere for å se våre opplevelser.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center">
@@ -233,7 +176,6 @@ export function ExperiencesView() {
               <Gamepad2 className="w-20 h-20 text-zinc-800" />
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
         </div>
 
         {/* TITLE */}
