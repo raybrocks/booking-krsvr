@@ -273,9 +273,15 @@ export function ExperiencesView() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-12 text-center uppercase">
-        Våre Opplevelser
-      </h1>
+      <motion.div
+         initial={{ opacity: 0, y: 20 }}
+         animate={{ opacity: 1, y: 0 }}
+         className="text-center mb-16"
+      >
+        <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white">
+          Våre Opplevelser
+        </h1>
+      </motion.div>
 
       {/* HORIZONTAL CAROUSEL NAV */}
       <div className="relative w-full max-w-6xl mx-auto flex items-center mb-16">
