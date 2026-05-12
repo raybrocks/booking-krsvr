@@ -122,6 +122,15 @@ export function ExperiencesView() {
     fetchExperiences();
   }, []);
 
+  useEffect(() => {
+    if (selectedId && scrollRef.current) {
+      const selectedElement = scrollRef.current.querySelector(`[data-id="${selectedId}"]`) as HTMLElement;
+      if (selectedElement) {
+        selectedElement.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }
+  }, [selectedId]);
+
   const filteredExperiences = experiences.filter(exp => {
     if (activeFilter === "Alle") return true;
     if (activeFilter === "Familievennlig") return exp.familyFriendly;
@@ -276,6 +285,7 @@ export function ExperiencesView() {
             return (
               <button
                 key={exp.id}
+                data-id={exp.id}
                 onClick={() => setSelectedId(exp.id)}
                 className={`flex flex-col items-center justify-center flex-shrink-0 snap-center focus:outline-none group min-w-[120px] px-2 py-3 rounded-2xl border transition-all duration-300 ${
                   isSelected 
