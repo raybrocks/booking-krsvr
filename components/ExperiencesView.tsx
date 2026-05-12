@@ -196,11 +196,11 @@ export function ExperiencesView() {
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       <motion.div
          initial={{ opacity: 0, y: 20 }}
          animate={{ opacity: 1, y: 0 }}
-         className="text-center mb-8"
+         className="text-center mb-8 w-full"
       >
         <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white mb-6">
           Våre VR Opplevelser
@@ -224,7 +224,7 @@ export function ExperiencesView() {
       </motion.div>
 
       {/* HORIZONTAL CAROUSEL NAV */}
-      <div className="sticky top-20 z-40 w-full bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5 py-4 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
+      <div className="sticky top-[70px] md:top-[85px] z-40 w-full bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5 py-4 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
         <div className="relative w-full max-w-6xl mx-auto flex items-center">
           <button 
             onClick={scrollLeft} 
