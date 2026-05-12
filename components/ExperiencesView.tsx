@@ -166,6 +166,38 @@ export function ExperiencesView() {
     }
   };
 
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const diffX = touchStartX.current - touchEndX;
+    const diffY = touchStartY.current - touchEndY;
+
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) { 
+      const currentIndex = filteredExperiences.findIndex(exp => exp.id === selectedId);
+      if (diffX > 0) {
+        if (currentIndex < filteredExperiences.length - 1) {
+          setSelectedId(filteredExperiences[currentIndex + 1].id);
+        }
+      } else {
+        if (currentIndex > 0) {
+          setSelectedId(filteredExperiences[currentIndex - 1].id);
+        }
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   // Maps experience type to an icon
   const getIconForType = (type: string, name: string) => {
     const lname = name.toLowerCase();
@@ -288,6 +320,8 @@ export function ExperiencesView() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-6xl mx-auto flex flex-col items-center"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {/* IMAGE / MEDIA GALLERY */}
         <div className="w-full mb-12">
