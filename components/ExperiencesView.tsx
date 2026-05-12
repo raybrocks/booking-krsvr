@@ -26,18 +26,43 @@ import {
   Baby,
   UserCheck,
   Layers,
-  Smile
+  Smile,
+  Activity,
+  X,
+  Play
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 function MediaGallery({ experience }: { experience: any }) {
-  const [activeSlide, setActiveSlide] = useState<"image" | "video">("image");
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  return (
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl group">
+        {experience.picture ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img 
+            src={experience.picture} 
+            alt={experience.name} 
+            className="w-full h-full object-cover select-none pointer-events-none"
+          />
+        ) : (
+          <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+            <Gamepad2 className="w-20 h-20 text-zinc-800" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-  const hasVideo = !!experience.videoUrl;
-  
+export function ExperiencesView() {
+  const [experiences, setExperiences] = useState<any[]>([]);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<string>("Alle");
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
     let embedUrl = url;
@@ -58,138 +83,6 @@ function MediaGallery({ experience }: { experience: any }) {
     }
     return embedUrl;
   };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-    
-    if ((isLeftSwipe || isRightSwipe) && hasVideo) {
-      setActiveSlide(prev => prev === "image" ? "video" : "image");
-    }
-  };
-
-  const toggleMedia = () => {
-    setActiveSlide(prev => prev === "image" ? "video" : "image");
-  };
-
-  return (
-    <div className="w-full flex flex-col items-center">
-      <div 
-        className="w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl group"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        {activeSlide === "image" ? (
-          experience.picture ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img 
-              src={experience.picture} 
-              alt={experience.name} 
-              className="w-full h-full object-cover select-none pointer-events-none"
-            />
-          ) : (
-            <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-              <Gamepad2 className="w-20 h-20 text-zinc-800" />
-            </div>
-          )
-        ) : (
-          <div className="w-full h-full bg-black relative">
-            <iframe 
-              src={getEmbedUrl(experience.videoUrl)} 
-              className="w-full h-full md:pointer-events-auto"
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-            ></iframe>
-          </div>
-        )}
-
-        {/* Desktop Side arrows */}
-        {hasVideo && (
-          <>
-            <button 
-              onClick={toggleMedia}
-              className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-[#9C39FF] hover:bg-[#8A30E0] rounded-full text-white transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] z-10"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button 
-              onClick={toggleMedia}
-              className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-[#9C39FF] hover:bg-[#8A30E0] rounded-full text-white transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] z-10"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            {/* Desktop Dots inside image */}
-            <div className="hidden md:flex absolute bottom-4 left-0 right-0 justify-center gap-3 z-10">
-              <button 
-                onClick={() => setActiveSlide("image")}
-                className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "image" ? "bg-[#9C39FF] scale-125 shadow-[0_0_10px_rgba(156,57,255,0.8)]" : "bg-white/50 hover:bg-white/80"}`}
-                aria-label="View Image"
-              />
-              <button 
-                onClick={() => setActiveSlide("video")}
-                className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "video" ? "bg-[#9C39FF] scale-125 shadow-[0_0_10px_rgba(156,57,255,0.8)]" : "bg-white/50 hover:bg-white/80"}`}
-                aria-label="Play Video"
-              />
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Mobile controls below gallery */}
-      {hasVideo && (
-        <div className="md:hidden flex items-center justify-center gap-6 mt-6 w-full px-4">
-           <button 
-              onClick={toggleMedia}
-              className="p-3 bg-[#9C39FF] rounded-full text-white transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] active:scale-95"
-            >
-              <ChevronLeft className="w-6 h-6" />
-           </button>
-           
-           <div className="flex gap-3">
-              <button 
-                onClick={() => setActiveSlide("image")}
-                className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "image" ? "bg-[#9C39FF] scale-125 shadow-[0_0_10px_rgba(156,57,255,0.8)]" : "bg-zinc-700"}`}
-                aria-label="View Image"
-              />
-              <button 
-                onClick={() => setActiveSlide("video")}
-                className={`w-3 h-3 rounded-full transition-colors ${activeSlide === "video" ? "bg-[#9C39FF] scale-125 shadow-[0_0_10px_rgba(156,57,255,0.8)]" : "bg-zinc-700"}`}
-                aria-label="Play Video"
-              />
-           </div>
-
-           <button 
-              onClick={toggleMedia}
-              className="p-3 bg-[#9C39FF] rounded-full text-white transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] active:scale-95"
-            >
-              <ChevronRight className="w-6 h-6" />
-           </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export function ExperiencesView() {
-  const [experiences, setExperiences] = useState<any[]>([]);
-  const [selectedId, setSelectedId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<string>("Alle");
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchExperiences = async () => {
@@ -351,21 +244,25 @@ export function ExperiencesView() {
               <button
                 key={exp.id}
                 onClick={() => setSelectedId(exp.id)}
-                className="flex flex-col items-center flex-shrink-0 snap-center focus:outline-none group min-w-[120px]"
+                className={`flex flex-col items-center justify-center flex-shrink-0 snap-center focus:outline-none group min-w-[120px] px-2 py-3 rounded-2xl border transition-all duration-300 ${
+                  isSelected 
+                    ? "border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)]" 
+                    : "border-transparent hover:border-zinc-800 hover:bg-zinc-800/30"
+                }`}
               >
                 <div 
-                  className={`w-24 h-24 md:w-28 md:h-28 rounded-full border-2 flex items-center justify-center mb-4 transition-all duration-300 ${
+                  className={`mb-2 transition-colors duration-300 ${
                     isSelected 
-                      ? "border-[#9C39FF] text-white shadow-[0_0_25px_rgba(156,57,255,0.4)]" 
-                      : "border-zinc-800 text-zinc-500 group-hover:border-zinc-600 group-hover:text-zinc-300 bg-zinc-900/50"
+                      ? "text-white" 
+                      : "text-zinc-500 group-hover:text-zinc-300"
                   }`}
                 >
                   {getIconForType(exp.type, exp.name)}
                 </div>
-                <span className={`text-base md:text-lg font-medium transition-colors ${isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}>
+                <span className={`text-sm md:text-base font-medium mb-1 transition-colors ${isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}>
                   {exp.name}
                 </span>
-                <span className={`text-[10px] md:text-xs mt-1 uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-600 bg-zinc-900"}`}>
+                <span className={`text-[10px] md:text-[11px] uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-500 bg-zinc-900"}`}>
                   {exp.type}
                 </span>
               </button>
@@ -458,7 +355,7 @@ export function ExperiencesView() {
           )}
           {selected.jumpScare && (
              <div className="flex items-center gap-2 text-sm md:text-base">
-                <Skull className="w-5 h-5 text-white" />
+                <Activity className="w-5 h-5 text-white" />
                 <span>Jump Scare</span>
              </div>
           )}
@@ -470,7 +367,18 @@ export function ExperiencesView() {
         </p>
 
         {/* BUTTONS */}
-        <div className="flex gap-4">
+        <div className="flex flex-col items-center gap-4">
+          {selected.videoUrl && (
+            <Button 
+              variant="secondary"
+              size="lg" 
+              onClick={() => setIsVideoOpen(true)}
+              className="h-12 px-8 text-base bg-zinc-800 hover:bg-zinc-700 text-white rounded-full uppercase font-medium border border-zinc-700 transition-all hover:scale-105 group"
+            >
+              <Play className="w-5 h-5 mr-2 group-hover:text-[#9C39FF] transition-colors" />
+              Se video
+            </Button>
+          )}
           <Button 
             nativeButton={false} 
             render={<Link href="/booking" />} 
@@ -482,6 +390,34 @@ export function ExperiencesView() {
         </div>
 
       </motion.div>
+
+      {/* Video Modal */}
+      {isVideoOpen && selected.videoUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+          onClick={() => setIsVideoOpen(false)}
+        >
+          <button 
+            onClick={() => setIsVideoOpen(false)}
+            className="absolute top-4 right-4 md:top-8 md:right-8 z-[110] p-3 bg-zinc-800/80 hover:bg-zinc-700 rounded-full text-white transition-colors"
+            aria-label="Lukk video"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          
+          <div 
+            className="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-2xl border border-zinc-800 relative z-[105]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <iframe 
+              src={getEmbedUrl(selected.videoUrl)} 
+              className="w-full h-full"
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
