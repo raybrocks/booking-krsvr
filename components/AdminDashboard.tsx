@@ -325,7 +325,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-6 pt-32 pb-20">
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-light tracking-tight mb-2">Admin Dashboard</h1>

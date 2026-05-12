@@ -59,6 +59,7 @@ export default function ExperiencesManager() {
       familyFriendly: false,
       teambuilding: false,
       party: false,
+      jumpScare: false,
       picture: "",
       videoUrl: ""
     });
@@ -318,6 +319,15 @@ export default function ExperiencesManager() {
                   />
                   <span className="ml-2 text-sm text-zinc-300">Party (Bursdag/Utdrikningslag)</span>
                 </div>
+                <div className="flex items-center h-8">
+                  <input 
+                    type="checkbox" 
+                    checked={editForm.jumpScare || false}
+                    onChange={(e) => setEditForm({...editForm, jumpScare: e.target.checked})}
+                    className="w-5 h-5 accent-[#9C39FF]"
+                  />
+                  <span className="ml-2 text-sm text-zinc-300">Jump Scare</span>
+                </div>
               </div>
             </div>
             
@@ -396,6 +406,9 @@ export default function ExperiencesManager() {
                 )}
                 {exp.party && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Party</span>
+                )}
+                {exp.jumpScare && (
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Jump Scare</span>
                 )}
               </div>
               

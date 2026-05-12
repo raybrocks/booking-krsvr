@@ -188,6 +188,7 @@ export function ExperiencesView() {
   const [experiences, setExperiences] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<string>("Alle");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -228,7 +229,37 @@ export function ExperiencesView() {
     fetchExperiences();
   }, []);
 
-  const selected = experiences.find(e => e.id === selectedId) || experiences[0];
+  const filteredExperiences = experiences.filter(exp => {
+    if (activeFilter === "Alle") return true;
+    if (activeFilter === "Familievennlig") return exp.familyFriendly;
+    if (activeFilter === "Teambuilding") return exp.teambuilding;
+    if (activeFilter === "Fest og Moro") return exp.party;
+    if (activeFilter === "Jump Scare") return exp.jumpScare;
+    return true;
+  });
+
+  const selected = filteredExperiences.find(e => e.id === selectedId) || filteredExperiences[0] || experiences[0];
+
+  const handleFilterClick = (filter: string) => {
+    setActiveFilter(filter);
+    
+    // Find first experience matching new filter
+    const newFiltered = experiences.filter(exp => {
+      if (filter === "Alle") return true;
+      if (filter === "Familievennlig") return exp.familyFriendly;
+      if (filter === "Teambuilding") return exp.teambuilding;
+      if (filter === "Fest og Moro") return exp.party;
+      if (filter === "Jump Scare") return exp.jumpScare;
+      return true;
+    });
+
+    if (newFiltered.length > 0) {
+      setSelectedId(newFiltered[0].id);
+      if (scrollRef.current) {
+        scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+      }
+    }
+  };
 
   const scrollLeft = () => {
     if (scrollRef.current) {
@@ -276,11 +307,27 @@ export function ExperiencesView() {
       <motion.div
          initial={{ opacity: 0, y: 20 }}
          animate={{ opacity: 1, y: 0 }}
-         className="text-center mb-16"
+         className="text-center mb-8"
       >
-        <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white">
+        <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white mb-6">
           Våre VR Opplevelser
         </h1>
+
+        <div className="flex flex-wrap items-center justify-center gap-3 max-w-3xl mx-auto px-4">
+          {["Alle", "Teambuilding", "Fest og Moro", "Familievennlig", "Jump Scare"].map(filter => (
+            <button
+              key={filter}
+              onClick={() => handleFilterClick(filter)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                activeFilter === filter
+                  ? "bg-[#9C39FF] text-white shadow-[0_0_15px_rgba(156,57,255,0.4)]"
+                  : "bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
       </motion.div>
 
       {/* HORIZONTAL CAROUSEL NAV */}
@@ -298,7 +345,7 @@ export function ExperiencesView() {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <div className="flex items-start justify-center gap-4 md:gap-8 px-4 w-max min-w-full snap-x snap-mandatory">
-          {experiences.map((exp) => {
+          {filteredExperiences.map((exp) => {
             const isSelected = exp.id === selectedId;
             return (
               <button
@@ -407,6 +454,12 @@ export function ExperiencesView() {
              <div className="flex items-center gap-2 text-sm md:text-base">
                 <PartyPopper className="w-5 h-5 text-white" />
                 <span>Fest & Moro</span>
+             </div>
+          )}
+          {selected.jumpScare && (
+             <div className="flex items-center gap-2 text-sm md:text-base">
+                <Skull className="w-5 h-5 text-white" />
+                <span>Jump Scare</span>
              </div>
           )}
         </div>
