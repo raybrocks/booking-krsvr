@@ -11,21 +11,38 @@ export default function KontaktPage() {
     name: "",
     email: "",
     phone: "",
+    company: "",
     message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Mock network request
-    setTimeout(() => {
-      setIsSubmitting(false);
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
       setIsSuccess(true);
-      setFormData({ name: "", email: "", phone: "", message: "" });
+      setFormData({ name: "", email: "", phone: "", company: "", message: "" });
       setTimeout(() => setIsSuccess(false), 5000);
-    }, 1500);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      alert("Det oppstod en feil ved sending av meldingen. Vennligst prøv igjen senere.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -180,18 +197,32 @@ export default function KontaktPage() {
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium text-zinc-300">E-postadresse</label>
-                    <Input 
-                      id="email"
-                      name="email" 
-                      type="email" 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="text-sm font-medium text-zinc-300">E-postadresse</label>
+                      <Input 
+                        id="email"
+                        name="email" 
+                        type="email" 
                         value={formData.email}
                         onChange={handleChange}
-                      required 
-                      className="bg-zinc-900 border-zinc-800 focus-visible:ring-[#9C39FF] text-white h-12" 
-                      placeholder="din@epost.no"
-                    />
+                        required 
+                        className="bg-zinc-900 border-zinc-800 focus-visible:ring-[#9C39FF] text-white h-12" 
+                        placeholder="din@epost.no"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="company" className="text-sm font-medium text-zinc-300">Bedrift (valgfritt)</label>
+                      <Input 
+                        id="company"
+                        name="company" 
+                        type="text" 
+                        value={formData.company}
+                        onChange={handleChange}
+                        className="bg-zinc-900 border-zinc-800 focus-visible:ring-[#9C39FF] text-white h-12" 
+                        placeholder="Bedriftsnavn"
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="message" className="text-sm font-medium text-zinc-300">Melding</label>
@@ -236,7 +267,7 @@ export default function KontaktPage() {
            className="mt-12 rounded-3xl overflow-hidden border border-zinc-800/50 h-[400px] bg-zinc-900"
         >
           <iframe 
-            src="https://maps.google.com/maps?q=Industrigata%2012,%204632%20Kristiansand,%20Norway&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            src="https://maps.google.com/maps?q=KRS%20VR%20Arena,%20Industrigata%2012,%204632%20Kristiansand&t=&z=15&ie=UTF8&iwloc=&output=embed"
             width="100%" 
             height="100%" 
             style={{ border: 0 }} 
