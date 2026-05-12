@@ -33,9 +33,9 @@ export default function Header() {
     { href: "/", label: "Hovedside" },
     { href: "/opplevelser", label: "VR Opplevelser" },
     { href: "/arrangement", label: "Arrangement" },
-    { href: "/booking", label: "Booking" },
     { href: "/faq", label: "FAQ" },
     { href: "/kontakt", label: "Kontakt" },
+    { href: "/booking", label: "Booking" },
   ];
 
   return (
@@ -57,8 +57,8 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Right side Language Select (Desktop) & Menu Trigger (Mobile) */}
-        <div className="flex flex-1 justify-end items-center gap-4">
+        {/* Right side Actions */}
+        <div className="flex flex-1 justify-end items-center gap-3 md:gap-4">
           
           {/* Desktop Language Select */}
           <div className="hidden md:block">
@@ -91,18 +91,35 @@ export default function Header() {
               <SheetContent side="right" className="bg-zinc-950 border-zinc-800 text-zinc-100 flex flex-col pt-12">
                 <SheetTitle className="sr-only">Navigasjonsmeny</SheetTitle>
                 <nav className="flex flex-col gap-6 mt-8 flex-1">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`text-xl font-medium transition-colors ${
-                        pathname === link.href ? "text-[#9C39FF]" : "text-zinc-400 hover:text-zinc-200"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  {navLinks.map((link) => {
+                    const isBooking = link.href === "/booking";
+                    
+                    if (isBooking) {
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center justify-center h-14 mt-4 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-lg font-bold uppercase shadow-[0_0_15px_rgba(156,57,255,0.5)] transition-all"
+                        >
+                          {link.label}
+                        </Link>
+                      );
+                    }
+                    
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setIsOpen(false)}
+                        className={`text-xl font-medium transition-colors ${
+                          pathname === link.href ? "text-[#9C39FF]" : "text-zinc-400 hover:text-zinc-200"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    )
+                  })}
                 </nav>
                 
                 {/* Mobile Language Select (Bottom of Menu) */}
@@ -138,6 +155,19 @@ export default function Header() {
         <nav className="flex relative gap-1 md:gap-2">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
+            const isBooking = link.href === "/booking";
+
+            if (isBooking) {
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center justify-center h-10 px-6 ml-2 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-sm font-bold uppercase transition-all shadow-[0_0_15px_rgba(156,57,255,0.5)] hover:shadow-[0_0_25px_rgba(156,57,255,0.7)] hover:scale-105"
+                >
+                  {link.label}
+                </Link>
+              );
+            }
             
             return (
               <Link

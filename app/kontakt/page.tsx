@@ -72,7 +72,7 @@ export default function KontaktPage() {
                   <div>
                     <h3 className="text-white font-medium mb-1">Besøksadresse</h3>
                     <p className="text-zinc-400 font-light">
-                      Sentralt plassert i Kristiansand.<br />
+                      Industrigata 12, 4632 Kristiansand.<br />
                       Gratis parkering tilgjengelig.
                     </p>
                   </div>
@@ -83,7 +83,7 @@ export default function KontaktPage() {
                   </div>
                   <div>
                     <h3 className="text-white font-medium mb-1">E-post</h3>
-                    <p className="text-zinc-400 font-light">post@krsvrarena.no</p>
+                    <p className="text-zinc-400 font-light">post@krsvr.no</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -92,7 +92,7 @@ export default function KontaktPage() {
                   </div>
                   <div>
                     <h3 className="text-white font-medium mb-1">Telefon</h3>
-                    <p className="text-zinc-400 font-light">+47 00 00 00 00</p>
+                    <p className="text-zinc-400 font-light">+47 40828302</p>
                   </div>
                 </div>
               </div>
@@ -104,20 +104,9 @@ export default function KontaktPage() {
                 <Clock className="w-6 h-6 text-[#9C39FF]" />
                 <h2 className="text-2xl font-medium text-white">Åpningstider</h2>
               </div>
-              <ul className="space-y-3 text-zinc-400 font-light mb-6">
-                <li className="flex justify-between">
-                  <span>Torsdag - Fredag</span>
-                  <span className="text-white">16:00 - 22:00</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Lørdag</span>
-                  <span className="text-white">12:00 - 22:00</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Søndag</span>
-                  <span className="text-white">12:00 - 18:00</span>
-                </li>
-              </ul>
+              <div className="text-zinc-400 font-light mb-6">
+                Se bookingside for tilgjengelighet
+              </div>
               
               <div className="p-4 rounded-xl bg-[#9C39FF]/10 border border-[#9C39FF]/20 mt-6">
                 <div className="flex items-start gap-3">
@@ -247,7 +236,7 @@ export default function KontaktPage() {
            className="mt-12 rounded-3xl overflow-hidden border border-zinc-800/50 h-[400px] bg-zinc-900"
         >
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d16790.62768560124!2d7.986300481077797!3d58.14660993952402!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46380258d5607b3b%3A0x6b880ffdfd410db!2sKristiansand!5e0!3m2!1sno!2sno!4v1700684120300!5m2!1sno!2sno" 
+            src="https://maps.google.com/maps?q=Industrigata%2012,%204632%20Kristiansand,%20Norway&t=&z=15&ie=UTF8&iwloc=&output=embed"
             width="100%" 
             height="100%" 
             style={{ border: 0 }} 

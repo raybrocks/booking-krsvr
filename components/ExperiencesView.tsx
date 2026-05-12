@@ -279,7 +279,7 @@ export function ExperiencesView() {
          className="text-center mb-16"
       >
         <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white">
-          Våre Opplevelser
+          Våre VR Opplevelser
         </h1>
       </motion.div>
 
@@ -294,9 +294,10 @@ export function ExperiencesView() {
 
         <div 
           ref={scrollRef}
-          className="w-full flex items-start overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-4 md:gap-8 px-4"
+          className="w-full overflow-x-auto hide-scrollbar"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
+          <div className="flex items-start justify-center gap-4 md:gap-8 px-4 w-max min-w-full snap-x snap-mandatory">
           {experiences.map((exp) => {
             const isSelected = exp.id === selectedId;
             return (
@@ -323,6 +324,7 @@ export function ExperiencesView() {
               </button>
             );
           })}
+          </div>
         </div>
 
         <button 
@@ -351,7 +353,7 @@ export function ExperiencesView() {
           <h2 className="text-4xl md:text-6xl font-black text-white tracking-wide uppercase text-center">
             {selected.name}
           </h2>
-          <span className="text-[10px] md:text-xs uppercase tracking-wider px-3 py-1 rounded bg-[#9C39FF] text-white font-medium">
+          <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
             {selected.type}
           </span>
         </div>
