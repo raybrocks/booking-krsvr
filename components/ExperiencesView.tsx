@@ -224,21 +224,22 @@ export function ExperiencesView() {
       </motion.div>
 
       {/* HORIZONTAL CAROUSEL NAV */}
-      <div className="relative w-full max-w-6xl mx-auto flex items-center mb-16">
-        <button 
-          onClick={scrollLeft} 
-          className="absolute -left-4 md:-left-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors"
-        >
-          <ChevronLeft className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
-        </button>
+      <div className="sticky top-20 z-40 w-full bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5 py-4 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
+        <div className="relative w-full max-w-6xl mx-auto flex items-center">
+          <button 
+            onClick={scrollLeft} 
+            className="absolute -left-4 md:-left-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors"
+          >
+            <ChevronLeft className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
+          </button>
 
-        <div 
-          ref={scrollRef}
-          className="w-full overflow-x-auto hide-scrollbar"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          <div className="flex items-start justify-center gap-4 md:gap-8 px-4 w-max min-w-full snap-x snap-mandatory">
-          {filteredExperiences.map((exp) => {
+          <div 
+            ref={scrollRef}
+            className="w-full overflow-x-auto hide-scrollbar"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            <div className="flex items-start justify-center gap-4 md:gap-8 px-4 w-max min-w-full snap-x snap-mandatory">
+            {filteredExperiences.map((exp) => {
             const isSelected = exp.id === selectedId;
             return (
               <button
@@ -277,6 +278,7 @@ export function ExperiencesView() {
         >
           <ChevronRight className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
         </button>
+        </div>
       </div>
 
       {/* SELECTED EXPERIENCE DETAILS */}
