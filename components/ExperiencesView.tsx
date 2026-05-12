@@ -224,7 +224,7 @@ export function ExperiencesView() {
       </motion.div>
 
       {/* HORIZONTAL CAROUSEL NAV */}
-      <div className="sticky top-[96px] md:top-[174px] lg:top-[184px] z-40 w-full bg-black py-4 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)] border-b border-white/5">
+      <div className="sticky top-[81px] md:top-[189px] lg:top-[199px] z-40 w-full bg-black py-4 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)] border-b border-white/5">
         <div className="relative w-full max-w-6xl mx-auto flex items-center">
           <button 
             onClick={scrollLeft} 

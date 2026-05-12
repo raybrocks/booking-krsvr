@@ -37,11 +37,7 @@ export default function LandingPage() {
           transition={{ duration: 0.7 }}
           className="max-w-4xl mx-auto space-y-6 md:space-y-8"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-zinc-300">
-            <MapPin className="w-4 h-4 text-[#9C39FF]" />
-            Nyåpning
-          </div>
-          
+
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tighter text-white leading-[1.15]">
             <span className="font-bold">VR Escape Rooms og Arcade for små og store grupper i Kristiansand</span>
           </h1>
