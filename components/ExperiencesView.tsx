@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { motion } from "motion/react";
+import { motion, AnimatePresence, PanInfo } from "motion/react";
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -175,25 +175,12 @@ export function ExperiencesView() {
     }
   };
 
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const swipeThreshold = 50;
     
-    const diffX = touchStartX.current - touchEndX;
-    const diffY = touchStartY.current - touchEndY;
-
-    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) { 
+    if (Math.abs(info.offset.x) > swipeThreshold) { 
       const currentIndex = filteredExperiences.findIndex(exp => exp.id === selectedId);
-      if (diffX > 0) {
+      if (info.offset.x < 0) {
         if (currentIndex < filteredExperiences.length - 1) {
           setSelectedId(filteredExperiences[currentIndex + 1].id);
         }
@@ -203,8 +190,6 @@ export function ExperiencesView() {
         }
       }
     }
-    touchStartX.current = null;
-    touchStartY.current = null;
   };
 
   // Maps experience type to an icon
@@ -324,14 +309,18 @@ export function ExperiencesView() {
       </div>
 
       {/* SELECTED EXPERIENCE DETAILS */}
+      <AnimatePresence mode="wait">
       <motion.div 
         key={selected.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-6xl mx-auto flex flex-col items-center"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ duration: 0.3 }}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.4}
+        onDragEnd={handleDragEnd}
+        className="w-full max-w-6xl mx-auto flex flex-col items-center cursor-grab active:cursor-grabbing"
       >
         {/* IMAGE / MEDIA GALLERY */}
         <div className="w-full mb-12">
@@ -436,6 +425,7 @@ export function ExperiencesView() {
         </div>
 
       </motion.div>
+      </AnimatePresence>
 
       {/* Video Modal */}
       {isVideoOpen && selected.videoUrl && (
