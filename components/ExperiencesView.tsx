@@ -200,13 +200,13 @@ export function ExperiencesView() {
       <motion.div
          initial={{ opacity: 0, y: 20 }}
          animate={{ opacity: 1, y: 0 }}
-         className="text-center mb-8 w-full"
+         className="mb-10 text-center px-4 w-full"
       >
-        <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white mb-6">
+        <h1 className="text-4xl md:text-5xl font-light tracking-tighter">
           Våre VR Opplevelser
         </h1>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 max-w-3xl mx-auto px-4">
+        <div className="flex flex-wrap items-center justify-center gap-3 max-w-3xl mx-auto px-4 mt-6">
           {["Alle", "Teambuilding", "Fest og Moro", "Familievennlig", "Jump Scare"].map(filter => (
             <button
               key={filter}

@@ -51,19 +51,19 @@ export default function KontaktPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black pt-28 pb-20 relative overflow-hidden">
+    <main className="min-h-screen bg-black pt-16 pb-20 relative overflow-hidden">
       <div className="absolute top-0 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9C39FF]/10 via-black to-black -z-10" />
       
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         <motion.div
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
-           className="text-center mb-16"
+           className="mb-10 text-center px-4"
         >
-          <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white mb-6">
+          <h1 className="text-4xl md:text-5xl font-light tracking-tighter">
             Kontakt Oss
           </h1>
-          <p className="text-lg md:text-xl text-zinc-400 font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-3 text-zinc-400 max-w-lg mx-auto">
             Har du spørsmål, ønsker du å booke for en større gruppe, eller planlegger et firmaevent?
             Ta kontakt med oss – vi hjelper deg gjerne!
           </p>

@@ -3,7 +3,7 @@ import { ExperiencesView } from "@/components/ExperiencesView";
 
 export default function ExperiencesPage() {
   return (
-    <main className="min-h-screen bg-black pt-32 pb-20 relative overflow-visible">
+    <main className="min-h-screen bg-black pt-16 pb-20 relative overflow-visible">
       {/* Background flourishes */}
       <div className="absolute top-0 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9C39FF]/10 via-black to-black -z-10" />
       
