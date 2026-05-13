@@ -67,7 +67,7 @@ function KontaktForm() {
     }
   }, [searchParams]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formType === "arrangement" && !consent) {
       alert("Du må samtykke til at vi kan kontakte deg.");
@@ -75,11 +75,44 @@ function KontaktForm() {
     }
     
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formType,
+          name,
+          email,
+          phone,
+          message,
+          groupType,
+          companyName,
+          eventType,
+          packageType,
+          peopleCount,
+          date,
+          altDate,
+          time,
+          food
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        setIsSuccess(true);
+      } else {
+        alert("Det oppstod en feil ved sending: " + (result.error?.message || "Ukjent feil"));
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Det oppstod en feil. Vennligst prøv igjen senere.");
+    } finally {
       setIsSubmitting(false);
-      setIsSuccess(true);
-    }, 1500);
+    }
   };
 
   const isFormValid = () => {
