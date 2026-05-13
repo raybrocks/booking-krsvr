@@ -10,6 +10,7 @@ export default function TransactionsManager() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [experiencesMap, setExperiencesMap] = useState<Record<string, string>>({});
 
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [selectedTx, setSelectedTx] = useState<any>(null);
@@ -19,6 +20,17 @@ export default function TransactionsManager() {
   useEffect(() => {
     const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
     
+    // Fetch experiences map once
+    import("firebase/firestore").then(({ getDocs }) => {
+      getDocs(collection(db, "experiences")).then(snapshot => {
+        const expsMap: Record<string, string> = {};
+        snapshot.docs.forEach(docSnap => {
+          expsMap[docSnap.id] = docSnap.data().title || docSnap.data().name || docSnap.id;
+        });
+        setExperiencesMap(expsMap);
+      }).catch(console.error);
+    });
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => {
         const bookingData = doc.data();
@@ -138,7 +150,7 @@ export default function TransactionsManager() {
                        {loadingReceipt ? (
                          <span className="flex items-center gap-2"><Loader2 className="w-3 h-3 animate-spin"/> Henter...</span>
                        ) : (
-                         selectedBooking?.experienceId ? `VR Opplevelse (${selectedBooking.experienceId})` : "VR Opplevelse"
+                         selectedBooking?.experienceId ? (experiencesMap[selectedBooking.experienceId] || `VR Opplevelse (${selectedBooking.experienceId})`) : "VR Opplevelse"
                        )}
                    </td>
                    <td className="text-center py-2">{selectedBooking?.players || 1}</td>

@@ -50,11 +50,12 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [experiencesMap, setExperiencesMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
     
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribeBookings = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -91,8 +92,19 @@ export default function AdminDashboard() {
 
     const interval = setInterval(() => setCurrentTime(Date.now()), 5000);
 
+    const unsubscribeExperiences = onSnapshot(collection(db, "experiences"), (snapshot) => {
+      const expsMap: Record<string, string> = {};
+      snapshot.docs.forEach(docSnap => {
+        expsMap[docSnap.id] = docSnap.data().title || docSnap.data().name || docSnap.id;
+      });
+      setExperiencesMap(expsMap);
+    }, (error) => {
+      console.error("Error fetching experiences:", error);
+    });
+
     return () => {
-      unsubscribe();
+      unsubscribeBookings();
+      unsubscribeExperiences();
       clearInterval(interval);
     };
   }, []);
@@ -248,7 +260,7 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-zinc-300">{booking.experienceId}</div>
+                    <div className="text-zinc-300">{experiencesMap[booking.experienceId] || booking.experienceId}</div>
                     <div className="flex items-center gap-1 mt-1 text-xs text-zinc-500">
                       <Users className="w-3 h-3" /> {booking.players} Players
                     </div>
