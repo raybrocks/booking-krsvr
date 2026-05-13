@@ -41,6 +41,7 @@ export default function ExperiencesManager() {
   const handleEdit = (exp: any) => {
     setEditingId(exp.id);
     setEditForm({ ...exp });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleAddNew = () => {
@@ -63,6 +64,7 @@ export default function ExperiencesManager() {
       picture: "",
       videoUrl: ""
     });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
