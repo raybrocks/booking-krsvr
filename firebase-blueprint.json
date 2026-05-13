@@ -10,7 +10,7 @@
         "shortDescription": { "type": "string" },
         "picture": { "type": "string" },
         "videoUrl": { "type": "string" },
-        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Adventure", "Zombie", "Archer"] },
+        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Adventure", "Zombie", "Archer", "Shooter"] },
         "age": { "type": "string" },
         "difficulty": { "type": "string" },
         "maxPlayers": { "type": "number" },
@@ -54,6 +54,7 @@
       "type": "object",
       "properties": {
         "id": { "type": "string" },
+        "termsContent": { "type": "string" },
         "openingHours": {
           "type": "object",
           "description": "Map of day of week (0-6, 0=Sunday) to array of timeslots (e.g., ['18:00', '19:30'])",

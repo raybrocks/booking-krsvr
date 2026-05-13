@@ -198,6 +198,7 @@ export function ExperiencesView() {
     const ltype = type ? type.toLowerCase() : "";
     
     if (ltype.includes("escape") || lname.includes("escape")) return <Handshake className="w-10 h-10" />;
+    if (ltype.includes("shooter") || lname.includes("shooter")) return <Crosshair className="w-10 h-10" />;
     if (ltype.includes("zomb") || lname.includes("zomb") || lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10" />;
     if (ltype.includes("archer") || lname.includes("archer")) return <Mountain className="w-10 h-10" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10" />;
