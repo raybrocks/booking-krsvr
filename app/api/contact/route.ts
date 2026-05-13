@@ -12,38 +12,46 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { name, email, phone, company, message } = await req.json();
+    const data = await req.json();
 
-    if (!name || !email || !message) {
+    if (!data.name || !data.email || !data.message) {
       return NextResponse.json(
         { error: 'Name, email, and message are required.' },
         { status: 400 }
       );
     }
 
-    const { data, error } = await resend.emails.send({
+    let htmlContent = `<h2>Ny henvendelse fra KRS VR Arena</h2>`;
+    
+    htmlContent += `<p><strong>Type:</strong> ${data.formType === 'arrangement' ? 'Arrangement / Gruppebooking' : 'Annen henvendelse'}</p>`;
+    htmlContent += `<p><strong>Navn:</strong> ${data.name}</p>`;
+    htmlContent += `<p><strong>E-post:</strong> ${data.email}</p>`;
+    htmlContent += `<p><strong>Telefon:</strong> ${data.phone}</p>`;
+    
+    if (data.formType === 'arrangement') {
+      htmlContent += `<p><strong>Gruppe:</strong> ${data.groupType === 'privat' ? 'Privat gruppe' : 'Bedrift / organisasjon'}</p>`;
+      if (data.companyName) {
+        htmlContent += `<p><strong>Bedriftsnavn:</strong> ${data.companyName}</p>`;
+      }
+      htmlContent += `<p><strong>Type arrangement:</strong> ${data.eventType}</p>`;
+      htmlContent += `<p><strong>Ønsket opplegg:</strong> ${data.packageType}</p>`;
+      htmlContent += `<p><strong>Antall personer:</strong> ${data.peopleCount}</p>`;
+      htmlContent += `<p><strong>Dato:</strong> ${data.date}</p>`;
+      if (data.altDate) {
+        htmlContent += `<p><strong>Alternativ dato:</strong> ${data.altDate}</p>`;
+      }
+      htmlContent += `<p><strong>Tidspunkt:</strong> ${data.time}</p>`;
+      htmlContent += `<p><strong>Matønsker:</strong> ${data.food}</p>`;
+    }
+    
+    htmlContent += `<p><strong>Melding:</strong></p><p>${data.message.replace(/\\n/g, '<br/>')}</p>`;
+
+    const { data: resendData, error } = await resend.emails.send({
       from: 'Krs VR Arena Form <booking@donotreply.krsvr.no>',
       to: 'post@krsvr.no',
-      replyTo: email,
-      subject: `Ny melding fra kontaktskjema: ${name}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          <h2 style="color: #9C39FF;">Ny henvendelse fra nettsiden</h2>
-          <p>Du har mottatt en ny melding fra kontaktskjemaet på krsvr.no.</p>
-          
-          <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0 0 10px 0;"><strong>Navn:</strong> ${name}</p>
-            <p style="margin: 0 0 10px 0;"><strong>E-post:</strong> <a href="mailto:${email}">${email}</a></p>
-            <p style="margin: 0 0 10px 0;"><strong>Telefon:</strong> ${phone || 'Ikke oppgitt'}</p>
-            <p style="margin: 0 0 10px 0;"><strong>Bedrift:</strong> ${company || 'Ikke oppgitt'}</p>
-          </div>
-          
-          <h3 style="font-size: 16px; margin-top: 20px;">Melding:</h3>
-          <div style="background: #fff; padding: 15px; border-left: 4px solid #9C39FF; border-radius: 0 4px 4px 0;">
-            <p style="margin: 0; white-space: pre-wrap;">${message}</p>
-          </div>
-        </div>
-      `,
+      replyTo: data.email,
+      subject: `Ny forespørsel: ${data.formType === 'arrangement' ? data.eventType || 'Arrangement' : 'Henvendelse'} fra ${data.name}`,
+      html: htmlContent,
     });
 
     if (error) {
@@ -51,7 +59,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, data }, { status: 200 });
+    return NextResponse.json({ success: true, data: resendData }, { status: 200 });
   } catch (error) {
     console.error('Contact form exception:', error);
     return NextResponse.json(
