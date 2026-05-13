@@ -32,7 +32,7 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: "Hovedside" },
     { href: "/opplevelser", label: "VR Opplevelser" },
-    { href: "/arrangement", label: "Arrangement" },
+    { href: "/arrangementer", label: "Arrangementer" },
     { href: "/faq", label: "FAQ" },
     { href: "/kontakt", label: "Kontakt" },
     { href: "/booking", label: "Booking" },

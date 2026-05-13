@@ -28,7 +28,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><Link href="/" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Hovedside</Link></li>
               <li><Link href="/opplevelser" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">VR Opplevelser</Link></li>
-              <li><Link href="/arrangement" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Arrangementer</Link></li>
+              <li><Link href="/arrangementer" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Arrangementer</Link></li>
               <li><Link href="/booking" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Booking</Link></li>
               <li><Link href="/faq" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">FAQ</Link></li>
             </ul>
