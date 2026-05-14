@@ -276,9 +276,18 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-zinc-300">{booking.totalPrice} NOK</div>
-                    <div className="text-xs text-zinc-500 mt-1 capitalize">
-                      {booking.paymentType}
+                    <div className="text-zinc-300">
+                      Totalt: {booking.totalPrice} NOK
+                    </div>
+                    {booking.amountPaid !== undefined && (
+                      <div className="text-xs text-zinc-400 mt-1">
+                        Betalt nå: {booking.amountPaid} NOK
+                      </div>
+                    )}
+                    <div className={`text-xs mt-1 font-medium ${booking.paymentType === 'full' || booking.amountPaid >= booking.totalPrice ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      {booking.paymentType === 'full' || booking.amountPaid >= booking.totalPrice 
+                        ? 'Fullt beløp betalt' 
+                        : `Å betale ved oppmøte: ${(booking.totalPrice || 0) - (booking.amountPaid || 0)} NOK`}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-xs text-zinc-400">
