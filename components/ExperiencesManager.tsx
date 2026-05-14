@@ -398,7 +398,7 @@ export default function ExperiencesManager() {
               <p className="text-sm text-zinc-400 line-clamp-2 mb-4 flex-1">{exp.shortDescription}</p>
               
               <div className="flex flex-wrap gap-2 text-xs text-zinc-500 mb-4">
-                <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Max {exp.maxPlayers}</span>
+                <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Fra 2-{exp.maxPlayers} personer</span>
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.age}</span>
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>
                 {exp.familyFriendly && (

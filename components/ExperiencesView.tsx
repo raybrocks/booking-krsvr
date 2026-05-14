@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { slugify } from "@/lib/utils";
 
 function MediaGallery({ experience }: { experience: any }) {
   return (
@@ -55,7 +56,7 @@ function MediaGallery({ experience }: { experience: any }) {
   );
 }
 
-export function ExperiencesView() {
+export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTypeSlug?: string | null, initialExpSlug?: string | null }) {
   const [experiences, setExperiences] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -103,7 +104,17 @@ export function ExperiencesView() {
 
           setExperiences(exps);
           if (exps.length > 0) {
-            setSelectedId(exps[0].id);
+            let initialId = exps[0].id;
+            
+            if (initialTypeSlug && initialExpSlug) {
+              const matchedExp = exps.find(e => slugify(e.type) === initialTypeSlug && slugify(e.name) === initialExpSlug);
+              if (matchedExp) initialId = matchedExp.id;
+            } else if (initialTypeSlug) {
+              const matchedExp = exps.find(e => slugify(e.type) === initialTypeSlug);
+              if (matchedExp) initialId = matchedExp.id;
+            }
+            
+            setSelectedId(initialId);
           } else {
             setSelectedId("");
           }
@@ -120,7 +131,7 @@ export function ExperiencesView() {
       }
     };
     fetchExperiences();
-  }, []);
+  }, [initialTypeSlug, initialExpSlug]);
 
   useEffect(() => {
     if (selectedId && scrollRef.current) {
@@ -129,7 +140,15 @@ export function ExperiencesView() {
         selectedElement.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       }
     }
-  }, [selectedId]);
+    
+    // Update URL when selectedId changes
+    const exp = experiences.find(e => e.id === selectedId);
+    if (exp) {
+      const newUrl = `/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`;
+      window.history.replaceState({ path: newUrl }, '', newUrl);
+    }
+    
+  }, [selectedId, experiences]);
 
   const filteredExperiences = experiences.filter(exp => {
     if (activeFilter === "Alle") return true;
@@ -347,7 +366,7 @@ export function ExperiencesView() {
 
           <div className="flex items-center gap-2 text-sm md:text-base">
             <Users className="w-5 h-5 text-white" />
-            <span>{selected.maxPlayers ? `Opptil ${selected.maxPlayers} pers` : "2-4 pers"}</span>
+            <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-4 personer"}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm md:text-base">
