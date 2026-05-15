@@ -65,7 +65,7 @@ export default function PriserPage() {
 
             <div className="space-y-4">
               {[
-                { pers: "8 pers+", price: "375 kr", popular: true },
+                { pers: "8 pers+", price: "375 kr", popular: false },
                 { pers: "5 - 7 pers", price: "385 kr", popular: false },
                 { pers: "3 - 4 pers", price: "395 kr", popular: false },
                 { pers: "2 pers", price: "460 kr", popular: false },
@@ -75,7 +75,7 @@ export default function PriserPage() {
                     <span className={`text-lg font-medium ${tier.popular ? 'text-white' : 'text-zinc-300'}`}>{tier.pers}</span>
                     {tier.popular && (
                       <span className="text-[10px] uppercase tracking-wider font-bold bg-[#9C39FF] text-white px-2 py-0.5 rounded-full">
-                        Mest popuær
+                        Mest populær
                       </span>
                     )}
                   </div>
@@ -99,7 +99,7 @@ export default function PriserPage() {
                 "Cirka 45-55 min aktiv spilletid i VR.",
                 "Dedikert gamemaster som har ansvar for deres gruppe.",
                 "Gruppebilder etter endt spill.",
-                "Gratis iskaldt vann å drikke.",
+                "Gratis vann å drikke.",
                 "Tilgang til vår partylounge i 30 minutter etter spillet.",
                 "Mulighet til å nyte medbrakt mat, kake og drikke.",
               ].map((item, idx) => (
