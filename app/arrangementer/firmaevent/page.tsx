@@ -2,10 +2,45 @@ import React from "react";
 import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 import PremiumPackageCard from "@/components/PremiumPackageCard";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Firmaevent, Julebord & Teambuilding Kristiansand | KRS VR Arena",
+  description: "Bygg team, skap energi og gi kollegene en opplevelse utenfor møterommet. Unike VR-opplevelser, perfekt for teambuilding, firmafest og julebord i Kristiansand.",
+  keywords: ["Teambuilding Kristiansand", "Firmaevent Kristiansand", "Julebord Kristiansand", "Firmafest Kristiansand", "Kick off Kristiansand", "Aktivitet for bedrifter", "VR bedrift"],
+  openGraph: {
+    title: "Firmaevent & Teambuilding Kristiansand | KRS VR Arena",
+    description: "Unike VR-opplevelser, perfekt for teambuilding, firmafest og julebord i Kristiansand. Fra 2-24 personer.",
+    url: "https://vrsenteret.no/arrangementer/firmaevent",
+    type: "website",
+  }
+};
 
 export default function FirmaeventPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Teambuilding og Firmaevent",
+    "description": "Engasjerende teambuilding, julebord og firmaevent med opptil 24 personer. Bygg relasjoner med samarbeids-VR.",
+    "brand": {
+      "@type": "Brand",
+      "name": "KRS VR Arena"
+    },
+    "category": "Corporate Events",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "375",
+      "priceCurrency": "NOK",
+      "offerCount": "3"
+    }
+  };
+
   return (
     <main className="min-h-screen pb-20 pt-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero Section */}
       <div className="mb-10 text-center px-4">
         <h1 className="text-4xl md:text-5xl font-light tracking-tighter">
@@ -29,7 +64,7 @@ export default function FirmaeventPage() {
         {/* Trust Line */}
         <div className="flex justify-center mb-16">
           <div className="inline-flex items-center text-sm text-zinc-400 bg-zinc-900/50 px-6 py-3 rounded-full border border-white/5 whitespace-normal text-center">
-            2–24 personer &middot; Fra 375 kr per person &middot; Partylounge &middot; Kaffe og vann ved forespørsel
+            2–64 personer &middot; Fra 375 kr per person &middot; Partylounge &middot; Kaffe og vann ved forespørsel
           </div>
         </div>
 

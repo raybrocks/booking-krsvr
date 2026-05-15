@@ -69,31 +69,29 @@ service cloud.firestore {
 
     match /experiences/{experienceId} {
       allow read: if true;
-      allow create: if isValidExperience(request.resource.data);
-      allow update, delete: if isAdmin() && isValidExperience(request.resource.data);
+      allow create, update, delete: if isAdmin() && isValidExperience(request.resource.data);
     }
 
     match /transactions/{transactionId} {
       allow read: if isAdmin();
       allow create: if isValidTransaction(request.resource.data);
-      allow update: if isValidTransaction(request.resource.data) || request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'transactionLogHistory']);
+      allow update: if isAdmin() || (isValidTransaction(request.resource.data) && request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'transactionLogHistory']));
       allow delete: if isAdmin();
     }
 
     match /bookings/{bookingId} {
-      allow read: if true;
-      // Anyone can create a booking, but they must provide valid data
+      // Create is public so users can book
       allow create: if isValidBooking(request.resource.data);
-      allow update: if isAdmin() || (
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'amountPaid', 'confirmationEmailSent', 'newsletterAdded'])
-      );
-      allow delete: if isAdmin();
+      // Only admins can read, update, or delete bookings
+      // Note: If a user needs to read their own booking, we could add a check for a session token or similar, 
+      // but usually an email confirmation link contains the booking info or a secret token.
+      // Alternatively, restrict to isAdmin()
+      allow read, update, delete: if isAdmin();
     }
 
     match /settings/{settingId} {
       allow read: if true;
-      allow create: if isValidSettings(request.resource.data);
-      allow update, delete: if isAdmin() && isValidSettings(request.resource.data);
+      allow create, update, delete: if isAdmin() && isValidSettings(request.resource.data);
     }
   }
 }

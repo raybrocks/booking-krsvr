@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebase-admin';
 
 export async function POST(req: Request) {
   try {
@@ -11,14 +10,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing reference' }, { status: 400 });
     }
 
-    const bookingRef = doc(db, 'bookings', reference);
-    const bookingSnap = await getDoc(bookingRef);
+    const bookingRef = adminDb.collection('bookings').doc(reference);
+    const bookingSnap = await bookingRef.get();
 
-    if (!bookingSnap.exists()) {
+    if (!bookingSnap.exists) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    const bookingData = bookingSnap.data();
+    const bookingData = bookingSnap.data()!;
 
     // -- Fetch Vipps Payment Status --
     const isTest = process.env.VIPPS_ENV !== 'production';
@@ -59,7 +58,7 @@ export async function POST(req: Request) {
           const successStates = ['AUTHORIZED', 'epayment.payment.reserved', 'CAPTURED', 'epayment.payment.captured', 'SALE'];
 
           if (!successStates.includes(pStatus)) {
-             await updateDoc(bookingRef, { status: 'cancelled' });
+             await bookingRef.update({ status: 'cancelled' });
              return NextResponse.json({ error: `Payment was not successful. Status: ${pStatus}` }, { status: 400 });
           }
 
@@ -96,7 +95,7 @@ export async function POST(req: Request) {
 
     // If it's already confirmed, we might just need to ensure the email is sent
     if (bookingData.status !== 'confirmed') {
-      await updateDoc(bookingRef, {
+      await bookingRef.update({
         status: 'confirmed'
       });
     }
@@ -105,10 +104,10 @@ export async function POST(req: Request) {
     if (!bookingData.confirmationEmailSent) {
       let customText = "";
       try {
-        const settingsRef = doc(db, 'settings', 'general');
-        const settingsSnap = await getDoc(settingsRef);
-        if (settingsSnap.exists()) {
-          customText = settingsSnap.data().bookingConfirmationText || "";
+        const settingsRef = adminDb.collection('settings').doc('general');
+        const settingsSnap = await settingsRef.get();
+        if (settingsSnap.exists) {
+          customText = settingsSnap.data()!.bookingConfirmationText || "";
         }
       } catch (e) {
         console.error("Failed to fetch settings for email:", e);
@@ -130,11 +129,11 @@ export async function POST(req: Request) {
 
       if (bookingData.acceptedNewsletter && !bookingData.newsletterAdded) {
          await addContactToNewsletter(bookingData.email, bookingData.firstName, bookingData.lastName);
-         await updateDoc(bookingRef, { newsletterAdded: true });
+         await bookingRef.update({ newsletterAdded: true });
       }
 
       // Mark email as sent
-      await updateDoc(bookingRef, {
+      await bookingRef.update({
         confirmationEmailSent: true
       });
     }

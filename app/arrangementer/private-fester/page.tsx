@@ -2,10 +2,45 @@ import React from "react";
 import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 import PremiumPackageCard from "@/components/PremiumPackageCard";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Utdrikningslag, Julebord & Bursdag Kristiansand | KRS VR Arena",
+  description: "Planlegger du utdrikningslag, bursdag eller julebord med vennegjengen? KRS VR Arena i Kristiansand tilbyr unike opplevelser for private grupper.",
+  keywords: ["Utdrikningslag Kristiansand", "Bursdag Kristiansand", "Private fester Kristiansand", "Julebord vennegjeng Kristiansand", "Vennegjeng aktivitet", "Innendørs aktivitet Kristiansand", "VR utdrikningslag"],
+  openGraph: {
+    title: "Utdrikningslag, Julebord & Bursdag i Kristiansand | KRS VR Arena",
+    description: "Samle vennegjengen for utdrikningslag, julebord eller bursdag med aktive og morsomme VR-opplevelser i Kristiansand.",
+    url: "https://vrsenteret.no/arrangementer/private-fester",
+    type: "website",
+  }
+};
 
 export default function PrivateFesterPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Utdrikningslag, Julebord og Bursdag (Private fester)",
+    "description": "Planlegg festen, utdrikningslaget eller julebordet med spennende VR-konkurranser og Escape Rooms. Inkluderer partylounge for gruppen din i Kristiansand.",
+    "brand": {
+      "@type": "Brand",
+      "name": "KRS VR Arena"
+    },
+    "category": "Private Events",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "375",
+      "priceCurrency": "NOK",
+      "offerCount": "3"
+    }
+  };
+
   return (
     <main className="min-h-screen pb-20 pt-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero Section */}
       <div className="mb-10 text-center px-4">
         <h1 className="text-4xl md:text-5xl font-light tracking-tighter">
@@ -29,7 +64,7 @@ export default function PrivateFesterPage() {
         {/* Trust Line */}
         <div className="flex justify-center mb-16">
           <div className="inline-flex items-center text-sm text-zinc-400 bg-zinc-900/50 px-6 py-3 rounded-full border border-white/5">
-            2–24 personer &middot; Fra 375 kr per person &middot; Partylounge inkludert &middot; Ingen erfaring nødvendig
+            2–64 personer &middot; Fra 375 kr per person &middot; Partylounge inkludert &middot; Ingen erfaring nødvendig
           </div>
         </div>
 
@@ -60,7 +95,7 @@ export default function PrivateFesterPage() {
           <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-8 flex flex-col">
             <h2 className="text-2xl font-medium tracking-tight mb-4">Bursdag</h2>
             <p className="text-zinc-400 leading-relaxed mb-8 flex-grow">
-              Gi bursdagsbarnet en opplevelse som skiller seg ut. Hos KRS VR Arena får gruppa prøve unike VR-opplevelser der alle kan delta, enten de har prøvd VR før eller ikke.
+              En opplevelse som skiller seg ut. Hos KRS VR Arena får gruppa prøve unike VR-opplevelser der alle kan delta, enten de har prøvd VR før eller ikke.
             </p>
             <Link href="/kontakt" className="inline-flex items-center text-sm font-medium text-white hover:text-[#9C39FF] transition-colors w-fit">
               Planlegg bursdag <ArrowRight className="ml-2 w-4 h-4" />

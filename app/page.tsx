@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import HomeCarousel from "@/components/HomeCarousel";
 import { motion } from "motion/react";
 import { 
   ArrowRight, 
@@ -24,8 +25,40 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "EntertainmentBusiness",
+    "name": "KRS VR Arena",
+    "description": "Løs oppdrag, koder eller konkurrer i eksklusive lagspill. Perfekt for venner, bursdag, utdrikningslag, firma og teambuilding.",
+    "url": "https://vrsenteret.no", 
+    "telephone": "+4740828302",
+    "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Industrigata 12",
+      "postalCode": "4632",
+      "addressLocality": "Kristiansand",
+      "addressCountry": "NO"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "58.149257",
+      "longitude": "8.016398"
+    },
+    "keywords": "VR Kristiansand, Escape Room, Teambuilding, Virtual Reality",
+    "offers": {
+      "@type": "AggregateOffer",
+      "offerCount": "10",
+      "priceCurrency": "NOK"
+    }
+  };
+
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* 1. Hero Section */}
       <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden pt-20">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9C39FF]/15 via-black to-black"></div>
@@ -39,7 +72,7 @@ export default function LandingPage() {
         >
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tighter text-white leading-[1.15]">
-            <span className="font-bold">VR Escape Rooms og Arcade for små og store grupper i Kristiansand</span>
+            <span className="font-bold">VR Escape Rooms og VR Arcade for små og store grupper i Kristiansand</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto font-light leading-relaxed">
@@ -155,13 +188,38 @@ export default function LandingPage() {
             <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
               <CalendarHeart className="w-10 h-10 text-[#9C39FF]" />
               <h4 className="text-2xl font-medium text-white">Bursdag</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Gi bursdagsbarnet en feiring som skiller seg skikkelig ut fra det vanlige programmet.</p>
+              <p className="text-zinc-400 font-light leading-relaxed">En feiring som skiller seg skikkelig ut fra det vanlige programmet.</p>
             </div>
             <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
               <Glasses className="w-10 h-10 text-[#9C39FF]" />
               <h4 className="text-2xl font-medium text-white">Familier med store barn</h4>
               <p className="text-zinc-400 font-light leading-relaxed">Utforsk nye verdener og løs spennende gåter sammen som en aktiv familie.</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5.5. Seksjon: Våre Opplevelser (Carousel) */}
+      <section className="py-28 relative overflow-hidden bg-zinc-950/80 border-y border-white/5">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#9C39FF]/15 via-transparent to-transparent opacity-80 pointer-events-none" />
+        
+        {/* Subtle blur overlay at edges for smoother scrolling effect */}
+        <div className="absolute inset-y-0 left-0 w-8 md:w-24 bg-gradient-to-r from-zinc-950/80 to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-8 md:w-24 bg-gradient-to-l from-zinc-950/80 to-transparent z-10 pointer-events-none" />
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-light text-white mb-5 tracking-tight">Fantastiske verdener å utforske</h2>
+            <p className="text-xl text-zinc-400 font-light max-w-2xl mx-auto">
+              Utvalget er stort, og opplevelsene varierer i sjangre fra spenningsfylte eventyr til heseblesende action. 
+            </p>
+          </div>
+          <HomeCarousel />
+          
+          <div className="mt-14 text-center">
+            <Link href="/opplevelser" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-base font-medium transition-all bg-[#9C39FF] text-white hover:bg-[#b05aff] hover:shadow-[0_0_20px_rgba(156,57,255,0.4)]">
+              Se alle våre VR-opplevelser <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -192,13 +250,13 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto">
             <ul className="space-y-4">
               {[
-                "Uforglemmelig sosial aktivitet som alle kan være med på.",
-                "Opplevelser med enormt fokus på både samarbeid og konkurranse.",
-                "To store spillsoner (150 kvm og 75 kvm) med full fri bevegelse.",
-                "Passer perfekt for både nybegynnere og erfarne VR-spillere.",
-                "Førsteklasses, moderne utstyr og eksklusive spill",
-                "Lokalt og sentralt plassert i Kristiansand.",
-                "Gratis parkering."
+                "Sosiale team-aktiviteter som alle kan være med på.",
+                "Engasjerende, gøy og full innlevelse fra første stund.",
+                "Gående opplevelse inni virtuelle verdener.",
+                "Passer for både nybegynnere og erfarne VR-spillere.",
+                "Alle spill er eksklusive og testet for høy underholdningsverdi",
+                "Tilgang til partylounge i 30 minutter etter spillet - mulighet til å nyte medbrakt mat og drikke",
+                "Sentralt på Lund med gratis gateparkering."
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-4 bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800/50 hover:border-zinc-700 transition-colors">
                   <CheckCircle2 className="w-6 h-6 text-[#9C39FF] flex-shrink-0 mt-0.5" />

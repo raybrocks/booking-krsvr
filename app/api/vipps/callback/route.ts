@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export async function POST(req: Request) {
   try {
@@ -25,14 +25,14 @@ export async function POST(req: Request) {
 
     // Attempt to log transaction
     try {
-      const transactionRef = doc(db, 'transactions', reference);
-      await setDoc(transactionRef, {
+      const transactionRef = adminDb.collection('transactions').doc(reference);
+      await transactionRef.set({
         bookingId: reference,
         amount: amount,
         status: paymentStatus,
         vippsOrderId: body.orderId || body.pspReference || 'unknown',
         transactionLogHistory: [body],
-        createdAt: serverTimestamp()
+        createdAt: FieldValue.serverTimestamp()
       }, { merge: true });
     } catch (dbErr) {
       console.error('Failed to log transaction:', dbErr);
@@ -40,8 +40,8 @@ export async function POST(req: Request) {
 
     if (paymentStatus === 'TERMINATED' || paymentStatus === 'CANCELLED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
        try {
-         const bookingRef = doc(db, 'bookings', reference);
-         await updateDoc(bookingRef, { status: 'cancelled' });
+         const bookingRef = adminDb.collection('bookings').doc(reference);
+         await bookingRef.update({ status: 'cancelled' });
        } catch (error) {
          console.error('Error updating booking status cancelled from webhook:', error);
        }
@@ -100,26 +100,26 @@ export async function POST(req: Request) {
             }
          }
 
-         const bookingRef = doc(db, 'bookings', reference);
-         await updateDoc(bookingRef, {
+         const bookingRef = adminDb.collection('bookings').doc(reference);
+         await bookingRef.update({
            status: 'confirmed',
            amountPaid: amount / 100 // assuming amount is in ore
          });
 
          // Fetch booking details
-         const bookingSnap = await getDoc(bookingRef);
-         if (bookingSnap.exists()) {
-           const bookingData = bookingSnap.data();
+         const bookingSnap = await bookingRef.get();
+         if (bookingSnap.exists) {
+           const bookingData = bookingSnap.data()!;
 
            // Check if we already sent the email to avoid duplicates
            if (!bookingData.confirmationEmailSent) {
              // Fetch custom text from settings
              let customText = "";
              try {
-               const settingsRef = doc(db, 'settings', 'general');
-               const settingsSnap = await getDoc(settingsRef);
-               if (settingsSnap.exists()) {
-                 customText = settingsSnap.data().bookingConfirmationText || "";
+               const settingsRef = adminDb.collection('settings').doc('general');
+               const settingsSnap = await settingsRef.get();
+               if (settingsSnap.exists) {
+                 customText = settingsSnap.data()!.bookingConfirmationText || "";
                }
              } catch (e) {
                console.error("Failed to fetch settings for email:", e);
@@ -137,11 +137,11 @@ export async function POST(req: Request) {
              // Subscribe to newsletter if accepted
              if (bookingData.acceptedNewsletter && !bookingData.newsletterAdded) {
                 await addContactToNewsletter(bookingData.email, bookingData.firstName, bookingData.lastName);
-                await updateDoc(bookingRef, { newsletterAdded: true });
+                await bookingRef.update({ newsletterAdded: true });
              }
 
              // Mark email as sent
-             await updateDoc(bookingRef, {
+             await bookingRef.update({
                confirmationEmailSent: true
              });
            }

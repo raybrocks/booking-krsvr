@@ -33,6 +33,7 @@ export default function Header() {
     { href: "/", label: "Hovedside" },
     { href: "/opplevelser", label: "VR Opplevelser" },
     { href: "/arrangementer", label: "Arrangementer" },
+    { href: "/priser", label: "Priser" },
     { href: "/faq", label: "FAQ" },
     { href: "/kontakt", label: "Kontakt" },
     { href: "/booking", label: "Booking" },

@@ -2,10 +2,46 @@ import React from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Users, PartyPopper } from "lucide-react";
 import { motion } from "motion/react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Arrangementer, Teambuilding & Utdrikningslag Kristiansand | KRS VR Arena",
+  description: "Planlegg teambuilding, utdrikningslag, firmaevent eller bursdag hos KRS VR Arena i Kristiansand. Full frihet i VR er den perfekte sosiale aktiviteten.",
+  keywords: ["Teambuilding Kristiansand", "Utdrikningslag Kristiansand", "Firmafest Kristiansand", "Julebord Kristiansand", "Bursdag Kristiansand", "Aktivitet Kristiansand", "Arrangement Kristiansand", "VR event"],
+  openGraph: {
+    title: "Arrangementer & Teambuilding Kristiansand | KRS VR Arena",
+    description: "Planlegg teambuilding, utdrikningslag, firmaevent eller bursdag med unike VR-opplevelser hos KRS VR Arena.",
+    url: "https://vrsenteret.no/arrangementer",
+    type: "website",
+  }
+};
 
 export default function ArrangementerPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "EventSeries",
+    "name": "Arrangementer, Teambuilding og Utdrikningslag hos KRS VR Arena",
+    "description": "Vi tilbyr skreddersydde pakker for teambuilding, utdrikningslag, firmaevent, julebord og bursdager i Kristiansand med eksklusiv VR-underholdning.",
+    "url": "https://vrsenteret.no/arrangementer",
+    "provider": {
+      "@type": "EntertainmentBusiness",
+      "name": "KRS VR Arena",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Industrigata 12",
+        "postalCode": "4632",
+        "addressLocality": "Kristiansand",
+        "addressCountry": "NO"
+      }
+    }
+  };
+
   return (
     <main className="min-h-screen pb-20 pt-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mb-10 text-center px-4">
         <h1 className="text-4xl md:text-5xl font-light tracking-tighter">
           Arrangementer hos KRS VR Arena
@@ -13,6 +49,7 @@ export default function ArrangementerPage() {
         <p className="mt-4 text-zinc-400 max-w-2xl mx-auto leading-relaxed">
           Planlegg bursdag, utdrikningslag, firmaevent, teambuilding eller julebord med unike VR-opplevelser i Kristiansand. Hos oss spiller dere på lag, løser oppdrag og skaper minner gruppa faktisk snakker om etterpå.
         </p>
+
         
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link href="/arrangementer/private-fester" className="px-6 py-2.5 rounded-full text-sm font-medium transition-all bg-white text-black hover:bg-zinc-200">

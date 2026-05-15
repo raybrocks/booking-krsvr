@@ -7,6 +7,7 @@ import { motion, AnimatePresence, PanInfo } from "motion/react";
 import { 
   ChevronLeft, 
   ChevronRight, 
+  ChevronDown,
   Clock, 
   Users, 
   Target,
@@ -62,6 +63,7 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>("Alle");
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const getEmbedUrl = (url: string) => {
@@ -160,6 +162,10 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
   });
 
   const selected = filteredExperiences.find(e => e.id === selectedId) || filteredExperiences[0] || experiences[0];
+
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [selectedId]);
 
   const handleFilterClick = (filter: string) => {
     setActiveFilter(filter);
@@ -417,9 +423,43 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
         </div>
 
         {/* DESCRIPTION */}
-        <p className="text-lg md:text-xl text-zinc-300 font-light leading-relaxed max-w-4xl text-center mb-12">
-          {selected.shortDescription}
-        </p>
+        <div className="max-w-4xl w-full text-center mb-12">
+          <p className="text-lg md:text-xl text-zinc-300 font-light leading-relaxed">
+            {selected.shortDescription}
+          </p>
+          
+          {selected.detailedDescription && (
+            <div className="mt-4">
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="text-base md:text-lg text-zinc-400 font-light leading-relaxed mt-4 text-left whitespace-pre-wrap">
+                      {selected.detailedDescription}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <button 
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="mt-6 text-sm uppercase tracking-wider font-medium text-[#9C39FF] hover:text-[#b466ff] transition-colors flex items-center justify-center gap-1 mx-auto"
+              >
+                <span>{isExpanded ? "Vis mindre" : "Les mer"}</span>
+                <motion.div
+                  animate={{ rotate: isExpanded ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </motion.div>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* BUTTONS */}
         <div className="flex flex-col items-center gap-4">

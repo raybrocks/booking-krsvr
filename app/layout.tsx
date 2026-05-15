@@ -17,8 +17,49 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Krs VR Arena Booking',
-  description: 'High-end VR experiences',
+  title: {
+    default: 'KRS VR Arena | VR Escape Room, Arcade & Teambuilding i Kristiansand',
+    template: '%s | KRS VR Arena'
+  },
+  description: 'Opplev eksklusive VR Escape Rooms, skytespill og eventyr i Kristiansand med full bevegelsesfrihet. Den perfekte aktiviteten for teambuilding, utdrikningslag, bursdager og vennegjengen.',
+  keywords: [
+    'VR Kristiansand',
+    'Escape Room Kristiansand',
+    'Teambuilding Kristiansand',
+    'Aktivitet Kristiansand',
+    'Utdrikningslag Kristiansand',
+    'Firmafest',
+    'Inneaktivitet Kristiansand',
+    'Barnebursdag Kristiansand',
+    'Virtual Reality'
+  ],
+  authors: [{ name: 'KRS VR Arena' }],
+  creator: 'KRS VR Arena',
+  publisher: 'KRS VR Arena',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: 'KRS VR Arena | VR Escape Room & Arcade i Kristiansand',
+    description: 'Opplev eksklusive VR Escape Rooms, skytespill og eventyr i Kristiansand. Full bevegelsesfrihet (roam free) på store spillområder for små og store grupper.',
+    url: 'https://vrsenteret.no', // update with actual domain if necessary
+    siteName: 'KRS VR Arena',
+    locale: 'nb_NO',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   manifest: '/manifest.webmanifest',
   icons: {
     icon: '/icon.svg',
@@ -28,7 +69,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'VR Admin',
+    title: 'KRS VR Arena',
   },
 };
 
