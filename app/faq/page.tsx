@@ -5,7 +5,15 @@ import { FaqClient } from "./FaqClient";
 const faqs = [
   {
     question: "Er det plass til grupper større enn 8 personer?",
-    answer: "Ja, vi tar imot større grupper uten problem. 8 personer kan spille samtidig, så vi deler store grupper opp i flere runder. Mellom hver bruk desinfiseres utstyret vårt grundig. Ta gjerne kontakt med oss via kontaktskjemaet dersom dere er en større gruppe.",
+    answer: "Ja, vi tar imot opptil 64 personer! 8 personer kan spille samtidig, så vi deler større grupper opp i flere puljer. Mens én gruppe spiller, kan resten av gruppen slappe av, mingle og nyte medbrakt mat og drikke i vår partylounge. Ta kontakt med oss for et opplegg som passer for din gruppe.",
+  },
+  {
+    question: "Kan vi ha med egen mat, kake eller drikke?",
+    answer: "Absolutt! Alle bookinger inkluderer 30 minutter gratis tilgang til vår partylounge etter spillet, hvor dere kan nyte medbrakt mat, kake og drikke. For medium og store grupper som deles opp i puljer, har dere tilgang til loungen under hele opplegget. Er dere en bedrift kan vi også koordinere pizza via våre lokale leverandører.",
+  },
+  {
+    question: "Hva er inkludert i prisen?",
+    answer: "Prisen inkluderer ca. 45-55 minutter aktiv spilltid i VR, en dedikert gamemaster for deres gruppe, gruppebilder etter endt spill, gratis vann, og tilgang til partylounge i 30 minutter etter spillet med mulighet for å nyte medbrakt mat og drikke. Prisene varierer noe basert på gruppestørrelsen – se vår prisoversikt for detaljer.",
   },
   {
     question: "Må vi ha erfaring med VR fra før av?",
@@ -13,11 +21,11 @@ const faqs = [
   },
   {
     question: "Hvor tidlig må vi møte opp?",
-    answer: "Vi ber om at dere møter 10 minutter før deres oppsatte starttid. Da rekker vi å registrere dere og kjøre opplæringen i fred og ro, slik at dere ikke mister noe av den verdifulle spilletiden deres.",
+    answer: "Vi ber om at dere møter 10-15 minutter før deres oppsatte starttid. Da rekker vi å registrere dere og kjøre opplæringen i fred og ro, slik at dere ikke mister noe av den verdifulle spilletiden deres.",
   },
   {
     question: "Hva bør jeg ha på meg?",
-    answer: "Siden dere vil bevege dere fritt over store VR-arenaer, anbefaler vi komfortable klær, som for eksempel en t-skjorte, og flate sko. Dersom dere vanligvis bruker briller, anbefaler vi på det sterkeste å bruke kontaktlinser i stedet, slik at dere får den beste opplevelsen i VR-brillene.",
+    answer: "Siden dere vil bevege dere fritt over store VR-arenaer i full bevegelse, anbefaler vi komfortable klær (som for eksempel en t-skjorte) og flate sko. Dersom dere vanligvis bruker briller, anbefaler vi på det sterkeste å bruke kontaktlinser i stedet da dette gir den desidert beste opplevelsen i VR-brillene.",
   },
   {
     question: "Finnes det egne tilbud eller rabatter?",
@@ -26,6 +34,10 @@ const faqs = [
   {
     question: "Hvordan fungerer avbooking?",
     answer: "Dere har mulighet til å avbooke kostnadsfritt inntil 48 timer før den oppsatte spilltiden deres. Avbestiller dere innenfor 48-timers fristen gjelder andre retningslinjer, de fullstendige vilkårene er tilgjengelige under booking.",
+  },
+  {
+    question: "Tilbyr dere parkering?",
+    answer: "Ja, vi ligger sentralt plassert på Lund i Kristiansand og tilbyr gratis gateparkering til våre gjester.",
   }
 ];
 
