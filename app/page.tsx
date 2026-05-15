@@ -21,7 +21,8 @@ import {
   Shirt,
   UsersRound,
   UserCheck,
-  Crown
+  Crown,
+  PartyPopper
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -94,23 +95,27 @@ export default function LandingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="mt-16 sm:mt-24 w-full max-w-5xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6 px-4"
+          className="mt-16 sm:mt-24 w-full max-w-6xl mx-auto flex flex-wrap justify-center gap-6 lg:gap-12 px-4"
         >
-          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2">
+          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
             <Smile className="w-6 h-6 text-[#9C39FF]/70" />
-            <span className="text-sm font-medium text-center">Ingen erfaring nødvendig</span>
+            <span className="text-sm font-medium text-center leading-tight">Ingen erfaring nødvendig</span>
           </div>
-          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2">
+          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
             <UserCheck className="w-6 h-6 text-[#9C39FF]/70" />
-            <span className="text-sm font-medium text-center">Dere får en dedikert gamemaster</span>
+            <span className="text-sm font-medium text-center leading-tight">Dere får en dedikert gamemaster</span>
           </div>
-          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2">
+          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
             <UsersRound className="w-6 h-6 text-[#9C39FF]/70" />
-            <span className="text-sm font-medium text-center">Perfekt for små og store grupper</span>
+            <span className="text-sm font-medium text-center leading-tight">Jobb sammen i små eller store grupper</span>
           </div>
-          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2">
+          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
             <Footprints className="w-6 h-6 text-[#9C39FF]/70" />
-            <span className="text-sm font-medium text-center">Bruk kroppen til å styre spillet</span>
+            <span className="text-sm font-medium text-center leading-tight">Full innlevelse i virtuelle verdener fra første sekund</span>
+          </div>
+          <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
+            <PartyPopper className="w-6 h-6 text-[#9C39FF]/70" />
+            <span className="text-sm font-medium text-center leading-tight">Tilgang til vår partylounge i 30 min etter spillet</span>
           </div>
         </motion.div>
       </section>
