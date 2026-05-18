@@ -372,12 +372,12 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
 
           <div className="flex items-center gap-2 text-sm md:text-base">
             <Users className="w-5 h-5 text-white" />
-            <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-4 personer"}</span>
+            <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-8 personer"}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm md:text-base">
             <UserCheck className="w-5 h-5 text-white" />
-            <span>{selected.age || "Fra 8 år"}</span>
+            <span>Fra {selected.age} år</span>
           </div>
 
           {selected.difficulty && (
