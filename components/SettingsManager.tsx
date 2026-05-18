@@ -220,7 +220,20 @@ export default function SettingsManager() {
                 type="checkbox" 
                 className="sr-only peer" 
                 checked={settings.bookingsClosed || false}
-                onChange={(e) => setSettings({...settings, bookingsClosed: e.target.checked})}
+                onChange={async (e) => {
+                  const newValue = e.target.checked;
+                  const newSettings = {...settings, bookingsClosed: newValue};
+                  setSettings(newSettings);
+                  
+                  // Auto-save emergency switch to ensure it takes effect immediately
+                  try {
+                    await setDoc(doc(db, "settings", "general"), newSettings);
+                    toast.success(newValue ? "Bookings are now CLOSED" : "Bookings are now OPEN");
+                  } catch (error) {
+                    console.error("Error saving emergency switch:", error);
+                    toast.error("Failed to update emergency switch");
+                  }
+                }}
               />
               <div className="w-14 h-7 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-500"></div>
             </label>
