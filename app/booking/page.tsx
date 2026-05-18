@@ -13,21 +13,13 @@ export default function BookingPage() {
         <h1 className="text-4xl md:text-5xl font-light tracking-tighter text-center mb-6">
           Booking
         </h1>
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-sm text-zinc-300 space-y-4 mb-8">
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-sm text-zinc-300 text-center space-y-4 mb-8">
           <p>
-            <strong>For små grupper (2-8 personer):</strong> Bruk bookingmodulen her til å velge dato, tidspunkt og opplevelse.
+            <strong>For små grupper (2-8 personer):</strong> <br />Bruk bookingmodulen under.
           </p>
           <p>
-            <strong>For større grupper (over 8 personer):</strong> Utforsk våre pakker og reserver via kontaktskjemaet.
+            <strong>For større grupper (8-64 personer):</strong> <br />Utforsk våre arrangementssider og reserver via kontaktskjema.
           </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Link href="/arrangementer" className="inline-flex h-9 items-center justify-center rounded-full bg-zinc-800 hover:bg-zinc-700 text-white px-5 text-xs font-medium transition-colors">
-              Se arrangementer
-            </Link>
-            <Link href="/kontakt" className="inline-flex h-9 items-center justify-center rounded-full bg-[#9C39FF] hover:bg-[#8b32e6] text-white px-5 text-xs font-medium transition-colors">
-              Gå til kontaktskjema
-            </Link>
-          </div>
         </div>
       </div>
 

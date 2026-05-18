@@ -13,7 +13,7 @@ export default function KjøpsvilkårPage() {
   useEffect(() => {
     async function fetchTerms() {
       try {
-        const docRef = doc(db, "settings", "global");
+        const docRef = doc(db, "settings", "general");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setTerms(docSnap.data().termsContent || "Ingen vilkår er fylt ut i systemet enda.");
