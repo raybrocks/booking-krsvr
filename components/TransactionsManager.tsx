@@ -35,25 +35,26 @@ export default function TransactionsManager() {
       const data = snapshot.docs.map(doc => {
         const bookingData = doc.data();
         let status = bookingData.status;
-        if (status === 'confirmed' || status === 'completed') {
-           status = 'AUTHORIZED'; // Or captured, just map to visual equivalents used in Receipts view
-        }
         
         return {
           id: doc.id,
           bookingId: doc.id,
           vippsOrderId: doc.id,
           amount: (bookingData.amountPaid || bookingData.totalPrice || 0) * 100, // convert back to ore for receipt calculations
-          status: status,
+          originalStatus: bookingData.status,
+          status: (status === 'confirmed' || status === 'completed') ? 'AUTHORIZED' : status,
           ...bookingData,
           // Format timestamp if it exists
-          createdAtDate: bookingData.createdAt?.toDate() || new Date()
+          createdAtDate: bookingData.createdAt?.toDate ? bookingData.createdAt.toDate() : new Date()
         };
       });
       
-      // Filter out non-completed/non-vipps if we only want vipps receipts here
-      // But actually, showing all confirmed bookings as receipts is better!
-      const validReceipts = data.filter(b => b.status === 'AUTHORIZED');
+      // Filter out cancelled and pending bookings to show all active receipts 
+      const validReceipts = data.filter(b => 
+        b.originalStatus !== 'cancelled' && 
+        b.originalStatus !== 'pending' && 
+        b.originalStatus !== 'error'
+      );
       
       setTransactions(validReceipts);
       setLoading(false);
