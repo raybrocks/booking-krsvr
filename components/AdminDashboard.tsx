@@ -371,7 +371,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6 pt-24 pb-20">
+    <div className="max-w-6xl mx-auto p-6 pt-0 md:pt-4 pb-20">
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sticky top-16 md:top-20 z-40 bg-background/90 backdrop-blur-md py-4 -mx-6 px-6 md:mx-0 md:px-0 rounded-b-xl">
         <div>
           <h1 className="text-3xl font-light tracking-tight">Admin Dashboard</h1>
