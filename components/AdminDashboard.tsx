@@ -247,8 +247,14 @@ export default function AdminDashboard() {
                   </td>
                 </tr>
               ) : (
-                tableBookings.map((booking) => (
-                <tr key={booking.id} className="hover:bg-zinc-800/20 transition-colors">
+                tableBookings.map((booking) => {
+                  const now = new Date(currentTime).getTime();
+                  const createdAt = booking.createdAt?.toDate ? booking.createdAt.toDate().getTime() : 
+                                    (booking.createdAt ? new Date(booking.createdAt).getTime() : now);
+                  const isExpired = booking.status === 'pending' && ((now - createdAt) > 5 * 60 * 1000);
+                  
+                  return (
+                <tr key={booking.id} className={`transition-colors ${isExpired ? 'bg-red-950/10 opacity-70' : 'hover:bg-zinc-800/20'}`}>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2 text-zinc-300">
                       <CalendarIcon className="w-4 h-4 text-zinc-500" />
@@ -280,8 +286,18 @@ export default function AdminDashboard() {
                       Totalt: {booking.totalPrice} NOK
                     </div>
                     {booking.status === 'pending' ? (
-                      <div className="text-xs text-amber-400 mt-1 font-medium">
-                        Ikke betalt (Venter på betaling)
+                      <div className="text-xs mt-1 font-medium">
+                        {(() => {
+                          const now = new Date(currentTime).getTime();
+                          const createdAt = booking.createdAt?.toDate ? booking.createdAt.toDate().getTime() : 
+                                            (booking.createdAt ? new Date(booking.createdAt).getTime() : now);
+                          const isExpired = (now - createdAt) > 5 * 60 * 1000;
+                          return isExpired ? (
+                            <span className="text-red-400">Utløpt (ikke betalt)</span>
+                          ) : (
+                            <span className="text-amber-400">Ikke betalt (Venter på betaling)</span>
+                          );
+                        })()}
                       </div>
                     ) : (
                       <>
@@ -344,7 +360,8 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                 </tr>
-                ))
+                );
+                })
               )}
             </tbody>
           </table>

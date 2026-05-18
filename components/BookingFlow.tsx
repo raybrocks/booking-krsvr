@@ -133,12 +133,29 @@ export default function BookingFlow() {
         const snapshot = await getDocs(q);
         const existingBookings = snapshot.docs.map(doc => doc.data());
         
+        const now = Date.now();
         // Exclude cancelled bookings (status can be "TERMINATED", "CANCELLED", or lowercased)
-        const activeBookings = existingBookings.filter(b => 
-          b.status?.toLowerCase() !== "terminated" && 
-          b.status?.toLowerCase() !== "cancelled" &&
-          b.status !== "TERMINATED" && b.status !== "CANCELLED"
-        );
+        // Also exclude pending bookings that are older than 5 minutes
+        const activeBookings = existingBookings.filter(b => {
+          if (
+            b.status?.toLowerCase() === "terminated" || 
+            b.status?.toLowerCase() === "cancelled" ||
+            b.status === "TERMINATED" || 
+            b.status === "CANCELLED"
+          ) {
+            return false;
+          }
+          
+          if (b.status === "pending" && b.createdAt) {
+            const createdAtMs = typeof b.createdAt.toMillis === 'function' ? b.createdAt.toMillis() : 
+                               (b.createdAt.seconds ? b.createdAt.seconds * 1000 : b.createdAt);
+            if (typeof createdAtMs === 'number' && now - createdAtMs > 5 * 60 * 1000) {
+              return false; // older than 5 minutes
+            }
+          }
+          
+          return true;
+        });
         
         const times = activeBookings.map(b => b.time as string);
         setBookedTimes(times);
