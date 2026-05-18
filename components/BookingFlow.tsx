@@ -71,6 +71,17 @@ export default function BookingFlow() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   
+  // Global Pricing State
+  const [globalPricing, setGlobalPricing] = useState<Record<string, number>>({
+    "2": 460,
+    "3": 395,
+    "4": 395,
+    "5": 385,
+    "6": 385,
+    "7": 385,
+    "8": 375
+  });
+  
   // Booked Times
   const [bookedTimes, setBookedTimes] = useState<string[]>([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
@@ -93,6 +104,11 @@ export default function BookingFlow() {
         const settingsDoc = await getDoc(doc(db, "settings", "general"));
         if (settingsDoc.exists()) {
           setSettings(settingsDoc.data() as Settings);
+        }
+
+        const pricingDoc = await getDoc(doc(db, "settings", "pricing"));
+        if (pricingDoc.exists() && pricingDoc.data().pricing) {
+          setGlobalPricing(pricingDoc.data().pricing);
         }
       } catch (error) {
         console.error("Failed to load data", error);
@@ -154,9 +170,9 @@ export default function BookingFlow() {
     return settings.openingHours[getDay(selectedDate).toString()] || [];
   }, [selectedDate, settings]);
 
-  const totalPrice = selectedExperience ? (selectedExperience.pricing[players.toString()] || selectedExperience.pricing["8"]) : 0;
-  const pricePerPerson = selectedExperience ? Math.round(totalPrice / players) : 0;
-  const amountToPay = paymentType === "full" ? totalPrice : pricePerPerson;
+  const pricePerPerson = globalPricing[players > 8 ? "8" : players.toString()] || 0;
+  const totalPrice = selectedExperience ? pricePerPerson * players : 0;
+  const amountToPay = paymentType === "full" ? totalPrice : (settings?.reservationFee || 500);
 
   const handleNext = () => {
     if (step === 1 && (!selectedDate || !selectedTime)) return toast.error(t("error.datetime") || "Please select a date and time.");
@@ -487,10 +503,10 @@ if (window.top) {
                               </div>
                               <div className="text-right">
                                 <div className="text-lg font-medium text-white">
-                                  {Math.round((exp.pricing[players.toString()] || exp.pricing["8"]) / players)} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
+                                  {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
                                 </div>
                                 <div className="text-sm text-zinc-500 mt-0.5">
-                                  {t("step3.total", { players })}: {exp.pricing[players.toString()] || exp.pricing["8"]} NOK
+                                  {t("step3.total", { players })}: {pricePerPerson * players} NOK
                                 </div>
                               </div>
                             </div>

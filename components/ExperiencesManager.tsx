@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, onSnapshot, doc, deleteDoc, setDoc, addDoc, updateDoc, writeBatch } from "firebase/firestore";
+import { collection, onSnapshot, doc, getDoc, deleteDoc, setDoc, addDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy } from "lucide-react";
@@ -14,8 +14,21 @@ export default function ExperiencesManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<any>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  
+  // Global Pricing State
+  const [globalPricing, setGlobalPricing] = useState<Record<string, number>>({
+    "2": 460,
+    "3": 395,
+    "4": 395,
+    "5": 385,
+    "6": 385,
+    "7": 385,
+    "8": 375
+  });
+  const [savingPricing, setSavingPricing] = useState(false);
 
   useEffect(() => {
+    // Fetch experiences
     const unsubscribe = onSnapshot(collection(db, "experiences"), async (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -34,6 +47,19 @@ export default function ExperiencesManager() {
       console.error("Error fetching experiences:", error);
       setLoading(false);
     });
+
+    // Fetch global pricing
+    const fetchPricing = async () => {
+      try {
+        const docSnap = await getDoc(doc(db, "settings", "pricing"));
+        if (docSnap.exists() && docSnap.data().pricing) {
+          setGlobalPricing(docSnap.data().pricing);
+        }
+      } catch (err) {
+        console.error("Error fetching pricing:", err);
+      }
+    };
+    fetchPricing();
 
     return () => unsubscribe();
   }, []);
@@ -56,7 +82,6 @@ export default function ExperiencesManager() {
       age: "12+",
       difficulty: "Medium",
       maxPlayers: 6,
-      pricing: { "2": 800, "3": 1100, "4": 1400, "5": 1700, "6": 2000 },
       isActive: true,
       familyFriendly: false,
       teambuilding: false,
@@ -148,6 +173,19 @@ export default function ExperiencesManager() {
     }
   };
 
+  const handleSavePricing = async () => {
+    setSavingPricing(true);
+    try {
+      await setDoc(doc(db, "settings", "pricing"), { pricing: globalPricing }, { merge: true });
+      toast.success("Global pricing updated successfully");
+    } catch (error) {
+      console.error("Error saving pricing:", error);
+      toast.error("Failed to update pricing");
+    } finally {
+      setSavingPricing(false);
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-[#9C39FF]" /></div>;
   }
@@ -155,6 +193,48 @@ export default function ExperiencesManager() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-light">Global Pricing Rules</h2>
+          <p className="text-zinc-400 text-sm">Set the per-person price based on group size. This applies to all experiences.</p>
+        </div>
+      </div>
+
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-sm">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[2, 3, 4, 5, 6, 7, 8].map(size => (
+            <div key={size} className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-zinc-400">
+                {size}{size === 8 ? '+' : ''} persons (kr/pers)
+              </label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  value={globalPricing[size.toString()] || ''}
+                  onChange={(e) => {
+                    const newPricing = {...globalPricing};
+                    newPricing[size.toString()] = Number(e.target.value);
+                    setGlobalPricing(newPricing);
+                  }}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-4 pr-10 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                />
+                <span className="absolute right-3 top-2.5 text-zinc-500 text-sm">kr</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex justify-end">
+          <button 
+            onClick={handleSavePricing}
+            disabled={savingPricing}
+            className="flex items-center gap-2 bg-zinc-800 text-white px-6 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50"
+          >
+            {savingPricing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Save Pricing
+          </button>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center mt-12">
         <div>
           <h2 className="text-2xl font-light">VR Experiences</h2>
           <p className="text-zinc-400 text-sm">Manage the games and experiences available for booking.</p>
@@ -341,28 +421,6 @@ export default function ExperiencesManager() {
                   />
                   <span className="ml-2 text-sm text-zinc-300">Jump Scare</span>
                 </div>
-              </div>
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-zinc-400 mb-2">Pricing (NOK by Group Size)</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[2, 3, 4, 5, 6, 7, 8].map(size => (
-                  <div key={size} className="flex items-center gap-2 bg-zinc-950 p-2 rounded-lg border border-zinc-800">
-                    <span className="text-zinc-500 text-sm w-16">{size} pax:</span>
-                    <input 
-                      type="number" 
-                      value={editForm.pricing[size.toString()] || ''}
-                      onChange={(e) => {
-                        const newPricing = {...editForm.pricing};
-                        newPricing[size.toString()] = Number(e.target.value);
-                        setEditForm({...editForm, pricing: newPricing});
-                      }}
-                      className="w-full bg-transparent text-white focus:outline-none text-sm"
-                      placeholder="Price"
-                    />
-                  </div>
-                ))}
               </div>
             </div>
           </div>
