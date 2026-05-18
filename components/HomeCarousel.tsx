@@ -124,15 +124,15 @@ export default function HomeCarousel() {
             <Link
               key={exp.id}
               href={`/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`}
-              className="flex flex-col items-center justify-center flex-shrink-0 snap-center group min-w-[140px] px-4 py-8 rounded-3xl border border-transparent hover:border-zinc-800 bg-zinc-900/30 hover:bg-zinc-800/60 transition-all duration-300 shadow-md"
+              className="flex flex-col items-center justify-center flex-shrink-0 snap-center group min-w-[140px] px-4 py-8 rounded-3xl border border-transparent bg-[#9C39FF] hover:bg-[#8b32e6] transition-all duration-300 shadow-lg shadow-[#9C39FF]/20"
             >
-              <div className="mb-4 text-zinc-500 group-hover:text-[#9C39FF] transition-colors duration-300">
+              <div className="mb-4 text-white transition-transform duration-300 group-hover:scale-110">
                 {getIconForType(exp.type, exp.name)}
               </div>
-              <span className="text-sm md:text-base font-medium mb-2 text-zinc-300 group-hover:text-white transition-colors text-center max-w-[120px] leading-tight">
+              <span className="text-sm md:text-base font-medium mb-2 text-white text-center max-w-[120px] leading-tight">
                 {exp.name}
               </span>
-              <span className="text-[10px] md:text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full text-zinc-400 bg-zinc-900/80 group-hover:bg-[#9C39FF] group-hover:text-white transition-colors">
+              <span className="text-[10px] md:text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full text-white bg-black/20 group-hover:bg-black/30 transition-colors">
                 {exp.type}
               </span>
             </Link>
