@@ -172,7 +172,7 @@ export default function BookingFlow() {
 
   const pricePerPerson = globalPricing[players > 8 ? "8" : players.toString()] || 0;
   const totalPrice = selectedExperience ? pricePerPerson * players : 0;
-  const amountToPay = paymentType === "full" ? totalPrice : (settings?.reservationFee || 500);
+  const amountToPay = paymentType === "full" ? totalPrice : pricePerPerson;
 
   const handleNext = () => {
     if (step === 1 && (!selectedDate || !selectedTime)) return toast.error(t("error.datetime") || "Please select a date and time.");
