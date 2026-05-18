@@ -84,7 +84,10 @@ export default function PriserPage() {
               ))}
             </div>
 
-            <div className="mt-8 pt-8 border-t border-zinc-800 text-center">
+            <div className="mt-8 pt-8 border-t border-zinc-800 flex flex-col gap-3">
+              <Link href="/opplevelser" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-zinc-700 hover:bg-zinc-800 text-white font-bold transition-colors">
+                Se VR opplevelser
+              </Link>
               <Link href="/booking" className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white font-bold transition-colors shadow-[0_0_15px_rgba(156,57,255,0.4)] hover:shadow-[0_0_25px_rgba(156,57,255,0.6)]">
                 Book din opplevelse nå
               </Link>
