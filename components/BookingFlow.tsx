@@ -419,9 +419,9 @@ if (window.top) {
                 </div>
               </div>
               
-              <div className="bg-zinc-900 rounded-xl p-4 text-sm text-zinc-400">
+              <div className="bg-[#9C39FF]/10 border border-[#9C39FF]/20 rounded-2xl p-4 md:p-5 text-sm text-zinc-300 space-y-3">
                 <p>Prisene er per person og synker for større grupper.</p>
-                <p className="mt-2 text-zinc-300 font-medium">Merk: Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst.</p>
+                <p><strong>Merk:</strong> Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst.</p>
               </div>
             </div>
           )}
