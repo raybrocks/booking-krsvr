@@ -88,7 +88,9 @@ export default function TransactionsManager() {
   const filteredTransactions = transactions.filter(t => 
     t.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
     t.bookingId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.vippsOrderId?.toLowerCase().includes(searchQuery.toLowerCase())
+    t.vippsOrderId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    t.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    t.lastName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const renderReceipt = () => {
@@ -217,7 +219,7 @@ export default function TransactionsManager() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
-            placeholder="Search by ID, Booking ID, or Vipps Order ID..."
+            placeholder="Search by ID, Name, Booking ID, or Vipps Order ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
@@ -264,6 +266,7 @@ export default function TransactionsManager() {
             <thead className="bg-zinc-900 border-b border-zinc-800 text-zinc-400">
               <tr>
                 <th className="px-6 py-4 font-medium">Date</th>
+                <th className="px-6 py-4 font-medium">Customer</th>
                 <th className="px-6 py-4 font-medium">Booking/System Ref</th>
                 <th className="px-6 py-4 font-medium">Vipps Order ID</th>
                 <th className="px-6 py-4 font-medium">Amount</th>
@@ -274,7 +277,7 @@ export default function TransactionsManager() {
             <tbody className="divide-y divide-zinc-800/50">
               {filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-zinc-500">
                     No transactions found.
                   </td>
                 </tr>
@@ -283,6 +286,9 @@ export default function TransactionsManager() {
                 <tr key={tx.id} className="hover:bg-zinc-800/20 transition-colors">
                   <td className="px-6 py-4 text-zinc-400">
                     {tx.createdAtDate.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 text-zinc-300">
+                    {tx.firstName} {tx.lastName}
                   </td>
                   <td className="px-6 py-4">
                     <div className="font-mono text-zinc-300 text-xs">{tx.bookingId}</div>
