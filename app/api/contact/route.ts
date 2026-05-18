@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { adminDb } from '@/lib/firebase-admin';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -20,10 +21,23 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    
+    let toEmail = 'post@krsvr.no';
+    try {
+      const settingsDoc = await adminDb.collection('settings').doc('general').get();
+      if (settingsDoc.exists) {
+        const settingsData = settingsDoc.data();
+        if (settingsData && settingsData.adminEmail) {
+          toEmail = settingsData.adminEmail;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch admin email from db in contact:", e);
+    }
 
     let htmlContent = `<h2>Ny henvendelse fra KRS VR Arena</h2>`;
     
-    htmlContent += `<p><strong>Type:</strong> ${data.formType === 'arrangement' ? 'Arrangement / Gruppebooking' : 'Annen henvendelse'}</p>`;
+    htmlContent += `<p><strong>Type:</strong> ${data.formType === 'arrangement' ? 'Arrangement / Gruppbooking' : 'Annen henvendelse'}</p>`;
     htmlContent += `<p><strong>Navn:</strong> ${data.name}</p>`;
     htmlContent += `<p><strong>E-post:</strong> ${data.email}</p>`;
     htmlContent += `<p><strong>Telefon:</strong> ${data.phone}</p>`;
@@ -48,7 +62,7 @@ export async function POST(req: Request) {
 
     const { data: resendData, error } = await resend.emails.send({
       from: 'Krs VR Arena Form <booking@donotreply.krsvr.no>',
-      to: 'post@krsvr.no',
+      to: toEmail,
       replyTo: data.email,
       subject: `Ny forespørsel: ${data.formType === 'arrangement' ? data.eventType || 'Arrangement' : 'Henvendelse'} fra ${data.name}`,
       html: htmlContent,

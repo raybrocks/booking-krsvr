@@ -113,7 +113,7 @@ export async function POST(req: Request) {
         console.error("Failed to fetch settings for email:", e);
       }
 
-      const { sendBookingConfirmationEmail, addContactToNewsletter } = await import('@/lib/email');
+      const { sendBookingConfirmationEmail, sendAdminNewBookingNotification, addContactToNewsletter } = await import('@/lib/email');
       
       // Ensure we pass the current data including any potentially missing fields
       const emailData = { 
@@ -126,6 +126,8 @@ export async function POST(req: Request) {
         emailData,
         customText
       );
+
+      await sendAdminNewBookingNotification(emailData);
 
       if (bookingData.acceptedNewsletter && !bookingData.newsletterAdded) {
          await addContactToNewsletter(bookingData.email, bookingData.firstName, bookingData.lastName);

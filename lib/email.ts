@@ -4,6 +4,19 @@ import { db } from '@/lib/firebase';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+async function getAdminEmail() {
+  try {
+    const settingsRef = doc(db, 'settings', 'general');
+    const settingsSnap = await getDoc(settingsRef);
+    if (settingsSnap.exists() && settingsSnap.data().adminEmail) {
+      return settingsSnap.data().adminEmail;
+    }
+  } catch (e) {
+    console.error("Failed to fetch admin email", e);
+  }
+  return "post@krsvr.no";
+}
+
 export async function sendBookingConfirmationEmail(
   to: string, 
   bookingDetails: any,
@@ -14,6 +27,7 @@ export async function sendBookingConfirmationEmail(
     return;
   }
 
+  const adminEmail = await getAdminEmail();
   const { firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId } = bookingDetails;
   
   let experienceTitle = "VR Experience";
@@ -61,7 +75,7 @@ export async function sendBookingConfirmationEmail(
       </ul>
 
       <p style="margin-top: 40px; font-size: 14px; color: #666;">
-        If you have any questions or need to make changes to your booking, please don't hesitate to reply to this email, or contact us at post@krsvr.no.
+        If you have any questions or need to make changes to your booking, please don't hesitate to reply to this email, or contact us at ${adminEmail}.
       </p>
       <p style="font-size: 14px; color: #666;">
         Best regards,<br/>Krs VR Arena
@@ -71,7 +85,7 @@ export async function sendBookingConfirmationEmail(
         <strong>Krs VR Arena AS</strong><br/>
         Organisasjonsnummer: 936318878 MVA<br/>
         Kristiansand, Norge<br/>
-        <a href="mailto:post@krsvr.no" style="color: #9C39FF; text-decoration: none;">post@krsvr.no</a>
+        <a href="mailto:${adminEmail}" style="color: #9C39FF; text-decoration: none;">${adminEmail}</a>
       </div>
     </div>
   `;
@@ -80,14 +94,13 @@ export async function sendBookingConfirmationEmail(
     const { data, error } = await resend.emails.send({
       from: 'Krs VR Arena <booking@donotreply.krsvr.no>',
       to,
-      replyTo: 'post@krsvr.no',
+      replyTo: adminEmail,
       subject: 'Booking Confirmation & Receipt - Krs VR Arena',
       html,
     });
     
     if (error) {
       console.error("Resend API returned an error:", error);
-      // We don't throw here to avoid preventing the booking confirmation from saving
       return null;
     }
     
@@ -95,8 +108,62 @@ export async function sendBookingConfirmationEmail(
     return data;
   } catch (error) {
     console.error("Failed to send email (exception):", error);
-    // returning null instead of throwing so the booking doesn't get messed up
     return null;
+  }
+}
+
+export async function sendAdminNewBookingNotification(bookingDetails: any) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Admin email not sent.");
+    return;
+  }
+
+  const adminEmail = await getAdminEmail();
+  const { firstName, lastName, email, phone, date, time, players, totalPrice, amountPaid, experienceId } = bookingDetails;
+  
+  let experienceTitle = "VR Experience";
+  if (experienceId) {
+    try {
+      const expRef = doc(db, 'experiences', experienceId);
+      const expSnap = await getDoc(expRef);
+      if (expSnap.exists() && expSnap.data().title) {
+        experienceTitle = expSnap.data().title;
+      }
+    } catch (e) {}
+  }
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; color: #333;">
+      <h1 style="color: #9C39FF;">Ny Booking Mottatt</h1>
+      <p>En ny booking har blitt gjennomført og betalt.</p>
+      
+      <ul style="list-style: none; padding: 0; background: #f9f9f9; padding: 15px; border-left: 4px solid #9C39FF;">
+        <li style="margin-bottom: 8px;"><strong>Navn:</strong> ${firstName} ${lastName}</li>
+        <li style="margin-bottom: 8px;"><strong>E-post:</strong> ${email}</li>
+        <li style="margin-bottom: 8px;"><strong>Telefon:</strong> ${phone}</li>
+        <li style="margin-bottom: 8px;"><strong>Opplevelse:</strong> ${experienceTitle}</li>
+        <li style="margin-bottom: 8px;"><strong>Dato:</strong> ${date}</li>
+        <li style="margin-bottom: 8px;"><strong>Tidspunkt:</strong> ${time}</li>
+        <li style="margin-bottom: 8px;"><strong>Antall personer:</strong> ${players}</li>
+        <li style="margin-bottom: 8px;"><strong>Totalpris (NOK):</strong> ${totalPrice}</li>
+        <li style="margin-bottom: 8px;"><strong>Forhåndsbetalt (NOK):</strong> ${amountPaid}</li>
+      </ul>
+      <p>Logg inn i admin-panelet for mer informasjon.</p>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Krs VR Arena Admin <booking@donotreply.krsvr.no>',
+      to: adminEmail,
+      subject: `Ny Booking: ${date} kl ${time} - ${firstName} ${lastName}`,
+      html,
+    });
+    
+    if (error) console.error("Admin resend error:", error);
+    return data;
+  } catch (err) {
+    console.error("Failed to send admin email:", err);
   }
 }
 

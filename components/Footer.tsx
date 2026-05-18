@@ -1,8 +1,29 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Facebook, Instagram } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function Footer() {
+  const [adminEmail, setAdminEmail] = useState("post@krsvr.no");
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const docRef = doc(db, "settings", "general");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().adminEmail) {
+          setAdminEmail(docSnap.data().adminEmail);
+        }
+      } catch (error) {
+        console.error("Failed to fetch settings for footer:", error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   return (
     <footer className="w-full bg-zinc-950 border-t border-white/5 pt-16 pb-8 mt-auto">
       <div className="container mx-auto px-4 md:px-6">
@@ -47,7 +68,7 @@ export default function Footer() {
             <h4 className="text-white font-medium mb-6">Kontakt</h4>
             <ul className="space-y-3">
               <li className="text-zinc-400 text-sm">Industrigata 12<br/>4632 Kristiansand</li>
-              <li className="text-zinc-400 text-sm"><a href="mailto:post@krsvr.no" className="hover:text-[#9C39FF] transition-colors">post@krsvr.no</a></li>
+              <li className="text-zinc-400 text-sm"><a href={`mailto:${adminEmail}`} className="hover:text-[#9C39FF] transition-colors">{adminEmail}</a></li>
               <li className="text-zinc-400 text-sm"><a href="tel:+4740828302" className="hover:text-[#9C39FF] transition-colors">+47 40828302</a></li>
             </ul>
           </div>

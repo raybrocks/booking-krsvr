@@ -44,7 +44,8 @@ export default function SettingsManager() {
             "6": ["12:00", "13:30", "15:00", "16:30", "18:00", "19:30", "21:00"]
           },
           specialHours: {},
-          reservationFee: 500
+          reservationFee: 500,
+          adminEmail: "post@krsvr.no"
         });
       }
       setLoading(false);
@@ -238,6 +239,18 @@ export default function SettingsManager() {
               <div className="w-14 h-7 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-500"></div>
             </label>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Administrator Email</label>
+          <p className="text-zinc-500 text-xs mb-2">This email will receive contact form submissions, new booking notifications, and will be displayed in the footer.</p>
+          <input 
+            type="email"
+            value={settings.adminEmail || "post@krsvr.no"} 
+            onChange={(e) => setSettings({...settings, adminEmail: e.target.value})} 
+            placeholder="admin@example.com"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
+          />
         </div>
 
         <div className="mb-6">

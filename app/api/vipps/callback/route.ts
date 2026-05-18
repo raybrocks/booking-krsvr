@@ -126,13 +126,16 @@ export async function POST(req: Request) {
              }
 
              // Send email
-             const { sendBookingConfirmationEmail, addContactToNewsletter } = await import('@/lib/email');
+             const { sendBookingConfirmationEmail, sendAdminNewBookingNotification, addContactToNewsletter } = await import('@/lib/email');
              
              await sendBookingConfirmationEmail(
                bookingData.email,
                { ...bookingData, amountPaid: amount / 100 },
                customText
              );
+
+             // Send admin notification
+             await sendAdminNewBookingNotification({ ...bookingData, amountPaid: amount / 100 });
 
              // Subscribe to newsletter if accepted
              if (bookingData.acceptedNewsletter && !bookingData.newsletterAdded) {
