@@ -354,14 +354,13 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6 pt-32 pb-20">
-      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="max-w-6xl mx-auto p-6 pt-24 pb-20">
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sticky top-16 md:top-20 z-40 bg-background/90 backdrop-blur-md py-4 -mx-6 px-6 md:mx-0 md:px-0 rounded-b-xl">
         <div>
-          <h1 className="text-3xl font-light tracking-tight mb-2">Admin Dashboard</h1>
-          <p className="text-zinc-400">Manage your VR Arena bookings, experiences, and settings.</p>
+          <h1 className="text-3xl font-light tracking-tight">Admin Dashboard</h1>
         </div>
         
-        <div className="flex bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 w-fit shrink-0 overflow-x-auto max-w-full">
+        <div className="flex bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 w-fit shrink-0 overflow-x-auto max-w-full shadow-lg shadow-black/50">
           <button 
             onClick={() => setActiveTab("upcoming")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
