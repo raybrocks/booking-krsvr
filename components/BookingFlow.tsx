@@ -49,7 +49,7 @@ export default function BookingFlow() {
   // Booking State
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>("");
-  const [players, setPlayers] = useState<number>(2);
+  const [players, setPlayers] = useState<number>(5);
   const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
   const [filterType, setFilterType] = useState<string>("All");
   
@@ -309,7 +309,7 @@ if (window.top) {
                 <p className="text-zinc-400">Velg når dere vil besøke Krs VR Arena.</p>
               </div>
               
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 md:p-5 text-sm text-zinc-300 space-y-3">
+              <div className="bg-[#9C39FF]/10 border border-[#9C39FF]/20 rounded-2xl p-4 md:p-5 text-sm text-zinc-300 space-y-3">
                 <p>
                   <strong>For små grupper (2-8 personer):</strong> <br />Bruk bookingmodulen under.
                 </p>
@@ -422,7 +422,6 @@ if (window.top) {
               <div className="bg-zinc-900 rounded-xl p-4 text-sm text-zinc-400">
                 <p>Prisene er per person og synker for større grupper.</p>
                 <p className="mt-2 text-zinc-300 font-medium">Merk: Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst.</p>
-                <p className="mt-2">For grupper over 8, vennligst kontakt oss på telefon eller e-post for å arrangere teambuilding.</p>
               </div>
             </div>
           )}
