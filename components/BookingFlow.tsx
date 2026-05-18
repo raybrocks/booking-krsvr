@@ -388,7 +388,7 @@ if (window.top) {
                 <p className="text-zinc-400">{t("step2.subtitle")}</p>
               </div>
               
-              <div className="flex items-center justify-center gap-6">
+              <div className="flex items-center justify-center gap-6 mb-8">
                 <button 
                   onClick={() => setPlayers(Math.max(2, players - 1))}
                   className="w-12 h-12 rounded-full border border-zinc-700 flex items-center justify-center hover:bg-zinc-800 transition-colors"
@@ -402,6 +402,15 @@ if (window.top) {
                 >
                   +
                 </button>
+              </div>
+
+              <div className="bg-zinc-900/50 border border-[#9C39FF]/20 rounded-2xl p-6 text-center max-w-sm mx-auto mb-8 shadow-[0_0_15px_rgba(156,57,255,0.05)]">
+                <div className="text-4xl font-medium text-white mb-2">
+                  {pricePerPerson} kr <span className="text-base font-normal text-zinc-400">per pers</span>
+                </div>
+                <div className="text-sm text-zinc-500 font-medium">
+                  {t("step3.total", { players }) || "Total pris"}: {pricePerPerson * players} kr
+                </div>
               </div>
               
               <div className="bg-zinc-900 rounded-xl p-4 text-sm text-zinc-400">
@@ -488,27 +497,17 @@ if (window.top) {
                               )}
                             </div>
                             
-                            <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-between items-end mt-auto">
-                              <div>
-                                <Button 
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSelectedExperience(exp);
-                                      setStep(4);
-                                  }}
-                                  className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white"
-                                >
-                                  {t("step3.booknow")}
-                                </Button>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-lg font-medium text-white">
-                                  {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
-                                </div>
-                                <div className="text-sm text-zinc-500 mt-0.5">
-                                  {t("step3.total", { players })}: {pricePerPerson * players} NOK
-                                </div>
-                              </div>
+                            <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end mt-auto">
+                              <Button 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedExperience(exp);
+                                    setStep(4);
+                                }}
+                                className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white w-full sm:w-auto"
+                              >
+                                {t("step3.booknow")}
+                              </Button>
                             </div>
                           </CardContent>
                         </Card>
