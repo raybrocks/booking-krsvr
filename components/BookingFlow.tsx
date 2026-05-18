@@ -526,7 +526,7 @@ if (window.top) {
                                     setSelectedExperience(exp);
                                     setStep(4);
                                 }}
-                                className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white w-full sm:w-auto"
+                                className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-8 rounded-full shadow-[0_0_15px_rgba(156,57,255,0.3)] hover:scale-105 transition-all"
                               >
                                 Book nå
                               </Button>

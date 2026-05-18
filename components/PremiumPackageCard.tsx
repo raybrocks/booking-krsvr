@@ -75,9 +75,11 @@ export default function PremiumPackageCard() {
             </div>
           </div>
 
-          <Link href="/kontakt" className="inline-block w-full py-4 rounded-lg text-base font-medium transition-all bg-[#9C39FF] text-white hover:bg-[#8b32e6] text-center shadow-lg shadow-[#9C39FF]/20">
-            Send forespørsel
-          </Link>
+          <div className="flex justify-center mt-6">
+            <Link href="/kontakt" className="inline-block px-12 py-4 rounded-full text-base font-medium transition-all bg-[#9C39FF] text-white hover:bg-[#8b32e6] text-center shadow-[0_0_15px_rgba(156,57,255,0.3)] hover:scale-105">
+              Send forespørsel
+            </Link>
+          </div>
           <p className="mt-4 text-sm text-zinc-400 text-center">
             Fortell oss ønsket dato, antall personer og type arrangement, så hjelper vi dere med å sette opp et passende opplegg.
           </p>

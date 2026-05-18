@@ -81,10 +81,10 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-            <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="w-full sm:w-auto h-14 px-8 text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105">
+            <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-14 px-8 text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 min-w-[240px]">
               Book opplevelse <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button nativeButton={false} render={<Link href="/opplevelser" />} size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-lg border-zinc-700 hover:bg-zinc-800 rounded-full text-white">
+            <Button nativeButton={false} render={<Link href="/opplevelser" />} size="lg" variant="outline" className="h-14 px-8 text-lg border-zinc-700 hover:bg-zinc-800 rounded-full text-white min-w-[240px]">
               Se opplevelser
             </Button>
           </div>
@@ -328,10 +328,10 @@ export default function LandingPage() {
           Reserver din tid i dag, og gled deg til en opplevelse gruppa sent vil glemme.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="w-full sm:w-auto h-16 px-10 text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105">
+          <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-16 px-10 text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 min-w-[320px]">
             Book opplevelse
           </Button>
-          <Button nativeButton={false} render={<Link href="/kontakt" />} size="lg" variant="outline" className="w-full sm:w-auto h-16 px-10 text-xl border-zinc-700 hover:bg-zinc-800 rounded-full text-white">
+          <Button nativeButton={false} render={<Link href="/kontakt" />} size="lg" variant="outline" className="h-16 px-10 text-xl border-zinc-700 hover:bg-zinc-800 rounded-full text-white min-w-[320px]">
             Send gruppeforespørsel (8+)
           </Button>
         </div>

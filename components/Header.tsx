@@ -49,22 +49,24 @@ export default function Header() {
               <SheetTrigger render={<button className="text-zinc-200 hover:text-white p-2" />}>
                 <Menu size={28} />
               </SheetTrigger>
-              <SheetContent side="right" className="bg-zinc-950 border-zinc-800 text-zinc-100 flex flex-col pt-12">
+              <SheetContent side="right" className="bg-[#0a0a0c]/95 border-zinc-800/50 backdrop-blur-xl text-zinc-100 flex flex-col pt-20">
                 <SheetTitle className="sr-only">Navigasjonsmeny</SheetTitle>
-                <nav className="flex flex-col gap-6 mt-8 flex-1">
+                <nav className="flex flex-col items-center gap-8 flex-1 w-full mt-8">
                   {navLinks.map((link) => {
                     const isBooking = link.href === "/booking";
+                    const isActive = pathname === link.href;
                     
                     if (isBooking) {
                       return (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          onClick={() => setIsOpen(false)}
-                          className="flex items-center justify-center h-14 mt-4 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-lg font-bold uppercase shadow-[0_0_15px_rgba(156,57,255,0.5)] transition-all"
-                        >
-                          {link.label}
-                        </Link>
+                        <div key={link.href} className="w-full flex justify-center mt-4">
+                          <Link
+                            href={link.href}
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center justify-center h-12 px-10 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-sm font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(156,57,255,0.3)] transition-all hover:scale-105"
+                          >
+                            {link.label}
+                          </Link>
+                        </div>
                       );
                     }
                     
@@ -73,11 +75,16 @@ export default function Header() {
                         key={link.href}
                         href={link.href}
                         onClick={() => setIsOpen(false)}
-                        className={`text-xl font-medium transition-colors ${
-                          pathname === link.href ? "text-[#9C39FF]" : "text-zinc-400 hover:text-zinc-200"
+                        className={`text-2xl font-light tracking-wide transition-all ${
+                          isActive ? "text-white" : "text-zinc-500 hover:text-zinc-200"
                         }`}
                       >
-                        {link.label}
+                        {isActive ? (
+                           <span className="relative flex flex-col items-center">
+                             {link.label}
+                             <span className="absolute -bottom-3 w-1 h-1 rounded-full bg-[#9C39FF]" />
+                           </span>
+                        ) : link.label}
                       </Link>
                     )
                   })}
