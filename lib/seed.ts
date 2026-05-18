@@ -15,7 +15,6 @@ export async function seedDatabase() {
     age: "18+",
     difficulty: "Easy",
     maxPlayers: 2,
-    subtitles: ["English"],
     pricing: {
       "2": 10 // 10 NOK for 2 people
     },
@@ -37,7 +36,6 @@ export async function seedDatabase() {
       age: "12+",
       difficulty: "Medium",
       maxPlayers: 6,
-      subtitles: ["English", "Norwegian"],
       pricing: {
         "2": 800,
         "3": 1100,
@@ -58,7 +56,6 @@ export async function seedDatabase() {
       age: "16+",
       difficulty: "Hard",
       maxPlayers: 8,
-      subtitles: ["English"],
       pricing: {
         "2": 900,
         "3": 1200,
@@ -79,7 +76,6 @@ export async function seedDatabase() {
       age: "8+",
       difficulty: "Easy",
       maxPlayers: 4,
-      subtitles: ["English", "Norwegian", "Swedish"],
       pricing: {
         "2": 700,
         "3": 1000,

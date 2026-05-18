@@ -16,7 +16,6 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { Loader2, CheckCircle2, ChevronRight, ChevronLeft, Users, Clock, Calendar as CalendarIcon } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
 
 type Experience = {
   id: string;
@@ -27,7 +26,6 @@ type Experience = {
   age: string;
   difficulty: string;
   maxPlayers: number;
-  subtitles: string[];
   pricing: Record<string, number>;
   isActive: boolean;
   order?: number;
@@ -43,7 +41,6 @@ type Settings = {
 };
 
 export default function BookingFlow() {
-  const { t } = useI18n();
   const [step, setStep] = useState(1);
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -175,18 +172,18 @@ export default function BookingFlow() {
   const amountToPay = paymentType === "full" ? totalPrice : pricePerPerson;
 
   const handleNext = () => {
-    if (step === 1 && (!selectedDate || !selectedTime)) return toast.error(t("error.datetime") || "Please select a date and time.");
-    if (step === 3 && !selectedExperience) return toast.error(t("error.experience") || "Please select an experience.");
+    if (step === 1 && (!selectedDate || !selectedTime)) return toast.error("Vennligst velg dato og tid.");
+    if (step === 3 && !selectedExperience) return toast.error("Vennligst velg en opplevelse.");
     if (step === 4) {
-      if (!firstName || !lastName || !email || !phone) return toast.error(t("error.personal") || "Please fill in all personal details.");
+      if (!firstName || !lastName || !email || !phone) return toast.error("Vennligst fyll inn alle felter.");
       
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) return toast.error(t("error.email") || "Please enter a valid email address.");
+      if (!emailRegex.test(email)) return toast.error("Vennligst skriv inn en gyldig e-postadresse.");
       
       const digitCount = phone.replace(/\D/g, '').length;
-      if (digitCount < 8) return toast.error(t("error.phone") || "Phone number must contain at least 8 digits.");
+      if (digitCount < 8) return toast.error("Telefonnummeret må inneholde minst 8 siffer.");
     }
-    if (step === 5 && !acceptedTerms) return toast.error(t("error.terms") || "You must accept the terms of service.");
+    if (step === 5 && !acceptedTerms) return toast.error("Du må godta vilkårene.");
     setStep(s => s + 1);
   };
 
@@ -267,12 +264,12 @@ if (window.top) {
         <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10 text-green-500" />
         </div>
-        <h2 className="text-3xl font-light mb-4">{t("success.title")}</h2>
+        <h2 className="text-3xl font-light mb-4">Booking Bekreftet</h2>
         <p className="text-zinc-300 mb-8">
-          {t("success.desc", { name: firstName, date: selectedDate ? format(selectedDate, "MMMM do, yyyy") : "", time: selectedTime, email: email })}
+          Takk, {firstName}. VR opplevelsen er booket {selectedDate ? format(selectedDate, "MMMM do, yyyy") : ""} kl. {selectedTime}. Vi har sendt bekreftelse til {email}.
         </p>
         <Button onClick={() => window.location.reload()} variant="outline" className="rounded-full border-zinc-700 hover:bg-zinc-800">
-          {t("success.bookanother")}
+          Book en ny
         </Button>
       </motion.div>
     );
@@ -308,8 +305,8 @@ if (window.top) {
           {step === 1 && (
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">{t("step1.title")}</h2>
-                <p className="text-zinc-400">{t("step1.subtitle")}</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">Velg dato & tid</h2>
+                <p className="text-zinc-400">Velg når dere vil besøke Krs VR Arena.</p>
               </div>
               
               <div className="grid grid-cols-1 gap-10">
@@ -340,7 +337,7 @@ if (window.top) {
                 <div>
                   <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                     <Clock className="w-5 h-5 text-zinc-400" />
-                    {t("step1.available")}
+                    Ledige tider
                   </h3>
                   {selectedDate ? (
                     loadingTimes ? (
@@ -364,16 +361,16 @@ if (window.top) {
                                     : "border-zinc-800 hover:border-zinc-600 text-zinc-300"
                               }`}
                             >
-                              {time} {isBooked && (t("step1.booked") || "(Booked)")}
+                              {time} {isBooked && ("(Booket)")}
                             </button>
                           );
                         })}
                       </div>
                     ) : (
-                      <p className="text-zinc-400 text-sm">{t("step1.notimes")}</p>
+                      <p className="text-zinc-400 text-sm">Ingen ledige tider på denne datoen.</p>
                     )
                   ) : (
-                    <p className="text-zinc-400 text-sm">{t("step1.selectdate")}</p>
+                    <p className="text-zinc-400 text-sm">Vennligst velg en dato først.</p>
                   )}
                 </div>
               </div>
@@ -384,8 +381,8 @@ if (window.top) {
           {step === 2 && (
             <div className="space-y-8 text-center max-w-lg mx-auto">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">{t("step2.title")}</h2>
-                <p className="text-zinc-400">{t("step2.subtitle")}</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">Gruppestørrelse</h2>
+                <p className="text-zinc-400">Hvor mange skal spille?</p>
               </div>
               
               <div className="flex items-center justify-center gap-6 mb-8">
@@ -409,14 +406,14 @@ if (window.top) {
                   {pricePerPerson} kr <span className="text-base font-normal text-zinc-400">per pers</span>
                 </div>
                 <div className="text-sm text-zinc-500 font-medium">
-                  {t("step3.total", { players }) || "Total pris"}: {pricePerPerson * players} kr
+                  Total for {players}: {pricePerPerson * players} kr
                 </div>
               </div>
               
               <div className="bg-zinc-900 rounded-xl p-4 text-sm text-zinc-400">
-                <p>{t("step2.info1")}</p>
-                <p className="mt-2 text-zinc-300 font-medium">{t("info.capacity")}</p>
-                <p className="mt-2">{t("step2.info2")}</p>
+                <p>Prisene er per person og synker for større grupper.</p>
+                <p className="mt-2 text-zinc-300 font-medium">Merk: Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst.</p>
+                <p className="mt-2">For grupper over 8, vennligst kontakt oss på telefon eller e-post for å arrangere teambuilding.</p>
               </div>
             </div>
           )}
@@ -425,8 +422,8 @@ if (window.top) {
           {step === 3 && (
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">{t("step3.title")}</h2>
-                <p className="text-zinc-400">{t("step3.subtitle")}</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">Velg VR Opplevelse</h2>
+                <p className="text-zinc-400">Velg VR-eventyr for gruppen.</p>
               </div>
               
               {/* Filter */}
@@ -442,7 +439,7 @@ if (window.top) {
                           : "bg-zinc-900/50 text-zinc-400 hover:bg-zinc-800 border border-zinc-800 hover:text-zinc-200"
                       }`}
                     >
-                      {type === "All" ? t("filter.all") : type}
+                      {type === "All" ? "Alle" : type}
                     </button>
                   ))}
                 </div>
@@ -490,10 +487,10 @@ if (window.top) {
                             <p className="text-zinc-400 text-sm mb-4">{exp.shortDescription}</p>
                             
                             <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
-                              <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.age")} {exp.age}</span>
-                              <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.diff")} {exp.difficulty}</span>
+                              <span className="bg-zinc-900 px-2 py-1 rounded">Alder: {exp.age}</span>
+                              <span className="bg-zinc-900 px-2 py-1 rounded">Vanskelighet: {exp.difficulty}</span>
                               {exp.familyFriendly && (
-                                <span className="bg-zinc-900 px-2 py-1 rounded">{t("step3.familyfriendly")}</span>
+                                <span className="bg-zinc-900 px-2 py-1 rounded">Familievennlig</span>
                               )}
                             </div>
                             
@@ -506,7 +503,7 @@ if (window.top) {
                                 }}
                                 className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white w-full sm:w-auto"
                               >
-                                {t("step3.booknow")}
+                                Book nå
                               </Button>
                             </div>
                           </CardContent>
@@ -521,7 +518,7 @@ if (window.top) {
                 .filter(e => filterType === "All" || e.type === filterType)
                 .length === 0 && (
                 <div className="text-center py-10 text-zinc-400 bg-zinc-900/30 rounded-2xl border border-zinc-800/50">
-                  {t("step3.noexp", { players })}
+                  Ingen opplevelser tilgjengelig for {players} personer med valgt filter.
                 </div>
               )}
             </div>
@@ -531,14 +528,14 @@ if (window.top) {
           {step === 4 && (
             <div className="space-y-8 max-w-md mx-auto">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">{t("step4.title")}</h2>
-                <p className="text-zinc-400">{t("step4.subtitle")}</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">Dine opplysninger</h2>
+                <p className="text-zinc-400">Hvem står på bookingen?</p>
               </div>
               
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-zinc-300">{t("step4.fname")}</Label>
+                    <Label htmlFor="firstName" className="text-zinc-300">Fornavn</Label>
                     <Input 
                       id="firstName" 
                       value={firstName} 
@@ -547,7 +544,7 @@ if (window.top) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-zinc-300">{t("step4.lname")}</Label>
+                    <Label htmlFor="lastName" className="text-zinc-300">Etternavn</Label>
                     <Input 
                       id="lastName" 
                       value={lastName} 
@@ -558,7 +555,7 @@ if (window.top) {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-zinc-300">{t("step4.email")}</Label>
+                  <Label htmlFor="email" className="text-zinc-300">E-postadresse</Label>
                   <Input 
                     id="email" 
                     type="email" 
@@ -569,7 +566,7 @@ if (window.top) {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-zinc-300">{t("step4.phone")}</Label>
+                  <Label htmlFor="phone" className="text-zinc-300">Telefonnummer</Label>
                   <Input 
                     id="phone" 
                     type="tel" 
@@ -587,8 +584,8 @@ if (window.top) {
           {step === 5 && (
             <div className="space-y-8 max-w-md mx-auto">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">{t("step5.title")}</h2>
-                <p className="text-zinc-400">{t("step5.subtitle")}</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">Nesten ferdig</h2>
+                <p className="text-zinc-400">Vennligst se over våre vilkår.</p>
               </div>
               
               <div className="space-y-6">
@@ -601,10 +598,10 @@ if (window.top) {
                   />
                   <div className="space-y-2 leading-none">
                     <Label htmlFor="terms" className="text-sm font-medium leading-relaxed">
-                      {t("step5.terms")}
+                      Jeg har lest og aksepterer kjøpsvilkårene, inkludert avbestillingsregler.
                     </Label>
                     <p className="text-xs text-zinc-400">
-                      {t("step5.termsdesc")}
+                      Avbestilling må skje senest 48 timer før aktiviteten.
                     </p>
                     <Dialog>
                       <DialogTrigger className="text-[#9C39FF] text-xs hover:underline outline-none text-left mt-1">
@@ -646,10 +643,10 @@ if (window.top) {
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="newsletter" className="text-sm font-medium leading-relaxed">
-                      {t("step5.news")}
+                      Meld meg på nyhetsbrev
                     </Label>
                     <p className="text-xs text-zinc-400">
-                      {t("step5.newsdesc")}
+                      Få oppdateringer om nye VR-opplevelser og tilbud.
                     </p>
                   </div>
                 </div>
@@ -661,15 +658,15 @@ if (window.top) {
           {step === 6 && (
             <div className="space-y-8 max-w-lg mx-auto">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">{t("step6.title")}</h2>
-                <p className="text-zinc-400">{t("step6.subtitle")}</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">Betaling</h2>
+                <p className="text-zinc-400">Se over bookingen og velg betalingsmetode.</p>
               </div>
               
               <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
                 <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
                   <div>
                     <h3 className="font-medium">{selectedExperience?.name}</h3>
-                    <p className="text-sm text-zinc-400">{t("step6.players", { players })}</p>
+                    <p className="text-sm text-zinc-400">{players} Spillere</p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">{selectedDate && format(selectedDate, "MMM do")}</p>
@@ -678,29 +675,29 @@ if (window.top) {
                 </div>
                 
                 <div className="flex justify-between items-end text-lg">
-                  <span className="text-zinc-300">{t("step6.price")}</span>
+                  <span className="text-zinc-300">Pris</span>
                   <div className="text-right">
                     <div className="font-medium text-white">
-                      {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">{t("step3.perperson")}</span>
+                      {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">per person</span>
                     </div>
                     <div className="text-sm text-zinc-500 mt-0.5">
-                      {t("step3.total", { players })}: {totalPrice} NOK
+                      {`Total for ${players}`}: {totalPrice} NOK
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="bg-zinc-900/50 rounded-xl p-4 text-sm text-zinc-300 border border-zinc-800">
-                <p>{t("info.capacity")}</p>
+                <p>Merk: Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst.</p>
               </div>
 
               <div className="space-y-4">
-                <Label className="text-zinc-300">{t("step6.payopt")}</Label>
+                <Label className="text-zinc-300">Betalingsalternativ</Label>
                 <RadioGroup value={paymentType} onValueChange={(v: "full" | "reservation") => setPaymentType(v)}>
                   <div className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'full' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} onClick={() => setPaymentType('full')}>
                     <div className="flex items-center space-x-3">
                       <RadioGroupItem value="full" id="full" className="border-zinc-500 text-[#9C39FF]" />
-                      <Label htmlFor="full" className="cursor-pointer">{t("step6.payfull")}</Label>
+                      <Label htmlFor="full" className="cursor-pointer">Betal hele beløpet</Label>
                     </div>
                     <span className="font-medium">{totalPrice} NOK</span>
                   </div>
@@ -709,9 +706,9 @@ if (window.top) {
                     <div className="flex items-center space-x-3">
                       <RadioGroupItem value="reservation" id="reservation" className="border-zinc-500 text-[#9C39FF]" />
                       <div className="space-y-1">
-                        <Label htmlFor="reservation" className="cursor-pointer font-medium">{t("step6.resfee")}</Label>
-                        <p className="text-xs text-zinc-400">{t("step6.eq1person")}</p>
-                        <p className="text-xs text-zinc-400">{t("step6.payrest")}</p>
+                        <Label htmlFor="reservation" className="cursor-pointer font-medium">Reservasjonsavgift</Label>
+                        <p className="text-xs text-zinc-400">Tilsvarer 1 person</p>
+                        <p className="text-xs text-zinc-400">Betal restbeløpet i arenaen</p>
                       </div>
                     </div>
                     <span className="font-medium">{pricePerPerson} NOK</span>
@@ -730,7 +727,7 @@ if (window.top) {
               className="text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full px-6"
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
-              {t("nav.back")}
+              Tilbake
             </Button>
             
             {step < 6 ? (
@@ -738,7 +735,7 @@ if (window.top) {
                 onClick={handleNext} 
                 className="bg-[#9C39FF] text-white hover:bg-[#9C39FF]/90 rounded-full px-8 shadow-[0_0_20px_rgba(156,57,255,0.4)]"
               >
-                {t("nav.continue")}
+                Fortsett
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : settings?.bookingsClosed ? (
@@ -747,8 +744,8 @@ if (window.top) {
                 variant="outline"
                 className="border-zinc-800 bg-zinc-900/50 opacity-100 cursor-not-allowed hover:bg-zinc-900/50 hover:text-white text-zinc-300 rounded-2xl h-auto py-3 px-8 flex flex-col items-center"
               >
-                <div className="font-medium">{t("step6.closed.title")}</div>
-                <div className="text-xs text-zinc-500 mt-1">{t("step6.closed.subtitle")}</div>
+                <div className="font-medium">Booking midlertidig stengt</div>
+                <div className="text-xs text-zinc-500 mt-1">Send e-post til post@krsvr.no</div>
               </Button>
             ) : (
               <Button 
@@ -759,10 +756,10 @@ if (window.top) {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    {t("nav.processing")}
+                    Behandler...
                   </>
                 ) : (
-                  t("nav.pay", { amount: amountToPay })
+                  `Betal ${amountToPay} NOK`
                 )}
               </Button>
             )}

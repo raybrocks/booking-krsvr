@@ -14,7 +14,6 @@
         "age": { "type": "string" },
         "difficulty": { "type": "string" },
         "maxPlayers": { "type": "number" },
-        "subtitles": { "type": "array", "items": { "type": "string" } },
         "pricing": {
           "type": "object",
           "description": "Pricing per total group size (e.g., '2': 800, '3': 1100)",

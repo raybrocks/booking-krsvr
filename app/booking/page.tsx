@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import BookingFlow from "@/components/BookingFlow";
-import { useI18n } from "@/lib/i18n";
 
 export default function BookingPage() {
-  const { t } = useI18n();
 
   return (
     <main className="min-h-screen pb-20 pt-16">

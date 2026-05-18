@@ -3,31 +3,13 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useI18n } from "@/lib/i18n";
 import { Menu } from "lucide-react";
 import { motion } from "motion/react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 
 export default function Header() {
-  const { language, setLanguage } = useI18n();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-
-  const languageMap: Record<string, { name: string; flag: string }> = {
-    no: { name: "Norsk", flag: "🇳🇴" },
-    en: { name: "English", flag: "🇬🇧" },
-    de: { name: "Deutsch", flag: "🇩🇪" },
-    uk: { name: "Українська", flag: "🇺🇦" },
-    pl: { name: "Polski", flag: "🇵🇱" },
-    es: { name: "Español", flag: "🇪🇸" },
-  };
 
   const navLinks = [
     { href: "/", label: "Hovedside" },
@@ -61,28 +43,6 @@ export default function Header() {
         {/* Right side Actions */}
         <div className="flex flex-1 justify-end items-center gap-3 md:gap-4">
           
-          {/* Desktop Language Select */}
-          <div className="hidden md:block">
-            <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
-              <SelectTrigger className="w-[140px] h-12 bg-zinc-950/80 backdrop-blur-md rounded-full border-zinc-800 shadow-xl focus:ring-[#9C39FF] px-5">
-                <SelectValue placeholder="Language">
-                  <span className="flex items-center">
-                    <span className="mr-2">{languageMap[language]?.flag}</span>
-                    <span>{languageMap[language]?.name}</span>
-                  </span>
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
-                <SelectItem value="no"><span className="mr-2">🇳🇴</span>Norsk</SelectItem>
-                <SelectItem value="en"><span className="mr-2">🇬🇧</span>English</SelectItem>
-                <SelectItem value="de"><span className="mr-2">🇩🇪</span>Deutsch</SelectItem>
-                <SelectItem value="uk"><span className="mr-2">🇺🇦</span>Українська</SelectItem>
-                <SelectItem value="pl"><span className="mr-2">🇵🇱</span>Polski</SelectItem>
-                <SelectItem value="es"><span className="mr-2">🇪🇸</span>Español</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Mobile Menu Trigger */}
           <div className="flex md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -122,29 +82,6 @@ export default function Header() {
                     )
                   })}
                 </nav>
-                
-                {/* Mobile Language Select (Bottom of Menu) */}
-                <div className="mt-auto mb-8">
-                  <p className="text-sm text-zinc-500 mb-3 px-1">Språk / Language</p>
-                  <Select value={language} onValueChange={(val: any) => setLanguage(val)}>
-                    <SelectTrigger className="w-full h-14 bg-zinc-900/50 rounded-2xl border-zinc-800 focus:ring-[#9C39FF] px-5">
-                      <SelectValue placeholder="Language">
-                        <span className="flex items-center">
-                          <span className="mr-3 text-lg">{languageMap[language]?.flag}</span>
-                          <span className="text-base">{languageMap[language]?.name}</span>
-                        </span>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
-                      <SelectItem value="no"><span className="mr-2">🇳🇴</span>Norsk</SelectItem>
-                      <SelectItem value="en"><span className="mr-2">🇬🇧</span>English</SelectItem>
-                      <SelectItem value="de"><span className="mr-2">🇩🇪</span>Deutsch</SelectItem>
-                      <SelectItem value="uk"><span className="mr-2">🇺🇦</span>Українська</SelectItem>
-                      <SelectItem value="pl"><span className="mr-2">🇵🇱</span>Polski</SelectItem>
-                      <SelectItem value="es"><span className="mr-2">🇪🇸</span>Español</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </SheetContent>
             </Sheet>
           </div>
