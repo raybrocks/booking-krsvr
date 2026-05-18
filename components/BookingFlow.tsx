@@ -309,6 +309,15 @@ if (window.top) {
                 <p className="text-zinc-400">Velg når dere vil besøke Krs VR Arena.</p>
               </div>
               
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 md:p-5 text-sm text-zinc-300 space-y-3">
+                <p>
+                  <strong>For små grupper (2-8 personer):</strong> <br />Bruk bookingmodulen under.
+                </p>
+                <p>
+                  <strong>For større grupper (8-64 personer):</strong> <br />Utforsk våre arrangementssider og reserver via kontaktskjema.
+                </p>
+              </div>
+              
               <div className="grid grid-cols-1 gap-10">
                 <div className="w-full">
                   <Calendar
