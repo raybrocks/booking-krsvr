@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -94,6 +95,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
               }
             }}
           />
+          <ScrollToTop />
       </body>
     </html>
   );
