@@ -93,5 +93,10 @@ service cloud.firestore {
       allow read: if true;
       allow create, update, delete: if isAdmin() && isValidSettings(request.resource.data);
     }
+
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
   }
 }
