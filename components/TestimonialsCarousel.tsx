@@ -10,7 +10,13 @@ import useEmblaCarousel from "embla-carousel-react";
 export default function TestimonialsCarousel() {
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [emblaRef] = useEmblaCarousel({ loop: true, align: "center", skipSnaps: false });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: testimonials.length > 1, align: "center", skipSnaps: false });
+
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.reInit({ loop: testimonials.length > 1, align: "center", skipSnaps: false });
+    }
+  }, [emblaApi, testimonials.length]);
 
   useEffect(() => {
     // Note: We might not have order field indexed yet, so we pull all and sort client-side, 
@@ -45,7 +51,7 @@ export default function TestimonialsCarousel() {
     <div className="w-full max-w-6xl mx-auto overflow-hidden mt-8 mb-16 px-4" ref={emblaRef}>
       <div className="flex touch-pan-y -ml-4">
         {testimonials.map((testi) => (
-          <div key={testi.id} className="min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.333%] pl-4">
+          <div key={testi.id} className={`min-w-0 pl-4 ${testimonials.length === 1 ? 'flex-[0_0_100%]' : 'flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.333%]'}`}>
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden h-full flex flex-col group hover:border-zinc-700 transition-colors">
               <div className="relative w-full aspect-video bg-zinc-950">
                 {testi.mainImage ? (
