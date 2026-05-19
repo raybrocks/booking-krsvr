@@ -67,7 +67,14 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-medium mb-6">Kontakt</h4>
             <ul className="space-y-3">
-              <li className="text-zinc-400 text-sm">Industrigata 12<br/>4632 Kristiansand</li>
+              <li className="text-zinc-400 text-sm">
+                Industrigata 12<br/>4632 Kristiansand
+              </li>
+              <li className="text-zinc-400 text-sm">
+                <a href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" target="_blank" rel="noopener noreferrer" className="hover:text-[#9C39FF] transition-colors flex items-center">
+                  Google Maps Veibeskrivelse
+                </a>
+              </li>
               <li className="text-zinc-400 text-sm"><a href={`mailto:${adminEmail}`} className="hover:text-[#9C39FF] transition-colors">{adminEmail}</a></li>
               <li className="text-zinc-400 text-sm"><a href="tel:+4740828302" className="hover:text-[#9C39FF] transition-colors">+47 40828302</a></li>
             </ul>
