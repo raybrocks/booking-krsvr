@@ -57,11 +57,19 @@ function MediaGallery({ experience }: { experience: any }) {
   );
 }
 
-export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTypeSlug?: string | null, initialExpSlug?: string | null }) {
-  const [experiences, setExperiences] = useState<any[]>([]);
+export function ExperiencesView({ 
+  initialExperiences = [],
+  initialTypeSlug, 
+  initialExpSlug 
+}: { 
+  initialExperiences?: any[];
+  initialTypeSlug?: string | null;
+  initialExpSlug?: string | null;
+}) {
+  const [experiences, setExperiences] = useState<any[]>(initialExperiences);
   const [selectedId, setSelectedId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>("Alle");
+  const [activeTypeSlug, setActiveTypeSlug] = useState<string>(initialTypeSlug || "alle");
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -88,52 +96,43 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
   };
 
   useEffect(() => {
-    const fetchExperiences = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "experiences"));
-        if (!querySnapshot.empty) {
-          let exps = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-          
-          // Sort by order
-          exps.sort((a, b) => {
-            const orderA = typeof a.order === 'number' ? a.order : 999;
-            const orderB = typeof b.order === 'number' ? b.order : 999;
-            return orderA - orderB;
-          });
+    if (initialExperiences.length > 0) {
+      setExperiences(initialExperiences);
+    }
+  }, [initialExperiences]);
 
-          // Filter out inactive
-          exps = exps.filter(e => e.isActive);
+  useEffect(() => {
+    setActiveTypeSlug(initialTypeSlug || "alle");
+  }, [initialTypeSlug]);
 
-          setExperiences(exps);
-          if (exps.length > 0) {
-            let initialId = exps[0].id;
-            
-            if (initialTypeSlug && initialExpSlug) {
-              const matchedExp = exps.find(e => slugify(e.type) === initialTypeSlug && slugify(e.name) === initialExpSlug);
-              if (matchedExp) initialId = matchedExp.id;
-            } else if (initialTypeSlug) {
-              const matchedExp = exps.find(e => slugify(e.type) === initialTypeSlug);
-              if (matchedExp) initialId = matchedExp.id;
-            }
-            
-            setSelectedId(initialId);
-          } else {
-            setSelectedId("");
-          }
-        } else {
-          setExperiences([]);
-          setSelectedId("");
-        }
-      } catch (error) {
-        console.error("Error fetching experiences:", error);
-        setExperiences([]);
-        setSelectedId("");
-      } finally {
-        setIsLoading(false);
+  useEffect(() => {
+    if (experiences.length > 0) {
+      let initialId = "";
+      // Initialize selectedId based on activeTypeSlug and initialExpSlug
+      if (activeTypeSlug !== "alle" && initialExpSlug) {
+        const matchedExp = experiences.find(e => slugify(e.type) === activeTypeSlug && slugify(e.name) === initialExpSlug);
+        if (matchedExp) initialId = matchedExp.id;
+      } else if (activeTypeSlug !== "alle") {
+        const matchedExp = experiences.find(e => slugify(e.type) === activeTypeSlug);
+        if (matchedExp) initialId = matchedExp.id;
       }
-    };
-    fetchExperiences();
-  }, [initialTypeSlug, initialExpSlug]);
+      
+      if (!initialId) {
+        // If no match based on slug, use the first experience based on activeTypeSlug
+        const matchingTypeExps = activeTypeSlug === "alle" 
+          ? experiences 
+          : experiences.filter(e => slugify(e.type) === activeTypeSlug);
+        
+        if (matchingTypeExps.length > 0) {
+            initialId = matchingTypeExps[0].id;
+        } else {
+            initialId = experiences[0].id;
+        }
+      }
+      
+      setSelectedId(initialId);
+    }
+  }, [experiences, activeTypeSlug, initialExpSlug]);
 
   useEffect(() => {
     if (selectedId && scrollRef.current) {
@@ -153,12 +152,20 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
   }, [selectedId, experiences]);
 
   const filteredExperiences = experiences.filter(exp => {
-    if (activeFilter === "Alle") return true;
-    if (activeFilter === "Familievennlig") return exp.familyFriendly;
-    if (activeFilter === "Teambuilding") return exp.teambuilding;
-    if (activeFilter === "Fest og Moro") return exp.party;
-    if (activeFilter === "Jump Scare") return exp.jumpScare;
-    return true;
+    // 1. Filter by attribute
+    let attrMatch = true;
+    if (activeFilter === "Familievennlig") attrMatch = exp.familyFriendly;
+    else if (activeFilter === "Teambuilding") attrMatch = exp.teambuilding;
+    else if (activeFilter === "Fest og Moro") attrMatch = exp.party;
+    else if (activeFilter === "Jump Scare") attrMatch = exp.jumpScare;
+    
+    // 2. Filter by type
+    let typeMatch = true;
+    if (activeTypeSlug && activeTypeSlug !== "alle") {
+      typeMatch = slugify(exp.type) === activeTypeSlug;
+    }
+
+    return attrMatch && typeMatch;
   });
 
   const selected = filteredExperiences.find(e => e.id === selectedId) || filteredExperiences[0] || experiences[0];
@@ -172,12 +179,17 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
     
     // Find first experience matching new filter
     const newFiltered = experiences.filter(exp => {
-      if (filter === "Alle") return true;
-      if (filter === "Familievennlig") return exp.familyFriendly;
-      if (filter === "Teambuilding") return exp.teambuilding;
-      if (filter === "Fest og Moro") return exp.party;
-      if (filter === "Jump Scare") return exp.jumpScare;
-      return true;
+      let attrMatch = true;
+      if (filter === "Familievennlig") attrMatch = exp.familyFriendly;
+      else if (filter === "Teambuilding") attrMatch = exp.teambuilding;
+      else if (filter === "Fest og Moro") attrMatch = exp.party;
+      else if (filter === "Jump Scare") attrMatch = exp.jumpScare;
+      
+      let typeMatch = true;
+      if (activeTypeSlug && activeTypeSlug !== "alle") {
+        typeMatch = slugify(exp.type) === activeTypeSlug;
+      }
+      return attrMatch && typeMatch;
     });
 
     if (newFiltered.length > 0) {
@@ -230,14 +242,6 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
     return <Gamepad2 className="w-10 h-10" />;
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#9C39FF] border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   if (experiences.length === 0 || !selected) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -258,6 +262,7 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
           Våre VR Opplevelser
         </h1>
 
+        {/* Existing Attribute Filters */}
         <div className="flex flex-wrap items-center justify-center gap-3 max-w-3xl mx-auto px-4 mt-6">
           {["Alle", "Teambuilding", "Fest og Moro", "Familievennlig", "Jump Scare"].map(filter => (
             <button
@@ -272,6 +277,39 @@ export function ExperiencesView({ initialTypeSlug, initialExpSlug }: { initialTy
               {filter}
             </button>
           ))}
+        </div>
+
+        {/* New Experience Type Filters */}
+        <div className="flex flex-wrap items-center justify-center gap-3 max-w-4xl mx-auto px-4 mt-4">
+          <Link
+            href="/opplevelser"
+            scroll={false}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+              activeTypeSlug === "alle"
+                ? "border-[#9C39FF] bg-[#9C39FF]/20 text-white shadow-[0_0_15px_rgba(156,57,255,0.2)]"
+                : "border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-white"
+            }`}
+          >
+            Alle Typer
+          </Link>
+          {Array.from(new Set(experiences.map(e => e.type))).filter(Boolean).map(type => {
+            const tSlug = slugify(type);
+            const isActive = activeTypeSlug === tSlug;
+            return (
+              <Link
+                key={type}
+                href={`/opplevelser/${tSlug}`}
+                scroll={false}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+                  isActive
+                    ? "border-[#9C39FF] bg-[#9C39FF]/20 text-white shadow-[0_0_15px_rgba(156,57,255,0.2)]"
+                    : "border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-white"
+                }`}
+              >
+                {type}
+              </Link>
+            );
+          })}
         </div>
       </motion.div>
 
