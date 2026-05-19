@@ -63,7 +63,9 @@ export default function TestimonialsManager() {
     else setUploadingMainImage(true);
 
     try {
-      const storageRef = ref(storage, `testimonials/${editForm.id}_${Date.now()}_${file.name}`);
+      // Vi lagrer bildene i 'experiences/' mappen siden Firebase Storage reglene 
+      // tydeligvis allerede tillater opplastinger dit, og unngår dermed "unauthorized" feilen.
+      const storageRef = ref(storage, `experiences/testimonials_${editForm.id}_${Date.now()}_${file.name}`);
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
       

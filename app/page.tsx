@@ -230,7 +230,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 6. Seksjon: Teambuilding */}
+      {/* 6. Seksjon: Teambuilding Testimonials Carousel */}
       <section className="py-32 relative overflow-hidden bg-gradient-to-b from-transparent to-[#9C39FF]/5 hidden sm:block">
         <div className="container mx-auto px-4">
           <div className="mb-20">
