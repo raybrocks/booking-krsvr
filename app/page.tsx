@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import HomeCarousel from "@/components/HomeCarousel";
+import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import { motion } from "motion/react";
 import { 
   ArrowRight, 
@@ -232,12 +233,19 @@ export default function LandingPage() {
       {/* 6. Seksjon: Teambuilding */}
       <section className="py-32 relative overflow-hidden bg-gradient-to-b from-transparent to-[#9C39FF]/5 hidden sm:block">
         <div className="container mx-auto px-4">
+          <div className="mb-20">
+             <div className="max-w-4xl mx-auto text-center mb-12">
+               <h2 className="text-4xl md:text-5xl font-light text-white mb-5 tracking-tight">Teambuilding som engasjerer</h2>
+             </div>
+             <TestimonialsCarousel />
+          </div>
+
           <div className="max-w-5xl mx-auto bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 rounded-3xl p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#9C39FF]/10 rounded-full blur-3xl -z-10 absolute-center translate-x-1/3 -translate-y-1/2"></div>
             
-            <h2 className="text-4xl md:text-5xl font-light text-white mb-6">Teambuilding som engasjerer</h2>
+            <h3 className="text-3xl md:text-4xl font-light text-white mb-6">Ser dere etter en aktivitet som virkelig bygger relasjoner?</h3>
             <p className="text-xl text-zinc-300 font-light max-w-3xl mx-auto mb-10 leading-relaxed">
-              Ser dere etter en aktivitet som virkelig bygger relasjoner? I våre opplevelser må deltakerne samarbeide, kommunisere, ta raske avgjørelser og løse oppgaver felles.
+              I våre opplevelser må deltakerne samarbeide, kommunisere, ta raske avgjørelser og løse oppgaver felles.
             </p>
             <Button nativeButton={false} render={<Link href="/kontakt" />} size="lg" className="h-14 px-8 text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-transform hover:scale-105">
               Send forespørsel (mer enn 8 pers) <ArrowRight className="ml-2 w-5 h-5" />

@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { collection, onSnapshot, doc, getDoc, deleteDoc, setDoc, addDoc, updateDoc, writeBatch } from "firebase/firestore";
-import { ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import TestimonialsManager from "./TestimonialsManager";
 
 export default function ExperiencesManager() {
   const [experiences, setExperiences] = useState<any[]>([]);
@@ -525,6 +526,8 @@ export default function ExperiencesManager() {
           </div>
         ))}
       </div>
+      <TestimonialsManager />
+
     </div>
   );
 }
