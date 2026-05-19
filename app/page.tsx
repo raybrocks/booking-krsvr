@@ -248,7 +248,7 @@ export default function LandingPage() {
               I våre opplevelser må deltakerne samarbeide, kommunisere, ta raske avgjørelser og løse oppgaver felles.
             </p>
             <Button nativeButton={false} render={<Link href="/arrangementer/firmaevent" />} size="lg" className="h-14 px-8 text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-transform hover:scale-105">
-              Send forespørsel (mer enn 8 pers) <ArrowRight className="ml-2 w-5 h-5" />
+              Se arrangementer <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
         </div>
