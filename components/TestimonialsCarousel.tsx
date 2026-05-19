@@ -53,13 +53,13 @@ export default function TestimonialsCarousel() {
         {testimonials.map((testi) => (
           <div key={testi.id} className={`min-w-0 pl-4 ${testimonials.length === 1 ? 'flex-[0_0_100%]' : 'flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.333%]'}`}>
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden h-full flex flex-col group hover:border-zinc-700 transition-colors">
-              <div className="relative w-full aspect-video bg-zinc-950">
+              <div className="relative w-full aspect-video bg-zinc-950 overflow-hidden">
                 {testi.mainImage ? (
                   <Image src={testi.mainImage} alt={testi.companyName} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : (
                   <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">Ingen bilde</div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80 pointer-events-none" />
               </div>
               <div className="p-6 flex flex-col flex-grow items-center text-center -mt-12 relative z-10">
                 {testi.logoImage ? (

@@ -231,7 +231,7 @@ export default function LandingPage() {
       </section>
 
       {/* 6. Seksjon: Teambuilding Testimonials Carousel */}
-      <section className="py-32 relative overflow-hidden bg-gradient-to-b from-transparent to-[#9C39FF]/5 hidden sm:block">
+      <section className="py-32 relative overflow-hidden bg-gradient-to-b from-transparent to-[#9C39FF]/5">
         <div className="container mx-auto px-4">
           <div className="mb-20">
              <div className="max-w-4xl mx-auto text-center mb-12">
