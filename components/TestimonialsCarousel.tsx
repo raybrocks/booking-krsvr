@@ -61,13 +61,13 @@ export default function TestimonialsCarousel() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80 pointer-events-none" />
               </div>
-              <div className="p-6 flex flex-col flex-grow items-center text-center -mt-16 md:-mt-20 relative z-10">
+              <div className="p-6 flex flex-col flex-grow items-center text-center -mt-20 md:-mt-32 relative z-10">
                 {testi.logoImage ? (
-                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-white border-4 border-zinc-900 shadow-xl mb-4">
-                    <Image src={testi.logoImage} alt="Logo" width={128} height={128} className="object-contain w-full h-full p-2 md:p-4" />
+                  <div className="w-36 h-36 md:w-64 md:h-64 rounded-full overflow-hidden bg-white border-4 border-zinc-900 shadow-xl mb-4">
+                    <Image src={testi.logoImage} alt="Logo" width={256} height={256} className="object-contain w-full h-full p-2 md:p-4" />
                   </div>
                 ) : (
-                   <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-zinc-800 border-4 border-zinc-900 mb-4" />
+                   <div className="w-36 h-36 md:w-64 md:h-64 rounded-full bg-zinc-800 border-4 border-zinc-900 mb-4" />
                 )}
                 <h3 className="text-xl font-medium text-white">{testi.companyName}</h3>
               </div>

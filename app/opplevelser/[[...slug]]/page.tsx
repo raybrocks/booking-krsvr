@@ -5,6 +5,8 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { slugify } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {
