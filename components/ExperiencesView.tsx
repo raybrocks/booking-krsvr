@@ -68,6 +68,7 @@ export function ExperiencesView({
 }) {
   const [experiences, setExperiences] = useState<any[]>(initialExperiences);
   const [selectedId, setSelectedId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(initialExperiences.length === 0);
   const [activeFilter, setActiveFilter] = useState<string>("Alle");
   const [activeTypeSlug, setActiveTypeSlug] = useState<string>(initialTypeSlug || "alle");
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -96,10 +97,30 @@ export function ExperiencesView({
   };
 
   useEffect(() => {
-    if (initialExperiences.length > 0) {
-      setExperiences(initialExperiences);
-    }
-  }, [initialExperiences]);
+    const fetchExperiences = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "experiences"));
+        if (!querySnapshot.empty) {
+          let exps = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+          
+          exps.sort((a, b) => {
+            const orderA = typeof a.order === 'number' ? a.order : 999;
+            const orderB = typeof b.order === 'number' ? b.order : 999;
+            return orderA - orderB;
+          });
+
+          exps = exps.filter(e => e.isActive);
+          setExperiences(exps);
+        }
+      } catch (error) {
+        console.error("Error fetching experiences:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExperiences();
+  }, []);
 
   useEffect(() => {
     setActiveTypeSlug(initialTypeSlug || "alle");
@@ -241,6 +262,14 @@ export function ExperiencesView({
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10" />;
     return <Gamepad2 className="w-10 h-10" />;
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#9C39FF] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   if (experiences.length === 0 || !selected) {
     return (
