@@ -587,6 +587,31 @@ function KontaktForm() {
 
           </form>
         )}
+
+        {/* Google Maps */}
+        <div className="mt-24 mb-10 max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-medium tracking-tight text-white mb-3">
+              Her finner du oss
+            </h2>
+            <p className="text-zinc-400">
+              KRS VR Arena, Industrigata 12, 4632 Kristiansand
+            </p>
+          </div>
+          <div className="bg-zinc-900/40 border border-white/5 p-2 rounded-2xl w-full">
+            <iframe 
+              title="KRS VR Arena Kart"
+              width="100%" 
+              height="450" 
+              src="https://maps.google.com/maps?width=100%25&amp;height=450&amp;hl=no&amp;q=Industrigata%2012,%204632%20Kristiansand+(KRS%20VR%20Arena)&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
+              style={{ border: 0, borderRadius: '0.75rem' }}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </div>
+
       </div>
     </main>
   );
