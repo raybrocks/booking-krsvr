@@ -45,6 +45,8 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
+      url: `https://vrsenteret.no/opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`,
+      type: "website",
     },
   };
 }

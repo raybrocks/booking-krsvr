@@ -1,6 +1,18 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Personvernerklæring | KRS VR Arena",
+  description: "Les om hvordan KRS VR Arena samler inn og behandler personopplysninger i henhold til gjeldende regelverk.",
+  openGraph: {
+    title: "Personvernerklæring | KRS VR Arena",
+    description: "Les om hvordan KRS VR Arena samler inn og behandler personopplysninger.",
+    url: "https://vrsenteret.no/personvern",
+    type: "website",
+  }
+};
 
 export default function PrivacyPolicyPage() {
   return (
