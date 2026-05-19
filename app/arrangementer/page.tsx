@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Arrangementer & Teambuilding Kristiansand | KRS VR Arena",
     description: "Planlegg teambuilding, utdrikningslag, firmaevent eller bursdag med unike VR-opplevelser hos KRS VR Arena.",
-    url: "https://vrsenteret.no/arrangementer",
+    url: "https://www.krsvr.no/arrangementer",
     type: "website",
   }
 };
@@ -22,7 +22,7 @@ export default function ArrangementerPage() {
     "@type": "EventSeries",
     "name": "Arrangementer, Teambuilding og Utdrikningslag hos KRS VR Arena",
     "description": "Vi tilbyr skreddersydde pakker for teambuilding, utdrikningslag, firmaevent, julebord og bursdager i Kristiansand med eksklusiv VR-underholdning.",
-    "url": "https://vrsenteret.no/arrangementer",
+    "url": "https://www.krsvr.no/arrangementer",
     "provider": {
       "@type": "EntertainmentBusiness",
       "name": "KRS VR Arena",

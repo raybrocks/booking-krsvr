@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'KRS VR Arena | VR Escape Room & Arcade i Kristiansand',
     description: 'Opplev eksklusive VR Escape Rooms, skytespill og eventyr i Kristiansand. Full bevegelsesfrihet (roam free) på store spillområder for små og store grupper.',
-    url: 'https://vrsenteret.no', // update with actual domain if necessary
+    url: 'https://www.krsvr.no', // update with actual domain if necessary
     siteName: 'KRS VR Arena',
     locale: 'nb_NO',
     type: 'website',

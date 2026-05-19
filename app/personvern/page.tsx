@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Personvernerklæring | KRS VR Arena",
     description: "Les om hvordan KRS VR Arena samler inn og behandler personopplysninger.",
-    url: "https://vrsenteret.no/personvern",
+    url: "https://www.krsvr.no/personvern",
     type: "website",
   }
 };

@@ -31,7 +31,7 @@ export default function LandingPage() {
     "@type": "EntertainmentBusiness",
     "name": "KRS VR Arena",
     "description": "Løs oppdrag, koder eller konkurrer i eksklusive lagspill. Perfekt for venner, bursdag, utdrikningslag, firma og teambuilding.",
-    "url": "https://vrsenteret.no", 
+    "url": "https://www.krsvr.no", 
     "telephone": "+4740828302",
     "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic",
     "address": {

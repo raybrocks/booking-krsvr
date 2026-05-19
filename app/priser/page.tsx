@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Priser på VR i Kristiansand | KRS VR Arena",
     description: "Priser for grupper. Ca 45-55 min aktiv spilletid, inkludert partylounge.",
-    url: "https://vrsenteret.no/priser",
+    url: "https://www.krsvr.no/priser",
     type: "website",
   }
 };

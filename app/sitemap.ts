@@ -4,7 +4,7 @@ import { db } from "@/lib/firebase";
 import { slugify } from "@/lib/utils";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://vrsenteret.no";
+  const baseUrl = "https://www.krsvr.no";
   
   // Static routes
   const routes: MetadataRoute.Sitemap = [

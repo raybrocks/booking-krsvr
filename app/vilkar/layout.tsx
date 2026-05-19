@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Kjøpsvilkår og Betingelser | KRS VR Arena",
     description: "Les våre kjøpsvilkår og avbestillingsregler.",
-    url: "https://vrsenteret.no/vilkar",
+    url: "https://www.krsvr.no/vilkar",
     type: "website",
   }
 };

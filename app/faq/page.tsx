@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "FAQ - Ofte stilte spørsmål | KRS VR Arena",
     description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, inkludert grupper, utstyr, aldersgrense og booking.",
-    url: "https://vrsenteret.no/faq",
+    url: "https://www.krsvr.no/faq",
     type: "website",
   }
 };

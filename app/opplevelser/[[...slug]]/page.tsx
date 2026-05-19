@@ -45,7 +45,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `https://vrsenteret.no/opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`,
+      url: `https://www.krsvr.no/opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`,
       type: "website",
     },
   };
@@ -122,7 +122,7 @@ export default async function ExperiencesPage({
           "@type": "Product",
           "name": exp.name,
           "description": exp.shortDescription || "",
-          "url": `https://vrsenteret.no/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`,
+          "url": `https://www.krsvr.no/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`,
           "brand": providerInfo
         }
       }))

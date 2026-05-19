@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Firmaevent & Teambuilding Kristiansand | KRS VR Arena",
     description: "Unike VR-opplevelser, perfekt for teambuilding, firmafest og julebord i Kristiansand. Fra 2-24 personer.",
-    url: "https://vrsenteret.no/arrangementer/firmaevent",
+    url: "https://www.krsvr.no/arrangementer/firmaevent",
     type: "website",
   }
 };
