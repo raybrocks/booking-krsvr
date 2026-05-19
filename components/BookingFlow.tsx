@@ -30,6 +30,11 @@ type Experience = {
   isActive: boolean;
   order?: number;
   familyFriendly?: boolean;
+  teambuilding?: boolean;
+  party?: boolean;
+  jumpScare?: boolean;
+  duration?: string;
+  tags?: string[];
 };
 
 type Settings = {
@@ -512,11 +517,25 @@ if (window.top) {
                             <p className="text-zinc-400 text-sm mb-4">{exp.shortDescription}</p>
                             
                             <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
-                              <span className="bg-zinc-900 px-2 py-1 rounded">Alder: {exp.age}</span>
-                              <span className="bg-zinc-900 px-2 py-1 rounded">Vanskelighet: {exp.difficulty}</span>
+                              {exp.duration && <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.duration}</span>}
+                              <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Fra {exp.age} år</span>
+                              <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Maks {exp.maxPlayers} spillere</span>
+                              {exp.difficulty && <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>}
                               {exp.familyFriendly && (
-                                <span className="bg-zinc-900 px-2 py-1 rounded">Familievennlig</span>
+                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Familievennlig</span>
                               )}
+                              {exp.teambuilding && (
+                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Teambuilding</span>
+                              )}
+                              {exp.party && (
+                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Fest & Moro</span>
+                              )}
+                              {exp.jumpScare && (
+                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Jump Scare</span>
+                              )}
+                              {exp.tags && exp.tags.map(tag => (
+                                <span key={tag} className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{tag}</span>
+                              ))}
                             </div>
                             
                             <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end mt-auto">
