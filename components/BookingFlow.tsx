@@ -140,7 +140,7 @@ export default function BookingFlow() {
         
         const now = Date.now();
         // Exclude cancelled bookings (status can be "TERMINATED", "CANCELLED", or lowercased)
-        // Also exclude pending bookings that are older than 5 minutes
+        // Also exclude pending bookings that are older than 15 minutes
         const activeBookings = existingBookings.filter(b => {
           if (
             b.status?.toLowerCase() === "terminated" || 
@@ -154,8 +154,8 @@ export default function BookingFlow() {
           if (b.status === "pending" && b.createdAt) {
             const createdAtMs = typeof b.createdAt.toMillis === 'function' ? b.createdAt.toMillis() : 
                                (b.createdAt.seconds ? b.createdAt.seconds * 1000 : b.createdAt);
-            if (typeof createdAtMs === 'number' && now - createdAtMs > 5 * 60 * 1000) {
-              return false; // older than 5 minutes
+            if (typeof createdAtMs === 'number' && now - createdAtMs > 15 * 60 * 1000) {
+              return false; // older than 15 minutes
             }
           }
           

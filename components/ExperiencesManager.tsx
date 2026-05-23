@@ -27,6 +27,7 @@ export default function ExperiencesManager() {
     "8": 375
   });
   const [savingPricing, setSavingPricing] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
 
   useEffect(() => {
     // Fetch experiences
@@ -198,42 +199,53 @@ export default function ExperiencesManager() {
           <h2 className="text-2xl font-light">Global Pricing Rules</h2>
           <p className="text-zinc-400 text-sm">Set the per-person price based on group size. This applies to all experiences.</p>
         </div>
+        <button 
+          onClick={() => setShowPricing(!showPricing)}
+          className="bg-zinc-800 text-white px-4 py-2 rounded-xl hover:bg-zinc-700 transition-colors"
+        >
+          {showPricing ? 'Skjul prisstruktur' : 'Endre prisstruktur'}
+        </button>
       </div>
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-sm">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[2, 3, 4, 5, 6, 7, 8].map(size => (
-            <div key={size} className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-zinc-400">
-                {size}{size === 8 ? '+' : ''} persons (kr/pers)
-              </label>
-              <div className="relative">
-                <input 
-                  type="number" 
-                  value={globalPricing[size.toString()] || ''}
-                  onChange={(e) => {
-                    const newPricing = {...globalPricing};
-                    newPricing[size.toString()] = Number(e.target.value);
-                    setGlobalPricing(newPricing);
-                  }}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-4 pr-10 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
-                />
-                <span className="absolute right-3 top-2.5 text-zinc-500 text-sm">kr</span>
+      {showPricing && (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-sm">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[2, 3, 4, 5, 6, 7, 8].map(size => (
+              <div key={size} className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-zinc-400">
+                  {size}{size === 8 ? '+' : ''} persons (kr/pers)
+                </label>
+                <div className="relative">
+                  <input 
+                    type="number" 
+                    value={globalPricing[size.toString()] || ''}
+                    onChange={(e) => {
+                      const newPricing = {...globalPricing};
+                      newPricing[size.toString()] = Number(e.target.value);
+                      setGlobalPricing(newPricing);
+                    }}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-4 pr-10 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                  />
+                  <span className="absolute right-3 top-2.5 text-zinc-500 text-sm">kr</span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button 
+              onClick={() => {
+                handleSavePricing();
+                setShowPricing(false);
+              }}
+              disabled={savingPricing}
+              className="flex items-center gap-2 bg-zinc-800 text-white px-6 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50"
+            >
+              {savingPricing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Lagre og lukk
+            </button>
+          </div>
         </div>
-        <div className="mt-4 flex justify-end">
-          <button 
-            onClick={handleSavePricing}
-            disabled={savingPricing}
-            className="flex items-center gap-2 bg-zinc-800 text-white px-6 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50"
-          >
-            {savingPricing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save Pricing
-          </button>
-        </div>
-      </div>
+      )}
 
       <div className="flex justify-between items-center mt-12">
         <div>
