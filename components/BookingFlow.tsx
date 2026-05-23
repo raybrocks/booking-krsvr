@@ -189,9 +189,11 @@ export default function BookingFlow() {
     return settings.openingHours[getDay(selectedDate).toString()] || [];
   }, [selectedDate, settings]);
 
-  const pricePerPerson = globalPricing[players > 8 ? "8" : players.toString()] || 0;
-  const totalPrice = selectedExperience ? pricePerPerson * players : 0;
-  const amountToPay = paymentType === "full" ? totalPrice : pricePerPerson;
+  const isVippsTest = selectedExperience?.type && selectedExperience.type.toLowerCase() === "vipps test";
+  const basePricePerPerson = globalPricing[players > 8 ? "8" : players.toString()] || 0;
+  const pricePerPerson = isVippsTest ? 2 : basePricePerPerson;
+  const totalPrice = isVippsTest ? 2 : (selectedExperience ? basePricePerPerson * players : 0);
+  const amountToPay = isVippsTest ? 2 : (paymentType === "full" ? totalPrice : pricePerPerson);
 
   const handleNext = () => {
     if (step === 1 && (!selectedDate || !selectedTime)) return toast.error("Vennligst velg dato og tid.");
@@ -722,7 +724,7 @@ if (window.top) {
                   <span className="text-zinc-300">Pris</span>
                   <div className="text-right">
                     <div className="font-medium text-white">
-                      {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">per person</span>
+                      {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">{isVippsTest ? "totalt" : "per person"}</span>
                     </div>
                     <div className="text-sm text-zinc-500 mt-0.5">
                       {`Total for ${players}`}: {totalPrice} NOK

@@ -109,7 +109,7 @@ export function ExperiencesView({
             return orderA - orderB;
           });
 
-          exps = exps.filter(e => e.isActive);
+          exps = exps.filter(e => e.isActive && e.type !== "Vipps test");
           setExperiences(exps);
         }
       } catch (error) {
