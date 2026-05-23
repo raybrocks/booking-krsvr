@@ -10,7 +10,7 @@
         "shortDescription": { "type": "string" },
         "picture": { "type": "string" },
         "videoUrl": { "type": "string" },
-        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Adventure", "Zombie", "Archer", "Shooter"] },
+        "type": { "type": "string", "enum": ["Escape Room", "Zombie shooter", "Adventure", "Zombie", "Archer", "Shooter", "Vipps test"] },
         "age": { "type": "string" },
         "difficulty": { "type": "string" },
         "maxPlayers": { "type": "number" },

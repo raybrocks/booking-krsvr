@@ -32,7 +32,7 @@ service cloud.firestore {
              data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
              data.shortDescription is string && data.shortDescription.size() < 1000 &&
              (!('videoUrl' in data) || data.videoUrl == null || (data.videoUrl is string && data.videoUrl.size() < 500)) &&
-             data.type in ["Escape Room", "Zombie shooter", "Adventure", "Zombie", "Archer", "Shooter"] &&
+             data.type in ["Escape Room", "Zombie shooter", "Adventure", "Zombie", "Archer", "Shooter", "Vipps test"] &&
              data.maxPlayers is number && data.maxPlayers > 0 && data.maxPlayers <= 20 &&
              data.pricing is map;
     }
