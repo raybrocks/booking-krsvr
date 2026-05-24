@@ -109,6 +109,43 @@ export default function AdminDashboard() {
     };
   }, []);
 
+  const handleVippsAction = async (bookingId: string, action: 'capture' | 'cancel' | 'refund', amount?: number) => {
+    const loadingToastId = toast.loading(`Prøver å ${action} via Vipps...`);
+    try {
+      let res;
+      if (action === 'capture') {
+        const amountOre = amount ? Math.round(amount * 100) : 0;
+        res = await fetch("/api/vipps/capture", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transactions: [{ bookingId, amount: amountOre }] })
+        });
+      } else if (action === 'cancel') {
+        res = await fetch("/api/vipps/cancel", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId })
+        });
+      } else if (action === 'refund') {
+        const amountOre = amount ? Math.round(amount * 100) : 0;
+        res = await fetch("/api/vipps/refund", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, amount: amountOre })
+        });
+      }
+
+      const data = await res?.json();
+      if (res?.ok) {
+        toast.success(`Vipps ${action} vellykket!`, { id: loadingToastId });
+      } else {
+        toast.error(`Feil: ${data?.error || data?.message || 'Ukjent feil'}`, { id: loadingToastId });
+      }
+    } catch (e: any) {
+      toast.error(`Feil ved oppkobling: ${e.message}`, { id: loadingToastId });
+    }
+  };
+
   const updateBookingStatus = async (id: string, newStatus: string) => {
     try {
       await updateDoc(doc(db, "bookings", id), { status: newStatus });
@@ -234,6 +271,9 @@ export default function AdminDashboard() {
                 <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('createdAt')}>
                   Placed At {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('vippsStatus')}>
+                  Vipps Status {sortConfig.key === 'vippsStatus' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </th>
                 <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('status')}>
                   Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
@@ -321,6 +361,43 @@ export default function AdminDashboard() {
                         <div className="mt-1 flex items-center gap-1"><Clock className="w-3 h-3" />{new Intl.DateTimeFormat("no-NO", { timeStyle: "short" }).format(booking.createdAt.toDate())}</div>
                       </div>
                     ) : "N/A"}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col gap-2">
+                       <span className={`text-xs font-semibold uppercase px-2 py-1 rounded inline-flex w-fit ${
+                          booking.vippsStatus?.includes("reserved") || booking.vippsStatus === "AUTHORIZED" ? 'bg-amber-500/20 text-amber-300' :
+                          booking.vippsStatus?.includes("captured") || booking.vippsStatus === "SALE" || booking.vippsStatus === "CAPTURED" ? 'bg-emerald-500/20 text-emerald-300' :
+                          booking.vippsStatus?.includes("refunded") ? 'bg-blue-500/20 text-blue-300' :
+                          booking.vippsStatus ? 'bg-zinc-800 text-zinc-300' : 'text-zinc-600'
+                       }`}>
+                         {booking.vippsStatus || "Ingen Status"}
+                       </span>
+                       {booking.vippsAmount > 0 && <span className="text-xs text-zinc-400">Beløp: {booking.vippsAmount / 100} NOK</span>}
+                       
+                       {(booking.vippsStatus?.includes("reserved") || booking.vippsStatus === "AUTHORIZED") && (
+                         <div className="flex flex-col gap-1 mt-1">
+                           <button onClick={() => handleVippsAction(booking.id, 'capture', booking.totalPrice)} className="text-xs bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-2 py-1 rounded transition-colors whitespace-nowrap">
+                             Complete(kjør Capture)
+                           </button>
+                           <button onClick={() => handleVippsAction(booking.id, 'cancel')} className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-1 rounded transition-colors whitespace-nowrap">
+                             Frigi(avbryt reservasjon)
+                           </button>
+                         </div>
+                       )}
+                       
+                       {(booking.vippsStatus?.includes("captured") || booking.vippsStatus === "SALE" || booking.vippsStatus === "CAPTURED") && (
+                         <div className="flex flex-col gap-1 mt-1">
+                           <button onClick={() => {
+                             const amt = prompt('Beløp å refundere i NOK? (eks: 900)', String(booking.vippsAmount ? booking.vippsAmount / 100 : booking.totalPrice));
+                             if (amt && !isNaN(Number(amt))) {
+                               handleVippsAction(booking.id, 'refund', Number(amt));
+                             }
+                           }} className="text-xs bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 px-2 py-1 rounded transition-colors whitespace-nowrap">
+                             Refunder
+                           </button>
+                         </div>
+                       )}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">

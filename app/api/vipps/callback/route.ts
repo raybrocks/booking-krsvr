@@ -15,8 +15,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Vipps Webhook Received:', body);
 
-    const reference = body.reference; // This matches the bookingId we sent
-    const amount = body.amount?.value || 0;
+    const reference = body.reference || body.aggregate?.reference;
+    const amount = body.amount?.value || body.aggregate?.amount?.value || 0;
     const paymentStatus = body.name || body.status || 'UNKNOWN';
 
     if (!reference) {
@@ -31,82 +31,50 @@ export async function POST(req: Request) {
         amount: amount,
         status: paymentStatus,
         vippsOrderId: body.orderId || body.pspReference || 'unknown',
-        transactionLogHistory: [body],
-        createdAt: FieldValue.serverTimestamp()
+        transactionLogHistory: FieldValue.arrayUnion(body),
+        updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
     } catch (dbErr) {
       console.error('Failed to log transaction:', dbErr);
     }
 
-    if (paymentStatus === 'TERMINATED' || paymentStatus === 'CANCELLED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
-       try {
-         const bookingRef = adminDb.collection('bookings').doc(reference);
-         await bookingRef.update({ status: 'cancelled' });
-       } catch (error) {
-         console.error('Error updating booking status cancelled from webhook:', error);
-       }
+    // Update booking with the latest vipps status
+    try {
+      const bookingRef = adminDb.collection('bookings').doc(reference);
+      const updateData: any = {
+        vippsStatus: paymentStatus,
+        vippsUpdatedAt: FieldValue.serverTimestamp()
+      };
+      
+      if (amount > 0 && (paymentStatus.includes('captured') || paymentStatus === 'CAPTURED' || paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED' || paymentStatus === 'SALE')) {
+        updateData.vippsAmount = amount;
+      }
+      
+      if (paymentStatus.includes('cancelled') || paymentStatus === 'TERMINATED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
+         updateData.status = 'cancelled';
+      } else if (paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED') {
+         // Keep it pending or mark reserved? We can mark it confirmed once captured, or let the shop decide.
+         // We won't automatically capture anymore since user wants to do it manually from dashboard!
+         // Wait, user said "Dersom en ordre er reservert så skal det være 2 knapper"
+         // I should NOT automatically capture here if previously they wanted manual capture.
+      } else if (paymentStatus.includes('captured') || paymentStatus === 'CAPTURED' || paymentStatus === 'SALE') {
+         updateData.status = 'confirmed';
+         updateData.amountPaid = amount / 100;
+      }
+
+      await bookingRef.update(updateData);
+    } catch (dbErr) {
+      console.error('Failed to update booking with vipps status:', dbErr);
+    }
+
+    if (paymentStatus.includes('cancelled') || paymentStatus === 'TERMINATED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
        return NextResponse.json({ success: true });
     }
 
-    // Here you would typically update your database (Firebase)
-    // to mark the booking as paid based on body.reference and body.status
-    if (paymentStatus === 'AUTHORIZED' || paymentStatus === 'epayment.payment.reserved' || paymentStatus === 'CAPTURED' || paymentStatus === 'epayment.payment.captured' || paymentStatus === 'SALE') {
+    // After updating booking, if it was captured we might need to send email
+    if (paymentStatus.includes('captured') || paymentStatus === 'CAPTURED' || paymentStatus === 'SALE') {
        try {
-         // Automatically attempt to capture the payment if reserved
-         if (paymentStatus === 'epayment.payment.reserved' || paymentStatus === 'AUTHORIZED') {
-            const isTest = process.env.VIPPS_ENV !== 'production';
-            const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
-            const clientId = process.env.VIPPS_CLIENT_ID;
-            const clientSecret = process.env.VIPPS_CLIENT_SECRET;
-            const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
-            const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
-
-            if (clientId && clientSecret && subscriptionKey && merchantSerialNumber) {
-              const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
-                method: 'POST',
-                headers: {
-                  'client_id': clientId,
-                  'client_secret': clientSecret,
-                  'Ocp-Apim-Subscription-Key': subscriptionKey,
-                },
-              });
-              if (tokenResponse.ok) {
-                const tokenData = await tokenResponse.json();
-                
-                const captureResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}/capture`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${tokenData.access_token}`,
-                    'Ocp-Apim-Subscription-Key': subscriptionKey,
-                    'Merchant-Serial-Number': merchantSerialNumber,
-                    'Idempotency-Key': `capture-${reference}`
-                  },
-                  body: JSON.stringify({
-                    modificationAmount: {
-                      currency: 'NOK',
-                      value: amount
-                    }
-                  })
-                });
-                
-                if (!captureResponse.ok) {
-                    const captureErr = await captureResponse.text();
-                    console.error("Failed to automatically capture payment:", captureErr);
-                } else {
-                    console.log(`Payment for ${reference} automatically captured!`);
-                }
-              }
-            }
-         }
-
          const bookingRef = adminDb.collection('bookings').doc(reference);
-         await bookingRef.update({
-           status: 'confirmed',
-           amountPaid: amount / 100 // assuming amount is in ore
-         });
-
-         // Fetch booking details
          const bookingSnap = await bookingRef.get();
          if (bookingSnap.exists) {
            const bookingData = bookingSnap.data()!;
