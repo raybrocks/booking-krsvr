@@ -53,10 +53,7 @@ export async function POST(req: Request) {
       if (paymentStatus.includes('cancelled') || paymentStatus === 'TERMINATED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
          updateData.status = 'cancelled';
       } else if (paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED') {
-         // Keep it pending or mark reserved? We can mark it confirmed once captured, or let the shop decide.
-         // We won't automatically capture anymore since user wants to do it manually from dashboard!
-         // Wait, user said "Dersom en ordre er reservert så skal det være 2 knapper"
-         // I should NOT automatically capture here if previously they wanted manual capture.
+         // The user wants automatic capture on reserved, but keeping the manual buttons as a fallback safeguard
       } else if (paymentStatus.includes('captured') || paymentStatus === 'CAPTURED' || paymentStatus === 'SALE') {
          updateData.status = 'confirmed';
          updateData.amountPaid = amount / 100;
@@ -69,6 +66,59 @@ export async function POST(req: Request) {
 
     if (paymentStatus.includes('cancelled') || paymentStatus === 'TERMINATED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
        return NextResponse.json({ success: true });
+    }
+
+    // Automatically attempt to capture the payment if reserved
+    if (paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED') {
+       try {
+         const isTest = process.env.VIPPS_ENV !== 'production';
+         const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
+         const clientId = process.env.VIPPS_CLIENT_ID;
+         const clientSecret = process.env.VIPPS_CLIENT_SECRET;
+         const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
+         const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
+
+         if (clientId && clientSecret && subscriptionKey && merchantSerialNumber) {
+           const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
+             method: 'POST',
+             headers: {
+               'client_id': clientId,
+               'client_secret': clientSecret,
+               'Ocp-Apim-Subscription-Key': subscriptionKey,
+             },
+           });
+           
+           if (tokenResponse.ok) {
+             const tokenData = await tokenResponse.json();
+             
+             const captureResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}/capture`, {
+               method: 'POST',
+               headers: {
+                 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${tokenData.access_token}`,
+                 'Ocp-Apim-Subscription-Key': subscriptionKey,
+                 'Merchant-Serial-Number': merchantSerialNumber,
+                 'Idempotency-Key': `capture-${reference}`
+               },
+               body: JSON.stringify({
+                 modificationAmount: {
+                   currency: 'NOK',
+                   value: amount
+                 }
+               })
+             });
+             
+             if (!captureResponse.ok) {
+                 const captureErr = await captureResponse.text();
+                 console.error("Failed to automatically capture payment:", captureErr);
+             } else {
+                 console.log(`Payment for ${reference} automatically captured!`);
+             }
+           }
+         }
+       } catch (error) {
+         console.error('Error during automatic vipps capture:', error);
+       }
     }
 
     // After updating booking, if it was captured we might need to send email
