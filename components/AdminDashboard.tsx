@@ -251,10 +251,10 @@ export default function AdminDashboard() {
   const renderBookingsTable = (tableBookings: any[], title?: string) => (
     <div className="mb-8 last:mb-0" key={title || 'table'}>
       {title && <h2 className="text-xl font-medium mb-4 text-zinc-200">{title}</h2>}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-900 border-b border-zinc-800 text-zinc-400">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col">
+        <div className="overflow-auto max-h-[70vh] rounded-2xl relative">
+          <table className="w-full text-left text-sm whitespace-nowrap">
+            <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">
               <tr>
                 <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('dateTime')}>
                   Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
@@ -291,7 +291,7 @@ export default function AdminDashboard() {
                   const now = new Date(currentTime).getTime();
                   const createdAt = booking.createdAt?.toDate ? booking.createdAt.toDate().getTime() : 
                                     (booking.createdAt ? new Date(booking.createdAt).getTime() : now);
-                  const isExpired = booking.status === 'pending' && ((now - createdAt) > 5 * 60 * 1000);
+                  const isExpired = booking.status === 'pending' && ((now - createdAt) > 15 * 60 * 1000);
                   
                   return (
                 <tr key={booking.id} className={`transition-colors ${isExpired ? 'bg-red-950/10 opacity-70' : 'hover:bg-zinc-800/20'}`}>
@@ -331,7 +331,7 @@ export default function AdminDashboard() {
                           const now = new Date(currentTime).getTime();
                           const createdAt = booking.createdAt?.toDate ? booking.createdAt.toDate().getTime() : 
                                             (booking.createdAt ? new Date(booking.createdAt).getTime() : now);
-                          const isExpired = (now - createdAt) > 5 * 60 * 1000;
+                          const isExpired = (now - createdAt) > 15 * 60 * 1000;
                           return isExpired ? (
                             <span className="text-red-400">Utløpt (ikke betalt)</span>
                           ) : (
@@ -449,7 +449,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 pt-0 md:pt-4 pb-20">
-      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sticky top-16 md:top-20 z-40 bg-background/90 backdrop-blur-md py-4 -mx-6 px-6 md:mx-0 md:px-0 rounded-b-xl">
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sticky top-[72px] md:top-[88px] z-[60] bg-zinc-950/90 backdrop-blur-xl py-4 -mx-6 px-6 md:mx-0 md:px-0 border-b md:border border-zinc-800/80 md:rounded-xl md:px-4 md:py-3 shadow-2xl">
         <div>
           <h1 className="text-3xl font-light tracking-tight">Admin Dashboard</h1>
         </div>

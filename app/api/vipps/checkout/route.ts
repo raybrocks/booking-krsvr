@@ -16,12 +16,13 @@ export async function POST(req: Request) {
     const clientSecret = process.env.VIPPS_CLIENT_SECRET;
     const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
     const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
-    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    if (!appBaseUrl) {
-      const protocol = req.headers.get('x-forwarded-proto') || 'https';
-      const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost';
-      appBaseUrl = `${protocol}://${host}`;
-    }
+    const protocol = req.headers.get('x-forwarded-proto') || 'https';
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+    
+    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `${protocol}://${host}` : 'https://krsvr.no');
+    
+    // Fjern eventuell trailing slash (/) på slutten av base URL
+    appBaseUrl = appBaseUrl.replace(/\/$/, "");
     
     // Vipps requires HTTPS. Force it. 
     // Note: If running locally without ngrok/https, Vipps callbacks won't reach localhost anyway.

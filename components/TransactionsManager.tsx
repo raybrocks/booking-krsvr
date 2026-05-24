@@ -260,10 +260,10 @@ export default function TransactionsManager() {
         </button>
       </div>
 
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-900 border-b border-zinc-800 text-zinc-400">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col">
+        <div className="overflow-auto max-h-[70vh] rounded-2xl relative">
+          <table className="w-full text-left text-sm whitespace-nowrap">
+            <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">
               <tr>
                 <th className="px-6 py-4 font-medium">Date</th>
                 <th className="px-6 py-4 font-medium">Customer</th>
