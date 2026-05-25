@@ -53,7 +53,12 @@ export async function POST(req: Request) {
         
         if (paymentResponse.ok) {
           const paymentInfo = await paymentResponse.json();
-          const pStatus = paymentInfo.state || paymentInfo.status; // depending on API version
+          const pStatus = paymentInfo.state || paymentInfo.status || 'UNKNOWN';
+          
+          await bookingRef.update({ 
+              vippsStatus: pStatus,
+              vippsVerifyRaw: JSON.stringify(paymentInfo)
+          });
           
           const successStates = ['AUTHORIZED', 'epayment.payment.reserved', 'CAPTURED', 'epayment.payment.captured', 'SALE'];
 
@@ -82,15 +87,25 @@ export async function POST(req: Request) {
               });
               
               if (!captureResponse.ok) {
-                 console.error("Auto-capture in verify failed:", await captureResponse.text());
+                 const errText = await captureResponse.text();
+                 console.error("Auto-capture in verify failed:", errText);
+                 await bookingRef.update({ vippsCaptureError: errText });
+              } else {
+                 await bookingRef.update({ vippsStatus: 'CAPTURED' });
               }
           }
         } else {
+             const errorText = await paymentResponse.text();
+             await bookingRef.update({ vippsStatus: 'FETCH_FAILED', vippsVerifyRaw: errorText });
              return NextResponse.json({ error: 'Could not verify payment with Vipps' }, { status: 400 });
         }
       } else {
+         const errorText = await tokenResponse.text();
+         await bookingRef.update({ vippsStatus: 'AUTH_FAILED', vippsVerifyRaw: errorText });
          return NextResponse.json({ error: 'Failed to authenticate with Vipps' }, { status: 500 });
       }
+    } else {
+        await bookingRef.update({ vippsStatus: 'MISSING_ENV_VARS' });
     }
 
     // If it's already confirmed, we might just need to ensure the email is sent

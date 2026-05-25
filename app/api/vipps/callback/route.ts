@@ -53,14 +53,22 @@ export async function POST(req: Request) {
                 paymentStatus = statusData.state;
                 amount = statusData.amount?.value || 0;
             } else {
-                console.error("Failed to verify payment state from Vipps", await statusResponse.text());
+                const rawError = await statusResponse.text();
+                console.error("Failed to verify payment state from Vipps", rawError);
+                await adminDb.collection('bookings').doc(reference).update({ vippsStatus: 'WEBHOOK_VERIFY_FETCH_FAILED', vippsVerifyRaw: rawError });
                 return NextResponse.json({ error: 'Failed to verify payment status' }, { status: 400 });
             }
+        } else {
+            const rawError = await tokenResponse.text();
+            console.error("Token fail in webhook", rawError);
+            await adminDb.collection('bookings').doc(reference).update({ vippsStatus: 'WEBHOOK_TOKEN_FAILED', vippsVerifyRaw: rawError });
+            return NextResponse.json({ error: 'Failed to authenticate webhook verify' }, { status: 400 });
         }
     } else {
         console.warn("Vipps credentials missing, falling back to payload data (not recommended in production).");
         amount = body.amount?.value || body.aggregate?.amount?.value || 0;
         paymentStatus = body.name || body.status || body.state || 'UNKNOWN';
+        await adminDb.collection('bookings').doc(reference).update({ vippsStatus: 'WEBHOOK_MISSING_VARS' });
     }
 
     // Attempt to log transaction
