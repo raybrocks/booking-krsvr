@@ -8,7 +8,8 @@ export async function GET(req: Request) {
     const clientId = process.env.VIPPS_CLIENT_ID;
     const clientSecret = process.env.VIPPS_CLIENT_SECRET;
     const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
-    const appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://krsvr.no';
+    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://krsvr.no';
+    appBaseUrl = appBaseUrl.replace(/\/$/, "");
     
     if (!clientId || !clientSecret || !subscriptionKey) {
       return NextResponse.json({ error: 'Missing credentials' }, { status: 500 });
@@ -25,23 +26,34 @@ export async function GET(req: Request) {
     });
 
     if (!tokenResponse.ok) {
-      return NextResponse.json({ error: 'Token failed', details: await tokenResponse.text() }, { status: 500 });
+      return NextResponse.json({ error: 'Token failed' }, { status: 500 });
     }
 
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    if (req.url.includes('getEvents=true')) {
-        const eventsResponse = await fetch(`${baseUrl}/webhooks/v1/events`, {
+    // 2. Clear all existing webhooks
+    const webhooksResponse = await fetch(`${baseUrl}/webhooks/v1/webhooks`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Ocp-Apim-Subscription-Key': subscriptionKey,
+      }
+    });
+    
+    const webhooksList = await webhooksResponse.json();
+    
+    for (const wh of (webhooksList.webhooks || [])) {
+        await fetch(`${baseUrl}/webhooks/v1/webhooks/${wh.id}`, {
+            method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Ocp-Apim-Subscription-Key': subscriptionKey,
             }
         });
-        return NextResponse.json(await eventsResponse.json());
     }
 
-    // 2. Register Webhook
+    // 3. Register Webhook
     const webhookResponse = await fetch(`${baseUrl}/webhooks/v1/webhooks`, {
       method: 'POST',
       headers: {
@@ -64,10 +76,6 @@ export async function GET(req: Request) {
     });
 
     if (!webhookResponse.ok) {
-        // If it already exists, maybe we need to fetch it
-        if (webhookResponse.status === 400 || webhookResponse.status === 409) {
-           return NextResponse.json({ error: 'Webhook might already exist or invalid', details: await webhookResponse.text() }, { status: webhookResponse.status });
-        }
       return NextResponse.json({ error: 'Webhook registration failed', details: await webhookResponse.text() }, { status: 500 });
     }
 
