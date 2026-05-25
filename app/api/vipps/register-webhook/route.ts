@@ -5,9 +5,9 @@ export async function GET(req: Request) {
     const isTest = process.env.VIPPS_ENV !== 'production';
     const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
     
-    const clientId = process.env.VIPPS_CLIENT_ID;
-    const clientSecret = process.env.VIPPS_CLIENT_SECRET;
-    const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
+    const clientId = process.env.VIPPS_CLIENT_ID || '';
+    const clientSecret = process.env.VIPPS_CLIENT_SECRET || '';
+    const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY || '';
     let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://krsvr.no';
     appBaseUrl = appBaseUrl.replace(/\/$/, "");
     
