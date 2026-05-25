@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log('Vipps Webhook Received:', body);
 
-    const reference = body.reference || body.aggregate?.reference || body.payment?.reference;
+    const reference = body.reference || body.data?.reference || body.aggregate?.reference || body.payment?.reference;
     if (!reference) {
       return NextResponse.json({ error: 'Missing reference' }, { status: 400 });
     }
@@ -66,8 +68,8 @@ export async function POST(req: Request) {
         }
     } else {
         console.warn("Vipps credentials missing, falling back to payload data (not recommended in production).");
-        amount = body.amount?.value || body.aggregate?.amount?.value || 0;
-        paymentStatus = body.name || body.status || body.state || 'UNKNOWN';
+        amount = body.data?.amount?.value || body.amount?.value || body.aggregate?.amount?.value || 0;
+        paymentStatus = body.name || body.status || body.state || body.data?.status || body.data?.state || 'UNKNOWN';
         await adminDb.collection('bookings').doc(reference).update({ vippsStatus: 'WEBHOOK_MISSING_VARS' });
     }
 
@@ -78,7 +80,7 @@ export async function POST(req: Request) {
         bookingId: reference,
         amount: amount,
         status: paymentStatus,
-        vippsOrderId: body.orderId || body.pspReference || 'unknown',
+        vippsOrderId: body.data?.reference || body.orderId || body.pspReference || reference || 'unknown',
         transactionLogHistory: FieldValue.arrayUnion(body),
         updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
