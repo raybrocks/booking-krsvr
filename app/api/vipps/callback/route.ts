@@ -9,8 +9,13 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Vipps Webhook Received:', body);
 
-    const reference = body.reference || body.data?.reference || body.aggregate?.reference || body.payment?.reference;
+    const reference = body.reference || body.item?.reference || body.data?.reference || body.aggregate?.reference || body.payment?.reference;
     if (!reference) {
+      await adminDb.collection('webhookLogs').add({
+        error: 'Missing reference',
+        body: body,
+        receivedAt: FieldValue.serverTimestamp()
+      });
       return NextResponse.json({ error: 'Missing reference' }, { status: 400 });
     }
 
@@ -68,8 +73,8 @@ export async function POST(req: Request) {
         }
     } else {
         console.warn("Vipps credentials missing, falling back to payload data (not recommended in production).");
-        amount = body.data?.amount?.value || body.amount?.value || body.aggregate?.amount?.value || 0;
-        paymentStatus = body.name || body.status || body.state || body.data?.status || body.data?.state || 'UNKNOWN';
+        amount = body.item?.amount?.value || body.data?.amount?.value || body.amount?.value || body.aggregate?.amount?.value || 0;
+        paymentStatus = body.item?.state || body.item?.status || body.name || body.status || body.state || body.data?.status || body.data?.state || 'UNKNOWN';
         await adminDb.collection('bookings').doc(reference).update({ vippsStatus: 'WEBHOOK_MISSING_VARS' });
     }
 
@@ -80,7 +85,7 @@ export async function POST(req: Request) {
         bookingId: reference,
         amount: amount,
         status: paymentStatus,
-        vippsOrderId: body.data?.reference || body.orderId || body.pspReference || reference || 'unknown',
+        vippsOrderId: body.item?.reference || body.data?.reference || body.orderId || body.pspReference || reference || 'unknown',
         transactionLogHistory: FieldValue.arrayUnion(body),
         updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
