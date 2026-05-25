@@ -4,23 +4,63 @@ import { FieldValue } from 'firebase-admin/firestore';
 
 export async function POST(req: Request) {
   try {
-    const authHeader = req.headers.get('authorization');
-    const expectedToken = process.env.VIPPS_CALLBACK_TOKEN || 'DefaultSecureToken123';
-
-    // Verify the callback token
-    if (authHeader !== `Bearer ${expectedToken}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await req.json();
     console.log('Vipps Webhook Received:', body);
 
-    const reference = body.reference || body.aggregate?.reference;
-    const amount = body.amount?.value || body.aggregate?.amount?.value || 0;
-    const paymentStatus = body.name || body.status || 'UNKNOWN';
-
+    const reference = body.reference || body.aggregate?.reference || body.payment?.reference;
     if (!reference) {
       return NextResponse.json({ error: 'Missing reference' }, { status: 400 });
+    }
+
+    // Securely fetch actual status from Vipps instead of relying purely on unverified webhook
+    const isTest = process.env.VIPPS_ENV !== 'production';
+    const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
+    const clientId = process.env.VIPPS_CLIENT_ID;
+    const clientSecret = process.env.VIPPS_CLIENT_SECRET;
+    const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
+    const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
+    
+    let paymentStatus = 'UNKNOWN';
+    let amount = 0;
+    
+    if (clientId && clientSecret && subscriptionKey && merchantSerialNumber) {
+        // 1. Get Access Token
+        const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
+            method: 'POST',
+            headers: {
+            'client_id': clientId,
+            'client_secret': clientSecret,
+            'Ocp-Apim-Subscription-Key': subscriptionKey,
+            },
+        });
+        
+        if (tokenResponse.ok) {
+            const tokenData = await tokenResponse.json();
+            
+            // 2. Fetch real Payment Status
+            const statusResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}`, {
+               method: 'GET',
+               headers: {
+                  'Authorization': `Bearer ${tokenData.access_token}`,
+                  'Ocp-Apim-Subscription-Key': subscriptionKey,
+                  'Merchant-Serial-Number': merchantSerialNumber
+               }
+            });
+            
+            if (statusResponse.ok) {
+                const statusData = await statusResponse.json();
+                console.log(`Vipps actual state for ${reference}:`, statusData.state);
+                paymentStatus = statusData.state;
+                amount = statusData.amount?.value || 0;
+            } else {
+                console.error("Failed to verify payment state from Vipps", await statusResponse.text());
+                return NextResponse.json({ error: 'Failed to verify payment status' }, { status: 400 });
+            }
+        }
+    } else {
+        console.warn("Vipps credentials missing, falling back to payload data (not recommended in production).");
+        amount = body.amount?.value || body.aggregate?.amount?.value || 0;
+        paymentStatus = body.name || body.status || body.state || 'UNKNOWN';
     }
 
     // Attempt to log transaction
