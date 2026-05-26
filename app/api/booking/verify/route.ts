@@ -60,7 +60,7 @@ export async function POST(req: Request) {
               vippsVerifyRaw: JSON.stringify(paymentInfo)
           });
           
-          const successStates = ['AUTHORIZED', 'epayment.payment.reserved', 'CAPTURED', 'epayment.payment.captured', 'SALE'];
+          const successStates = ['AUTHORIZED', 'RESERVED', 'epayment.payment.reserved', 'CAPTURED', 'epayment.payment.captured', 'SALE'];
 
           if (!successStates.includes(pStatus)) {
              await bookingRef.update({ status: 'cancelled' });

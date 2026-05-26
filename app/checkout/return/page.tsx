@@ -2,8 +2,6 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";

@@ -1,6 +1,5 @@
 import { MetadataRoute } from 'next';
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { adminDb } from "@/lib/firebase-admin";
 import { slugify } from "@/lib/utils";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -28,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic experiences
   let experiencesUrls: MetadataRoute.Sitemap = [];
   try {
-    const querySnapshot = await getDocs(collection(db, "experiences"));
+    const querySnapshot = await adminDb.collection("experiences").get();
     const experiences = querySnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
     
     // Add types (categories)

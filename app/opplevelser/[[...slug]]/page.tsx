@@ -1,8 +1,7 @@
 import React from "react";
 import { ExperiencesView } from "@/components/ExperiencesView";
 import { Metadata } from "next";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { adminDb } from "@/lib/firebase-admin";
 import { slugify } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +20,7 @@ export async function generateMetadata({
 
   if (initialTypeSlug) {
     try {
-      const querySnapshot = await getDocs(collection(db, "experiences"));
+      const querySnapshot = await adminDb.collection("experiences").get();
       const exps = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
 
       if (initialExpSlug) {
@@ -64,7 +63,7 @@ export default async function ExperiencesPage({
 
   let experiences: any[] = [];
   try {
-    const querySnapshot = await getDocs(collection(db, "experiences"));
+    const querySnapshot = await adminDb.collection("experiences").get();
     experiences = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
     experiences = experiences.filter(e => e.isActive);
     experiences.sort((a, b) => {
