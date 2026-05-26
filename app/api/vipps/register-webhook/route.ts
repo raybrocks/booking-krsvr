@@ -8,7 +8,11 @@ export async function GET(req: Request) {
     const clientId = process.env.VIPPS_CLIENT_ID || '';
     const clientSecret = process.env.VIPPS_CLIENT_SECRET || '';
     const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY || '';
-    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://krsvr.no';
+    
+    const protocol = req.headers.get('x-forwarded-proto') || 'https';
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+    
+    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `${protocol}://${host}` : 'https://krsvr.no');
     appBaseUrl = appBaseUrl.replace(/\/$/, "");
     
     if (!clientId || !clientSecret || !subscriptionKey) {
