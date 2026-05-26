@@ -93,37 +93,18 @@ export async function POST(req: Request) {
       console.error('Failed to log transaction:', dbErr);
     }
 
-    // Update booking with the latest vipps status
-    try {
-      const bookingRef = adminDb.collection('bookings').doc(reference);
-      const updateData: any = {
-        vippsStatus: paymentStatus,
-        vippsUpdatedAt: FieldValue.serverTimestamp()
-      };
-      
-      if (amount > 0 && (paymentStatus.includes('captured') || paymentStatus === 'CAPTURED' || paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED' || paymentStatus === 'SALE')) {
-        updateData.vippsAmount = amount;
-      }
-      
-      if (paymentStatus.includes('cancelled') || paymentStatus === 'TERMINATED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
-         updateData.status = 'cancelled';
-      } else if (paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED') {
-         // The user wants automatic capture on reserved, but keeping the manual buttons as a fallback safeguard
-      } else if (paymentStatus.includes('captured') || paymentStatus === 'CAPTURED' || paymentStatus === 'SALE') {
-         updateData.status = 'confirmed';
-         updateData.amountPaid = amount / 100;
-      }
-
-      await bookingRef.update(updateData);
-    } catch (dbErr) {
-      console.error('Failed to update booking with vipps status:', dbErr);
-    }
-
     if (paymentStatus.includes('cancelled') || paymentStatus === 'TERMINATED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
+       try {
+         await adminDb.collection('bookings').doc(reference).update({ 
+            vippsStatus: paymentStatus,
+            status: 'cancelled',
+            vippsUpdatedAt: FieldValue.serverTimestamp()
+         });
+       } catch (e) {}
        return NextResponse.json({ success: true });
     }
 
-    // Automatically attempt to capture the payment if reserved
+    // Automatically attempt to capture the payment if reserved BEFORE updating the database
     if (paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED') {
        try {
          const isTest = process.env.VIPPS_ENV !== 'production';
@@ -168,12 +149,39 @@ export async function POST(req: Request) {
                  console.error("Failed to automatically capture payment:", captureErr);
              } else {
                  console.log(`Payment for ${reference} automatically captured!`);
+                 paymentStatus = 'CAPTURED'; // Update status since it was successfully captured
              }
            }
          }
        } catch (error) {
          console.error('Error during automatic vipps capture:', error);
        }
+    }
+
+    // Update booking with the latest vipps status
+    try {
+      const bookingRef = adminDb.collection('bookings').doc(reference);
+      const updateData: any = {
+        vippsStatus: paymentStatus,
+        vippsUpdatedAt: FieldValue.serverTimestamp()
+      };
+      
+      if (amount > 0 && (paymentStatus.includes('captured') || paymentStatus === 'CAPTURED' || paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED' || paymentStatus === 'SALE')) {
+        updateData.vippsAmount = amount;
+      }
+      
+      if (paymentStatus.includes('cancelled') || paymentStatus === 'TERMINATED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED') {
+         updateData.status = 'cancelled';
+      } else if (paymentStatus.includes('reserved') || paymentStatus === 'AUTHORIZED') {
+         // Reserved, but not captured.
+      } else if (paymentStatus.includes('captured') || paymentStatus === 'CAPTURED' || paymentStatus === 'SALE') {
+         updateData.status = 'confirmed';
+         updateData.amountPaid = amount / 100;
+      }
+
+      await bookingRef.update(updateData);
+    } catch (dbErr) {
+      console.error('Failed to update booking with vipps status:', dbErr);
     }
 
     // After updating booking, if it was captured we might need to send email
