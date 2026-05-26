@@ -1,15 +1,14 @@
 import { Resend } from 'resend';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebase-admin';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function getAdminEmail() {
   try {
-    const settingsRef = doc(db, 'settings', 'general');
-    const settingsSnap = await getDoc(settingsRef);
-    if (settingsSnap.exists() && settingsSnap.data().adminEmail) {
-      return settingsSnap.data().adminEmail;
+    const settingsRef = adminDb.collection('settings').doc('general');
+    const settingsSnap = await settingsRef.get();
+    if (settingsSnap.exists && settingsSnap.data()?.adminEmail) {
+      return settingsSnap.data()?.adminEmail;
     }
   } catch (e) {
     console.error("Failed to fetch admin email", e);
@@ -33,10 +32,10 @@ export async function sendBookingConfirmationEmail(
   let experienceTitle = "VR Experience";
   if (experienceId) {
     try {
-      const expRef = doc(db, 'experiences', experienceId);
-      const expSnap = await getDoc(expRef);
-      if (expSnap.exists() && expSnap.data().title) {
-        experienceTitle = expSnap.data().title;
+      const expRef = adminDb.collection('experiences').doc(experienceId);
+      const expSnap = await expRef.get();
+      if (expSnap.exists && expSnap.data()?.title) {
+        experienceTitle = expSnap.data()?.title;
       }
     } catch (e) {
       console.error("Error fetching experience title:", e);
@@ -124,10 +123,10 @@ export async function sendAdminNewBookingNotification(bookingDetails: any) {
   let experienceTitle = "VR Experience";
   if (experienceId) {
     try {
-      const expRef = doc(db, 'experiences', experienceId);
-      const expSnap = await getDoc(expRef);
-      if (expSnap.exists() && expSnap.data().title) {
-        experienceTitle = expSnap.data().title;
+      const expRef = adminDb.collection('experiences').doc(experienceId);
+      const expSnap = await expRef.get();
+      if (expSnap.exists && expSnap.data()?.title) {
+        experienceTitle = expSnap.data()?.title;
       }
     } catch (e) {}
   }
