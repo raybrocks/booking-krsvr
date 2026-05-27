@@ -18,6 +18,8 @@ export async function generateMetadata({
   let title = "VR Opplevelser | VRSenteret";
   let description = "Utforsk våre fantastiske VR-opplevelser, fra Escape Rooms til skytespill og eventyr for hele familien.";
 
+  let isVippsTest = false;
+
   if (initialTypeSlug) {
     try {
       const querySnapshot = await adminDb.collection("experiences").get();
@@ -28,12 +30,22 @@ export async function generateMetadata({
         if (matchedExp) {
           title = `${matchedExp.name} | ${matchedExp.type} | VRSenteret`;
           description = matchedExp.description || description;
+          if (matchedExp.type?.toLowerCase().includes("vipps-test") || matchedExp.type?.toLowerCase().includes("vipps test")) {
+            isVippsTest = true;
+          }
         }
       } else {
         const matchedType = exps.find(e => slugify(e.type) === initialTypeSlug);
         if (matchedType) {
           title = `${matchedType.type} | VR Opplevelser | VRSenteret`;
+          if (matchedType.type?.toLowerCase().includes("vipps-test") || matchedType.type?.toLowerCase().includes("vipps test")) {
+            isVippsTest = true;
+          }
         }
+      }
+      
+      if (initialTypeSlug.includes("vipps-test") || initialTypeSlug.includes("vipps-test")) {
+          isVippsTest = true;
       }
     } catch (error) {
       console.error("Error fetching metadata:", error);
@@ -49,6 +61,7 @@ export async function generateMetadata({
       url: `https://www.krsvr.no/opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`,
       type: "website",
     },
+    ...(isVippsTest && { robots: { index: false, follow: false } }),
   };
 }
 

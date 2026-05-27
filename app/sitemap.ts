@@ -28,7 +28,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let experiencesUrls: MetadataRoute.Sitemap = [];
   try {
     const querySnapshot = await adminDb.collection("experiences").get();
-    const experiences = querySnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    let experiences = querySnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    
+    // Filter out vipps-test from sitemap
+    experiences = experiences.filter(e => {
+        const typeStr = (e.type || "").toLowerCase();
+        return !typeStr.includes("vipps-test") && !typeStr.includes("vipps test");
+    });
     
     // Add types (categories)
     const types = Array.from(new Set(experiences.map(e => e.type).filter(Boolean)));
