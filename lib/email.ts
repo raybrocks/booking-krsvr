@@ -111,6 +111,72 @@ export async function sendBookingConfirmationEmail(
   }
 }
 
+export async function sendBookingCancellationEmail(
+  to: string, 
+  bookingDetails: any
+) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Cancellation email not sent.");
+    return;
+  }
+
+  const adminEmail = await getAdminEmail();
+  const { firstName, lastName, date, time, experienceId, amountPaid } = bookingDetails;
+  
+  let experienceTitle = "VR Experience";
+  if (experienceId) {
+    try {
+      const expRef = adminDb.collection('experiences').doc(experienceId);
+      const expSnap = await expRef.get();
+      if (expSnap.exists && expSnap.data()?.title) {
+        experienceTitle = expSnap.data()?.title;
+      }
+    } catch (e) {}
+  }
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+      <h1 style="color: #FF3939;">Booking Kansellert / Refundert</h1>
+      <p>Hei ${firstName} ${lastName},</p>
+      <p>Din booking hos Krs VR Arena har blitt kansellert.</p>
+      
+      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Bookingdetaljer</h2>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 10px;"><strong>Opplevelse:</strong> ${experienceTitle}</li>
+        <li style="margin-bottom: 10px;"><strong>Dato:</strong> ${date}</li>
+        <li style="margin-bottom: 10px;"><strong>Tid:</strong> ${time}</li>
+        ${amountPaid ? `<li style="margin-bottom: 10px;"><strong>Refundert beløp (NOK):</strong> ${amountPaid}</li>` : ''}
+      </ul>
+
+      <p style="margin-top: 40px; font-size: 14px; color: #666;">
+        Har du spørsmål, vennligst svar på denne e-posten eller kontakt oss på ${adminEmail}.
+      </p>
+      <p style="font-size: 14px; color: #666;">
+        Vennlig hilsen,<br/>Krs VR Arena
+      </p>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Krs VR Arena <booking@donotreply.krsvr.no>',
+      to,
+      replyTo: adminEmail,
+      subject: 'Booking Kansellert - Krs VR Arena',
+      html,
+    });
+    
+    if (error) {
+      console.error("Resend API returned an error:", error);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error("Failed to send cancellation email:", error);
+    return null;
+  }
+}
+
 export async function sendAdminNewBookingNotification(bookingDetails: any) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY is not set. Admin email not sent.");

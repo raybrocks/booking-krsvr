@@ -114,12 +114,43 @@ export async function POST(req: Request) {
 
         if (paymentStatus.toLowerCase().includes('cancelled') || paymentStatus === 'TERMINATED' || paymentStatus === 'ABORTED' || paymentStatus === 'EXPIRED' || paymentStatus.toLowerCase().includes('refund')) {
            try {
+             // 1. Lagre kvittering for regnskapet (refundering)
+             const receiptRef = adminDb.collection('receipts').doc(`refund-${reference}-${Date.now()}`);
+             await receiptRef.set({
+               bookingId: reference,
+               amount: -Math.abs(amount), // Negative amount for refund
+               status: paymentStatus,
+               type: paymentStatus.toLowerCase().includes('refund') ? 'refund' : 'cancellation',
+               createdAt: FieldValue.serverTimestamp()
+             });
+
+             // 2. Oppdater booking status
              await adminDb.collection('bookings').doc(reference).update({ 
                 vippsStatus: paymentStatus,
                 status: 'cancelled',
                 vippsUpdatedAt: FieldValue.serverTimestamp()
              });
-           } catch (e) {}
+
+             // 3. Send out cancellation email in background
+             Promise.resolve().then(async () => {
+               try {
+                 const bookingSnap = await adminDb.collection('bookings').doc(reference).get();
+                 const bookingData = bookingSnap.data();
+                 if (bookingData && bookingData.email && !bookingData.cancellationEmailSent) {
+                   const { sendBookingCancellationEmail } = await import('@/lib/email');
+                   const emailData = { ...bookingData, amountPaid: amount / 100 };
+                   await sendBookingCancellationEmail(bookingData.email, emailData);
+                   
+                   await adminDb.collection('bookings').doc(reference).update({ cancellationEmailSent: true });
+                 }
+               } catch (e) {
+                 console.error("Feilet å sende kansellerings epost:", e);
+               }
+             });
+
+           } catch (e) {
+             console.error("Feil ved håndtering av kansellering:", e);
+           }
            return; 
         }
 
