@@ -120,8 +120,8 @@ export async function POST(req: Request) {
              method: 'GET',
              headers: {
                 'Authorization': `Bearer ${globalAccessToken}`,
-                'Ocp-Apim-Subscription-Key': subscriptionKey,
-                'Merchant-Serial-Number': merchantSerialNumber
+                'Ocp-Apim-Subscription-Key': subscriptionKey as string,
+                'Merchant-Serial-Number': merchantSerialNumber as string
              }
           });
           
@@ -180,8 +180,8 @@ export async function POST(req: Request) {
                headers: {
                  'Content-Type': 'application/json',
                  'Authorization': `Bearer ${globalAccessToken}`,
-                 'Ocp-Apim-Subscription-Key': subscriptionKey,
-                 'Merchant-Serial-Number': merchantSerialNumber,
+                 'Ocp-Apim-Subscription-Key': subscriptionKey || '',
+                 'Merchant-Serial-Number': merchantSerialNumber || '',
                  'Idempotency-Key': `capture-webhook-${reference}-${Date.now()}`
                },
                body: JSON.stringify({ modificationAmount: { currency: 'NOK', value: amount }})
