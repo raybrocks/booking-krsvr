@@ -1,61 +1,12 @@
 import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
-import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
-
-// Hjelpefunksjon for å validere HMAC signatur fra Vipps
-function verifyVippsSignature(req: Request, rawText: string, pathAndQuery: string) {
-  const secret = process.env.VIPPS_WEBHOOK_SECRET;
-  if (!secret) {
-    console.warn("VIPPS_WEBHOOK_SECRET mangler i miljøvariablene. Skipper HMAC validering.");
-    return true; // Tillat midlertidig hvis secret ikke er satt, men varsle!
-  }
-
-  try {
-    const authHeader = req.headers.get('authorization') || '';
-    const dateHeader = req.headers.get('x-ms-date') || '';
-    const hostHeader = req.headers.get('host') || '';
-    const contentSha = req.headers.get('x-ms-content-sha256') || '';
-
-    // Sjekk content hash
-    const expectedContentHash = crypto.createHash('sha256').update(rawText).digest('base64');
-    if (expectedContentHash !== contentSha) {
-      console.error("Webhook content hash matcher ikke!");
-      return false;
-    }
-
-    // Bygg string to sign
-    const method = req.method;
-    const stringToSign = `${method}\n${pathAndQuery}\n${dateHeader};${hostHeader};${contentSha}`;
-    const generatedSignature = crypto.createHmac('sha256', secret).update(stringToSign).digest('base64');
-
-    // Hent ut signatur fra headeren (Eks: HMAC-SHA256 SignedHeaders=...&Signature=xyz)
-    const match = authHeader.match(/Signature=([^&]+)/);
-    if (!match) return false;
-    
-    const providedSignature = match[1];
-    return generatedSignature === providedSignature;
-  } catch (error) {
-    console.error("Feil under validering av HMAC:", error);
-    return false;
-  }
-}
 
 export async function POST(req: Request) {
   try {
     const rawText = await req.text();
-    
-    // Sikkerhetssjekk
-    // Path er vanligvis "/api/vipps/callback" i Next.js, evt kan vi hente den fra URL
-    const url = new URL(req.url);
-    const pathAndQuery = url.pathname + url.search;
-    
-    if (!verifyVippsSignature(req, rawText, pathAndQuery)) {
-      console.error("Ugyldig Vipps Webhook Signatur");
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     let body;
     try {
