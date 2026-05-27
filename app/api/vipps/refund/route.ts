@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { adminDb } from '@/lib/firebase-admin';
 
 export async function POST(req: Request) {
     try {
@@ -50,6 +51,16 @@ export async function POST(req: Request) {
         if (!refundResponse.ok) {
             const errText = await refundResponse.text();
             return NextResponse.json({ error: errText }, { status: refundResponse.status });
+        }
+
+        try {
+            await adminDb.collection('bookings').doc(bookingId).update({
+                vippsStatus: 'REFUNDED',
+                status: 'cancelled',
+                vippsUpdatedAt: new Date().toISOString()
+            });
+        } catch (dbErr) {
+            console.error('Failed to update DB on refund:', dbErr);
         }
 
         return NextResponse.json({ success: true, message: 'Refunded successfully.' });

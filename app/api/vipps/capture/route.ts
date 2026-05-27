@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { adminDb } from '@/lib/firebase-admin';
 
 export async function POST(req: Request) {
     try {
@@ -53,6 +54,17 @@ export async function POST(req: Request) {
 
             if (captureResponse.ok) {
                 captured.push(tx.bookingId);
+                try {
+                    await adminDb.collection('bookings').doc(tx.bookingId).update({
+                        vippsStatus: 'CAPTURED',
+                        status: 'confirmed',
+                        vippsAmount: tx.amount,
+                        amountPaid: tx.amount / 100,
+                        vippsUpdatedAt: new Date().toISOString()
+                    });
+                } catch (dbErr) {
+                    console.error('Failed to update DB on capture:', dbErr);
+                }
             } else {
                 errors.push({ id: tx.bookingId, error: await captureResponse.text() });
             }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { adminDb } from '@/lib/firebase-admin';
 
 export async function POST(req: Request) {
     try {
@@ -43,6 +44,16 @@ export async function POST(req: Request) {
         if (!cancelResponse.ok) {
             const errText = await cancelResponse.text();
             return NextResponse.json({ error: errText }, { status: cancelResponse.status });
+        }
+
+        try {
+            await adminDb.collection('bookings').doc(bookingId).update({
+                vippsStatus: 'CANCELLED',
+                status: 'cancelled',
+                vippsUpdatedAt: new Date().toISOString()
+            });
+        } catch (dbErr) {
+            console.error('Failed to update DB on cancel:', dbErr);
         }
 
         return NextResponse.json({ success: true, message: 'Reservation cancelled successfully.' });
