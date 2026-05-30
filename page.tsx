@@ -196,7 +196,7 @@ export default function LandingPage() {
               <h4 className="text-2xl font-medium text-white">Bursdag</h4>
               <p className="text-zinc-400 font-light leading-relaxed">En feiring som skiller seg skikkelig ut fra det vanlige programmet.</p>
             </Link>
-            <Link href="/booking" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
+            <Link href="/arrangementer/private-fester" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
               <Glasses className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Familier med store barn</h4>
               <p className="text-zinc-400 font-light leading-relaxed">Utforsk nye verdener og løs spennende gåter sammen som en aktiv familie.</p>

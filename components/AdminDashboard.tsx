@@ -456,13 +456,19 @@ export default function AdminDashboard() {
         
         <div className="flex bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 w-fit shrink-0 overflow-x-auto max-w-full shadow-lg shadow-black/50">
           <button 
-            onClick={() => setActiveTab("upcoming")}
+            onClick={() => {
+              setActiveTab("upcoming");
+              setSortConfig({ key: 'dateTime', direction: 'asc' });
+            }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
             <Clock4 className="w-4 h-4" /> Upcoming
           </button>
           <button 
-            onClick={() => setActiveTab("archive")}
+            onClick={() => {
+              setActiveTab("archive");
+              setSortConfig({ key: 'dateTime', direction: 'desc' });
+            }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
             <ListOrdered className="w-4 h-4" /> Archive
