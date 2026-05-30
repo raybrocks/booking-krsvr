@@ -84,22 +84,16 @@ export default function PrivateFesterPage() {
         <div className="grid md:grid-cols-2 gap-6 mb-24">
           <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-8 flex flex-col">
             <h2 className="text-2xl font-medium tracking-tight mb-4">Utdrikningslag</h2>
-            <p className="text-zinc-400 leading-relaxed mb-8 flex-grow">
+            <p className="text-zinc-400 leading-relaxed flex-grow mb-0">
               Start dagen eller kvelden med en opplevelse som får hele gjengen i gang. Dere spiller på lag, fullfører oppdrag, konkurrerer og skaper øyeblikk det er lett å snakke om resten av feiringen.
             </p>
-            <Link href="/kontakt" className="inline-flex items-center text-sm font-medium text-white hover:text-[#9C39FF] transition-colors w-fit">
-              Planlegg utdrikningslag <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
           </div>
 
           <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-8 flex flex-col">
             <h2 className="text-2xl font-medium tracking-tight mb-4">Bursdag</h2>
-            <p className="text-zinc-400 leading-relaxed mb-8 flex-grow">
+            <p className="text-zinc-400 leading-relaxed flex-grow mb-0">
               En opplevelse som skiller seg ut. Hos KRS VR Arena får gruppa prøve unike VR-opplevelser der alle kan delta, enten de har prøvd VR før eller ikke.
             </p>
-            <Link href="/kontakt" className="inline-flex items-center text-sm font-medium text-white hover:text-[#9C39FF] transition-colors w-fit">
-              Planlegg bursdag <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
           </div>
         </div>
 

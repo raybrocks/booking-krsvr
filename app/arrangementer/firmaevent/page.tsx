@@ -84,32 +84,23 @@ export default function FirmaeventPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-24">
           <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-6 flex flex-col hover:bg-zinc-900/50 transition-colors">
             <h2 className="text-xl font-medium tracking-tight mb-3">Teambuilding</h2>
-            <p className="text-zinc-400 text-sm leading-relaxed mb-6 flex-grow">
+            <p className="text-zinc-400 text-sm leading-relaxed flex-grow mb-0">
               En aktivitet der samarbeid faktisk betyr noe. Deltakerne må kommunisere, fordele roller, ta raske valg og jobbe sammen for å lykkes i spillet.
             </p>
-            <Link href="/kontakt" className="inline-flex items-center text-sm font-medium text-white hover:text-[#9C39FF] transition-colors w-fit">
-              Planlegg teambuilding <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
           </div>
 
           <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-6 flex flex-col hover:bg-zinc-900/50 transition-colors">
             <h2 className="text-xl font-medium tracking-tight mb-3">Kick Off / Firmafest</h2>
-            <p className="text-zinc-400 text-sm leading-relaxed mb-6 flex-grow">
+            <p className="text-zinc-400 text-sm leading-relaxed flex-grow mb-0">
               Start perioden, prosjektet eller feiringen med en opplevelse som samler folk. VR gir energi, latter og en felles opplevelse som fungerer på tvers av avdelinger og erfaringsnivå.
             </p>
-            <Link href="/kontakt" className="inline-flex items-center text-sm font-medium text-white hover:text-[#9C39FF] transition-colors w-fit">
-              Planlegg firmaevent <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
           </div>
 
           <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-6 flex flex-col hover:bg-zinc-900/50 transition-colors">
             <h2 className="text-xl font-medium tracking-tight mb-3">Julebord</h2>
-            <p className="text-zinc-400 text-sm leading-relaxed mb-6 flex-grow">
+            <p className="text-zinc-400 text-sm leading-relaxed flex-grow mb-0">
               Gjør julebordet mer minneverdig med en aktivitet før maten, festen eller resten av kvelden. VR-opplevelsene gir gruppa noe å samles rundt &mdash; uten at det blir stivt eller formelt.
             </p>
-            <Link href="/kontakt" className="inline-flex items-center text-sm font-medium text-white hover:text-[#9C39FF] transition-colors w-fit">
-              Planlegg julebord <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
           </div>
         </div>
 

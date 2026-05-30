@@ -171,36 +171,36 @@ export default function LandingPage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <Handshake className="w-10 h-10 text-[#9C39FF]" />
+            <Link href="/arrangementer/firmaevent" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
+              <Handshake className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Teambuilding</h4>
               <p className="text-zinc-400 font-light leading-relaxed">Styrk samholdet gjennom utfordrende samarbeid og oppdrag som engasjerer.</p>
-            </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <Users className="w-10 h-10 text-[#9C39FF]" />
+            </Link>
+            <Link href="/arrangementer/private-fester" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
+              <Users className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Vennegrupper</h4>
               <p className="text-zinc-400 font-light leading-relaxed">Samle gjengen til en annerledes, aktiv og sosial kveld. En garantert kveld utenom det vanlige.</p>
-            </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <Briefcase className="w-10 h-10 text-[#9C39FF]" />
+            </Link>
+            <Link href="/arrangementer/firmaevent" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
+              <Briefcase className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Firmaevent</h4>
               <p className="text-zinc-400 font-light leading-relaxed">Bryt opp arbeidsdagen med en engasjerende teambuilding, garantert et høydepunkt i kalenderen.</p>
-            </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <Crown className="w-10 h-10 text-[#9C39FF]" />
+            </Link>
+            <Link href="/arrangementer/private-fester" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
+              <Crown className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Utdrikningslag</h4>
               <p className="text-zinc-400 font-light leading-relaxed">En energisk start på feiringen der alle i alle aldre kan delta på lik linje.</p>
-            </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <CalendarHeart className="w-10 h-10 text-[#9C39FF]" />
+            </Link>
+            <Link href="/arrangementer/private-fester" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
+              <CalendarHeart className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Bursdag</h4>
               <p className="text-zinc-400 font-light leading-relaxed">En feiring som skiller seg skikkelig ut fra det vanlige programmet.</p>
-            </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4">
-              <Glasses className="w-10 h-10 text-[#9C39FF]" />
+            </Link>
+            <Link href="/arrangementer/private-fester" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
+              <Glasses className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Familier med store barn</h4>
               <p className="text-zinc-400 font-light leading-relaxed">Utforsk nye verdener og løs spennende gåter sammen som en aktiv familie.</p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

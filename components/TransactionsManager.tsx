@@ -312,7 +312,7 @@ export default function TransactionsManager() {
                       onClick={() => handleViewReceipt(tx)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded-md transition-colors border border-zinc-700"
                     >
-                      <Receipt className="w-3.5 h-3.5" /> Receipt
+                      <Receipt className="w-3.5 h-3.5" /> Kvittering
                     </button>
                   </td>
                 </tr>

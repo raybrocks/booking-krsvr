@@ -45,39 +45,38 @@ export async function sendBookingConfirmationEmail(
   // Basic HTML template for the email
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-      <h1 style="color: #9C39FF;">Booking Confirmation & Receipt</h1>
-      <p>Hi ${firstName} ${lastName},</p>
-      <p>Thank you for your booking! Your payment of NOK ${amountPaid} has been received.</p>
+      <h1 style="color: #9C39FF;">Bestillingsbekreftelse og Kvittering</h1>
+      <p>Hei ${firstName} ${lastName},</p>
+      <p>Takk for din bestilling! Din betaling på NOK ${amountPaid} er registrert.</p>
       
       ${customText ? `<div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9C39FF;">
         <p style="margin: 0;">${customText.replace(/\n/g, '<br/>')}</p>
       </div>` : ''}
 
-      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Booking Details</h2>
+      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Bestillingsdetaljer</h2>
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 10px;"><strong>Experience:</strong> ${experienceTitle}</li>
-        <li style="margin-bottom: 10px;"><strong>Date:</strong> ${date}</li>
-        <li style="margin-bottom: 10px;"><strong>Time:</strong> ${time}</li>
-        <li style="margin-bottom: 10px;"><strong>Players:</strong> ${players}</li>
+        <li style="margin-bottom: 10px;"><strong>Opplevelse:</strong> ${experienceTitle}</li>
+        <li style="margin-bottom: 10px;"><strong>Dato:</strong> ${date}</li>
+        <li style="margin-bottom: 10px;"><strong>Tidspunkt:</strong> ${time}</li>
+        <li style="margin-bottom: 10px;"><strong>Antall personer:</strong> ${players}</li>
       </ul>
 
       <p style="margin-top: 15px; font-size: 14px; background: #fff8e1; padding: 15px; border-radius: 6px; border-left: 4px solid #ffc107; color: #665000;">
         <strong>Merk:</strong> Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk spillets makskapasitet før dere ankommer arenaen.<br/>
-        <span style="font-size: 12px; opacity: 0.9;"><strong>Note:</strong> You can adjust the number of players right up until the game starts. Please check the game's maximum capacity before arriving.</span>
       </p>
 
-      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Payment Receipt</h2>
+      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Betalingskvittering</h2>
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 10px;"><strong>Total Price:</strong> NOK ${totalPrice}</li>
-        <li style="margin-bottom: 10px;"><strong>Amount Paid (Reservation Fee):</strong> NOK ${amountPaid}</li>
-        <li style="margin-bottom: 10px;"><strong>Remaining Balance Amount:</strong> NOK ${totalPrice - amountPaid} (to be paid at the venue)</li>
+        <li style="margin-bottom: 10px;"><strong>Totalpris:</strong> NOK ${totalPrice}</li>
+        <li style="margin-bottom: 10px;"><strong>Betalt beløp (Reservasjonsgebyr):</strong> NOK ${amountPaid}</li>
+        <li style="margin-bottom: 10px;"><strong>Gjenstående beløp:</strong> NOK ${totalPrice - amountPaid} (betales ved oppmøte)</li>
       </ul>
 
       <p style="margin-top: 40px; font-size: 14px; color: #666;">
-        If you have any questions or need to make changes to your booking, please don't hesitate to reply to this email, or contact us at ${adminEmail}.
+        Har du spørsmål eller behov for å endre på din bestilling, vennligst svar på denne e-posten, eller ta kontakt med oss på ${adminEmail}.
       </p>
       <p style="font-size: 14px; color: #666;">
-        Best regards,<br/>Krs VR Arena
+        Med vennlig hilsen,<br/>Krs VR Arena
       </p>
       
       <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999; line-height: 1.5;">
@@ -94,7 +93,7 @@ export async function sendBookingConfirmationEmail(
       from: 'Krs VR Arena <booking@donotreply.krsvr.no>',
       to,
       replyTo: adminEmail,
-      subject: 'Booking Confirmation & Receipt - Krs VR Arena',
+      subject: 'Bestillingsbekreftelse og Kvittering - Krs VR Arena',
       html,
     });
     
