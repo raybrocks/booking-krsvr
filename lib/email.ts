@@ -72,6 +72,18 @@ export async function sendBookingConfirmationEmail(
         <li style="margin-bottom: 10px;"><strong>Gjenstående beløp:</strong> NOK ${totalPrice - amountPaid} (betales ved oppmøte)</li>
       </ul>
 
+      <div style="margin-top: 40px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
+        <h3 style="font-size: 16px; margin-top: 0; margin-bottom: 15px; color: #333;">Nyttig før ankomst</h3>
+        <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
+          <strong>Slik finner du oss:</strong><br/>
+          <a href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" target="_blank" rel="noopener noreferrer" style="color: #9C39FF; text-decoration: none; font-weight: bold;">📍 Google Maps Veibeskrivelse</a>
+        </p>
+        <p style="margin: 0; font-size: 14px; color: #555;">
+          <strong>Lurer du på noe?</strong><br/>
+          Spørsmål rundt briller/linser, bekledning eller annet? Sjekk ut våre <a href="https://krsvr.no/faq" target="_blank" rel="noopener noreferrer" style="color: #9C39FF; text-decoration: none; font-weight: bold;">Ofte Stilte Spørsmål (FAQ)</a>.
+        </p>
+      </div>
+
       <p style="margin-top: 40px; font-size: 14px; color: #666;">
         Har du spørsmål eller behov for å endre på din bestilling, vennligst svar på denne e-posten, eller ta kontakt med oss på ${adminEmail}.
       </p>

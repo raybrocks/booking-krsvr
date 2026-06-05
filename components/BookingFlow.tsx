@@ -122,7 +122,7 @@ export default function BookingFlow() {
     loadData();
   }, []);
 
-  useEffect(() => {
+    useEffect(() => {
     async function fetchBookedTimes() {
       if (!selectedDate) {
         setBookedTimes([]);
@@ -139,7 +139,7 @@ export default function BookingFlow() {
         const existingBookings = snapshot.docs.map(doc => doc.data());
         
         const now = Date.now();
-        // Exclude cancelled bookings (status can be "TERMINATED", "CANCELLED", or lowercased)
+        // Exclude cancelled bookings
         // Also exclude pending bookings that are older than 15 minutes
         const activeBookings = existingBookings.filter(b => {
           if (
@@ -151,10 +151,29 @@ export default function BookingFlow() {
             return false;
           }
           
-          if (b.status === "pending" && b.createdAt) {
-            const createdAtMs = typeof b.createdAt.toMillis === 'function' ? b.createdAt.toMillis() : 
-                               (b.createdAt.seconds ? b.createdAt.seconds * 1000 : b.createdAt);
-            if (typeof createdAtMs === 'number' && now - createdAtMs > 15 * 60 * 1000) {
+          if (b.status?.toLowerCase() === "pending" && b.createdAt) {
+            let createdAtMs = now;
+            
+            if (typeof b.createdAt.toMillis === 'function') {
+              createdAtMs = b.createdAt.toMillis();
+            } else if (b.createdAt.seconds) {
+              createdAtMs = b.createdAt.seconds * 1000;
+            } else if (b.createdAt instanceof Date) {
+              createdAtMs = b.createdAt.getTime();
+            } else if (typeof b.createdAt === 'number') {
+              createdAtMs = b.createdAt;
+            } else if (typeof b.createdAt === 'string') {
+              // Safari/Firefox fiks: Konverter "YYYY-MM-DD HH:mm:ss" til standard ISO 8601
+              const safeDateStr = b.createdAt.includes(' ') && !b.createdAt.includes('T') 
+                ? b.createdAt.replace(' ', 'T') 
+                : b.createdAt;
+              const parsed = new Date(safeDateStr).getTime();
+              if (!isNaN(parsed)) {
+                createdAtMs = parsed;
+              }
+            }
+
+            if (now - createdAtMs > 15 * 60 * 1000) {
               return false; // older than 15 minutes
             }
           }
@@ -162,11 +181,11 @@ export default function BookingFlow() {
           return true;
         });
         
-        const times = activeBookings.map(b => b.time as string);
+        const times = activeBookings.map(b => typeof b.time === 'string' ? b.time.trim() : b.time);
         setBookedTimes(times);
         
         // If selected time is now booked, remove it
-        setSelectedTime(prev => times.includes(prev) ? "" : prev);
+        setSelectedTime(prev => times.includes(prev?.trim()) ? "" : prev);
       } catch (error) {
         console.error("Failed to fetch booked times", error);
       } finally {
@@ -379,12 +398,12 @@ if (window.top) {
                       </div>
                     ) : availableTimes.length > 0 ? (
                       <div className="grid grid-cols-2 gap-3">
-                        {availableTimes.map((time) => {
-                          const isBooked = bookedTimes.includes(time);
-                          return (
-                            <button
-                              key={time}
-                              onClick={() => !isBooked && setSelectedTime(time)}
+{availableTimes.map((time) => {
+  const isBooked = bookedTimes.includes(typeof time === 'string' ? time.trim() : time);
+  return (
+    <button
+      key={time as string}
+      onClick={() => !isBooked && setSelectedTime(time as string)}
                               disabled={isBooked}
                               className={`py-3 px-4 rounded-xl border text-sm font-medium transition-all ${
                                 isBooked
