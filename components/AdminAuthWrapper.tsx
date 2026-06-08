@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Lock, Loader2, LogOut } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
@@ -10,14 +11,22 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
-    // Simple client-side check for admin auth
-    const isAdmin = localStorage.getItem("krsvr_admin_auth") === "true";
-    if (isAdmin) {
-      setUser({ email: "post@krsvr.no" });
-    }
-    setLoading(false);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      setLoading(false);
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -26,12 +35,15 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
     setError("");
     
     try {
-      // Very basic static password check for the new setup without firebase
-      if (email === "post@krsvr.no" && password === "admin2026") {
-        localStorage.setItem("krsvr_admin_auth", "true");
-        setUser({ email: "post@krsvr.no" });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setError(error.message === "Invalid login credentials" ? "Feil e-post eller passord." : error.message);
       } else {
-        setError("Feil e-post eller passord.");
+        setUser(data.user);
       }
     } catch (err: any) {
       console.error(err);
@@ -42,8 +54,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   };
 
   const handleLogout = async () => {
-    localStorage.removeItem("krsvr_admin_auth");
-    setUser(null);
+    await supabase.auth.signOut();
   };
 
   if (loading) {
