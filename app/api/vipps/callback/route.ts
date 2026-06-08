@@ -139,7 +139,7 @@ export async function POST(req: Request) {
                  'Authorization': `Bearer ${globalAccessToken}`,
                  'Ocp-Apim-Subscription-Key': subscriptionKey || '',
                  'Merchant-Serial-Number': merchantSerialNumber || '',
-                 'Idempotency-Key': `capture-webhook-${reference}-${Date.now()}`
+                 'Idempotency-Key': (`cap-w-${reference}-${Date.now()}`).substring(0, 50)
                },
                body: JSON.stringify({ modificationAmount: { currency: 'NOK', value: amount }})
              });
@@ -159,6 +159,7 @@ export async function POST(req: Request) {
           if (['captured', 'sale'].some(s => paymentStatus.toLowerCase().includes(s))) {
              updateData.status = 'confirmed';
              updateData.amountPaid = amount / 100;
+             updateData.paymentRef = reference;
           }
 
           const bookingData = await prisma.booking.update({
@@ -170,6 +171,27 @@ export async function POST(req: Request) {
           if (['captured', 'sale'].some(s => paymentStatus.toLowerCase().includes(s))) {
             const confirmedBookingSnap = bookingData;
             
+            // Create receipt if it doesn't exist
+            try {
+               const receiptExists = await prisma.receipt.findFirst({
+                 where: { bookingId: reference, status: 'CAPTURED' }
+               });
+               
+               if (!receiptExists) {
+                 await prisma.receipt.create({
+                   data: {
+                     bookingId: reference,
+                     amount: amount / 100,
+                     status: 'CAPTURED',
+                     paymentRef: reference,
+                     type: 'payment',
+                   }
+                 });
+               }
+            } catch (e) {
+               console.error("Failed to create receipt in webhook", e);
+            }
+
             // Increment discount code usage if exists
             if (confirmedBookingSnap?.discountCode) {
                try {

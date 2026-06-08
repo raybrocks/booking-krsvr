@@ -75,7 +75,7 @@ export async function POST(req: Request) {
                    'Authorization': `Bearer ${tokenData.access_token}`,
                    'Ocp-Apim-Subscription-Key': subscriptionKey,
                    'Merchant-Serial-Number': merchantSerialNumber,
-                   'Idempotency-Key': `capture-verify-${reference}-${Date.now()}`
+                   'Idempotency-Key': (`cap-v-${reference}-${Date.now()}`).substring(0, 50)
                  },
                  body: JSON.stringify({
                    modificationAmount: {
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
             where: { id: reference },
             data: { 
               status: updatedStatus,
-              ...(updatedStatus === 'confirmed' ? { amountPaid: newAmountPaid } : {})
+              ...(updatedStatus === 'confirmed' ? { amountPaid: newAmountPaid, paymentRef: reference } : {})
             }
           });
           

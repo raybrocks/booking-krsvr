@@ -42,7 +42,7 @@ export async function POST(req: Request) {
                     'Authorization': `Bearer ${tokenData.access_token}`,
                     'Ocp-Apim-Subscription-Key': subscriptionKey,
                     'Merchant-Serial-Number': merchantSerialNumber,
-                    'Idempotency-Key': `capture-manual-${tx.bookingId}`
+                    'Idempotency-Key': (`cap-m-${tx.bookingId}-${Date.now()}`).substring(0, 50)
                 },
                 body: JSON.stringify({
                     modificationAmount: {
