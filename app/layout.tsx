@@ -17,6 +17,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.krsvr.no'),
   title: {
     default: 'KRS VR Arena | VR Escape Room, Arcade & Teambuilding i Kristiansand',
     template: '%s | KRS VR Arena'
