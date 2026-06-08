@@ -183,7 +183,7 @@ export async function POST(req: Request) {
             }
             
             if (confirmedBookingSnap && !confirmedBookingSnap.cancellationEmailSent) {
-              const { sendEmail } = await import('@/lib/email');
+              const { sendEmail, sendAdminNewBookingNotification } = await import('@/lib/email');
               
               const settingsDoc = await prisma.setting.findUnique({ where: { key: 'general' } });
               const generalSettings = settingsDoc?.value || { email: 'booking@krsvr.no', phone: '+47 000 00 000' };
@@ -203,6 +203,8 @@ export async function POST(req: Request) {
                   generalSettings
                 );
                 
+                await sendAdminNewBookingNotification(confirmedBookingSnap).catch(console.error);
+
                 await prisma.booking.update({
                   where: { id: reference },
                   data: { cancellationEmailSent: false } // Reusing this column conceptually? Actually email verification state. Wait...
@@ -218,8 +220,8 @@ export async function POST(req: Request) {
         }
       };
       
-      // Kjører uten å avvente overfor Vipps, Vipps får sin 200 OK raskt
-      updateOperations();
+      // Vi venter på at operasjonene fullføres slik at Vercel ikke dreper prosessen
+      await updateOperations();
     }));
 
     return new NextResponse('OK', { status: 200 });
