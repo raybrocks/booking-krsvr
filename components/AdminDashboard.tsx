@@ -200,6 +200,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const reduceBooking = async (id: string) => {
+    const timeToRemove = window.prompt("Hvilket tidspunkt vil du fjerne utvidelsen for? Tast inn nøyaktig klokkeslett (eks: 14:30):");
+    if (!timeToRemove) return;
+
+    try {
+      const response = await fetch(`/api/admin/bookings/${id}/reduce`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timeToRemove: timeToRemove.trim() })
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        toast.error(data.error || "Feilet ved fjerning av utvidet tid");
+      } else {
+        toast.success(`Suksess! Tiden ble redusert, total tid er nå ${data.newDuration} minutter.`);
+      }
+    } catch (error) {
+       toast.error("Nettverksfeil oppstod.");
+    }
+  };
+
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -344,13 +366,24 @@ export default function AdminDashboard() {
                           </span>
                        )}
                        {booking.status !== 'cancelled' && (
-                         <button 
-                           onClick={() => extendBooking(booking.id)} 
-                           className="text-xs text-zinc-500 hover:text-white px-1 py-0.5 rounded transition-colors ml-1 bg-zinc-800/80 border border-zinc-700/50" 
-                           title="Legg til en ekstra tidsslot (utvid ++)"
-                         >
-                           + Tid
-                         </button>
+                         <>
+                           <button 
+                             onClick={() => extendBooking(booking.id)} 
+                             className="text-xs text-zinc-500 hover:text-white px-1 py-0.5 rounded transition-colors ml-1 bg-zinc-800/80 border border-zinc-700/50" 
+                             title="Legg til en ekstra tidsslot (utvid ++)"
+                           >
+                             + Tid
+                           </button>
+                           {booking.duration && booking.duration > 90 && (
+                             <button 
+                               onClick={() => reduceBooking(booking.id)} 
+                               className="text-xs text-zinc-500 hover:text-red-400 px-1 py-0.5 rounded transition-colors ml-1 bg-zinc-800/80 border border-zinc-700/50" 
+                               title="Slett ekstra tidsslot (reduser --)"
+                             >
+                               - Tid
+                             </button>
+                           )}
+                         </>
                        )}
                     </div>
                   </td>
