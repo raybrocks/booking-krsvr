@@ -55,6 +55,12 @@ model Booking {
   paymentRef        String?  
   discountCode      String?
   
+  bookingType       String   @default("private") // private or corporate
+  companyName       String?
+  internalNotes     String?
+  duration          Int      @default(90)
+  parentBookingId   String?  // References main booking if this is a duplicated blocked slot
+  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

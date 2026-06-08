@@ -17,6 +17,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       where: { id: id },
       data,
     });
+
+    // Also cascade status update to shadow bookings 
+    if (data.status) {
+       await prisma.booking.updateMany({
+         where: { parentBookingId: id },
+         data: { status: data.status }
+       });
+    }
     
     return NextResponse.json(updatedBooking);
   } catch (error) {
@@ -27,6 +35,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
+    // Delete child bookings first
+    await prisma.booking.deleteMany({
+      where: { parentBookingId: id }
+    });
+
     await prisma.booking.delete({
       where: { id: id },
     });

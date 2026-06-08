@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2 } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import SettingsManager from "./SettingsManager";
 import ExperiencesManager from "./ExperiencesManager";
 import TransactionsManager from "./TransactionsManager";
 import DiscountCodesManager from "./DiscountCodesManager";
+import ManualBookingManager from "./ManualBookingManager";
 
 const playDing = () => {
   try {
@@ -39,7 +40,7 @@ const playDing = () => {
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "discount-codes" | "settings">("upcoming");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "discount-codes" | "settings" | "manual">("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isFirstLoad = useRef(true);
   const notifiedBookingIds = useRef<Set<string>>(new Set());
@@ -177,6 +178,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const extendBooking = async (id: string) => {
+    const nextTime = window.prompt("Tast inn nøyaktig klokkeslett for tidspunktet som skal blokkeres for utvidelsen (eks: 14:30):");
+    if (!nextTime) return;
+
+    try {
+      const response = await fetch(`/api/admin/bookings/${id}/extend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nextTime: nextTime.trim() })
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        toast.error(data.error || "Feilet ved utvidelse");
+      } else {
+        toast.success(`Suksess! Utvidet til ${data.newDuration} minutter totalt.`);
+      }
+    } catch (error) {
+       toast.error("Nettverksfeil oppstod.");
+    }
+  };
+
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -196,8 +219,10 @@ export default function AdminDashboard() {
       const todayStr = `${year}-${month}-${day}`;
 
       result = result.filter(booking => {
-        return booking.status === "confirmed" && booking.date >= todayStr;
+        return booking.status === "confirmed" && booking.date >= todayStr && booking.bookingType !== 'system';
       });
+    } else {
+       result = result.filter(booking => booking.bookingType !== 'system');
     }
 
     // Filter by status
@@ -233,8 +258,8 @@ export default function AdminDashboard() {
         aValue = new Date(`${a.date}T${a.time}`).getTime();
         bValue = new Date(`${b.date}T${b.time}`).getTime();
       } else if (sortConfig.key === 'createdAt') {
-        aValue = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-        bValue = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+        aValue = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        bValue = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       }
 
       if (aValue < bValue) {
@@ -298,8 +323,7 @@ export default function AdminDashboard() {
               ) : (
                 tableBookings.map((booking) => {
                   const now = new Date(currentTime).getTime();
-                  const createdAt = booking.createdAt?.toDate ? booking.createdAt.toDate().getTime() : 
-                                    (booking.createdAt ? new Date(booking.createdAt).getTime() : now);
+                  const createdAt = booking.createdAt ? new Date(booking.createdAt).getTime() : now;
                   const isExpired = booking.status === 'pending' && ((now - createdAt) > 15 * 60 * 1000);
                   
                   return (
@@ -309,9 +333,25 @@ export default function AdminDashboard() {
                       <CalendarIcon className="w-4 h-4 text-zinc-500" />
                       {booking.date}
                     </div>
-                    <div className="flex items-center gap-2 mt-1 text-zinc-400 text-xs">
-                      <Clock className="w-3 h-3" />
-                      {booking.time}
+                    <div className="flex items-center gap-3 mt-1">
+                       <span className="flex items-center gap-1 text-zinc-400 text-xs font-semibold">
+                         <Clock className="w-3 h-3" />
+                         {booking.time}
+                       </span>
+                       {booking.duration && booking.duration > 90 && (
+                          <span className="bg-[#9C39FF]/10 text-[#9C39FF] text-[10px] px-1.5 py-0.5 rounded-full font-bold cursor-help" title={`Dette er en utvidet gruppe-booking. Parent-ID: ${booking.id}`}>
+                            {booking.duration} minutter
+                          </span>
+                       )}
+                       {booking.status !== 'cancelled' && (
+                         <button 
+                           onClick={() => extendBooking(booking.id)} 
+                           className="text-xs text-zinc-500 hover:text-white px-1 py-0.5 rounded transition-colors ml-1 bg-zinc-800/80 border border-zinc-700/50" 
+                           title="Legg til en ekstra tidsslot (utvid ++)"
+                         >
+                           + Tid
+                         </button>
+                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -321,7 +361,12 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-medium text-zinc-200">{booking.firstName} {booking.lastName}</div>
+                    <div className="font-medium text-zinc-200">
+                      {booking.bookingType === 'corporate' && booking.companyName ? (
+                        <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded mr-2">Bedrift</span>
+                      ) : null}
+                      {booking.companyName ? `${booking.companyName} (${booking.firstName} ${booking.lastName})` : `${booking.firstName} ${booking.lastName}`}
+                    </div>
                     <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
                       <span className="flex items-center gap-1">
                         <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
@@ -329,6 +374,11 @@ export default function AdminDashboard() {
                       </span>
                       <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
                     </div>
+                    {booking.internalNotes && (
+                       <div className="mt-2 text-xs text-zinc-400 bg-zinc-800/40 p-2 rounded-lg border border-zinc-700/50 italic max-w-xs whitespace-normal">
+                          {booking.internalNotes}
+                       </div>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-zinc-300">
@@ -338,8 +388,7 @@ export default function AdminDashboard() {
                       <div className="text-xs mt-1 font-medium">
                         {(() => {
                           const now = new Date(currentTime).getTime();
-                          const createdAt = booking.createdAt?.toDate ? booking.createdAt.toDate().getTime() : 
-                                            (booking.createdAt ? new Date(booking.createdAt).getTime() : now);
+                          const createdAt = booking.createdAt ? new Date(booking.createdAt).getTime() : now;
                           const isExpired = (now - createdAt) > 15 * 60 * 1000;
                           return isExpired ? (
                             <span className="text-red-400">Utløpt (ikke betalt)</span>
@@ -364,10 +413,10 @@ export default function AdminDashboard() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-xs text-zinc-400">
-                    {booking.createdAt?.toDate ? (
+                    {booking.createdAt ? (
                       <div>
-                        <div>{new Intl.DateTimeFormat("no-NO", { dateStyle: "short" }).format(booking.createdAt.toDate())}</div>
-                        <div className="mt-1 flex items-center gap-1"><Clock className="w-3 h-3" />{new Intl.DateTimeFormat("no-NO", { timeStyle: "short" }).format(booking.createdAt.toDate())}</div>
+                        <div>{new Intl.DateTimeFormat("no-NO", { dateStyle: "short" }).format(new Date(booking.createdAt))}</div>
+                        <div className="mt-1 flex items-center gap-1"><Clock className="w-3 h-3" />{new Intl.DateTimeFormat("no-NO", { timeStyle: "short" }).format(new Date(booking.createdAt))}</div>
                       </div>
                     ) : "N/A"}
                   </td>
@@ -472,6 +521,12 @@ export default function AdminDashboard() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
             <Clock4 className="w-4 h-4" /> Upcoming
+          </button>
+          <button 
+            onClick={() => setActiveTab("manual")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}
+          >
+            <Plus className="w-4 h-4" /> Manuell Booking
           </button>
           <button 
             onClick={() => {
@@ -588,6 +643,7 @@ export default function AdminDashboard() {
       {activeTab === "transactions" && <TransactionsManager />}
       {activeTab === "discount-codes" && <DiscountCodesManager />}
       {activeTab === "settings" && <SettingsManager />}
+      {activeTab === "manual" && <ManualBookingManager />}
     </div>
   );
 }
