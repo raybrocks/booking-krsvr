@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { doc, getDoc, setDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
@@ -23,30 +21,32 @@ export default function SettingsManager() {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const docRef = doc(db, "settings", "general");
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setSettings({
-          ...data,
-          specialHours: data.specialHours || {}
-        });
-      } else {
-        // Default settings if none exist
-        setSettings({
-          openingHours: {
-            "0": [],
-            "1": ["16:00", "17:30", "19:00", "20:30"],
-            "2": ["16:00", "17:30", "19:00", "20:30"],
-            "3": ["16:00", "17:30", "19:00", "20:30"],
-            "4": ["16:00", "17:30", "19:00", "20:30"],
-            "5": ["14:00", "15:30", "17:00", "18:30", "20:00", "21:30"],
-            "6": ["12:00", "13:30", "15:00", "16:30", "18:00", "19:30", "21:00"]
-          },
-          specialHours: {},
-          reservationFee: 500,
-          adminEmail: "post@krsvr.no"
-        });
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.general) {
+            setSettings({
+              ...data.general,
+              specialHours: data.general.specialHours || {}
+            });
+          } else {
+            // Default settings if missing
+            setSettings({
+              openingHours: {
+                "0": [], "1": ["16:00", "17:30", "19:00", "20:30"],
+                "2": ["16:00", "17:30", "19:00", "20:30"], "3": ["16:00", "17:30", "19:00", "20:30"],
+                "4": ["16:00", "17:30", "19:00", "20:30"], "5": ["14:00", "15:30", "17:00", "18:30", "20:00", "21:30"],
+                "6": ["12:00", "13:30", "15:00", "16:30", "18:00", "19:30", "21:00"]
+              },
+              specialHours: {},
+              reservationFee: 500,
+              adminEmail: "post@krsvr.no"
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load settings from API", err);
       }
       setLoading(false);
     };
@@ -56,7 +56,11 @@ export default function SettingsManager() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await setDoc(doc(db, "settings", "general"), settings);
+      await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'general', value: settings })
+      });
       toast.success("Settings saved successfully");
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -139,21 +143,18 @@ export default function SettingsManager() {
     try {
       if (!force) {
         // Check for conflicting bookings
-        const q = query(
-          collection(db, "bookings"), 
-          where("date", ">=", vacationStart),
-          where("date", "<=", vacationEnd)
-        );
-        const snapshot = await getDocs(q);
-        
-        const conflictingBookings = snapshot.docs
-          .map(d => ({id: d.id, ...d.data()}))
-          .filter((b: any) => b.status !== "cancelled");
+        const qRes = await fetch(`/api/admin/bookings`);
+        if (qRes.ok) {
+          const allBookings = await qRes.json();
+          const conflictingBookings = allBookings.filter((b: any) => {
+            return b.status !== "cancelled" && b.date >= vacationStart && b.date <= vacationEnd;
+          });
 
-        if (conflictingBookings.length > 0) {
-          setVacationWarning(conflictingBookings);
-          setApplyingVacation(false);
-          return;
+          if (conflictingBookings.length > 0) {
+            setVacationWarning(conflictingBookings);
+            setApplyingVacation(false);
+            return;
+          }
         }
       }
 
@@ -228,7 +229,11 @@ export default function SettingsManager() {
                   
                   // Auto-save emergency switch to ensure it takes effect immediately
                   try {
-                    await setDoc(doc(db, "settings", "general"), newSettings);
+                    await fetch('/api/settings', {
+                      method: 'PUT',
+                      headers: {'Content-Type': 'application/json'},
+                      body: JSON.stringify({ key: 'general', value: newSettings })
+                    });
                     toast.success(newValue ? "Bookings are now CLOSED" : "Bookings are now OPEN");
                   } catch (error) {
                     console.error("Error saving emergency switch:", error);

@@ -1,19 +1,32 @@
 import { Resend } from 'resend';
-import { adminDb } from '@/lib/firebase-admin';
+import { prisma } from './prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function getAdminEmail() {
   try {
-    const settingsRef = adminDb.collection('settings').doc('general');
-    const settingsSnap = await settingsRef.get();
-    if (settingsSnap.exists && settingsSnap.data()?.adminEmail) {
-      return settingsSnap.data()?.adminEmail;
+    const settingsDoc = await prisma.setting.findUnique({
+      where: { key: 'general' }
+    });
+    if (settingsDoc && settingsDoc.value) {
+      const settingsData = settingsDoc.value as any;
+      if (settingsData && settingsData.adminEmail) {
+        return settingsData.adminEmail;
+      }
     }
   } catch (e) {
     console.error("Failed to fetch admin email", e);
   }
   return "post@krsvr.no";
+}
+
+export async function sendEmail(
+  to: string, 
+  bookingDetails: any,
+  experienceDetails: any,
+  generalSettings: any
+) {
+  return sendBookingConfirmationEmail(to, bookingDetails, "");
 }
 
 export async function sendBookingConfirmationEmail(
@@ -32,10 +45,9 @@ export async function sendBookingConfirmationEmail(
   let experienceTitle = "VR Experience";
   if (experienceId) {
     try {
-      const expRef = adminDb.collection('experiences').doc(experienceId);
-      const expSnap = await expRef.get();
-      if (expSnap.exists && expSnap.data()?.title) {
-        experienceTitle = expSnap.data()?.title;
+      const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
+      if (exp && exp.name) {
+        experienceTitle = exp.name;
       }
     } catch (e) {
       console.error("Error fetching experience title:", e);
@@ -47,7 +59,7 @@ export async function sendBookingConfirmationEmail(
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
       <h1 style="color: #9C39FF;">Bestillingsbekreftelse og Kvittering</h1>
       <p>Hei ${firstName} ${lastName},</p>
-      <p>Takk for din bestilling! Din betaling på NOK ${amountPaid} er registrert.</p>
+      <p>Takk for din bestilling! Din betaling er registrert.</p>
       
       ${customText ? `<div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9C39FF;">
         <p style="margin: 0;">${customText.replace(/\n/g, '<br/>')}</p>
@@ -68,7 +80,7 @@ export async function sendBookingConfirmationEmail(
       <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Betalingskvittering</h2>
       <ul style="list-style: none; padding: 0;">
         <li style="margin-bottom: 10px;"><strong>Totalpris:</strong> NOK ${totalPrice}</li>
-        <li style="margin-bottom: 10px;"><strong>Betalt beløp (Reservasjonsgebyr):</strong> NOK ${amountPaid}</li>
+        <li style="margin-bottom: 10px;"><strong>Betalt beløp (Reservasjonsgebyr/Fullt):</strong> NOK ${amountPaid}</li>
         <li style="margin-bottom: 10px;"><strong>Gjenstående beløp:</strong> NOK ${totalPrice - amountPaid} (betales ved oppmøte)</li>
       </ul>
 
@@ -137,10 +149,9 @@ export async function sendBookingCancellationEmail(
   let experienceTitle = "VR Experience";
   if (experienceId) {
     try {
-      const expRef = adminDb.collection('experiences').doc(experienceId);
-      const expSnap = await expRef.get();
-      if (expSnap.exists && expSnap.data()?.title) {
-        experienceTitle = expSnap.data()?.title;
+      const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
+      if (exp && exp.name) {
+        experienceTitle = exp.name;
       }
     } catch (e) {}
   }
@@ -200,10 +211,9 @@ export async function sendAdminNewBookingNotification(bookingDetails: any) {
   let experienceTitle = "VR Experience";
   if (experienceId) {
     try {
-      const expRef = adminDb.collection('experiences').doc(experienceId);
-      const expSnap = await expRef.get();
-      if (expSnap.exists && expSnap.data()?.title) {
-        experienceTitle = expSnap.data()?.title;
+      const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
+      if (exp && exp.name) {
+        experienceTitle = exp.name;
       }
     } catch (e) {}
   }
@@ -243,17 +253,13 @@ export async function sendAdminNewBookingNotification(bookingDetails: any) {
   }
 }
 
-
 export async function addContactToNewsletter(email: string, firstName: string, lastName: string) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY is not set. Contact not added to newsletter.");
     return;
   }
   
-  // Use either the env variable or the hardcoded segment ID provided by the user
   const segmentId = process.env.RESEND_SEGMENT_ID || "cd27fc2d-8077-4580-9404-9190a982020a";
-  // The audience ID is kept for backward compatibility if the SDK needs it (though Segments are the new way)
-  // We omit audienceId as Resend recommends using the project-level contacts and segments.
   
   try {
     const data = await resend.contacts.create({
@@ -264,11 +270,10 @@ export async function addContactToNewsletter(email: string, firstName: string, l
       segments: [
         { id: segmentId }
       ]
-    } as any); // Type cast in case of old SDK issues, but tsc proves it works.
+    } as any); 
     console.log("Contact added to Resend segment successfully:", data);
     return data;
   } catch (error) {
     console.error("Failed to add contact to newsletter:", error);
-    // Don't throw so it doesn't break booking flow
   }
 }

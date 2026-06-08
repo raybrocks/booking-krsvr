@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -54,10 +54,19 @@ export async function POST(req: Request) {
         }
 
         try {
-            await adminDb.collection('bookings').doc(bookingId).update({
-                vippsStatus: 'REFUNDED',
-                status: 'cancelled',
-                vippsUpdatedAt: new Date().toISOString()
+            await prisma.booking.update({
+                where: { id: bookingId },
+                data: { status: 'cancelled' }
+            });
+            
+            await prisma.receipt.create({
+                data: {
+                    bookingId,
+                    amount: -(amount / 100),
+                    status: 'REFUNDED',
+                    paymentRef: bookingId,
+                    type: 'refund'
+                }
             });
         } catch (dbErr) {
             console.error('Failed to update DB on refund:', dbErr);

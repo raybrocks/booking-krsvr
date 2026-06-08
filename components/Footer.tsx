@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Facebook, Instagram } from "lucide-react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 export default function Footer() {
   const [adminEmail, setAdminEmail] = useState("post@krsvr.no");
@@ -12,10 +10,12 @@ export default function Footer() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const docRef = doc(db, "settings", "general");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().adminEmail) {
-          setAdminEmail(docSnap.data().adminEmail);
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.general && data.general.adminEmail) {
+            setAdminEmail(data.general.adminEmail);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch settings for footer:", error);

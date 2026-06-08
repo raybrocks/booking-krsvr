@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Experience {
+  id              String   @id @default(cuid())
+  name            String
+  shortDescription String
+  description     String?
+  picture         String?
+  type            String?
+  age             String?
+  difficulty      String?
+  maxPlayers      Int      @default(6)
+  pricing         Json?    
+  isActive        Boolean  @default(true)
+  order           Int      @default(999)
+  familyFriendly  Boolean  @default(false)
+  teambuilding    Boolean  @default(false)
+  party           Boolean  @default(false)
+  jumpScare       Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  bookings        Booking[]
+}
+
+model Booking {
+  id                String   @id @default(cuid())
+  experienceId      String
+  date              String   
+  time              String   
+  players           Int
+  firstName         String
+  lastName          String
+  email             String
+  phone             String
+  acceptedTerms     Boolean
+  acceptedNewsletter Boolean @default(false)
+  paymentType       String   
+  totalPrice        Float
+  amountPaid        Float    @default(0)
+  status            String   @default("pending") 
+  cancellationEmailSent Boolean @default(false)
+  paymentRef        String?  
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  experience        Experience @relation(fields: [experienceId], references: [id])
+  
+  @@unique([date, time])
+  @@index([status])
+  @@index([date])
+}
+
+model Receipt {
+  id                String   @id @default(cuid())
+  bookingId         String
+  amount            Float
+  currency          String   @default("NOK")
+  status            String
+  paymentRef        String
+  type              String   @default("payment") 
+  
+  createdAt         DateTime @default(now())
+}
+
+model WebhookLog {
+  id                String   @id @default(cuid())
+  reference         String
+  event             String
+  payload           Json
+  createdAt         DateTime @default(now())
+}
+
+model Setting {
+  key               String   @id
+  value             Json
+  updatedAt         DateTime @updatedAt
+}
+
+model Testimonial {
+  id                String   @id @default(cuid())
+  name              String
+  text              String
+  rating            Int      @default(5)
+  isActive          Boolean  @default(true)
+  order             Int      @default(999)
+  createdAt         DateTime @default(now())
+}

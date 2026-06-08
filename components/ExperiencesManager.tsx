@@ -1,9 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, onSnapshot, doc, getDoc, deleteDoc, setDoc, addDoc, updateDoc, writeBatch } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -29,41 +26,36 @@ export default function ExperiencesManager() {
   const [savingPricing, setSavingPricing] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
 
-  useEffect(() => {
-    // Fetch experiences
-    const unsubscribe = onSnapshot(collection(db, "experiences"), async (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as any[];
-      
-      data.sort((a, b) => {
-        const orderA = typeof a.order === 'number' ? a.order : 999;
-        const orderB = typeof b.order === 'number' ? b.order : 999;
-        return orderA - orderB;
-      });
-
+  const fetchExperiences = async () => {
+    try {
+      const res = await fetch("/api/experiences");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
       setExperiences(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
-    }, (error) => {
-      console.error("Error fetching experiences:", error);
-      setLoading(false);
-    });
+    }
+  };
 
-    // Fetch global pricing
-    const fetchPricing = async () => {
-      try {
-        const docSnap = await getDoc(doc(db, "settings", "pricing"));
-        if (docSnap.exists() && docSnap.data().pricing) {
-          setGlobalPricing(docSnap.data().pricing);
+  const fetchPricing = async () => {
+    try {
+      const res = await fetch("/api/settings");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.pricing && data.pricing.pricing) {
+          setGlobalPricing(data.pricing.pricing);
         }
-      } catch (err) {
-        console.error("Error fetching pricing:", err);
       }
-    };
-    fetchPricing();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchExperiences();
+    fetchPricing();
   }, []);
 
   const handleEdit = (exp: any) => {
@@ -73,10 +65,8 @@ export default function ExperiencesManager() {
   };
 
   const handleAddNew = () => {
-    const newId = "exp_" + Date.now();
-    setEditingId(newId);
+    setEditingId("new");
     setEditForm({
-      id: newId,
       name: "New Experience",
       shortDescription: "",
       detailedDescription: "",
@@ -101,10 +91,21 @@ export default function ExperiencesManager() {
 
     setUploadingImage(true);
     try {
-      const storageRef = ref(storage, `experiences/${editForm.id}_${Date.now()}_${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      setEditForm({ ...editForm, picture: downloadURL });
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("pathPrefix", "experiences");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      const data = await res.json();
+      setEditForm({ ...editForm, picture: data.url });
       toast.success("Image uploaded successfully");
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -116,9 +117,24 @@ export default function ExperiencesManager() {
 
   const handleSave = async () => {
     try {
-      await setDoc(doc(db, "experiences", editForm.id), editForm);
+      if (editingId === "new") {
+        const res = await fetch("/api/experiences", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editForm)
+        });
+        if (!res.ok) throw new Error("Failed to create");
+      } else {
+        const res = await fetch(`/api/experiences/${editForm.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editForm)
+        });
+        if (!res.ok) throw new Error("Failed to update");
+      }
       toast.success("Experience saved successfully");
       setEditingId(null);
+      fetchExperiences();
     } catch (error) {
       console.error("Error saving experience:", error);
       toast.error("Failed to save experience");
@@ -128,8 +144,12 @@ export default function ExperiencesManager() {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this experience?")) {
       try {
-        await deleteDoc(doc(db, "experiences", id));
+        const res = await fetch(`/api/experiences/${id}`, {
+          method: "DELETE"
+        });
+        if (!res.ok) throw new Error("Failed to delete");
         toast.success("Experience deleted");
+        fetchExperiences();
       } catch (error) {
         console.error("Error deleting experience:", error);
         toast.error("Failed to delete experience");
@@ -140,12 +160,19 @@ export default function ExperiencesManager() {
   const handleDuplicate = async (exp: any) => {
     try {
       const { id, ...dataToDuplicate } = exp;
-      await addDoc(collection(db, "experiences"), {
+      const copy = {
         ...dataToDuplicate,
         name: `${exp.name} (Copy)`,
         isActive: false, // Make it inactive by default
+      };
+      const res = await fetch("/api/experiences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(copy)
       });
+      if (!res.ok) throw new Error("Failed to duplicate");
       toast.success("Experience duplicated as draft");
+      fetchExperiences();
     } catch (error) {
       console.error("Error duplicating experience:", error);
       toast.error("Failed to duplicate experience");
@@ -163,22 +190,31 @@ export default function ExperiencesManager() {
     newExperiences[index] = newExperiences[swapIndex];
     newExperiences[swapIndex] = temp;
 
+    const updates = newExperiences.map((exp, i) => ({ id: exp.id, order: i }));
+    setExperiences(newExperiences);
+
     try {
-      const batch = writeBatch(db);
-      newExperiences.forEach((exp, i) => {
-        batch.update(doc(db, "experiences", exp.id), { order: i });
+      const res = await fetch("/api/experiences", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates)
       });
-      await batch.commit();
+      if (!res.ok) throw new Error("Failed to update order");
     } catch (error) {
       console.error("Error updating order:", error);
-      toast.error("Failed to update order. Make sure 'order' exists in rules if required.");
+      toast.error("Failed to update order.");
     }
   };
 
   const handleSavePricing = async () => {
     setSavingPricing(true);
     try {
-      await setDoc(doc(db, "settings", "pricing"), { pricing: globalPricing }, { merge: true });
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pricing: { pricing: globalPricing } })
+      });
+      if (!res.ok) throw new Error("Failed to save pricing");
       toast.success("Global pricing updated successfully");
     } catch (error) {
       console.error("Error saving pricing:", error);

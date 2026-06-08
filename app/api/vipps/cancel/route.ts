@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -47,11 +47,10 @@ export async function POST(req: Request) {
         }
 
         try {
-            await adminDb.collection('bookings').doc(bookingId).update({
-                vippsStatus: 'CANCELLED',
-                status: 'cancelled',
-                vippsUpdatedAt: new Date().toISOString()
-            });
+             await prisma.booking.update({
+                 where: { id: bookingId },
+                 data: { status: 'cancelled' }
+             });
         } catch (dbErr) {
             console.error('Failed to update DB on cancel:', dbErr);
         }

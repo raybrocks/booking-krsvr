@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { prisma } from '@/lib/prisma';
+import { sendEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
   try {
@@ -10,14 +11,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing reference' }, { status: 400 });
     }
 
-    const bookingRef = adminDb.collection('bookings').doc(reference);
-    const bookingSnap = await bookingRef.get();
+    const booking = await prisma.booking.findUnique({
+      where: { id: reference }
+    });
 
-    if (!bookingSnap.exists) {
+    if (!booking) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
-
-    const bookingData = bookingSnap.data()!;
 
     // -- Fetch Vipps Payment Status --
     const isTest = process.env.VIPPS_ENV !== 'production';
@@ -55,19 +55,18 @@ export async function POST(req: Request) {
           const paymentInfo = await paymentResponse.json();
           const pStatus = paymentInfo.state || paymentInfo.status || 'UNKNOWN';
           
-          await bookingRef.update({ 
-              vippsStatus: pStatus,
-              vippsVerifyRaw: JSON.stringify(paymentInfo)
-          });
-          
+          let updatedStatus = booking.status;
           const successStates = ['AUTHORIZED', 'RESERVED', 'epayment.payment.reserved', 'CAPTURED', 'epayment.payment.captured', 'SALE'];
 
           if (!successStates.includes(pStatus)) {
-             await bookingRef.update({ status: 'cancelled' });
+             await prisma.booking.update({
+               where: { id: reference },
+               data: { status: 'cancelled' }
+             });
              return NextResponse.json({ error: `Payment was not successful. Status: ${pStatus}` }, { status: 400 });
           }
 
-          if (pStatus !== 'CAPTURED') {
+          if (pStatus !== 'CAPTURED' && !pStatus.includes('captured')) {
               // 3. Automatically Capture the Payment
               const captureResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}/capture`, {
                  method: 'POST',
@@ -76,12 +75,12 @@ export async function POST(req: Request) {
                    'Authorization': `Bearer ${tokenData.access_token}`,
                    'Ocp-Apim-Subscription-Key': subscriptionKey,
                    'Merchant-Serial-Number': merchantSerialNumber,
-                   'Idempotency-Key': `capture-verify-${reference}`
+                   'Idempotency-Key': `capture-verify-${reference}-${Date.now()}`
                  },
                  body: JSON.stringify({
                    modificationAmount: {
                      currency: 'NOK',
-                     value: paymentInfo.amount?.value || Math.round((bookingData.amountPaid || 0) * 100) 
+                     value: paymentInfo.amount?.value || Math.round((booking.amountPaid || 0) * 100) 
                    }
                  })
               });
@@ -89,75 +88,43 @@ export async function POST(req: Request) {
               if (!captureResponse.ok) {
                  const errText = await captureResponse.text();
                  console.error("Auto-capture in verify failed:", errText);
-                 await bookingRef.update({ vippsCaptureError: errText });
-              } else {
-                 await bookingRef.update({ vippsStatus: 'CAPTURED' });
               }
           }
+          
+          updatedStatus = 'confirmed';
+          
+          await prisma.booking.update({
+            where: { id: reference },
+            data: { status: updatedStatus }
+          });
+          
         } else {
              const errorText = await paymentResponse.text();
-             await bookingRef.update({ vippsStatus: 'FETCH_FAILED', vippsVerifyRaw: errorText });
              return NextResponse.json({ error: 'Could not verify payment with Vipps' }, { status: 400 });
         }
-      } else {
-         const errorText = await tokenResponse.text();
-         await bookingRef.update({ vippsStatus: 'AUTH_FAILED', vippsVerifyRaw: errorText });
-         return NextResponse.json({ error: 'Failed to authenticate with Vipps' }, { status: 500 });
       }
-    } else {
-        await bookingRef.update({ vippsStatus: 'MISSING_ENV_VARS' });
     }
 
-    // If it's already confirmed, we might just need to ensure the email is sent
-    if (bookingData.status !== 'confirmed') {
-      await bookingRef.update({
-        status: 'confirmed'
+    // Re-fetch to get newest status
+    const verifiedData = await prisma.booking.findUnique({ 
+        where: { id: reference },
+        include: { experience: true }
+    });
+
+    if (!verifiedData) return NextResponse.json({ error: 'Booking missing after verification' }, { status: 404 });
+
+    // Auto-update to confirmed if it was pending and we bypassed vipps (e.g., pay at venue)
+    if (verifiedData.status === 'pending' && verifiedData.paymentType !== 'vipps') {
+      await prisma.booking.update({
+        where: { id: reference },
+        data: { status: 'confirmed' }
       });
+      verifiedData.status = 'confirmed';
     }
 
-    // Check if we need to send the email
-    if (!bookingData.confirmationEmailSent) {
-      let customText = "";
-      try {
-        const settingsRef = adminDb.collection('settings').doc('general');
-        const settingsSnap = await settingsRef.get();
-        if (settingsSnap.exists) {
-          customText = settingsSnap.data()!.bookingConfirmationText || "";
-        }
-      } catch (e) {
-        console.error("Failed to fetch settings for email:", e);
-      }
-
-      const { sendBookingConfirmationEmail, sendAdminNewBookingNotification, addContactToNewsletter } = await import('@/lib/email');
-      
-      // Ensure we pass the current data including any potentially missing fields
-      const emailData = { 
-        ...bookingData, 
-        amountPaid: bookingData.amountPaid || 0 
-      };
-
-      await sendBookingConfirmationEmail(
-        bookingData.email,
-        emailData,
-        customText
-      );
-
-      await sendAdminNewBookingNotification(emailData);
-
-      if (bookingData.acceptedNewsletter && !bookingData.newsletterAdded) {
-         await addContactToNewsletter(bookingData.email, bookingData.firstName, bookingData.lastName);
-         await bookingRef.update({ newsletterAdded: true });
-      }
-
-      // Mark email as sent
-      await bookingRef.update({
-        confirmationEmailSent: true
-      });
-    }
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, booking: verifiedData });
   } catch (error) {
-    console.error("Error verifying booking:", error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Verify booking error:', error);
+    return NextResponse.json({ error: 'Failed to verify booking' }, { status: 500 });
   }
 }

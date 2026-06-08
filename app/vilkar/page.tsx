@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -13,10 +11,14 @@ export default function KjøpsvilkårPage() {
   useEffect(() => {
     async function fetchTerms() {
       try {
-        const docRef = doc(db, "settings", "general");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setTerms(docSnap.data().termsContent || "Ingen vilkår er fylt ut i systemet enda.");
+        const response = await fetch('/api/settings');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.general && data.general.termsContent) {
+            setTerms(data.general.termsContent);
+          } else {
+            setTerms("Ingen vilkår er fylt ut i systemet enda.");
+          }
         } else {
           setTerms("Ingen vilkår er fylt ut i systemet enda.");
         }

@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import SettingsManager from "./SettingsManager";
@@ -53,59 +51,61 @@ export default function AdminDashboard() {
   const [experiencesMap, setExperiencesMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
-    
-    const unsubscribeBookings = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setBookings(data);
-      setLoading(false);
+    const fetchData = async () => {
+      try {
+        const [bookingsRes, experiencesRes] = await Promise.all([
+          fetch('/api/admin/bookings'),
+          fetch('/api/experiences') 
+        ]);
 
-      let newlyConfirmed = false;
-      let newlyConfirmedCount = 0;
+        if (bookingsRes.ok) {
+          const data = await bookingsRes.json();
+          setBookings(data);
+          setLoading(false);
 
-      snapshot.docs.forEach(docSnap => {
-        const docData = docSnap.data();
-        const isConfirmed = docData.status === 'confirmed' || docData.status === 'completed';
-        
-        if (isConfirmed && !notifiedBookingIds.current.has(docSnap.id)) {
-          notifiedBookingIds.current.add(docSnap.id);
-          if (!isFirstLoad.current) {
-            newlyConfirmed = true;
-            newlyConfirmedCount++;
+          let newlyConfirmed = false;
+          let newlyConfirmedCount = 0;
+
+          data.forEach((docData: any) => {
+            const isConfirmed = docData.status === 'confirmed' || docData.status === 'completed';
+            
+            if (isConfirmed && !notifiedBookingIds.current.has(docData.id)) {
+              notifiedBookingIds.current.add(docData.id);
+              if (!isFirstLoad.current) {
+                newlyConfirmed = true;
+                newlyConfirmedCount++;
+              }
+            }
+          });
+
+          if (newlyConfirmed) {
+            playDing();
+            toast.success(`Ny bestilling bekreftet! / New booking confirmed! (${newlyConfirmedCount})`);
           }
+          isFirstLoad.current = false;
         }
-      });
 
-      if (newlyConfirmed) {
-        playDing();
-        toast.success(`Ny bestilling bekreftet! / New booking confirmed! (${newlyConfirmedCount})`);
+        if (experiencesRes.ok) {
+          const exps = await experiencesRes.json();
+          const expsMap: Record<string, string> = {};
+          exps.forEach((e: any) => {
+            expsMap[e.id] = e.title || e.name || e.id;
+          });
+          setExperiencesMap(expsMap);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
       }
+    };
 
-      isFirstLoad.current = false;
-    }, (error) => {
-      console.error("Error fetching bookings:", error);
-      setLoading(false);
-    });
-
-    const interval = setInterval(() => setCurrentTime(Date.now()), 5000);
-
-    const unsubscribeExperiences = onSnapshot(collection(db, "experiences"), (snapshot) => {
-      const expsMap: Record<string, string> = {};
-      snapshot.docs.forEach(docSnap => {
-        expsMap[docSnap.id] = docSnap.data().title || docSnap.data().name || docSnap.id;
-      });
-      setExperiencesMap(expsMap);
-    }, (error) => {
-      console.error("Error fetching experiences:", error);
-    });
+    fetchData();
+    const intervalData = setInterval(fetchData, 10000);
+    const intervalTime = setInterval(() => setCurrentTime(Date.now()), 5000);
 
     return () => {
-      unsubscribeBookings();
-      unsubscribeExperiences();
-      clearInterval(interval);
+      clearInterval(intervalData);
+      clearInterval(intervalTime);
     };
   }, []);
 
@@ -148,7 +148,13 @@ export default function AdminDashboard() {
 
   const updateBookingStatus = async (id: string, newStatus: string) => {
     try {
-      await updateDoc(doc(db, "bookings", id), { status: newStatus });
+      await fetch(`/api/admin/bookings/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
       toast.success(`Booking marked as ${newStatus}`);
     } catch (error) {
       console.error("Error updating status:", error);
@@ -159,7 +165,9 @@ export default function AdminDashboard() {
   const deleteBooking = async (id: string) => {
     if (window.confirm("Are you sure you want to permanently delete this booking? This action cannot be undone.")) {
       try {
-        await deleteDoc(doc(db, "bookings", id));
+        await fetch(`/api/admin/bookings/${id}`, {
+          method: 'DELETE'
+        });
         toast.success("Booking permanently deleted");
       } catch (error) {
         console.error("Error deleting booking:", error);

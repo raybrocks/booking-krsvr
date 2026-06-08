@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { motion, AnimatePresence, PanInfo } from "motion/react";
 import { 
   ChevronLeft, 
@@ -99,17 +97,17 @@ export function ExperiencesView({
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "experiences"));
-        if (!querySnapshot.empty) {
-          let exps = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+        const response = await fetch('/api/experiences');
+        if (response.ok) {
+          let exps = await response.json();
           
-          exps.sort((a, b) => {
+          exps.sort((a: any, b: any) => {
             const orderA = typeof a.order === 'number' ? a.order : 999;
             const orderB = typeof b.order === 'number' ? b.order : 999;
             return orderA - orderB;
           });
 
-          exps = exps.filter(e => e.isActive && e.type !== "Vipps test");
+          exps = exps.filter((e: any) => e.isActive && e.type !== "Vipps test");
           setExperiences(exps);
         }
       } catch (error) {

@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { collection, onSnapshot, query, orderBy, limit } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Loader2 } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 
@@ -19,26 +17,25 @@ export default function TestimonialsCarousel() {
   }, [emblaApi, testimonials.length]);
 
   useEffect(() => {
-    // Note: We might not have order field indexed yet, so we pull all and sort client-side, 
-    // or rely on order if indexed. For safety we pull all and sort.
-    const unsubscribe = onSnapshot(collection(db, "testimonials"), (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as any[];
-      
-      data.sort((a, b) => {
-        const orderA = typeof a.order === 'number' ? a.order : 999;
-        const orderB = typeof b.order === 'number' ? b.order : 999;
-        return orderA - orderB;
-      });
-
-      // User requested 3 items.
-      setTestimonials(data.slice(0, 3));
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    async function load() {
+      try {
+        const res = await fetch('/api/testimonials?active_only=true');
+        if (res.ok) {
+           const data = await res.json();
+           data.sort((a: any, b: any) => {
+             const orderA = typeof a.order === 'number' ? a.order : 999;
+             const orderB = typeof b.order === 'number' ? b.order : 999;
+             return orderA - orderB;
+           });
+           setTestimonials(data.slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Failed to load testimonials:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, []);
 
   if (loading) {

@@ -1,7 +1,7 @@
 import React from "react";
 import { ExperiencesView } from "@/components/ExperiencesView";
 import { Metadata } from "next";
-import { adminDb } from "@/lib/firebase-admin";
+import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -22,20 +22,21 @@ export async function generateMetadata({
 
   if (initialTypeSlug) {
     try {
-      const querySnapshot = await adminDb.collection("experiences").get();
-      const exps = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+      const exps = await prisma.experience.findMany({
+        where: { isActive: true }
+      });
 
       if (initialExpSlug) {
-        const matchedExp = exps.find(e => slugify(e.type) === initialTypeSlug && slugify(e.name) === initialExpSlug);
+        const matchedExp = exps.find(e => slugify(e.type || "") === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
         if (matchedExp) {
           title = `${matchedExp.name} | ${matchedExp.type} | VRSenteret`;
-          description = matchedExp.description || description;
+          description = matchedExp.shortDescription || description;
           if (matchedExp.type?.toLowerCase().includes("vipps-test") || matchedExp.type?.toLowerCase().includes("vipps test")) {
             isVippsTest = true;
           }
         }
       } else {
-        const matchedType = exps.find(e => slugify(e.type) === initialTypeSlug);
+        const matchedType = exps.find(e => slugify(e.type || "") === initialTypeSlug);
         if (matchedType) {
           title = `${matchedType.type} | VR Opplevelser | VRSenteret`;
           if (matchedType.type?.toLowerCase().includes("vipps-test") || matchedType.type?.toLowerCase().includes("vipps test")) {
@@ -76,9 +77,9 @@ export default async function ExperiencesPage({
 
   let experiences: any[] = [];
   try {
-    const querySnapshot = await adminDb.collection("experiences").get();
-    experiences = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-    experiences = experiences.filter(e => e.isActive);
+    experiences = await prisma.experience.findMany({
+      where: { isActive: true }
+    });
     experiences.sort((a, b) => {
       const orderA = typeof a.order === 'number' ? a.order : 999;
       const orderB = typeof b.order === 'number' ? b.order : 999;
@@ -91,7 +92,7 @@ export default async function ExperiencesPage({
   // Determine if it's a specific experience or a list
   let matchedExp = null;
   if (initialTypeSlug && initialExpSlug) {
-    matchedExp = experiences.find(e => slugify(e.type) === initialTypeSlug && slugify(e.name) === initialExpSlug);
+    matchedExp = experiences.find(e => slugify(e.type || "") === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
   }
 
   let jsonLd: any = null;
@@ -136,7 +137,7 @@ export default async function ExperiencesPage({
           "@type": "Product",
           "name": exp.name,
           "description": exp.shortDescription || "",
-          "url": `https://www.krsvr.no/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`,
+          "url": `https://www.krsvr.no/opplevelser/${slugify(exp.type || "")}/${slugify(exp.name || "")}`,
           "brand": providerInfo
         }
       }))

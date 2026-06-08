@@ -3,8 +3,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Handshake, Crosshair, Skull, Mountain, Ghost, Gamepad2 } from "lucide-react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 export default function HomeCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -15,15 +13,16 @@ export default function HomeCarousel() {
   useEffect(() => {
     async function fetchExperiences() {
       try {
-        const snapshot = await getDocs(collection(db, "experiences"));
-        let expList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-        expList = expList.filter(e => e.isActive);
-        expList.sort((a, b) => {
-          const orderA = typeof a.order === 'number' ? a.order : 999;
-          const orderB = typeof b.order === 'number' ? b.order : 999;
-          return orderA - orderB;
-        });
-        setExperiences(expList);
+        const response = await fetch('/api/experiences?active_only=true');
+        if (response.ok) {
+          let expList = await response.json();
+          expList.sort((a: any, b: any) => {
+            const orderA = typeof a.order === 'number' ? a.order : 999;
+            const orderB = typeof b.order === 'number' ? b.order : 999;
+            return orderA - orderB;
+          });
+          setExperiences(expList);
+        }
       } catch (error) {
         console.error("Error fetching experiences:", error);
       } finally {

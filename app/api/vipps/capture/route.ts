@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -55,12 +55,22 @@ export async function POST(req: Request) {
             if (captureResponse.ok) {
                 captured.push(tx.bookingId);
                 try {
-                    await adminDb.collection('bookings').doc(tx.bookingId).update({
-                        vippsStatus: 'CAPTURED',
-                        status: 'confirmed',
-                        vippsAmount: tx.amount,
-                        amountPaid: tx.amount / 100,
-                        vippsUpdatedAt: new Date().toISOString()
+                    await prisma.booking.update({
+                        where: { id: tx.bookingId },
+                        data: {
+                            status: 'confirmed',
+                            amountPaid: tx.amount / 100
+                        }
+                    });
+                    
+                    await prisma.receipt.create({
+                        data: {
+                            bookingId: tx.bookingId,
+                            amount: tx.amount / 100,
+                            status: 'CAPTURED',
+                            paymentRef: tx.bookingId,
+                            type: 'payment'
+                        }
                     });
                 } catch (dbErr) {
                     console.error('Failed to update DB on capture:', dbErr);

@@ -10,8 +10,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
-import { collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
@@ -91,26 +89,27 @@ export default function BookingFlow() {
   useEffect(() => {
     async function loadData() {
       try {
-        const expSnapshot = await getDocs(collection(db, "experiences"));
-        let expData = expSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Experience));
+        const [expRes, settingsRes] = await Promise.all([
+          fetch('/api/experiences?active_only=true'),
+          fetch('/api/settings')
+        ]);
         
-        // Sort by order
-        expData.sort((a, b) => {
-          const orderA = typeof a.order === 'number' ? a.order : 999;
-          const orderB = typeof b.order === 'number' ? b.order : 999;
-          return orderA - orderB;
-        });
-
-        setExperiences(expData.filter(e => e.isActive));
-
-        const settingsDoc = await getDoc(doc(db, "settings", "general"));
-        if (settingsDoc.exists()) {
-          setSettings(settingsDoc.data() as Settings);
+        if (expRes.ok) {
+           const expData = await expRes.json();
+           setExperiences(expData);
         }
-
-        const pricingDoc = await getDoc(doc(db, "settings", "pricing"));
-        if (pricingDoc.exists() && pricingDoc.data().pricing) {
-          setGlobalPricing(pricingDoc.data().pricing);
+        
+        if (settingsRes.ok) {
+           const settingsData = await settingsRes.json();
+           if (settingsData.general) {
+             setSettings(settingsData.general as Settings);
+           }
+           if (settingsData.pricing && settingsData.pricing.pricing) {
+             // Fallback for nested pricing dict if it was stored that way
+             setGlobalPricing(settingsData.pricing.pricing);
+           } else if (settingsData.pricing) {
+             setGlobalPricing(settingsData.pricing);
+           }
         }
       } catch (error) {
         console.error("Failed to load data", error);
@@ -131,17 +130,16 @@ export default function BookingFlow() {
       setLoadingTimes(true);
       try {
         const dateString = format(selectedDate, "yyyy-MM-dd");
-        const q = query(
-          collection(db, "bookings"),
-          where("date", "==", dateString)
-        );
-        const snapshot = await getDocs(q);
-        const existingBookings = snapshot.docs.map(doc => doc.data());
+        const response = await fetch(`/api/booking?date=${dateString}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch booked times');
+        }
+        const existingBookings = await response.json();
         
         const now = Date.now();
         // Exclude cancelled bookings
         // Also exclude pending bookings that are older than 15 minutes
-        const activeBookings = existingBookings.filter(b => {
+        const activeBookings = existingBookings.filter((b: any) => {
           if (
             b.status?.toLowerCase() === "terminated" || 
             b.status?.toLowerCase() === "cancelled" ||
@@ -154,23 +152,8 @@ export default function BookingFlow() {
           if (b.status?.toLowerCase() === "pending" && b.createdAt) {
             let createdAtMs = now;
             
-            if (typeof b.createdAt.toMillis === 'function') {
-              createdAtMs = b.createdAt.toMillis();
-            } else if (b.createdAt.seconds) {
-              createdAtMs = b.createdAt.seconds * 1000;
-            } else if (b.createdAt instanceof Date) {
-              createdAtMs = b.createdAt.getTime();
-            } else if (typeof b.createdAt === 'number') {
-              createdAtMs = b.createdAt;
-            } else if (typeof b.createdAt === 'string') {
-              // Safari/Firefox fiks: Konverter "YYYY-MM-DD HH:mm:ss" til standard ISO 8601
-              const safeDateStr = b.createdAt.includes(' ') && !b.createdAt.includes('T') 
-                ? b.createdAt.replace(' ', 'T') 
-                : b.createdAt;
-              const parsed = new Date(safeDateStr).getTime();
-              if (!isNaN(parsed)) {
-                createdAtMs = parsed;
-              }
+            if (typeof b.createdAt === 'string') {
+               createdAtMs = new Date(b.createdAt).getTime();
             }
 
             if (now - createdAtMs > 15 * 60 * 1000) {
@@ -181,7 +164,7 @@ export default function BookingFlow() {
           return true;
         });
         
-        const times = activeBookings.map(b => typeof b.time === 'string' ? b.time.trim() : b.time);
+        const times = activeBookings.map((b: any) => typeof b.time === 'string' ? b.time.trim() : b.time);
         setBookedTimes(times);
         
         // If selected time is now booked, remove it
@@ -237,24 +220,37 @@ export default function BookingFlow() {
     
     setIsSubmitting(true);
     try {
-      // 1. Create a pending booking in Firebase
-      const bookingRef = await addDoc(collection(db, "bookings"), {
-        experienceId: selectedExperience.id,
-        date: format(selectedDate, "yyyy-MM-dd"),
-        time: selectedTime,
-        players,
-        firstName,
-        lastName,
-        email,
-        phone,
-        acceptedTerms,
-        acceptedNewsletter,
-        paymentType,
-        totalPrice,
-        amountPaid: amountToPay,
-        status: "pending", // Set as pending until payment completes
-        createdAt: serverTimestamp()
+      // 1. Create a pending booking in Postgres
+      const bookingResponse = await fetch('/api/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          experienceId: selectedExperience.id,
+          date: format(selectedDate, "yyyy-MM-dd"),
+          time: selectedTime,
+          players,
+          firstName,
+          lastName,
+          email,
+          phone,
+          acceptedTerms,
+          acceptedNewsletter,
+          paymentType,
+          totalPrice,
+          amountPaid: amountToPay,
+          status: "pending", 
+        })
       });
+
+      const bookingData = await bookingResponse.json();
+      
+      if (!bookingResponse.ok) {
+        throw new Error(bookingData.error || 'Failed to create pending booking');
+      }
+      
+      const bookingId = bookingData.id;
 
       // 2. Call our Vipps API route to initiate checkout
       const response = await fetch('/api/vipps/checkout', {
@@ -263,7 +259,7 @@ export default function BookingFlow() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bookingId: bookingRef.id,
+          bookingId: bookingId,
           amount: amountToPay,
           description: `Booking: ${selectedExperience.name} for ${players} players`,
         }),

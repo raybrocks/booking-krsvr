@@ -1,9 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, onSnapshot, doc, deleteDoc, setDoc, writeBatch } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "@/lib/firebase";
 import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -16,27 +13,21 @@ export default function TestimonialsManager() {
   const [uploadingMainImage, setUploadingMainImage] = useState(false);
   const [uploadingLogoImage, setUploadingLogoImage] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "testimonials"), (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as any[];
-      
-      data.sort((a, b) => {
-        const orderA = typeof a.order === 'number' ? a.order : 999;
-        const orderB = typeof b.order === 'number' ? b.order : 999;
-        return orderA - orderB;
-      });
-
+  const fetchTestimonials = async () => {
+    try {
+      const res = await fetch("/api/testimonials");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
       setTestimonials(data);
-      setLoading(false);
-    }, (error) => {
+    } catch (error) {
       console.error("Error fetching testimonials:", error);
+    } finally {
       setLoading(false);
-    });
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchTestimonials();
   }, []);
 
   const handleEdit = (testi: any) => {
@@ -45,10 +36,8 @@ export default function TestimonialsManager() {
   };
 
   const handleAddNew = () => {
-    const newId = "testi_" + Date.now();
-    setEditingId(newId);
+    setEditingId("new");
     setEditForm({
-      id: newId,
       companyName: "New Company",
       mainImage: "",
       logoImage: ""
@@ -63,16 +52,25 @@ export default function TestimonialsManager() {
     else setUploadingMainImage(true);
 
     try {
-      // Vi lagrer bildene i 'experiences/' mappen siden Firebase Storage reglene 
-      // tydeligvis allerede tillater opplastinger dit, og unngår dermed "unauthorized" feilen.
-      const storageRef = ref(storage, `experiences/testimonials_${editForm.id}_${Date.now()}_${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("pathPrefix", "testimonials");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      const data = await res.json();
+
       if (isLogo) {
-        setEditForm({ ...editForm, logoImage: downloadURL });
+        setEditForm({ ...editForm, logoImage: data.url });
       } else {
-        setEditForm({ ...editForm, mainImage: downloadURL });
+        setEditForm({ ...editForm, mainImage: data.url });
       }
       
       toast.success("Image uploaded successfully");
@@ -87,12 +85,24 @@ export default function TestimonialsManager() {
 
   const handleSave = async () => {
     try {
-      if (!editForm.id) {
-         editForm.id = "testi_" + Date.now();
+      if (editingId === "new") {
+        const res = await fetch("/api/testimonials", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editForm)
+        });
+        if (!res.ok) throw new Error("Failed to create");
+      } else {
+        const res = await fetch(`/api/testimonials/${editForm.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editForm)
+        });
+        if (!res.ok) throw new Error("Failed to update");
       }
-      await setDoc(doc(db, "testimonials", editForm.id), editForm);
       toast.success("Testimonial saved successfully");
       setEditingId(null);
+      fetchTestimonials();
     } catch (error) {
       console.error("Error saving testimonial:", error);
       toast.error("Failed to save testimonial");
@@ -102,8 +112,12 @@ export default function TestimonialsManager() {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this testimonial?")) {
       try {
-        await deleteDoc(doc(db, "testimonials", id));
+        const res = await fetch(`/api/testimonials/${id}`, {
+          method: "DELETE"
+        });
+        if (!res.ok) throw new Error("Failed to delete");
         toast.success("Testimonial deleted");
+        fetchTestimonials();
       } catch (error) {
         console.error("Error deleting testimonial:", error);
         toast.error("Failed to delete testimonial");
@@ -118,19 +132,27 @@ export default function TestimonialsManager() {
     const newTestimonials = [...testimonials];
     const swapIndex = direction === 'up' ? index - 1 : index + 1;
     
+    // Swap objects
     const temp = newTestimonials[index];
     newTestimonials[index] = newTestimonials[swapIndex];
     newTestimonials[swapIndex] = temp;
 
+    // Fix the order property sequentially
+    const updates = newTestimonials.map((t, i) => ({ id: t.id, order: i }));
+    
+    // Optic UI update immediately
+    setTestimonials(newTestimonials);
+
     try {
-      const batch = writeBatch(db);
-      newTestimonials.forEach((testi, i) => {
-        batch.update(doc(db, "testimonials", testi.id), { order: i });
+      const res = await fetch("/api/testimonials", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates)
       });
-      await batch.commit();
+      if (!res.ok) throw new Error("Batch update failed");
     } catch (error) {
       console.error("Error updating order:", error);
-      toast.error("Failed to update order. Make sure 'order' exists or firestore permissions are set.");
+      toast.error("Failed to update order.");
     }
   };
 

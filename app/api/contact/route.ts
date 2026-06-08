@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { adminDb } from '@/lib/firebase-admin';
+import { prisma } from '@/lib/prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -24,9 +24,11 @@ export async function POST(req: Request) {
     
     let toEmail = 'post@krsvr.no';
     try {
-      const settingsDoc = await adminDb.collection('settings').doc('general').get();
-      if (settingsDoc.exists) {
-        const settingsData = settingsDoc.data();
+      const settingsDoc = await prisma.setting.findUnique({
+        where: { key: 'general' }
+      });
+      if (settingsDoc && settingsDoc.value) {
+        const settingsData = settingsDoc.value as any;
         if (settingsData && settingsData.adminEmail) {
           toEmail = settingsData.adminEmail;
         }

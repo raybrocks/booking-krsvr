@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, onSnapshot, query, orderBy, doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { Loader2, Receipt, Search, ExternalLink, Printer } from "lucide-react";
+import { Loader2, Receipt, Search, Printer } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export default function TransactionsManager() {
@@ -18,52 +16,55 @@ export default function TransactionsManager() {
   const [loadingReceipt, setLoadingReceipt] = useState(false);
 
   useEffect(() => {
-    const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
-    
-    // Fetch experiences map once
-    import("firebase/firestore").then(({ getDocs }) => {
-      getDocs(collection(db, "experiences")).then(snapshot => {
-        const expsMap: Record<string, string> = {};
-        snapshot.docs.forEach(docSnap => {
-          expsMap[docSnap.id] = docSnap.data().title || docSnap.data().name || docSnap.id;
-        });
-        setExperiencesMap(expsMap);
-      }).catch(console.error);
-    });
+    const fetchTransactions = async () => {
+      try {
+        const [bookingsRes, experiencesRes] = await Promise.all([
+          fetch('/api/admin/bookings'),
+          fetch('/api/experiences')
+        ]);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => {
-        const bookingData = doc.data();
-        let status = bookingData.status;
-        
-        return {
-          id: doc.id,
-          bookingId: doc.id,
-          vippsOrderId: doc.id,
-          amount: (bookingData.amountPaid || bookingData.totalPrice || 0) * 100, // convert back to ore for receipt calculations
-          originalStatus: bookingData.status,
-          status: (status === 'confirmed' || status === 'completed') ? 'AUTHORIZED' : status,
-          ...bookingData,
-          // Format timestamp if it exists
-          createdAtDate: bookingData.createdAt?.toDate ? bookingData.createdAt.toDate() : new Date()
-        };
-      });
-      
-      // Filter out cancelled and pending bookings to show all active receipts 
-      const validReceipts = data.filter(b => 
-        b.originalStatus !== 'cancelled' && 
-        b.originalStatus !== 'pending' && 
-        b.originalStatus !== 'error'
-      );
-      
-      setTransactions(validReceipts);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching transactions:", error);
-      setLoading(false);
-    });
+        if (experiencesRes.ok) {
+          const exps = await experiencesRes.json();
+          const expsMap: Record<string, string> = {};
+          exps.forEach((e: any) => {
+            expsMap[e.id] = e.title || e.name || e.id;
+          });
+          setExperiencesMap(expsMap);
+        }
 
-    return () => unsubscribe();
+        if (bookingsRes.ok) {
+          const fetchedBookings = await bookingsRes.json();
+          const data = fetchedBookings.map((bookingData: any) => {
+            let status = bookingData.status;            
+            const createdAtDate = bookingData.createdAt ? new Date(bookingData.createdAt) : new Date();
+
+            return {
+              id: bookingData.id,
+              bookingId: bookingData.id,
+              vippsOrderId: bookingData.id,
+              amount: (bookingData.amountPaid || bookingData.totalPrice || 0) * 100,
+              originalStatus: bookingData.status,
+              status: (status === 'confirmed' || status === 'completed') ? 'AUTHORIZED' : status,
+              ...bookingData,
+              createdAtDate
+            };
+          });
+          
+          const validReceipts = data.filter((b: any) => 
+            b.originalStatus !== 'cancelled' && 
+            b.originalStatus !== 'pending' && 
+            b.originalStatus !== 'error'
+          );
+          
+          setTransactions(validReceipts);
+        }
+      } catch (err) {
+        console.error("Failed fetching transactions:", err);
+      }
+      setLoading(false);
+    };
+
+    fetchTransactions();
   }, []);
 
   const handleViewReceipt = async (tx: any) => {
@@ -74,9 +75,13 @@ export default function TransactionsManager() {
     
     if (tx.bookingId) {
       try {
-        const bookingDoc = await getDoc(doc(db, "bookings", tx.bookingId));
-        if (bookingDoc.exists()) {
-          setSelectedBooking(bookingDoc.data());
+        const res = await fetch('/api/admin/bookings');
+        if (res.ok) {
+          const allBookings = await res.json();
+          const bookingDoc = allBookings.find((b: { id: any; }) => b.id === tx.bookingId);
+          if (bookingDoc) {
+             setSelectedBooking(bookingDoc);
+          }
         }
       } catch (e) {
         console.error(e);

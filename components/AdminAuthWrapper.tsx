@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { Lock, Loader2, LogOut } from "lucide-react";
 
 export default function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
@@ -14,11 +12,12 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    // Simple client-side check for admin auth
+    const isAdmin = localStorage.getItem("krsvr_admin_auth") === "true";
+    if (isAdmin) {
+      setUser({ email: "post@krsvr.no" });
+    }
+    setLoading(false);
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -27,7 +26,13 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
     setError("");
     
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      // Very basic static password check for the new setup without firebase
+      if (email === "post@krsvr.no" && password === "admin2026") {
+        localStorage.setItem("krsvr_admin_auth", "true");
+        setUser({ email: "post@krsvr.no" });
+      } else {
+        setError("Feil e-post eller passord.");
+      }
     } catch (err: any) {
       console.error(err);
       setError("Feil e-post eller passord.");
@@ -37,7 +42,8 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   };
 
   const handleLogout = async () => {
-    await signOut(auth);
+    localStorage.removeItem("krsvr_admin_auth");
+    setUser(null);
   };
 
   if (loading) {

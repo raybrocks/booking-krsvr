@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { adminDb } from "@/lib/firebase-admin";
+import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -27,8 +27,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic experiences
   let experiencesUrls: MetadataRoute.Sitemap = [];
   try {
-    const querySnapshot = await adminDb.collection("experiences").get();
-    let experiences = querySnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+    let experiences = await prisma.experience.findMany({
+      where: { isActive: true }
+    });
     
     // Filter out vipps-test from sitemap
     experiences = experiences.filter(e => {
@@ -45,8 +46,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    const detailUrls: MetadataRoute.Sitemap = experiences.filter(e => e.isActive).map(exp => ({
-      url: `${baseUrl}/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`,
+    const detailUrls: MetadataRoute.Sitemap = experiences.map(exp => ({
+      url: `${baseUrl}/opplevelser/${slugify(exp.type || "")}/${slugify(exp.name || "")}`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,
