@@ -300,7 +300,28 @@ export default function BookingFlow() {
       
       const bookingId = bookingData.id;
 
-      // 2. Call our Vipps API route to initiate checkout
+      // 2. Handle 0 amount (100% discount)
+      if (amountToPay === 0) {
+        const confirmZeroRes = await fetch('/api/booking/confirm-zero', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ bookingId: bookingId })
+        });
+        
+        if (!confirmZeroRes.ok) {
+           throw new Error('Kunne ikke bekrefte 0 kr booking');
+        }
+        
+        // Redirect to success page
+        if (window.top) {
+           window.top.location.href = `/checkout/return?reference=${bookingId}`;
+        } else {
+           window.location.href = `/checkout/return?reference=${bookingId}`;
+        }
+        return;
+      }
+
+      // 3. Call our Vipps API route to initiate checkout
       const response = await fetch('/api/vipps/checkout', {
         method: 'POST',
         headers: {
@@ -319,8 +340,8 @@ export default function BookingFlow() {
         throw new Error(data.error || 'Failed to initialize payment');
       }
 
-      // 3. Redirect user to Vipps Checkout
-if (window.top) {
+      // 4. Redirect user to Vipps Checkout
+      if (window.top) {
         window.top.location.href = data.checkoutUrl;
       } else {
         window.location.href = data.checkoutUrl;
