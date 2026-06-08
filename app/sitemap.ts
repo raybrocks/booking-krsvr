@@ -2,6 +2,9 @@ import { MetadataRoute } from 'next';
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 
+export const revalidate = 3600; // revalidate every hour
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.krsvr.no";
   

@@ -89,9 +89,10 @@ export default function BookingFlow() {
   useEffect(() => {
     async function loadData() {
       try {
+        const timestamp = new Date().getTime();
         const [expRes, settingsRes] = await Promise.all([
-          fetch('/api/experiences?active_only=true'),
-          fetch('/api/settings')
+          fetch(`/api/experiences?active_only=true&t=${timestamp}`),
+          fetch(`/api/settings?t=${timestamp}`)
         ]);
         
         if (expRes.ok) {
