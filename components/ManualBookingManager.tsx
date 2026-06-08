@@ -24,6 +24,8 @@ export default function ManualBookingManager() {
   const [companyName, setCompanyName] = useState("");
   const [internalNotes, setInternalNotes] = useState("");
   const [totalPrice, setTotalPrice] = useState(0);
+  const [sendConfirmation, setSendConfirmation] = useState(true);
+  const [customEmailText, setCustomEmailText] = useState("");
 
   // available times based on selected date
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
@@ -150,7 +152,9 @@ export default function ManualBookingManager() {
           totalPrice,
           paymentType: "manual",
           status: "confirmed",
-          shadowTimes
+          shadowTimes,
+          sendConfirmation,
+          customEmailText
         }),
       });
 
@@ -166,6 +170,7 @@ export default function ManualBookingManager() {
         setInternalNotes("");
         setTotalPrice(0);
         setDuration(90);
+        setCustomEmailText("");
         // refresh booked times
         setBookedTimes([...bookedTimes, time, ...shadowTimes]);
       } else {
@@ -378,6 +383,30 @@ export default function ManualBookingManager() {
                 onChange={(e) => setInternalNotes(e.target.value)}
                 placeholder="Spesielle detaljer, diett for catering, faktura-info etc."
               />
+            </div>
+            
+            <div className="pt-4 border-t border-zinc-800">
+               <label className="flex items-center gap-3 cursor-pointer mb-3">
+                 <input 
+                   type="checkbox" 
+                   checked={sendConfirmation}
+                   onChange={(e) => setSendConfirmation(e.target.checked)}
+                   className="w-5 h-5 accent-[#9C39FF] bg-zinc-900 border-zinc-700 rounded cursor-pointer"
+                 />
+                 <span className="text-zinc-200">Send booking-bekreftelse på e-post til kunden</span>
+               </label>
+               
+               {sendConfirmation && (
+                 <div className="pl-8">
+                    <label className="text-sm text-zinc-400 mb-1 block">Egendefinert melding i e-post (valgfritt)</label>
+                    <textarea
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF] min-h-[80px] text-sm resize-y"
+                      value={customEmailText}
+                      onChange={(e) => setCustomEmailText(e.target.value)}
+                      placeholder="Ekstra informasjon som kommer øverst i bekreftelsen (f.eks info om oppmøte, mat etc.)"
+                    />
+                 </div>
+               )}
             </div>
           </div>
         </div>

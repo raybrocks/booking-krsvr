@@ -129,6 +129,13 @@ export async function POST(req: NextRequest) {
         }
     }
 
+    // 4. Send Confirmation Email if requested
+    if (data.sendConfirmation && booking.email && booking.email !== 'ingen@epost.no') {
+       const { sendBookingConfirmationEmail } = await import('@/lib/email');
+       const customText = data.customEmailText || "";
+       await sendBookingConfirmationEmail(booking.email, booking, customText);
+    }
+
     return NextResponse.json({ success: true, booking });
   } catch (error: any) {
     console.error("Admin booking creation failed:", error);
