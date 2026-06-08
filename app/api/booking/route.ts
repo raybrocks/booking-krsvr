@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
              amountPaid: data.amountPaid,
              status: 'pending',
              paymentRef: null,
-             cancellationEmailSent: false
+             cancellationEmailSent: false,
+             discountCode: data.discountCode,
           }
         });
         return NextResponse.json({ id: resetBooking.id }, { status: 201 });
@@ -64,7 +65,8 @@ export async function POST(req: NextRequest) {
                amountPaid: data.amountPaid,
                status: 'pending',
                paymentRef: null,
-               cancellationEmailSent: false
+               cancellationEmailSent: false,
+               discountCode: data.discountCode,
             }
           });
           return NextResponse.json({ id: resetBooking.id }, { status: 201 });
@@ -90,6 +92,7 @@ export async function POST(req: NextRequest) {
         totalPrice: data.totalPrice,
         amountPaid: data.amountPaid,
         status: data.status || 'pending',
+        discountCode: data.discountCode,
       }
     });
 

@@ -170,6 +170,18 @@ export async function POST(req: Request) {
           if (['captured', 'sale'].some(s => paymentStatus.toLowerCase().includes(s))) {
             const confirmedBookingSnap = bookingData;
             
+            // Increment discount code usage if exists
+            if (confirmedBookingSnap?.discountCode) {
+               try {
+                 await prisma.discountCode.update({
+                   where: { code: confirmedBookingSnap.discountCode },
+                   data: { usageCount: { increment: 1 } }
+                 });
+               } catch (e) {
+                 console.error("Failed to increment discount code usage:", e);
+               }
+            }
+            
             if (confirmedBookingSnap && !confirmedBookingSnap.cancellationEmailSent) {
               const { sendEmail } = await import('@/lib/email');
               

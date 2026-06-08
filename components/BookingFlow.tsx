@@ -71,6 +71,14 @@ export default function BookingFlow() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   
+  // Discount Code
+  const [discountCodeInput, setDiscountCodeInput] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; discount: number; type: string } | null>(null);
+  const [validatingDiscount, setValidatingDiscount] = useState(false);
+  const [discountError, setDiscountError] = useState("");
+  const [discountMessage, setDiscountMessage] = useState("");
+
+  
   // Global Pricing State
   const [globalPricing, setGlobalPricing] = useState<Record<string, number>>({
     "2": 460,
@@ -195,8 +203,46 @@ export default function BookingFlow() {
   const isVippsTest = selectedExperience?.type && selectedExperience.type.toLowerCase() === "vipps test";
   const basePricePerPerson = globalPricing[players > 8 ? "8" : players.toString()] || 0;
   const pricePerPerson = isVippsTest ? 2 : basePricePerPerson;
-  const totalPrice = isVippsTest ? 2 : (selectedExperience ? basePricePerPerson * players : 0);
-  const amountToPay = isVippsTest ? 2 : (paymentType === "full" ? totalPrice : pricePerPerson);
+  const rawTotalPrice = isVippsTest ? 2 : (selectedExperience ? basePricePerPerson * players : 0);
+
+  let discountAmount = 0;
+  if (!isVippsTest && appliedDiscount) {
+    if (appliedDiscount.type === "percentage") {
+      discountAmount = (rawTotalPrice * appliedDiscount.discount) / 100;
+    } else {
+      discountAmount = appliedDiscount.discount;
+    }
+    if (discountAmount > rawTotalPrice) discountAmount = rawTotalPrice;
+  }
+  const totalPrice = rawTotalPrice - discountAmount;
+  const amountToPay = isVippsTest ? 2 : (paymentType === "full" ? totalPrice : Math.min(pricePerPerson, totalPrice));
+
+  const handleApplyDiscount = async () => {
+    if (!discountCodeInput.trim()) return;
+    setValidatingDiscount(true);
+    setDiscountError("");
+    setDiscountMessage("");
+    try {
+      const res = await fetch("/api/discount-codes/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: discountCodeInput.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setDiscountError(data.error || "Ugyldig rabattkode");
+        setAppliedDiscount(null);
+      } else {
+        setAppliedDiscount(data);
+        setDiscountMessage(`Rabattkode lagt til! (-${data.type === 'percentage' ? data.discount + '%' : data.discount + ' kr'})`);
+        setDiscountCodeInput("");
+      }
+    } catch (err) {
+      setDiscountError("Kunne ikke validere rabattkode");
+    } finally {
+      setValidatingDiscount(false);
+    }
+  };
 
   const handleNext = () => {
     if (step === 1 && (!selectedDate || !selectedTime)) return toast.error("Vennligst velg dato og tid.");
@@ -242,6 +288,7 @@ export default function BookingFlow() {
           totalPrice,
           amountPaid: amountToPay,
           status: "pending", 
+          discountCode: appliedDiscount?.code,
         })
       });
 
@@ -737,16 +784,44 @@ if (window.top) {
                 </div>
                 
                 <div className="flex justify-between items-end text-lg">
-                  <span className="text-zinc-300">Pris</span>
+                  <span className="text-zinc-300">Sum</span>
                   <div className="text-right">
+                    <div className="text-sm text-zinc-500 line-through">
+                      {appliedDiscount && `${rawTotalPrice} NOK`}
+                    </div>
                     <div className="font-medium text-white">
                       {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">{isVippsTest ? "totalt" : "per person"}</span>
                     </div>
                     <div className="text-sm text-zinc-500 mt-0.5">
-                      {`Total for ${players}`}: {totalPrice} NOK
+                      {`Total: ${totalPrice} NOK`}
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Discount Code Section */}
+              <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
+                <Label htmlFor="discount" className="text-zinc-300">Har du en rabattkode?</Label>
+                <div className="flex space-x-2">
+                  <Input 
+                    id="discount"
+                    value={discountCodeInput}
+                    onChange={(e) => setDiscountCodeInput(e.target.value)}
+                    placeholder="Skriv inn kode"
+                    className="bg-zinc-950 border-zinc-800"
+                    disabled={validatingDiscount}
+                  />
+                  <Button 
+                    onClick={handleApplyDiscount}
+                    disabled={!discountCodeInput.trim() || validatingDiscount}
+                    variant="secondary"
+                    className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700"
+                  >
+                    {validatingDiscount ? <Loader2 className="w-4 h-4 animate-spin" /> : "Legg til"}
+                  </Button>
+                </div>
+                {discountError && <p className="text-red-400 text-sm">{discountError}</p>}
+                {discountMessage && <p className="text-green-400 text-sm">{discountMessage}</p>}
               </div>
 
               <div className="bg-zinc-900/50 rounded-xl p-4 text-sm text-zinc-300 border border-zinc-800">

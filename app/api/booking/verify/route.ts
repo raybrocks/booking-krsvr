@@ -93,10 +93,20 @@ export async function POST(req: Request) {
           
           updatedStatus = 'confirmed';
           
+          const existingStatus = booking.status;
           await prisma.booking.update({
             where: { id: reference },
             data: { status: updatedStatus }
           });
+          
+          if (existingStatus !== 'confirmed' && booking.discountCode) {
+             try {
+                await prisma.discountCode.update({
+                   where: { code: booking.discountCode },
+                   data: { usageCount: { increment: 1 } }
+                });
+             } catch (e) {}
+          }
           
         } else {
              const errorText = await paymentResponse.text();

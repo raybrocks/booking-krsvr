@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import SettingsManager from "./SettingsManager";
 import ExperiencesManager from "./ExperiencesManager";
 import TransactionsManager from "./TransactionsManager";
+import DiscountCodesManager from "./DiscountCodesManager";
 
 const playDing = () => {
   try {
@@ -38,7 +39,7 @@ const playDing = () => {
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "settings">("upcoming");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "discount-codes" | "settings">("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isFirstLoad = useRef(true);
   const notifiedBookingIds = useRef<Set<string>>(new Set());
@@ -494,6 +495,12 @@ export default function AdminDashboard() {
             <Receipt className="w-4 h-4" /> Receipts
           </button>
           <button 
+            onClick={() => setActiveTab("discount-codes")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${activeTab === 'discount-codes' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+          >
+            Rabattkoder
+          </button>
+          <button 
             onClick={() => setActiveTab("settings")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
@@ -579,6 +586,7 @@ export default function AdminDashboard() {
 
       {activeTab === "experiences" && <ExperiencesManager />}
       {activeTab === "transactions" && <TransactionsManager />}
+      {activeTab === "discount-codes" && <DiscountCodesManager />}
       {activeTab === "settings" && <SettingsManager />}
     </div>
   );

@@ -53,6 +53,7 @@ model Booking {
   status            String   @default("pending") 
   cancellationEmailSent Boolean @default(false)
   paymentRef        String?  
+  discountCode      String?
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -98,4 +99,17 @@ model Testimonial {
   isActive          Boolean  @default(true)
   order             Int      @default(999)
   createdAt         DateTime @default(now())
+}
+
+model DiscountCode {
+  id                String   @id @default(cuid())
+  code              String   @unique
+  discount          Float
+  type              String   @default("percentage") // "percentage" or "fixed"
+  active            Boolean  @default(true)
+  expiresAt         DateTime?
+  usageLimit        Int?
+  usageCount        Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
