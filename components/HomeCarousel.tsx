@@ -13,7 +13,7 @@ export default function HomeCarousel() {
   useEffect(() => {
     async function fetchExperiences() {
       try {
-        const response = await fetch('/api/experiences?active_only=true');
+        const response = await fetch('/api/experiences?active_only=true&timestamp=' + new Date().getTime());
         if (response.ok) {
           let expList = await response.json();
           expList.sort((a: any, b: any) => {

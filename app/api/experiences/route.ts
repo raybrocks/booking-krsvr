@@ -15,7 +15,8 @@ export async function GET(req: NextRequest) {
     
     return NextResponse.json(experiences);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch experiences' }, { status: 500 });
+    console.error("GET /api/experiences ERROR:", error);
+    return NextResponse.json({ error: 'Failed to fetch experiences', details: String(error) }, { status: 500 });
   }
 }
 

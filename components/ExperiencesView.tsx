@@ -64,9 +64,11 @@ export function ExperiencesView({
   initialTypeSlug?: string | null;
   initialExpSlug?: string | null;
 }) {
-  const [experiences, setExperiences] = useState<any[]>(initialExperiences);
+  const [experiences, setExperiences] = useState<any[]>(
+    initialExperiences.filter((e: any) => e.isActive && e.type !== "Vipps test")
+  );
   const [selectedId, setSelectedId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(initialExperiences.length === 0);
+  const [isLoading, setIsLoading] = useState(experiences.length === 0);
   const [activeFilter, setActiveFilter] = useState<string>("Alle");
   const [activeTypeSlug, setActiveTypeSlug] = useState<string>(initialTypeSlug || "alle");
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -95,9 +97,11 @@ export function ExperiencesView({
   };
 
   useEffect(() => {
+    if (initialExperiences.length > 0) return;
+    
     const fetchExperiences = async () => {
       try {
-        const response = await fetch('/api/experiences');
+        const response = await fetch('/api/experiences?timestamp=' + new Date().getTime());
         if (response.ok) {
           let exps = await response.json();
           
@@ -118,7 +122,7 @@ export function ExperiencesView({
     };
 
     fetchExperiences();
-  }, []);
+  }, [initialExperiences.length]);
 
   useEffect(() => {
     setActiveTypeSlug(initialTypeSlug || "alle");
