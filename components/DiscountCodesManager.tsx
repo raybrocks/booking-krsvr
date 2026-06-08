@@ -162,10 +162,8 @@ export default function DiscountCodesManager() {
           setIsOpen(open);
           if (!open) resetForm();
         }}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white">
-              <Plus className="w-4 h-4 mr-2" /> Ny kode
-            </Button>
+          <DialogTrigger className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors bg-[#9C39FF] hover:bg-[#8A2BE2] text-white">
+            <Plus className="w-4 h-4 mr-2" /> Ny kode
           </DialogTrigger>
           <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
             <DialogHeader>
@@ -192,7 +190,7 @@ export default function DiscountCodesManager() {
                 </div>
                 <div className="space-y-2">
                   <Label>Type</Label>
-                  <Select value={type} onValueChange={setType}>
+                  <Select value={type} onValueChange={(val) => setType(val as string)}>
                     <SelectTrigger className="bg-zinc-900 border-zinc-800">
                       <SelectValue />
                     </SelectTrigger>
