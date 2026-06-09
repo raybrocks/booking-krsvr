@@ -16,6 +16,13 @@ export default function HomeCarousel() {
         const response = await fetch('/api/experiences?active_only=true&timestamp=' + new Date().getTime());
         if (response.ok) {
           let expList = await response.json();
+          
+          // Filter out "Vipps test" category/experiences
+          expList = expList.filter((exp: any) => 
+            exp.type !== "Vipps test" && 
+            exp.name !== "Vipps test"
+          );
+          
           expList.sort((a: any, b: any) => {
             const orderA = typeof a.order === 'number' ? a.order : 999;
             const orderB = typeof b.order === 'number' ? b.order : 999;
