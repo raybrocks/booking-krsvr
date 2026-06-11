@@ -285,6 +285,7 @@ export async function sendWeeklyAdminSummary(
           <p style="margin: 0 0 5px 0;"><strong>Opplevelse:</strong> ${b.experience?.name || 'Ukjent'} (${b.duration} min)</p>
           ${b.paymentType === 'manual' ? '<p style="margin: 0; color: #d97706; font-size: 12px;"><strong>Manuell Booking</strong></p>' : ''}
           ${b.paymentType === 'vipps' ? '<p style="margin: 0; color: #9C39FF; font-size: 12px;"><strong>Vipps Booking</strong></p>' : ''}
+          ${b.internalNotes ? `<div style="margin-top: 10px; padding: 10px; background-color: #fff9c4; border-left: 3px solid #fbc02d; font-size: 13px;"><strong style="color: #f57f17">Notat/Kommentar:</strong><br/>${b.internalNotes}</div>` : ''}
         </div>
       `).join('')}
 

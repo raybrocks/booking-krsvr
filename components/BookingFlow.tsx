@@ -461,24 +461,25 @@ export default function BookingFlow() {
                       <div className="flex items-center justify-center py-8">
                         <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
                       </div>
-                    ) : availableTimes.length > 0 ? (
+                    ) : (availableTimes.length > 0 || bookedTimes.length > 0) ? (
                       <div className="grid grid-cols-2 gap-3">
-{availableTimes.map((time) => {
-  const isBooked = bookedTimes.includes(typeof time === 'string' ? time.trim() : time);
+{Array.from(new Set([...availableTimes, ...bookedTimes])).sort().map((time) => {
+  const timeStr = typeof time === 'string' ? time.trim() : String(time);
+  const isBooked = bookedTimes.includes(timeStr);
   return (
     <button
-      key={time as string}
-      onClick={() => !isBooked && setSelectedTime(time as string)}
+      key={timeStr}
+      onClick={() => !isBooked && setSelectedTime(timeStr)}
                               disabled={isBooked}
                               className={`py-3 px-4 rounded-xl border text-sm font-medium transition-all ${
                                 isBooked
                                   ? "bg-zinc-900 border-zinc-800 text-zinc-600 opacity-50 cursor-not-allowed"
-                                  : selectedTime === time 
+                                  : selectedTime === timeStr 
                                     ? "bg-[#9C39FF] text-white border-[#9C39FF] shadow-[0_0_15px_rgba(156,57,255,0.3)]" 
                                     : "border-zinc-800 hover:border-zinc-600 text-zinc-300"
                               }`}
                             >
-                              {time} {isBooked && ("(Booket)")}
+                              {timeStr} {isBooked && ("(Booket)")}
                             </button>
                           );
                         })}
