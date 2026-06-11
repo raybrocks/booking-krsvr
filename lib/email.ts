@@ -253,6 +253,60 @@ export async function sendAdminNewBookingNotification(bookingDetails: any) {
   }
 }
 
+export async function sendWeeklyAdminSummary(
+  to: string,
+  weeklyStats: { totalRevenue: number, vippsRevenue: number, manualRevenue: number, numExperiences: number },
+  upcomingBookings: any[]
+) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Weekly summary email not sent.");
+    return;
+  }
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; color: #333;">
+      <h1 style="color: #9C39FF;">Ukentlig Oppsummering & Vaktliste</h1>
+      <p>Her er en oversikt over uken som gikk, og uken som kommer.</p>
+      
+      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Uken som gikk</h2>
+      <ul style="list-style: none; padding: 0; background: #f9f9f9; padding: 15px; border-left: 4px solid #9C39FF;">
+        <li style="margin-bottom: 8px;"><strong>Total omsetning:</strong> NOK ${weeklyStats.totalRevenue}</li>
+        <li style="margin-bottom: 8px;"><strong>Hvorav Vipps:</strong> NOK ${weeklyStats.vippsRevenue}</li>
+        <li style="margin-bottom: 8px;"><strong>Hvorav Manuelle bookinger:</strong> NOK ${weeklyStats.manualRevenue}</li>
+        <li style="margin-bottom: 8px;"><strong>Antall bookinger:</strong> ${weeklyStats.numExperiences}</li>
+      </ul>
+
+      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Uken som kommer (Neste 7 dager)</h2>
+      ${upcomingBookings.length === 0 ? '<p>Ingen bookinger registrert for neste uke enda.</p>' : ''}
+      ${upcomingBookings.map(b => `
+        <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #eee; border-radius: 8px;">
+          <p style="margin: 0 0 5px 0;"><strong>Dato:</strong> ${b.date} kl ${b.time}</p>
+          <p style="margin: 0 0 5px 0;"><strong>Navn:</strong> ${b.firstName} ${b.lastName} (${b.players} pers)</p>
+          <p style="margin: 0 0 5px 0;"><strong>Opplevelse:</strong> ${b.experience?.name || 'Ukjent'} (${b.duration} min)</p>
+          ${b.paymentType === 'manual' ? '<p style="margin: 0; color: #d97706; font-size: 12px;"><strong>Manuell Booking</strong></p>' : ''}
+          ${b.paymentType === 'vipps' ? '<p style="margin: 0; color: #9C39FF; font-size: 12px;"><strong>Vipps Booking</strong></p>' : ''}
+        </div>
+      `).join('')}
+
+      <p style="margin-top: 40px; font-size: 12px; color: #999;">Dette er en automatisk generert ukentlig oppsummering fra Krs VR Arena systemet.</p>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Krs VR Arena Admin <booking@donotreply.krsvr.no>',
+      to,
+      subject: `Ukentlig Oppsummering & Vaktliste`,
+      html,
+    });
+    
+    if (error) console.error("Admin resend error:", error);
+    return data;
+  } catch (err) {
+    console.error("Failed to send admin email:", err);
+  }
+}
+
 export async function addContactToNewsletter(email: string, firstName: string, lastName: string) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY is not set. Contact not added to newsletter.");
