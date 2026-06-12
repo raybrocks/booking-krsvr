@@ -109,6 +109,7 @@ export default function BookingFlow() {
                 <div className="w-full">
                   <Calendar
                     mode="single"
+                    weekStartsOn={1}
                     selected={selectedDate}
                     onSelect={(date) => {
                       setSelectedDate(date);

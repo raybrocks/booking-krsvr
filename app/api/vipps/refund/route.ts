@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendBookingCancellationEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
     try {
@@ -68,6 +69,14 @@ export async function POST(req: Request) {
                     type: 'refund'
                 }
             });
+            
+            const bookingForEmail = await prisma.booking.findUnique({ where: { id: bookingId } });
+            if (bookingForEmail) {
+               await sendBookingCancellationEmail(bookingForEmail.email, {
+                 ...bookingForEmail,
+                 amountPaid: amount / 100
+               });
+            }
         } catch (dbErr) {
             console.error('Failed to update DB on refund:', dbErr);
         }

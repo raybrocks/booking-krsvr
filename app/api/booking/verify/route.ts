@@ -19,6 +19,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
+    if (booking.status === 'confirmed') {
+      return NextResponse.json({ success: true, booking });
+    }
+
     // -- Fetch Vipps Payment Status --
     const isTest = process.env.VIPPS_ENV !== 'production';
     const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';

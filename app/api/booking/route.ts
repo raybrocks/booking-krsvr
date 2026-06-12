@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
                paymentRef: null,
                cancellationEmailSent: false,
                discountCode: data.discountCode,
+               manageToken: crypto.randomBytes(32).toString('hex'),
             }
           });
           return NextResponse.json({ id: resetBooking.id }, { status: 201 });
@@ -94,6 +96,7 @@ export async function POST(req: NextRequest) {
         amountPaid: data.amountPaid,
         status: data.status || 'pending',
         discountCode: data.discountCode,
+        manageToken: crypto.randomBytes(32).toString('hex'),
       }
     });
 

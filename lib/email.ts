@@ -40,7 +40,9 @@ export async function sendBookingConfirmationEmail(
   }
 
   const adminEmail = await getAdminEmail();
-  const { firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId } = bookingDetails;
+  const { id, manageToken, firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId } = bookingDetails;
+  
+  const manageUrl = `https://krsvr.no/booking/manage/${id}?token=${manageToken}`;
   
   let experienceTitle = "VR Experience";
   if (experienceId) {
@@ -93,6 +95,14 @@ export async function sendBookingConfirmationEmail(
         <p style="margin: 0; font-size: 14px; color: #555;">
           <strong>Lurer du på noe?</strong><br/>
           Spørsmål rundt briller/linser, bekledning eller annet? Sjekk ut våre <a href="https://krsvr.no/faq" target="_blank" rel="noopener noreferrer" style="color: #9C39FF; text-decoration: none; font-weight: bold;">Ofte Stilte Spørsmål (FAQ)</a>.
+        </p>
+      </div>
+
+      <div style="margin-top: 20px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
+        <h3 style="font-size: 16px; margin-top: 0; margin-bottom: 10px; color: #333;">Endre bookingen din?</h3>
+        <p style="margin: 0; font-size: 14px; color: #555;">
+          Du kan selv endre tidspunkt eller spill for bookingen din inntil 48 timer før start. <br/><br/>
+          <a href="${manageUrl}" style="color: #9C39FF; text-decoration: underline; font-weight: bold;">Klikk her for å administrere din booking</a>.
         </p>
       </div>
 
@@ -251,6 +261,54 @@ export async function sendAdminNewBookingNotification(bookingDetails: any) {
   } catch (err) {
     console.error("Failed to send admin email:", err);
   }
+}
+
+export async function sendAdminBookingUpdateNotification(bookingDetails: any) {
+  if (!process.env.RESEND_API_KEY) return;
+  const adminEmail = await getAdminEmail();
+  const { firstName, lastName, email, date, time } = bookingDetails;
+  
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; color: #333;">
+      <h1 style="color: #9C39FF;">Booking Endret av Kunde</h1>
+      <p>Kunden <strong>${firstName} ${lastName}</strong> (${email}) har endret bookingen sin via selvkansellerings-portalen.</p>
+      <p>Nytt tidspunkt er <strong>${date} kl ${time}</strong>.</p>
+      <p>Logg inn i admin-panelet for mer informasjon.</p>
+    </div>
+  `;
+
+  try {
+    await resend.emails.send({
+      from: 'Krs VR Arena Admin <booking@donotreply.krsvr.no>',
+      to: adminEmail,
+      subject: `Kunde endret booking: ${firstName} ${lastName}`,
+      html,
+    });
+  } catch (err) {}
+}
+
+export async function sendAdminBookingCancellationNotification(bookingDetails: any) {
+  if (!process.env.RESEND_API_KEY) return;
+  const adminEmail = await getAdminEmail();
+  const { firstName, lastName, email, date, time } = bookingDetails;
+  
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; color: #333;">
+      <h1 style="color: #ff4444;">Booking Kansellert av Kunde</h1>
+      <p>Kunden <strong>${firstName} ${lastName}</strong> (${email}) har kansellert bookingen sin via selvkansellerings-portalen.</p>
+      <p>Dette gjaldt bookingen for <strong>${date} kl ${time}</strong>.</p>
+      <p>Eventuelt reservasjonsgebyr er <strong>ikke</strong> refundert automatisk. Logg inn i admin-panelet for å behandle eventuell refusjon via Vipps-knappen.</p>
+    </div>
+  `;
+
+  try {
+    await resend.emails.send({
+      from: 'Krs VR Arena Admin <booking@donotreply.krsvr.no>',
+      to: adminEmail,
+      subject: `Kunde KANSELLERT booking: ${firstName} ${lastName}`,
+      html,
+    });
+  } catch (err) {}
 }
 
 export async function sendWeeklyAdminSummary(

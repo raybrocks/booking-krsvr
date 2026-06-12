@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendEmail } from '@/lib/email';
+import { sendEmail, sendAdminNewBookingNotification } from '@/lib/email';
 
 export async function POST(req: Request) {
   try {
@@ -56,6 +56,8 @@ export async function POST(req: Request) {
         experienceData, 
         generalSettings as any
       );
+      
+      await sendAdminNewBookingNotification(updatedBooking);
     } catch (e) {
        console.error("Failed to send zero confirmation email:", e);
     }

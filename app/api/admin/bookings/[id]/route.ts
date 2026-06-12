@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendBookingCancellationEmail } from '@/lib/email';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,6 +25,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
          where: { parentBookingId: id },
          data: { status: data.status }
        });
+       
+       if (data.status === 'cancelled') {
+         await sendBookingCancellationEmail(updatedBooking.email, updatedBooking);
+       }
     }
     
     return NextResponse.json(updatedBooking);

@@ -60,6 +60,7 @@ model Booking {
   internalNotes     String?
   duration          Int      @default(90)
   parentBookingId   String?  // References main booking if this is a duplicated blocked slot
+  manageToken       String?  @unique
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
