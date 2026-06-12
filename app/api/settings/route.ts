@@ -17,21 +17,31 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function PUT(req: NextRequest) {
   try {
     const data = await req.json();
     
-    // Process top-level keys as individual settings
-    for (const [key, value] of Object.entries(data)) {
+    // Check if it's the { key, value } format used by SettingsManager
+    if (data.key !== undefined && data.value !== undefined) {
       await prisma.setting.upsert({
-        where: { key },
-        update: { value: value as any },
-        create: { key, value: value as any },
+        where: { key: data.key },
+        update: { value: data.value as any },
+        create: { key: data.key, value: data.value as any },
       });
+    } else {
+      // Process top-level keys as individual settings
+      for (const [key, value] of Object.entries(data)) {
+        await prisma.setting.upsert({
+          where: { key },
+          update: { value: value as any },
+          create: { key, value: value as any },
+        });
+      }
     }
     
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("PUT /api/settings error", error);
     return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
   }
 }

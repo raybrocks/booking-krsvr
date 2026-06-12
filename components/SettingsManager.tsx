@@ -56,11 +56,31 @@ export default function SettingsManager() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await fetch('/api/settings', {
+      const settingsToSave = { ...settings };
+      
+      // Sort times before saving so they appear chronologically on the website
+      if (settingsToSave.openingHours) {
+        Object.keys(settingsToSave.openingHours).forEach(day => {
+          settingsToSave.openingHours[day].sort();
+        });
+      }
+      if (settingsToSave.specialHours) {
+        Object.keys(settingsToSave.specialHours).forEach(date => {
+          settingsToSave.specialHours[date].sort();
+        });
+      }
+
+      const res = await fetch('/api/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'general', value: settings })
+        body: JSON.stringify({ key: 'general', value: settingsToSave })
       });
+      
+      if (!res.ok) {
+        throw new Error("Failed to save settings");
+      }
+      
+      setSettings(settingsToSave);
       toast.success("Settings saved successfully");
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -86,7 +106,6 @@ export default function SettingsManager() {
   const updateTimeSlot = (dayIndex: string, timeIndex: number, value: string) => {
     const newSettings = { ...settings };
     newSettings.openingHours[dayIndex][timeIndex] = value;
-    newSettings.openingHours[dayIndex].sort();
     setSettings(newSettings);
   };
 
@@ -127,7 +146,6 @@ export default function SettingsManager() {
   const updateSpecialTimeSlot = (date: string, timeIndex: number, value: string) => {
     const newSettings = { ...settings };
     newSettings.specialHours[date][timeIndex] = value;
-    newSettings.specialHours[date].sort();
     setSettings(newSettings);
   };
 
