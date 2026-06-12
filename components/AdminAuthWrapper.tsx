@@ -27,7 +27,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase.auth]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

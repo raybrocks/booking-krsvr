@@ -22,7 +22,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Check if `nextTime` is already booked
     const existing = await prisma.booking.findUnique({
       where: {
-        date_time: {
+        experienceId_date_time: {
+          experienceId: booking.experienceId,
           date: booking.date,
           time: nextTime
         }

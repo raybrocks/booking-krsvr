@@ -9,7 +9,8 @@ export async function POST(req: NextRequest) {
     // but doing explicit check is sometimes nicer for error messages)
     const existing = await prisma.booking.findUnique({
       where: {
-        date_time: {
+        experienceId_date_time: {
+          experienceId: data.experienceId,
           date: data.date,
           time: data.time
         }

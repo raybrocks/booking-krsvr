@@ -66,7 +66,7 @@ model Booking {
 
   experience        Experience @relation(fields: [experienceId], references: [id])
   
-  @@unique([date, time])
+  @@unique([experienceId, date, time])
   @@index([status])
   @@index([date])
 }

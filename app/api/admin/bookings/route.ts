@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
     // Check if main timeslot is booked
     const existing = await prisma.booking.findUnique({
       where: {
-        date_time: {
+        experienceId_date_time: {
+          experienceId: data.experienceId,
           date: data.date,
           time: data.time
         }
@@ -48,7 +49,8 @@ export async function POST(req: NextRequest) {
        for (const shadowTime of data.shadowTimes) {
           const shadowExisting = await prisma.booking.findUnique({
              where: {
-               date_time: {
+               experienceId_date_time: {
+                 experienceId: data.experienceId,
                  date: data.date,
                  time: shadowTime
                }
@@ -96,7 +98,8 @@ export async function POST(req: NextRequest) {
            // delete if there's a cancelled one blocking
            const shadowExisting = await prisma.booking.findUnique({
               where: {
-                date_time: {
+                experienceId_date_time: {
+                  experienceId: data.experienceId,
                   date: data.date,
                   time: shadowTime
                 }
