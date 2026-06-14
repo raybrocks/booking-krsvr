@@ -80,9 +80,48 @@ export default function ExperiencesManager() {
       party: false,
       jumpScare: false,
       picture: "",
-      videoUrl: ""
+      videoUrl: "",
+      awards: []
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleAwardUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Could reuse uploadingImage or a new state
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("pathPrefix", "awards");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      const data = await res.json();
+      const currentAwards = Array.isArray(editForm.awards) ? [...editForm.awards] : [];
+      setEditForm({ ...editForm, awards: [...currentAwards, data.url] });
+      toast.success("Award image uploaded successfully");
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(`Award upload failed: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const removeAward = (indexToRemove: number) => {
+    if (!Array.isArray(editForm.awards)) return;
+    const newAwards = editForm.awards.filter((_: any, index: number) => index !== indexToRemove);
+    setEditForm({ ...editForm, awards: newAwards });
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -383,7 +422,43 @@ export default function ExperiencesManager() {
                 </div>
               </div>
             </div>
-            <div className="md:col-span-2">
+
+            <div className="md:col-span-2 pt-4 border-t border-zinc-800">
+              <label className="block text-sm font-medium text-zinc-400 mb-2">Awards & Recognitions (Optional)</label>
+              <div className="flex flex-wrap gap-4 mb-4">
+                {Array.isArray(editForm.awards) && editForm.awards.map((awardUrl: string, index: number) => (
+                  <div key={index} className="relative w-24 h-24 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 flex items-center justify-center p-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={awardUrl} alt={`Award ${index + 1}`} className="max-w-full max-h-full object-contain" />
+                    <button 
+                      onClick={() => removeAward(index)}
+                      className="absolute top-1 right-1 bg-red-500/80 p-1 rounded-full text-white hover:bg-red-500 transition-colors"
+                      title="Remove award"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                
+                <div className="w-24 h-24 rounded-xl border border-dashed border-zinc-700 bg-zinc-950 flex flex-col items-center justify-center text-zinc-500 hover:border-zinc-500 hover:text-zinc-400 transition-colors relative cursor-pointer">
+                  <Upload className="w-6 h-6 mb-1" />
+                  <span className="text-[10px] text-center px-1">Upload Award</span>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="absolute inset-0 opacity-0 cursor-pointer" 
+                    onChange={handleAwardUpload}
+                    disabled={uploadingImage}
+                    title="Upload award image"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500">
+                Laster opp priser/anerkjennelser (f.eks. Webby Awards, Best VR Game). Bruk bilder med transparent bakgrunn (PNG) for best resultat.
+              </p>
+            </div>
+
+            <div className="md:col-span-2 pt-4 border-t border-zinc-800">
               <label className="block text-sm font-medium text-zinc-400 mb-1">Video URL (YouTube/Vimeo) (Optional)</label>
               <input 
                 type="url" 

@@ -432,6 +432,22 @@ export function ExperiencesView({
           </span>
         </div>
 
+        {/* AWARDS / RECOGNITIONS */}
+        {selected.awards && Array.isArray(selected.awards) && selected.awards.length > 0 && (
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mb-8 max-w-4xl mx-auto px-4">
+            {selected.awards.map((awardUrl: string, index: number) => (
+              <div key={index} className="relative h-12 md:h-16 flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src={awardUrl} 
+                  alt={`Award ${index + 1}`} 
+                  className="max-h-full max-w-[150px] object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]" 
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* STATS ROW */}
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto">
           <div className="flex items-center gap-2 text-sm md:text-base">
