@@ -15,7 +15,7 @@ export async function generateMetadata({
   const initialTypeSlug = resolvedParams.slug?.[0];
   const initialExpSlug = resolvedParams.slug?.[1];
 
-  let title = "VR Opplevelser | VRSenteret";
+  let title = "VR Opplevelser";
   let description = "Utforsk våre fantastiske VR-opplevelser, fra Escape Rooms til skytespill og eventyr for hele familien.";
 
   let isVippsTest = false;
@@ -29,7 +29,7 @@ export async function generateMetadata({
       if (initialExpSlug) {
         const matchedExp = exps.find(e => slugify(e.type || "") === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
         if (matchedExp) {
-          title = `${matchedExp.name} | ${matchedExp.type} | VRSenteret`;
+          title = `${matchedExp.name} | ${matchedExp.type}`;
           description = matchedExp.shortDescription || description;
           if (matchedExp.type?.toLowerCase().includes("vipps-test") || matchedExp.type?.toLowerCase().includes("vipps test")) {
             isVippsTest = true;
@@ -38,7 +38,7 @@ export async function generateMetadata({
       } else {
         const matchedType = exps.find(e => slugify(e.type || "") === initialTypeSlug);
         if (matchedType) {
-          title = `${matchedType.type} | VR Opplevelser | VRSenteret`;
+          title = `${matchedType.type} | VR Opplevelser`;
           if (matchedType.type?.toLowerCase().includes("vipps-test") || matchedType.type?.toLowerCase().includes("vipps test")) {
             isVippsTest = true;
           }

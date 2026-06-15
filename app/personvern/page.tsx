@@ -4,10 +4,10 @@ import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Personvernerklæring | KRS VR Arena",
+  title: "Personvernerklæring",
   description: "Les om hvordan KRS VR Arena samler inn og behandler personopplysninger i henhold til gjeldende regelverk.",
   openGraph: {
-    title: "Personvernerklæring | KRS VR Arena",
+    title: "Personvernerklæring",
     description: "Les om hvordan KRS VR Arena samler inn og behandler personopplysninger.",
     url: "https://www.krsvr.no/personvern",
     type: "website",

@@ -5,11 +5,11 @@ import PremiumPackageCard from "@/components/PremiumPackageCard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Utdrikningslag, Julebord & Bursdag Kristiansand | KRS VR Arena",
+  title: "Utdrikningslag, Julebord & Bursdag Kristiansand",
   description: "Planlegger du utdrikningslag, bursdag eller julebord med vennegjengen? KRS VR Arena i Kristiansand tilbyr unike opplevelser for private grupper.",
   keywords: ["Utdrikningslag Kristiansand", "Bursdag Kristiansand", "Private fester Kristiansand", "Julebord vennegjeng Kristiansand", "Vennegjeng aktivitet", "Innendørs aktivitet Kristiansand", "VR utdrikningslag"],
   openGraph: {
-    title: "Utdrikningslag, Julebord & Bursdag i Kristiansand | KRS VR Arena",
+    title: "Utdrikningslag, Julebord & Bursdag i Kristiansand",
     description: "Samle vennegjengen for utdrikningslag, julebord eller bursdag med aktive og morsomme VR-opplevelser i Kristiansand.",
     url: "https://www.krsvr.no/arrangementer/private-fester",
     type: "website",

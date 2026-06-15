@@ -5,11 +5,11 @@ import { motion } from "motion/react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Arrangementer, Teambuilding & Utdrikningslag Kristiansand | KRS VR Arena",
+  title: "Arrangementer, Teambuilding & Utdrikningslag Kristiansand",
   description: "Planlegg teambuilding, utdrikningslag, firmaevent eller bursdag hos KRS VR Arena i Kristiansand. Full frihet i VR er den perfekte sosiale aktiviteten.",
   keywords: ["Teambuilding Kristiansand", "Utdrikningslag Kristiansand", "Firmafest Kristiansand", "Julebord Kristiansand", "Bursdag Kristiansand", "Aktivitet Kristiansand", "Arrangement Kristiansand", "VR event"],
   openGraph: {
-    title: "Arrangementer & Teambuilding Kristiansand | KRS VR Arena",
+    title: "Arrangementer & Teambuilding Kristiansand",
     description: "Planlegg teambuilding, utdrikningslag, firmaevent eller bursdag med unike VR-opplevelser hos KRS VR Arena.",
     url: "https://www.krsvr.no/arrangementer",
     type: "website",

@@ -5,11 +5,11 @@ import PremiumPackageCard from "@/components/PremiumPackageCard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Firmaevent, Julebord & Teambuilding Kristiansand | KRS VR Arena",
+  title: "Firmaevent, Julebord & Teambuilding Kristiansand",
   description: "Bygg team, skap energi og gi kollegene en opplevelse utenfor møterommet. Unike VR-opplevelser, perfekt for teambuilding, firmafest og julebord i Kristiansand.",
   keywords: ["Teambuilding Kristiansand", "Firmaevent Kristiansand", "Julebord Kristiansand", "Firmafest Kristiansand", "Kick off Kristiansand", "Aktivitet for bedrifter", "VR bedrift"],
   openGraph: {
-    title: "Firmaevent & Teambuilding Kristiansand | KRS VR Arena",
+    title: "Firmaevent & Teambuilding Kristiansand",
     description: "Unike VR-opplevelser, perfekt for teambuilding, firmafest og julebord i Kristiansand. Fra 2-24 personer.",
     url: "https://www.krsvr.no/arrangementer/firmaevent",
     type: "website",

@@ -4,11 +4,11 @@ import { Metadata } from "next";
 import { CheckCircle2, Clock, Info } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Priser og prisoversikt for VR opplevelser | KRS VR Arena",
+  title: "Priser og prisoversikt for VR opplevelser",
   description: "Se våre priser for VR Escape Room og VR Arcade. Prisen inkluderer ca 45-55 minutter aktiv spilltid, dedikert gamemaster, bilder og lån av partylounge.",
   keywords: ["Priser VR", "Hva koster VR Kristiansand", "VR priser pr person", "KRS VR Arena pris"],
   openGraph: {
-    title: "Priser på VR i Kristiansand | KRS VR Arena",
+    title: "Priser på VR i Kristiansand",
     description: "Priser for grupper. Ca 45-55 min aktiv spilletid, inkludert partylounge.",
     url: "https://www.krsvr.no/priser",
     type: "website",

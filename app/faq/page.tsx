@@ -42,11 +42,11 @@ const faqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "FAQ - Ofte stilte spørsmål | KRS VR Arena",
+  title: "FAQ - Ofte stilte spørsmål",
   description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, inkludert grupper, utstyr, aldersgrense og booking.",
   keywords: ["FAQ VR Kristiansand", "Ofte stilte spørsmål KRS VR Arena", "VR aldersgrense", "VR utstyr", "Spørsmål og svar VR"],
   openGraph: {
-    title: "FAQ - Ofte stilte spørsmål | KRS VR Arena",
+    title: "FAQ - Ofte stilte spørsmål",
     description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, inkludert grupper, utstyr, aldersgrense og booking.",
     url: "https://www.krsvr.no/faq",
     type: "website",
