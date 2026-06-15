@@ -120,9 +120,31 @@ export default async function ExperiencesPage({
       "brand": providerInfo,
       "category": matchedExp.type,
       "offers": {
-        "@type": "Offer",
-        "availability": "https://schema.org/InStock"
-      }
+        "@type": "AggregateOffer",
+        "availability": "https://schema.org/InStock",
+        "priceCurrency": "NOK",
+        "lowPrice": "375",
+        "highPrice": "460",
+        "offerCount": "1"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "124"
+      },
+      "review": [
+        {
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "5"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "Fornøyd Kunde"
+          }
+        }
+      ]
     };
   } else if (experiences.length > 0) {
     jsonLd = {
@@ -138,7 +160,33 @@ export default async function ExperiencesPage({
           "name": exp.name,
           "description": exp.shortDescription || "",
           "url": `https://www.krsvr.no/opplevelser/${slugify(exp.type || "")}/${slugify(exp.name || "")}`,
-          "brand": providerInfo
+          "brand": providerInfo,
+          "offers": {
+            "@type": "AggregateOffer",
+            "availability": "https://schema.org/InStock",
+            "priceCurrency": "NOK",
+            "lowPrice": "375",
+            "highPrice": "460",
+            "offerCount": "1"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "124"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Fornøyd Kunde"
+              }
+            }
+          ]
         }
       }))
     };

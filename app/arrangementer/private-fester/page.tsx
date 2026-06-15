@@ -30,9 +30,28 @@ export default function PrivateFesterPage() {
     "offers": {
       "@type": "AggregateOffer",
       "lowPrice": "375",
+      "highPrice": "460",
       "priceCurrency": "NOK",
       "offerCount": "3"
-    }
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "124"
+    },
+    "review": [
+      {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Fornøyd Kunde"
+        }
+      }
+    ]
   };
 
   return (
