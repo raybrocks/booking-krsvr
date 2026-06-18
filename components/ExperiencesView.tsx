@@ -34,10 +34,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { slugify } from "@/lib/utils";
 
-function MediaGallery({ experience }: { experience: any }) {
+function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVideo?: () => void }) {
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl group">
+    <div className="w-full flex flex-col items-center relative group">
+      <div className="w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl">
         {experience.picture ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img 
@@ -48,6 +48,19 @@ function MediaGallery({ experience }: { experience: any }) {
         ) : (
           <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
             <Gamepad2 className="w-20 h-20 text-zinc-800" />
+          </div>
+        )}
+
+        {/* Overlay for Play Button */}
+        {experience.videoUrl && onPlayVideo && (
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button 
+              onClick={onPlayVideo}
+              className="bg-[#9C39FF]/90 hover:bg-[#9C39FF] text-white p-6 rounded-full shadow-[0_0_30px_rgba(156,57,255,0.6)] transform hover:scale-110 transition-all flex items-center justify-center"
+              aria-label="Se Trailer"
+            >
+              <Play className="w-8 h-8 ml-1" />
+            </button>
           </div>
         )}
       </div>
@@ -86,6 +99,12 @@ export function ExperiencesView({
       }
     } else if (url.includes("youtu.be/")) {
       embedUrl = url.replace("youtu.be/", "www.youtube.com/embed/");
+      const questionIndex = embedUrl.indexOf("?");
+      if (questionIndex !== -1) {
+        embedUrl = embedUrl.substring(0, questionIndex);
+      }
+    } else if (url.includes("youtube.com/shorts/")) {
+      embedUrl = url.replace("youtube.com/shorts/", "www.youtube.com/embed/");
       const questionIndex = embedUrl.indexOf("?");
       if (questionIndex !== -1) {
         embedUrl = embedUrl.substring(0, questionIndex);
@@ -417,12 +436,11 @@ export function ExperiencesView({
         onDragEnd={handleDragEnd}
         className="w-full max-w-6xl mx-auto flex flex-col items-center cursor-grab active:cursor-grabbing"
       >
-        {/* IMAGE / MEDIA GALLERY */}
-        <div className="w-full mb-12">
-          <MediaGallery key={selected.id} experience={selected} />
+        {/* HERO IMAGE */}
+        <div className="relative mb-12">
+          <MediaGallery experience={selected} onPlayVideo={() => setIsVideoOpen(true)} />
+          {/* Fading text container overlapping bottom of image on desktop */}
         </div>
-
-        {/* TITLE */}
         <div className="flex flex-col items-center mb-8 gap-4">
           <h2 className="text-4xl md:text-6xl font-black text-white tracking-wide uppercase text-center">
             {selected.name}
@@ -548,17 +566,6 @@ export function ExperiencesView({
 
         {/* BUTTONS */}
         <div className="flex flex-col items-center gap-4">
-          {selected.videoUrl && (
-            <Button 
-              variant="secondary"
-              size="lg" 
-              onClick={() => setIsVideoOpen(true)}
-              className="h-12 px-8 text-base bg-zinc-800 hover:bg-zinc-700 text-white rounded-full uppercase font-medium border border-zinc-700 transition-all hover:scale-105 group"
-            >
-              <Play className="w-5 h-5 mr-2 group-hover:text-[#9C39FF] transition-colors" />
-              Se video
-            </Button>
-          )}
           <Button 
             nativeButton={false} 
             render={<Link href="/booking" />} 
@@ -573,32 +580,50 @@ export function ExperiencesView({
       </AnimatePresence>
 
       {/* Video Modal */}
-      {isVideoOpen && selected.videoUrl && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
-          onClick={() => setIsVideoOpen(false)}
-        >
-          <button 
+      {isVideoOpen && selected.videoUrl && (() => {
+        const isVertical = selected.videoUrl.includes("shorts") || selected.videoUrl.includes("tiktok");
+        const containerClasses = isVertical 
+          ? "w-full max-w-[400px] md:max-w-[450px] aspect-[9/16] rounded-3xl"
+          : "w-full max-w-5xl aspect-video rounded-2xl";
+
+        return (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
             onClick={() => setIsVideoOpen(false)}
-            className="absolute top-4 right-4 md:top-8 md:right-8 z-[110] p-3 bg-zinc-800/80 hover:bg-zinc-700 rounded-full text-white transition-colors"
-            aria-label="Lukk video"
           >
-            <X className="w-8 h-8" />
-          </button>
-          
-          <div 
-            className="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-2xl border border-zinc-800 relative z-[105]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <iframe 
-              src={getEmbedUrl(selected.videoUrl)} 
-              className="w-full h-full"
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-            ></iframe>
+            <button 
+              onClick={() => setIsVideoOpen(false)}
+              className="absolute top-4 right-4 md:top-8 md:right-8 z-[110] p-3 bg-zinc-800/80 hover:bg-zinc-700 rounded-full text-white transition-colors"
+              aria-label="Lukk video"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            
+            <div 
+              className={`${containerClasses} overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-zinc-800 relative z-[105] bg-black`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {selected.videoUrl.includes("youtube") || selected.videoUrl.includes("vimeo") ? (
+                <iframe 
+                  src={getEmbedUrl(selected.videoUrl)} 
+                  className="w-full h-full"
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <video 
+                  src={selected.videoUrl} 
+                  className="w-full h-full object-cover"
+                  controls 
+                  autoPlay 
+                  loop 
+                  playsInline
+                />
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

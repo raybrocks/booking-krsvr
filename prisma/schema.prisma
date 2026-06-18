@@ -28,6 +28,7 @@ model Experience {
   teambuilding    Boolean  @default(false)
   party           Boolean  @default(false)
   jumpScare       Boolean  @default(false)
+  videoUrl        String?
   awards          Json?
 
   createdAt       DateTime @default(now())
