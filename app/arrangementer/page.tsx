@@ -61,6 +61,18 @@ export default function ArrangementerPage() {
         </div>
       </div>
 
+      <div className="max-w-5xl mx-auto px-4 mt-12 mb-16">
+        <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl group">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent z-10 pointer-events-none"></div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src="/arrangement-hero.jpg" 
+            alt="Vennegjeng med VR-briller klare for spill" 
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+          />
+        </div>
+      </div>
+
       <div className="max-w-5xl mx-auto px-4 mt-16">
         {/* Pill Menu Navigation */}
         <div className="flex justify-center mb-10 w-full">
