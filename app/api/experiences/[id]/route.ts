@@ -29,6 +29,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (data.id) delete data.id;
     if (data.createdAt) delete data.createdAt;
     if (data.updatedAt) delete data.updatedAt;
+    if (data.experienceType) delete data.experienceType;
     
     const updatedExperience = await prisma.experience.update({
       where: { id: id },

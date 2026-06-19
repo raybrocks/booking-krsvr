@@ -33,6 +33,9 @@ export async function POST(req: NextRequest) {
       data.order = highestOrder ? highestOrder.order + 1 : 1;
     }
     
+    if (data.experienceType) delete data.experienceType;
+    if (data.id) delete data.id;
+    
     const newExperience = await prisma.experience.create({
       data,
     });
