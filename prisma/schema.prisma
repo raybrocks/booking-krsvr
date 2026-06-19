@@ -14,6 +14,7 @@ datasource db {
 model Experience {
   id              String   @id @default(cuid())
   name            String
+  subName         String?
   shortDescription String
   description     String?
   picture         String?
@@ -23,6 +24,7 @@ model Experience {
   age             String?
   difficulty      String?
   maxPlayers      Int      @default(6)
+  arenaSize       String?
   pricing         Json?    
   isActive        Boolean  @default(true)
   order           Int      @default(999)

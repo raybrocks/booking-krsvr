@@ -84,13 +84,16 @@ export default function ExperiencesManager() {
   const handleAddNew = () => {
     setEditingId("new");
     setEditForm({
+      id: "new",
       name: "New Experience",
+      subName: "",
       shortDescription: "",
       detailedDescription: "",
       type: "Escape Room",
       age: "12+",
       difficulty: "Medium",
       maxPlayers: 6,
+      arenaSize: "",
       isActive: true,
       familyFriendly: false,
       teambuilding: false,
@@ -378,6 +381,16 @@ export default function ExperiencesManager() {
               />
             </div>
             <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Sub-name (optional)</label>
+              <input
+                type="text"
+                value={editForm.subName || ""}
+                onChange={(e) => setEditForm({...editForm, subName: e.target.value})}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                placeholder="e.g. Mixed Reality Edition"
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-zinc-400 mb-1">Type</label>
               <select 
                 value={editForm.typeId || ""}
@@ -522,6 +535,16 @@ export default function ExperiencesManager() {
               />
             </div>
             <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Arena Size (optional)</label>
+              <input 
+                type="text"
+                value={editForm.arenaSize || ""}
+                onChange={(e) => setEditForm({...editForm, arenaSize: e.target.value})}
+                placeholder="e.g. 140 kvm arena"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-zinc-400 mb-1">Active</label>
               <div className="flex items-center h-10">
                 <input 
@@ -616,10 +639,11 @@ export default function ExperiencesManager() {
               
               <p className="text-sm text-zinc-400 line-clamp-2 mb-4 flex-1">{exp.shortDescription}</p>
               
-              <div className="flex flex-wrap gap-2 text-xs text-zinc-500 mb-4">
+              <div className="flex flex-wrap gap-2 text-xs text-zinc-400 mt-4 mb-3">
                 <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Fra 2-{exp.maxPlayers} personer</span>
-                <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.age}</span>
-                <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>
+                {exp.age && <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.age}</span>}
+                {exp.difficulty && <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>}
+                {exp.arenaSize && <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.arenaSize}</span>}
                 {exp.familyFriendly && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Family</span>
                 )}

@@ -22,6 +22,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       data,
     });
     
+    // Cascade the name change to all experiences linked to this type
+    if (data.name) {
+      await prisma.experience.updateMany({
+        where: { typeId: id },
+        data: { type: data.name }
+      });
+    }
+    
     return NextResponse.json(updatedType);
   } catch (error: any) {
     console.error("Failed to update experience type:", error);

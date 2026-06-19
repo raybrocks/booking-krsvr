@@ -28,7 +28,8 @@ import {
   Smile,
   Activity,
   X,
-  Play
+  Play,
+  Maximize
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -200,7 +201,7 @@ export function ExperiencesView({
     let attrMatch = true;
     if (activeFilter === "Familievennlig") attrMatch = exp.familyFriendly;
     else if (activeFilter === "Teambuilding") attrMatch = exp.teambuilding;
-    else if (activeFilter === "Fest og Moro") attrMatch = exp.party;
+    else if (activeFilter === "Party") attrMatch = exp.party;
     else if (activeFilter === "Jump Scare") attrMatch = exp.jumpScare;
     
     // 2. Filter by type
@@ -226,7 +227,7 @@ export function ExperiencesView({
       let attrMatch = true;
       if (filter === "Familievennlig") attrMatch = exp.familyFriendly;
       else if (filter === "Teambuilding") attrMatch = exp.teambuilding;
-      else if (filter === "Fest og Moro") attrMatch = exp.party;
+      else if (filter === "Party") attrMatch = exp.party;
       else if (filter === "Jump Scare") attrMatch = exp.jumpScare;
       
       let typeMatch = true;
@@ -316,7 +317,7 @@ export function ExperiencesView({
 
         {/* Existing Attribute Filters */}
         <div className="flex flex-wrap items-center justify-center gap-3 max-w-3xl mx-auto px-4 mt-6">
-          {["Alle", "Teambuilding", "Fest og Moro", "Familievennlig", "Jump Scare"].map(filter => (
+          {["Alle", "Teambuilding", "Party", "Familievennlig", "Jump Scare"].map(filter => (
             <button
               key={filter}
               onClick={() => handleFilterClick(filter)}
@@ -447,6 +448,11 @@ export function ExperiencesView({
           <h2 className="text-4xl md:text-6xl font-black text-white tracking-wide uppercase text-center">
             {selected.name}
           </h2>
+          {selected.subName && (
+            <h3 className="text-lg md:text-2xl text-zinc-400 font-medium tracking-wide uppercase text-center -mt-2">
+              {selected.subName}
+            </h3>
+          )}
           <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
             {selected.type}
           </span>
@@ -480,10 +486,19 @@ export function ExperiencesView({
             <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-8 personer"}</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm md:text-base">
-            <UserCheck className="w-5 h-5 text-white" />
-            <span>Fra {selected.age} år</span>
-          </div>
+          {selected.arenaSize && (
+            <div className="flex items-center gap-2 text-sm md:text-base">
+              <Maximize className="w-5 h-5 text-white" />
+              <span>{selected.arenaSize}</span>
+            </div>
+          )}
+
+          {selected.age && (
+            <div className="flex items-center gap-2 text-sm md:text-base">
+              <UserCheck className="w-5 h-5 text-white" />
+              <span>Fra {selected.age} år</span>
+            </div>
+          )}
 
           {selected.difficulty && (
             <div className="flex items-center gap-2 text-sm md:text-base">
@@ -514,10 +529,10 @@ export function ExperiencesView({
              </div>
           )}
           {selected.party && (
-             <div className="flex items-center gap-2 text-sm md:text-base">
-                <PartyPopper className="w-5 h-5 text-white" />
-                <span>Fest & Moro</span>
-             </div>
+              <div className="flex items-center gap-2">
+                <PartyPopper className="w-5 h-5" />
+                <span>Party</span>
+              </div>
           )}
           {selected.jumpScare && (
              <div className="flex items-center gap-2 text-sm md:text-base">

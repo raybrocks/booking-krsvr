@@ -297,7 +297,7 @@ export default function BookingFlow() {
                                 <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Teambuilding</span>
                               )}
                               {exp.party && (
-                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Fest & Moro</span>
+                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Party</span>
                               )}
                               {exp.jumpScare && (
                                 <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Jump Scare</span>
