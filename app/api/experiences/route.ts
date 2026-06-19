@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     const experiences = await prisma.experience.findMany({
       where: activeOnly ? { isActive: true } : undefined,
       orderBy: { order: 'asc' },
+      include: { experienceType: true }
     });
     
     return NextResponse.json(experiences);

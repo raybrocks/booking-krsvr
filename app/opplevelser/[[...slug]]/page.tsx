@@ -23,11 +23,12 @@ export async function generateMetadata({
   if (initialTypeSlug) {
     try {
       const exps = await prisma.experience.findMany({
-        where: { isActive: true }
+        where: { isActive: true },
+        include: { experienceType: true }
       });
 
       if (initialExpSlug) {
-        const matchedExp = exps.find(e => slugify(e.type || "") === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
+        const matchedExp = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
         if (matchedExp) {
           title = `${matchedExp.name} | ${matchedExp.type}`;
           description = matchedExp.shortDescription || description;
@@ -36,7 +37,7 @@ export async function generateMetadata({
           }
         }
       } else {
-        const matchedType = exps.find(e => slugify(e.type || "") === initialTypeSlug);
+        const matchedType = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug);
         if (matchedType) {
           title = `${matchedType.type} | VR Opplevelser`;
           if (matchedType.type?.toLowerCase().includes("vipps-test") || matchedType.type?.toLowerCase().includes("vipps test")) {
@@ -78,7 +79,8 @@ export default async function ExperiencesPage({
   let experiences: any[] = [];
   try {
     experiences = await prisma.experience.findMany({
-      where: { isActive: true }
+      where: { isActive: true },
+      include: { experienceType: true }
     });
     experiences.sort((a, b) => {
       const orderA = typeof a.order === 'number' ? a.order : 999;
@@ -92,7 +94,7 @@ export default async function ExperiencesPage({
   // Determine if it's a specific experience or a list
   let matchedExp = null;
   if (initialTypeSlug && initialExpSlug) {
-    matchedExp = experiences.find(e => slugify(e.type || "") === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
+    matchedExp = experiences.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
   }
 
   let jsonLd: any = null;
@@ -159,7 +161,7 @@ export default async function ExperiencesPage({
           "@type": "Product",
           "name": exp.name,
           "description": exp.shortDescription || "",
-          "url": `https://www.krsvr.no/opplevelser/${slugify(exp.type || "")}/${slugify(exp.name || "")}`,
+          "url": `https://www.krsvr.no/opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
           "brand": providerInfo,
           "offers": {
             "@type": "AggregateOffer",

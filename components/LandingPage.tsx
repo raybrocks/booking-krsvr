@@ -74,11 +74,10 @@ export default function LandingPage() {
         >
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tighter text-white leading-[1.15]">
-            <span className="font-bold">VR Escape Rooms og VR Arcade for små og store grupper i Kristiansand</span>
+            <span className="font-bold">Mixed Reality, VR Escape Rooms og teambuilding i Kristiansand</span>
           </h1>
-          
           <p className="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto font-light leading-relaxed">
-            Løs oppdrag, koder eller konkurrer i eksklusive lagspill. Perfekt for venner, bursdag, utdrikningslag, firma og teambuilding.
+            Løs oppdrag, konkurrer i actionfylte lagspill og opplev Mixed Reality — der arenaen blir en del av spillet. Perfekt for vennegjenger, bursdag og utdrikningslag — og en teambuilding-opplevelse kollegaene faktisk snakker om etterpå.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
@@ -89,6 +88,11 @@ export default function LandingPage() {
               Se opplevelser
             </Button>
           </div>
+
+          <p className="pt-8 text-sm md:text-base text-zinc-500 font-medium tracking-wider uppercase max-w-2xl mx-auto">
+            Kristiansands mest sosiale VR-opplevelse <br className="hidden sm:block" />
+            <span className="text-zinc-600">— der grupper går fysisk inn i spillet.</span>
+          </p>
         </motion.div>
 
         {/* 2. Tillitslinje (Trust Line) */}
@@ -112,7 +116,7 @@ export default function LandingPage() {
           </div>
           <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
             <Footprints className="w-6 h-6 text-[#9C39FF]/70" />
-            <span className="text-sm font-medium text-center leading-tight">Full innlevelse i virtuelle verdener fra første sekund</span>
+            <span className="text-sm font-medium text-center leading-tight">Beveg dere fysisk i spillet - gående opplevelse</span>
           </div>
           <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
             <PartyPopper className="w-6 h-6 text-[#9C39FF]/70" />

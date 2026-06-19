@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy } from "lucide-react";
+import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy, Settings } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import TestimonialsManager from "./TestimonialsManager";
+import ExperienceTypesModal from "./ExperienceTypesModal";
 
 export default function ExperiencesManager() {
   const [experiences, setExperiences] = useState<any[]>([]);
@@ -12,6 +13,10 @@ export default function ExperiencesManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<any>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  
+  // Experience Types State
+  const [experienceTypes, setExperienceTypes] = useState<any[]>([]);
+  const [showTypesModal, setShowTypesModal] = useState(false);
   
   // Global Pricing State
   const [globalPricing, setGlobalPricing] = useState<Record<string, number>>({
@@ -39,6 +44,17 @@ export default function ExperiencesManager() {
     }
   };
 
+  const fetchExperienceTypes = async () => {
+    try {
+      const res = await fetch("/api/experience-types");
+      if (!res.ok) throw new Error("Failed to fetch types");
+      const data = await res.json();
+      setExperienceTypes(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const fetchPricing = async () => {
     try {
       const res = await fetch("/api/settings");
@@ -56,6 +72,7 @@ export default function ExperiencesManager() {
   useEffect(() => {
     fetchExperiences();
     fetchPricing();
+    fetchExperienceTypes();
   }, []);
 
   const handleEdit = (exp: any) => {
@@ -327,12 +344,20 @@ export default function ExperiencesManager() {
           <h2 className="text-2xl font-light">VR Experiences</h2>
           <p className="text-zinc-400 text-sm">Manage the games and experiences available for booking.</p>
         </div>
-        <button 
-          onClick={handleAddNew}
-          className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Add New
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setShowTypesModal(true)}
+            className="flex items-center gap-2 bg-zinc-800 text-white px-4 py-2 rounded-xl hover:bg-zinc-700 transition-colors"
+          >
+            <Settings className="w-4 h-4" /> Spilltyper
+          </button>
+          <button 
+            onClick={handleAddNew}
+            className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors"
+          >
+            <Plus className="w-4 h-4" /> Add New
+          </button>
+        </div>
       </div>
 
       {editingId && (
@@ -355,16 +380,17 @@ export default function ExperiencesManager() {
             <div>
               <label className="block text-sm font-medium text-zinc-400 mb-1">Type</label>
               <select 
-                value={editForm.type}
-                onChange={(e) => setEditForm({...editForm, type: e.target.value})}
+                value={editForm.typeId || ""}
+                onChange={(e) => {
+                  const typeObj = experienceTypes.find(t => t.id === e.target.value);
+                  setEditForm({...editForm, typeId: e.target.value, type: typeObj?.name || ""});
+                }}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
               >
-                <option value="Escape Room">Escape Room</option>
-                <option value="Zombie">Zombie</option>
-                <option value="Adventure">Adventure</option>
-                <option value="Archer">Archer</option>
-                <option value="Shooter">Shooter</option>
-                <option value="Vipps test">Vipps test</option>
+                <option value="">Select a type...</option>
+                {experienceTypes.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
               </select>
             </div>
             <div className="md:col-span-2">
@@ -652,6 +678,13 @@ export default function ExperiencesManager() {
       </div>
       <TestimonialsManager />
 
+      {showTypesModal && (
+        <ExperienceTypesModal 
+          experienceTypes={experienceTypes}
+          onClose={() => setShowTypesModal(false)}
+          onRefresh={fetchExperienceTypes}
+        />
+      )}
     </div>
   );
 }

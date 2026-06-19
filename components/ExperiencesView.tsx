@@ -34,6 +34,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { slugify } from "@/lib/utils";
 
+const getTypeSlug = (exp: any) => exp.experienceType?.slug || slugify(exp.type || "");
+
 function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVideo?: () => void }) {
   return (
     <div className="w-full flex flex-col items-center relative group">
@@ -152,10 +154,10 @@ export function ExperiencesView({
       let initialId = "";
       // Initialize selectedId based on activeTypeSlug and initialExpSlug
       if (activeTypeSlug !== "alle" && initialExpSlug) {
-        const matchedExp = experiences.find(e => slugify(e.type) === activeTypeSlug && slugify(e.name) === initialExpSlug);
+        const matchedExp = experiences.find(e => getTypeSlug(e) === activeTypeSlug && slugify(e.name) === initialExpSlug);
         if (matchedExp) initialId = matchedExp.id;
       } else if (activeTypeSlug !== "alle") {
-        const matchedExp = experiences.find(e => slugify(e.type) === activeTypeSlug);
+        const matchedExp = experiences.find(e => getTypeSlug(e) === activeTypeSlug);
         if (matchedExp) initialId = matchedExp.id;
       }
       
@@ -163,7 +165,7 @@ export function ExperiencesView({
         // If no match based on slug, use the first experience based on activeTypeSlug
         const matchingTypeExps = activeTypeSlug === "alle" 
           ? experiences 
-          : experiences.filter(e => slugify(e.type) === activeTypeSlug);
+          : experiences.filter(e => getTypeSlug(e) === activeTypeSlug);
         
         if (matchingTypeExps.length > 0) {
             initialId = matchingTypeExps[0].id;
@@ -187,7 +189,7 @@ export function ExperiencesView({
     // Update URL when selectedId changes
     const exp = experiences.find(e => e.id === selectedId);
     if (exp) {
-      const newUrl = `/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`;
+      const newUrl = `/opplevelser/${getTypeSlug(exp)}/${slugify(exp.name)}`;
       window.history.replaceState({ path: newUrl }, '', newUrl);
     }
     
@@ -204,7 +206,7 @@ export function ExperiencesView({
     // 2. Filter by type
     let typeMatch = true;
     if (activeTypeSlug && activeTypeSlug !== "alle") {
-      typeMatch = slugify(exp.type) === activeTypeSlug;
+      typeMatch = getTypeSlug(exp) === activeTypeSlug;
     }
 
     return attrMatch && typeMatch;
@@ -229,7 +231,7 @@ export function ExperiencesView({
       
       let typeMatch = true;
       if (activeTypeSlug && activeTypeSlug !== "alle") {
-        typeMatch = slugify(exp.type) === activeTypeSlug;
+        typeMatch = getTypeSlug(exp) === activeTypeSlug;
       }
       return attrMatch && typeMatch;
     });

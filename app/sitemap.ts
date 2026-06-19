@@ -31,7 +31,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let experiencesUrls: MetadataRoute.Sitemap = [];
   try {
     let experiences = await prisma.experience.findMany({
-      where: { isActive: true }
+      where: { isActive: true },
+      include: { experienceType: true }
     });
     
     // Filter out vipps-test from sitemap
@@ -41,16 +42,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
     
     // Add types (categories)
-    const types = Array.from(new Set(experiences.map(e => e.type).filter(Boolean)));
-    const typeUrls: MetadataRoute.Sitemap = types.map((type: unknown) => ({
-      url: `${baseUrl}/opplevelser/${slugify(type as string)}`,
+    // Create a map of slug -> typeName to avoid duplicates and handle both new and legacy types
+    const typeMap = new Map<string, string>();
+    experiences.forEach(e => {
+      const typeStr = e.type || "";
+      const typeSlug = e.experienceType?.slug || slugify(typeStr);
+      if (typeSlug) {
+        typeMap.set(typeSlug, typeStr);
+      }
+    });
+
+    const typeUrls: MetadataRoute.Sitemap = Array.from(typeMap.keys()).map((typeSlug) => ({
+      url: `${baseUrl}/opplevelser/${typeSlug}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,
     }));
 
     const detailUrls: MetadataRoute.Sitemap = experiences.map(exp => ({
-      url: `${baseUrl}/opplevelser/${slugify(exp.type || "")}/${slugify(exp.name || "")}`,
+      url: `${baseUrl}/opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,

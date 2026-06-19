@@ -18,6 +18,8 @@ model Experience {
   description     String?
   picture         String?
   type            String?
+  typeId          String?
+  experienceType  ExperienceType? @relation(fields: [typeId], references: [id])
   age             String?
   difficulty      String?
   maxPlayers      Int      @default(6)
@@ -92,6 +94,17 @@ model WebhookLog {
   event             String
   payload           Json
   createdAt         DateTime @default(now())
+}
+
+model ExperienceType {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  slug      String       @unique
+  order     Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  
+  experiences Experience[]
 }
 
 model Setting {
