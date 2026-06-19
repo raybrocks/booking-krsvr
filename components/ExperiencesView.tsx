@@ -53,13 +53,13 @@ function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVide
 
         {/* Overlay for Play Button */}
         {experience.videoUrl && onPlayVideo && (
-          <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <button 
               onClick={onPlayVideo}
-              className="bg-[#9C39FF]/90 hover:bg-[#9C39FF] text-white p-6 rounded-full shadow-[0_0_30px_rgba(156,57,255,0.6)] transform hover:scale-110 transition-all flex items-center justify-center"
+              className="pointer-events-auto bg-black/20 backdrop-blur-md border border-white/20 hover:bg-black/40 hover:border-white/40 text-white w-12 h-12 md:w-16 md:h-16 rounded-full shadow-lg transform hover:scale-110 transition-all flex items-center justify-center group/play"
               aria-label="Se Trailer"
             >
-              <Play className="w-8 h-8 ml-1" />
+              <Play className="w-5 h-5 md:w-7 md:h-7 ml-1 text-white transition-colors" />
             </button>
           </div>
         )}
