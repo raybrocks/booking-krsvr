@@ -122,10 +122,10 @@ export default function HomeCarousel() {
 
       <div 
         ref={scrollRef}
-        className="w-full overflow-x-auto hide-scrollbar"
+        className="w-full overflow-x-auto overflow-y-hidden hide-scrollbar py-8"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        <div className="flex items-start justify-start md:justify-center gap-4 md:gap-8 px-8 md:px-4 w-max min-w-full snap-x snap-mandatory pb-4">
+        <div className="flex items-center justify-start md:justify-center gap-4 md:gap-8 px-8 md:px-4 w-max min-w-full snap-x snap-mandatory">
         {experiences.map((exp) => {
           return (
             <Tilt
