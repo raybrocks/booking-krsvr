@@ -313,13 +313,13 @@ export function ExperiencesView({
          animate={{ opacity: 1, y: 0 }}
          className="mb-10 text-center px-4 w-full"
       >
-        <h1 className="text-4xl md:text-5xl font-light tracking-tighter">
+        <h1 className="text-4xl md:text-5xl font-light tracking-tighter mb-4">
           Våre VR Opplevelser
         </h1>
 
         {/* Simple Primary Filter Row */}
-        <p className="text-zinc-400 text-sm md:text-base text-center italic mb-8 max-w-2xl mx-auto px-4">
-          «Alle opplevelser hos oss er laget for samarbeid, kommunikasjon og felles mestring.»
+        <p className="text-zinc-400 text-base md:text-lg text-center font-light mb-10 max-w-2xl mx-auto px-4">
+          Alle opplevelser hos oss er laget for samarbeid, kommunikasjon og felles mestring.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-4xl mx-auto px-4 mb-4">
           {["Alle", "Escape Room", "Mixed Reality", "Zombie", "Familie", "Teambuilding"].map(filter => (
