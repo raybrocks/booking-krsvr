@@ -48,7 +48,7 @@ function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVide
           // eslint-disable-next-line @next/next/no-img-element
           <img 
             src={experience.picture} 
-            alt={experience.name} 
+            alt={`Spill ${experience.name} - ${experience.type} hos KRS VR Arena i Kristiansand`} 
             className="w-full h-full object-cover select-none pointer-events-none"
           />
         ) : (
@@ -454,7 +454,7 @@ export function ExperiencesView({
                   <div key={index} className="relative h-12 md:h-16 flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity">
                     <img 
                       src={awardUrl} 
-                      alt={`Award ${index + 1}`} 
+                      alt={`Utmerkelse for ${selected.name}`} 
                       className="max-h-full max-w-[150px] object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]" 
                     />
                   </div>

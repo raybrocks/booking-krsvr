@@ -31,7 +31,7 @@ export default function LandingPage() {
     "@context": "https://schema.org",
     "@type": "EntertainmentBusiness",
     "name": "KRS VR Arena",
-    "description": "Løs oppdrag, koder eller konkurrer i eksklusive lagspill. Perfekt for venner, bursdag, utdrikningslag, firma og teambuilding.",
+    "description": "KRS VR Arena er en lokal opplevelsesbedrift i Kristiansand som tilbyr VR Escape Rooms, Mixed Reality-opplevelser, VR Arcade, Zombie Shooter og Spatial Ops. Løs oppdrag og koder, eller konkurrer i actionfylte lagspill. Vi tilbyr Norges mest immersive VR og Mixed Reality-teknologi (roam free) der arenaen blir en del av spillet. Våre opplevelser er perfekt for venner, bursdag, utdrikningslag, firmaevent og teambuilding.",
     "url": "https://www.krsvr.no", 
     "telephone": "+4740828302",
     "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic",
@@ -47,7 +47,7 @@ export default function LandingPage() {
       "latitude": "58.149257",
       "longitude": "8.016398"
     },
-    "keywords": "VR Kristiansand, Escape Room, Teambuilding, Virtual Reality",
+    "keywords": "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room, Zombie Shooter Kristiansand, Spatial Ops Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bursdag Kristiansand",
     "offers": {
       "@type": "AggregateOffer",
       "offerCount": "10",

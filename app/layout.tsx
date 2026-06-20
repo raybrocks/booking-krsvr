@@ -25,13 +25,16 @@ export const metadata: Metadata = {
   description: 'Opplev eksklusive VR Escape Rooms, skytespill og eventyr i Kristiansand med full bevegelsesfrihet. Den perfekte aktiviteten for teambuilding, utdrikningslag, bursdager og vennegjengen.',
   keywords: [
     'VR Kristiansand',
+    'Mixed Reality Kristiansand',
     'Escape Room Kristiansand',
+    'VR Escape Room Kristiansand',
+    'Zombie Shooter Kristiansand',
+    'Spatial Ops Kristiansand',
+    'Arcade Kristiansand',
     'Teambuilding Kristiansand',
-    'Aktivitet Kristiansand',
     'Utdrikningslag Kristiansand',
-    'Firmafest',
-    'Inneaktivitet Kristiansand',
-    'Barnebursdag Kristiansand',
+    'Bursdag Kristiansand',
+    'Firmaevent Kristiansand',
     'Virtual Reality'
   ],
   authors: [{ name: 'KRS VR Arena' }],
@@ -44,8 +47,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'KRS VR Arena | VR Escape Room & Arcade i Kristiansand',
-    description: 'Opplev eksklusive VR Escape Rooms, skytespill og eventyr i Kristiansand. Full bevegelsesfrihet (roam free) på store spillområder for små og store grupper.',
-    url: 'https://www.krsvr.no', // update with actual domain if necessary
+    description: 'Opplev eksklusive VR Escape Rooms, Mixed Reality, og actionfylte skytespill i Kristiansand. Full bevegelsesfrihet (roam free) på store spillområder for utdrikningslag, teambuilding, bursdag og vennegjenger.',
+    url: 'https://www.krsvr.no',
     siteName: 'KRS VR Arena',
     locale: 'nb_NO',
     type: 'website',

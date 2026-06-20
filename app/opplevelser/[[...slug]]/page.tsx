@@ -15,8 +15,8 @@ export async function generateMetadata({
   const initialTypeSlug = resolvedParams.slug?.[0];
   const initialExpSlug = resolvedParams.slug?.[1];
 
-  let title = "VR Opplevelser";
-  let description = "Utforsk våre fantastiske VR-opplevelser, fra Escape Rooms til skytespill og eventyr for hele familien.";
+  let title = "VR Opplevelser | KRS VR Arena Kristiansand";
+  let description = "Utforsk våre fantastiske VR-opplevelser og Mixed Reality i Kristiansand, fra VR Escape Rooms til actionfylte skytespill og eventyr for hele familien.";
 
   let isVippsTest = false;
 
@@ -30,8 +30,8 @@ export async function generateMetadata({
       if (initialExpSlug) {
         const matchedExp = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
         if (matchedExp) {
-          title = `${matchedExp.name} | ${matchedExp.type}`;
-          description = matchedExp.shortDescription || description;
+          title = `${matchedExp.name} | ${matchedExp.type} i Kristiansand`;
+          description = matchedExp.shortDescription ? `${matchedExp.shortDescription} Opplev ${matchedExp.name} hos KRS VR Arena i Kristiansand.` : description;
           if (matchedExp.type?.toLowerCase().includes("vipps-test") || matchedExp.type?.toLowerCase().includes("vipps test")) {
             isVippsTest = true;
           }
@@ -39,7 +39,7 @@ export async function generateMetadata({
       } else {
         const matchedType = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug);
         if (matchedType) {
-          title = `${matchedType.type} | VR Opplevelser`;
+          title = `${matchedType.type} i Kristiansand | VR Opplevelser`;
           if (matchedType.type?.toLowerCase().includes("vipps-test") || matchedType.type?.toLowerCase().includes("vipps test")) {
             isVippsTest = true;
           }
@@ -117,8 +117,8 @@ export default async function ExperiencesPage({
     jsonLd = {
       "@context": "https://schema.org",
       "@type": "Product",
-      "name": matchedExp.name,
-      "description": matchedExp.shortDescription || "",
+      "name": `${matchedExp.name} - ${matchedExp.type} i Kristiansand`,
+      "description": `${matchedExp.shortDescription || ""} Spilles hos KRS VR Arena i Kristiansand.`,
       "brand": providerInfo,
       "category": matchedExp.type,
       "offers": {
