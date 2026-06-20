@@ -35,6 +35,8 @@ export async function POST(req: NextRequest) {
     
     if (data.experienceType) delete data.experienceType;
     if (data.id) delete data.id;
+    if (data.description) delete data.description;
+    if (data.detailedDescription) delete data.detailedDescription;
     
     const newExperience = await prisma.experience.create({
       data,

@@ -16,7 +16,6 @@ model Experience {
   name            String
   subName         String?
   shortDescription String
-  description     String?
   picture         String?
   type            String?
   typeId          String?
@@ -32,6 +31,11 @@ model Experience {
   teambuilding    Boolean  @default(false)
   party           Boolean  @default(false)
   jumpScare       Boolean  @default(false)
+  action          Boolean  @default(false)
+  highscore       Boolean  @default(false)
+  mystic          Boolean  @default(false)
+  fantasy         Boolean  @default(false)
+  codeSolving     Boolean  @default(false)
   videoUrl        String?
   awards          Json?
 

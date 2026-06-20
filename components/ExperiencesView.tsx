@@ -29,7 +29,10 @@ import {
   Activity,
   X,
   Play,
-  Maximize
+  Maximize,
+  Trophy,
+  Sparkles,
+  Moon
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -85,9 +88,13 @@ export function ExperiencesView({
   );
   const [selectedId, setSelectedId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(experiences.length === 0);
-  const [activeFilter, setActiveFilter] = useState<string>("Alle");
-  const [activeTypeSlug, setActiveTypeSlug] = useState<string>(initialTypeSlug || "alle");
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [activePrimaryFilter, setActivePrimaryFilter] = useState<string>(() => {
+    if (initialTypeSlug === "escape-room" || initialTypeSlug === "escape-rooms") return "Escape Room";
+    if (initialTypeSlug === "mixed-reality") return "Mixed Reality";
+    if (initialTypeSlug === "zombie" || initialTypeSlug === "zombie-shooter") return "Zombie";
+    return "Alle";
+  });
   const [isExpanded, setIsExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -147,26 +154,23 @@ export function ExperiencesView({
   }, [initialExperiences.length]);
 
   useEffect(() => {
-    setActiveTypeSlug(initialTypeSlug || "alle");
-  }, [initialTypeSlug]);
-
-  useEffect(() => {
     if (experiences.length > 0) {
       let initialId = "";
-      // Initialize selectedId based on activeTypeSlug and initialExpSlug
-      if (activeTypeSlug !== "alle" && initialExpSlug) {
-        const matchedExp = experiences.find(e => getTypeSlug(e) === activeTypeSlug && slugify(e.name) === initialExpSlug);
+      const typeSlug = initialTypeSlug || "alle";
+      // Initialize selectedId based on typeSlug and initialExpSlug
+      if (typeSlug !== "alle" && initialExpSlug) {
+        const matchedExp = experiences.find(e => getTypeSlug(e) === typeSlug && slugify(e.name) === initialExpSlug);
         if (matchedExp) initialId = matchedExp.id;
-      } else if (activeTypeSlug !== "alle") {
-        const matchedExp = experiences.find(e => getTypeSlug(e) === activeTypeSlug);
+      } else if (typeSlug !== "alle") {
+        const matchedExp = experiences.find(e => getTypeSlug(e) === typeSlug);
         if (matchedExp) initialId = matchedExp.id;
       }
       
       if (!initialId) {
-        // If no match based on slug, use the first experience based on activeTypeSlug
-        const matchingTypeExps = activeTypeSlug === "alle" 
+        // If no match based on slug, use the first experience based on typeSlug
+        const matchingTypeExps = typeSlug === "alle" 
           ? experiences 
-          : experiences.filter(e => getTypeSlug(e) === activeTypeSlug);
+          : experiences.filter(e => getTypeSlug(e) === typeSlug);
         
         if (matchingTypeExps.length > 0) {
             initialId = matchingTypeExps[0].id;
@@ -177,7 +181,7 @@ export function ExperiencesView({
       
       setSelectedId(initialId);
     }
-  }, [experiences, activeTypeSlug, initialExpSlug]);
+  }, [experiences, initialTypeSlug, initialExpSlug]);
 
   useEffect(() => {
     if (selectedId && scrollRef.current) {
@@ -197,20 +201,18 @@ export function ExperiencesView({
   }, [selectedId, experiences]);
 
   const filteredExperiences = experiences.filter(exp => {
-    // 1. Filter by attribute
-    let attrMatch = true;
-    if (activeFilter === "Familievennlig") attrMatch = exp.familyFriendly;
-    else if (activeFilter === "Teambuilding") attrMatch = exp.teambuilding;
-    else if (activeFilter === "Party") attrMatch = exp.party;
-    else if (activeFilter === "Jump Scare") attrMatch = exp.jumpScare;
+    if (activePrimaryFilter === "Alle") return true;
+    if (activePrimaryFilter === "Familie") return exp.familyFriendly;
+    if (activePrimaryFilter === "Teambuilding") return exp.teambuilding;
     
-    // 2. Filter by type
-    let typeMatch = true;
-    if (activeTypeSlug && activeTypeSlug !== "alle") {
-      typeMatch = getTypeSlug(exp) === activeTypeSlug;
-    }
-
-    return attrMatch && typeMatch;
+    const tSlug = getTypeSlug(exp);
+    const nSlug = slugify(exp.name || "");
+    
+    if (activePrimaryFilter === "Escape Room") return tSlug.includes("escape");
+    if (activePrimaryFilter === "Mixed Reality") return tSlug.includes("mixed-reality");
+    if (activePrimaryFilter === "Zombie") return tSlug.includes("zombie") || nSlug.includes("zombie");
+    
+    return true;
   });
 
   const selected = filteredExperiences.find(e => e.id === selectedId) || filteredExperiences[0] || experiences[0];
@@ -219,22 +221,22 @@ export function ExperiencesView({
     setIsExpanded(false);
   }, [selectedId]);
 
-  const handleFilterClick = (filter: string) => {
-    setActiveFilter(filter);
+  const handlePrimaryFilterClick = (filter: string) => {
+    setActivePrimaryFilter(filter);
     
-    // Find first experience matching new filter
     const newFiltered = experiences.filter(exp => {
-      let attrMatch = true;
-      if (filter === "Familievennlig") attrMatch = exp.familyFriendly;
-      else if (filter === "Teambuilding") attrMatch = exp.teambuilding;
-      else if (filter === "Party") attrMatch = exp.party;
-      else if (filter === "Jump Scare") attrMatch = exp.jumpScare;
+      if (filter === "Alle") return true;
+      if (filter === "Familie") return exp.familyFriendly;
+      if (filter === "Teambuilding") return exp.teambuilding;
       
-      let typeMatch = true;
-      if (activeTypeSlug && activeTypeSlug !== "alle") {
-        typeMatch = getTypeSlug(exp) === activeTypeSlug;
-      }
-      return attrMatch && typeMatch;
+      const tSlug = getTypeSlug(exp);
+      const nSlug = slugify(exp.name || "");
+      
+      if (filter === "Escape Room") return tSlug.includes("escape");
+      if (filter === "Mixed Reality") return tSlug.includes("mixed-reality");
+      if (filter === "Zombie") return tSlug.includes("zombie") || nSlug.includes("zombie");
+      
+      return true;
     });
 
     if (newFiltered.length > 0) {
@@ -295,7 +297,7 @@ export function ExperiencesView({
     );
   }
 
-  if (experiences.length === 0 || !selected) {
+  if (experiences.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <h2 className="text-2xl font-bold text-white mb-4">Ingen opplevelser lagt til enda</h2>
@@ -315,332 +317,353 @@ export function ExperiencesView({
           Våre VR Opplevelser
         </h1>
 
-        {/* Existing Attribute Filters */}
-        <div className="flex flex-wrap items-center justify-center gap-3 max-w-3xl mx-auto px-4 mt-6">
-          {["Alle", "Teambuilding", "Party", "Familievennlig", "Jump Scare"].map(filter => (
+        {/* Simple Primary Filter Row */}
+        <p className="text-zinc-400 text-sm md:text-base text-center italic mb-8 max-w-2xl mx-auto px-4">
+          «Alle opplevelser hos oss er laget for samarbeid, kommunikasjon og felles mestring.»
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-4xl mx-auto px-4 mb-4">
+          {["Alle", "Escape Room", "Mixed Reality", "Zombie", "Familie", "Teambuilding"].map(filter => (
             <button
               key={filter}
-              onClick={() => handleFilterClick(filter)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeFilter === filter
-                  ? "bg-[#9C39FF] text-white shadow-[0_0_15px_rgba(156,57,255,0.4)]"
-                  : "bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+              onClick={() => handlePrimaryFilterClick(filter)}
+              className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all border ${
+                activePrimaryFilter === filter
+                  ? "border-[#9C39FF] bg-[#9C39FF]/20 text-white shadow-[0_0_15px_rgba(156,57,255,0.2)]"
+                  : "border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-white"
               }`}
             >
               {filter}
             </button>
           ))}
         </div>
-
-        {/* New Experience Type Filters */}
-        <div className="flex flex-wrap items-center justify-center gap-3 max-w-4xl mx-auto px-4 mt-4">
-          <Link
-            href="/opplevelser"
-            scroll={false}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
-              activeTypeSlug === "alle"
-                ? "border-[#9C39FF] bg-[#9C39FF]/20 text-white shadow-[0_0_15px_rgba(156,57,255,0.2)]"
-                : "border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-white"
-            }`}
-          >
-            Alle Typer
-          </Link>
-          {Array.from(new Set(experiences.map(e => e.type))).filter(Boolean).map(type => {
-            const tSlug = slugify(type);
-            const isActive = activeTypeSlug === tSlug;
-            return (
-              <Link
-                key={type}
-                href={`/opplevelser/${tSlug}`}
-                scroll={false}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
-                  isActive
-                    ? "border-[#9C39FF] bg-[#9C39FF]/20 text-white shadow-[0_0_15px_rgba(156,57,255,0.2)]"
-                    : "border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-white"
-                }`}
-              >
-                {type}
-              </Link>
-            );
-          })}
-        </div>
       </motion.div>
 
-      {/* HORIZONTAL CAROUSEL NAV */}
-      <div className="sticky top-[81px] md:top-[189px] lg:top-[199px] z-40 w-full bg-black py-4 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)] border-b border-white/5">
-        <div className="relative w-full max-w-6xl mx-auto flex items-center">
-          <button 
-            onClick={scrollLeft} 
-            className="absolute -left-4 md:-left-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors"
-          >
-            <ChevronLeft className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
-          </button>
-
-          <div 
-            ref={scrollRef}
-            className="w-full overflow-x-auto hide-scrollbar"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            <div className="flex items-start justify-center gap-4 md:gap-8 px-4 w-max min-w-full snap-x snap-mandatory">
-            {filteredExperiences.map((exp) => {
-            const isSelected = exp.id === selectedId;
-            return (
-              <button
-                key={exp.id}
-                data-id={exp.id}
-                onClick={() => setSelectedId(exp.id)}
-                className={`flex flex-col items-center justify-center flex-shrink-0 snap-center focus:outline-none group min-w-[120px] px-2 py-3 rounded-2xl border transition-all duration-300 ${
-                  isSelected 
-                    ? "border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)]" 
-                    : "border-transparent hover:border-zinc-800 hover:bg-zinc-800/30"
-                }`}
-              >
-                <div 
-                  className={`mb-2 transition-colors duration-300 ${
-                    isSelected 
-                      ? "text-white" 
-                      : "text-zinc-500 group-hover:text-zinc-300"
-                  }`}
-                >
-                  {getIconForType(exp.type, exp.name)}
-                </div>
-                <span className={`text-sm md:text-base font-medium mb-1 transition-colors ${isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}>
-                  {exp.name}
-                </span>
-                <span className={`text-[10px] md:text-[11px] uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-500 bg-zinc-900"}`}>
-                  {exp.type}
-                </span>
-              </button>
-            );
-          })}
+      {filteredExperiences.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 px-4 w-full">
+          <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mb-6">
+            <X className="w-8 h-8 text-zinc-500" />
           </div>
+          <h2 className="text-2xl font-bold text-white mb-3 text-center">Ingen opplevelser funnet</h2>
+          <p className="text-zinc-400 text-center max-w-md">Ingen opplevelser matcher filtrene. Prøv å fjerne ett filter.</p>
         </div>
-
-        <button 
-          onClick={scrollRight} 
-          className="absolute -right-4 md:-right-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors"
-        >
-          <ChevronRight className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
-        </button>
-        </div>
-      </div>
-
-      {/* SELECTED EXPERIENCE DETAILS */}
-      <AnimatePresence mode="wait">
-      <motion.div 
-        key={selected.id}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3 }}
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.4}
-        onDragEnd={handleDragEnd}
-        className="w-full max-w-6xl mx-auto flex flex-col items-center cursor-grab active:cursor-grabbing"
-      >
-        {/* HERO IMAGE */}
-        <div className="relative mb-12">
-          <MediaGallery experience={selected} onPlayVideo={() => setIsVideoOpen(true)} />
-          {/* Fading text container overlapping bottom of image on desktop */}
-        </div>
-        <div className="flex flex-col items-center mb-8 gap-4">
-          <h2 className="text-4xl md:text-6xl font-black text-white tracking-wide uppercase text-center">
-            {selected.name}
-          </h2>
-          {selected.subName && (
-            <h3 className="text-lg md:text-2xl text-zinc-400 font-medium tracking-wide uppercase text-center -mt-2">
-              {selected.subName}
-            </h3>
-          )}
-          <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
-            {selected.type}
-          </span>
-        </div>
-
-        {/* AWARDS / RECOGNITIONS */}
-        {selected.awards && Array.isArray(selected.awards) && selected.awards.length > 0 && (
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mb-8 max-w-4xl mx-auto px-4">
-            {selected.awards.map((awardUrl: string, index: number) => (
-              <div key={index} className="relative h-12 md:h-16 flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={awardUrl} 
-                  alt={`Award ${index + 1}`} 
-                  className="max-h-full max-w-[150px] object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]" 
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* STATS ROW */}
-        <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto">
-          <div className="flex items-center gap-2 text-sm md:text-base">
-            <Timer className="w-5 h-5 text-white" />
-            <span>{selected.duration || "45 min"}</span>
-          </div>
-
-          <div className="flex items-center gap-2 text-sm md:text-base">
-            <Users className="w-5 h-5 text-white" />
-            <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-8 personer"}</span>
-          </div>
-
-          {selected.arenaSize && (
-            <div className="flex items-center gap-2 text-sm md:text-base">
-              <Maximize className="w-5 h-5 text-white" />
-              <span>{selected.arenaSize}</span>
-            </div>
-          )}
-
-          {selected.age && (
-            <div className="flex items-center gap-2 text-sm md:text-base">
-              <UserCheck className="w-5 h-5 text-white" />
-              <span>Fra {selected.age} år</span>
-            </div>
-          )}
-
-          {selected.difficulty && (
-            <div className="flex items-center gap-2 text-sm md:text-base">
-              <Layers className="w-5 h-5 text-white" />
-              <span>{selected.difficulty}</span>
-            </div>
-          )}
-          
-          {/* Custom tags if any exist in the old array format */}
-          {selected.tags && Array.isArray(selected.tags) && selected.tags.map((tag: string, i: number) => (
-            <div key={i} className="flex items-center gap-2 text-sm md:text-base">
-               <Zap className="w-5 h-5 text-white" />
-               <span>{tag}</span>
-            </div>
-          ))}
-
-          {/* New specific tags */}
-          {selected.familyFriendly && (
-             <div className="flex items-center gap-2 text-sm md:text-base">
-                <Smile className="w-5 h-5 text-white" />
-                <span>Familievennlig</span>
-             </div>
-          )}
-          {selected.teambuilding && (
-             <div className="flex items-center gap-2 text-sm md:text-base">
-                <Handshake className="w-5 h-5 text-white" />
-                <span>Teambuilding</span>
-             </div>
-          )}
-          {selected.party && (
-              <div className="flex items-center gap-2">
-                <PartyPopper className="w-5 h-5" />
-                <span>Party</span>
-              </div>
-          )}
-          {selected.jumpScare && (
-             <div className="flex items-center gap-2 text-sm md:text-base">
-                <Activity className="w-5 h-5 text-white" />
-                <span>Jump Scare</span>
-             </div>
-          )}
-        </div>
-
-        {/* DESCRIPTION */}
-        <div className="max-w-4xl w-full text-center mb-12">
-          <p className="text-lg md:text-xl text-zinc-300 font-light leading-relaxed">
-            {selected.shortDescription}
-          </p>
-          
-          {selected.detailedDescription && (
-            <div className="mt-4">
-              <AnimatePresence>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <p className="text-base md:text-lg text-zinc-400 font-light leading-relaxed mt-4 text-left whitespace-pre-wrap">
-                      {selected.detailedDescription}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+      ) : (
+        <>
+          {/* HORIZONTAL CAROUSEL NAV */}
+          <div className="sticky top-[81px] md:top-[189px] lg:top-[199px] z-40 w-full bg-black py-4 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)] border-b border-white/5">
+            <div className="relative w-full max-w-6xl mx-auto flex items-center">
               <button 
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="mt-6 text-sm uppercase tracking-wider font-medium text-[#9C39FF] hover:text-[#b466ff] transition-colors flex items-center justify-center gap-1 mx-auto"
+                onClick={scrollLeft} 
+                className="absolute -left-4 md:-left-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors"
               >
-                <span>{isExpanded ? "Vis mindre" : "Les mer"}</span>
-                <motion.div
-                  animate={{ rotate: isExpanded ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </motion.div>
+                <ChevronLeft className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
+              </button>
+
+              <div 
+                ref={scrollRef}
+                className="w-full overflow-x-auto hide-scrollbar"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                <div className="flex items-start justify-center gap-4 md:gap-8 px-4 w-max min-w-full snap-x snap-mandatory">
+                {filteredExperiences.map((exp) => {
+                const isSelected = selected ? exp.id === selected.id : false;
+                return (
+                  <button
+                    key={exp.id}
+                    data-id={exp.id}
+                    onClick={() => setSelectedId(exp.id)}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 snap-center focus:outline-none group min-w-[120px] px-2 py-3 rounded-2xl border transition-all duration-300 ${
+                      isSelected 
+                        ? "border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)]" 
+                        : "border-transparent hover:border-zinc-800 hover:bg-zinc-800/30"
+                    }`}
+                  >
+                    <div 
+                      className={`mb-2 transition-colors duration-300 ${
+                        isSelected 
+                          ? "text-[#9C39FF]" 
+                          : "text-zinc-500 group-hover:text-zinc-300"
+                      }`}
+                    >
+                      {getIconForType(exp.type, exp.name)}
+                    </div>
+                    <span className={`text-sm md:text-base font-medium mb-1 transition-colors ${isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}>
+                      {exp.name}
+                    </span>
+                    <span className={`text-[10px] md:text-[11px] uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-500 bg-zinc-900"}`}>
+                      {exp.type}
+                    </span>
+                  </button>
+                );
+                })}
+                </div>
+              </div>
+
+              <button 
+                onClick={scrollRight}
+                className="absolute -right-4 md:-right-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors"
+              >
+                <ChevronRight className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
               </button>
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* BUTTONS */}
-        <div className="flex flex-col items-center gap-4">
-          <Button 
-            nativeButton={false} 
-            render={<Link href="/booking" />} 
-            size="lg" 
-            className="h-14 px-10 text-lg bg-[#9C39FF] hover:bg-[#8A30E0] text-white rounded-full uppercase font-bold shadow-[0_0_20px_rgba(156,57,255,0.6)] transition-all hover:scale-105"
+          {/* MAIN EXPERIENCE DISPLAY */}
+          {selected && (
+          <motion.div
+            key={selected.id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-6xl mx-auto flex flex-col items-center cursor-grab active:cursor-grabbing"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
           >
-            Booking
-          </Button>
-        </div>
+            {/* HERO IMAGE */}
+            <div className="relative mb-12 w-full">
+              <MediaGallery experience={selected} onPlayVideo={() => setIsVideoOpen(true)} />
+            </div>
+            <div className="flex flex-col items-center mb-8 gap-4 px-4">
+              <h2 className="text-4xl md:text-6xl font-black text-white tracking-wide uppercase text-center">
+                {selected.name}
+              </h2>
+              {selected.subName && (
+                <h3 className="text-lg md:text-2xl text-zinc-400 font-medium tracking-wide uppercase text-center -mt-2">
+                  {selected.subName}
+                </h3>
+              )}
+              <div className="flex items-center gap-2 flex-wrap justify-center mt-2">
+                <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
+                  {selected.type}
+                </span>
+                {selected.action && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Action</span>}
+                {selected.jumpScare && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Jump Scare</span>}
+                {selected.highscore && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Highscore</span>}
+                {selected.fantasy && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Fantasy</span>}
+                {selected.mystic && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Mystikk</span>}
+                {selected.codeSolving && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Kodeløsning</span>}
+              </div>
+            </div>
 
-      </motion.div>
-      </AnimatePresence>
+            {/* AWARDS / RECOGNITIONS */}
+            {selected.awards && Array.isArray(selected.awards) && selected.awards.length > 0 && (
+              <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mb-8 max-w-4xl mx-auto px-4">
+                {selected.awards.map((awardUrl: string, index: number) => (
+                  <div key={index} className="relative h-12 md:h-16 flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity">
+                    <img 
+                      src={awardUrl} 
+                      alt={`Award ${index + 1}`} 
+                      className="max-h-full max-w-[150px] object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]" 
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
 
-      {/* Video Modal */}
-      {isVideoOpen && selected.videoUrl && (() => {
-        const isVertical = selected.videoUrl.includes("shorts") || selected.videoUrl.includes("tiktok");
-        const containerClasses = isVertical 
-          ? "w-full max-w-[400px] md:max-w-[450px] aspect-[9/16] rounded-3xl"
-          : "w-full max-w-5xl aspect-video rounded-2xl";
+            {/* STATS ROW */}
+            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto px-4">
+              <div className="flex items-center gap-2 text-sm md:text-base">
+                <Timer className="w-5 h-5 text-white" />
+                <span>{selected.duration || "45 min"}</span>
+              </div>
 
-        return (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
-            onClick={() => setIsVideoOpen(false)}
-          >
-            <button 
-              onClick={() => setIsVideoOpen(false)}
-              className="absolute top-4 right-4 md:top-8 md:right-8 z-[110] p-3 bg-zinc-800/80 hover:bg-zinc-700 rounded-full text-white transition-colors"
-              aria-label="Lukk video"
-            >
-              <X className="w-8 h-8" />
-            </button>
-            
-            <div 
-              className={`${containerClasses} overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-zinc-800 relative z-[105] bg-black`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {selected.videoUrl.includes("youtube") || selected.videoUrl.includes("vimeo") ? (
-                <iframe 
-                  src={getEmbedUrl(selected.videoUrl)} 
-                  className="w-full h-full"
-                  frameBorder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowFullScreen
-                ></iframe>
-              ) : (
-                <video 
-                  src={selected.videoUrl} 
-                  className="w-full h-full object-cover"
-                  controls 
-                  autoPlay 
-                  loop 
-                  playsInline
-                />
+              <div className="flex items-center gap-2 text-sm md:text-base">
+                <Users className="w-5 h-5 text-white" />
+                <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-8 personer"}</span>
+              </div>
+
+              {selected.arenaSize && (
+                <div className="flex items-center gap-2 text-sm md:text-base">
+                  <Maximize className="w-5 h-5 text-white" />
+                  <span>{selected.arenaSize}</span>
+                </div>
+              )}
+
+              {selected.age && (
+                <div className="flex items-center gap-2 text-sm md:text-base">
+                  <UserCheck className="w-5 h-5 text-white" />
+                  <span>Fra {selected.age} år</span>
+                </div>
+              )}
+
+              {selected.difficulty && (
+                <div className="flex items-center gap-2 text-sm md:text-base">
+                  <Activity className="w-5 h-5 text-white" />
+                  <span>{selected.difficulty}</span>
+                </div>
               )}
             </div>
+
+            {/* CONTENT SPLIT */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full max-w-5xl mx-auto px-4">
+              {/* LEFT: DESCRIPTION */}
+              <div className="flex flex-col">
+                <h3 className="text-2xl font-bold text-white mb-6">Om opplevelsen</h3>
+                <div className="prose prose-invert prose-lg max-w-none text-zinc-400">
+                  {selected.shortDescription && selected.shortDescription.split('\n').map((paragraph: string, i: number) => (
+                    <p key={i} className="mb-4">{paragraph}</p>
+                  ))}
+                </div>
+              </div>
+
+              {/* RIGHT: DETAILS */}
+              <div className="flex flex-col gap-8">
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-6">Nøkkelpunkter</h3>
+                  <div className="flex flex-col gap-4">
+                    {selected.familyFriendly && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <Baby className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Familievennlig</h4>
+                          <p className="text-sm text-zinc-400">Passer perfekt for hele familien</p>
+                        </div>
+                      </div>
+                    )}
+                    {selected.teambuilding && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <Layers className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Teambuilding</h4>
+                          <p className="text-sm text-zinc-400">Krever samarbeid og kommunikasjon</p>
+                        </div>
+                      </div>
+                    )}
+                    {selected.party && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <PartyPopper className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Vennegjeng / Feiring</h4>
+                          <p className="text-sm text-zinc-400">Ypperlig for fest og moro!</p>
+                        </div>
+                      </div>
+                    )}
+                    {selected.action && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <Zap className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Action</h4>
+                          <p className="text-sm text-zinc-400">Høyt tempo og spenning!</p>
+                        </div>
+                      </div>
+                    )}
+                    {selected.jumpScare && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <Ghost className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Jump Scare</h4>
+                          <p className="text-sm text-zinc-400">Advarsel: Kan inneholde skremmende elementer</p>
+                        </div>
+                      </div>
+                    )}
+                    {selected.highscore && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <Trophy className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Highscore</h4>
+                          <p className="text-sm text-zinc-400">Jakt på poeng og sett nye rekorder!</p>
+                        </div>
+                      </div>
+                    )}
+                    {selected.fantasy && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <Sparkles className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Fantasy</h4>
+                          <p className="text-sm text-zinc-400">Opplev magiske og eventyrlige verdener</p>
+                        </div>
+                      </div>
+                    )}
+                    {selected.mystic && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <Moon className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Mystikk</h4>
+                          <p className="text-sm text-zinc-400">Gåtefulle og spennende mysterier venter</p>
+                        </div>
+                      </div>
+                    )}
+                    {selected.codeSolving && (
+                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
+                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
+                          <Key className="w-6 h-6 text-[#9C39FF]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white">Kodeløsning</h4>
+                          <p className="text-sm text-zinc-400">Krever kløkt og logisk tenkning for å løse kodene</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* PRICING IF AVAILABLE */}
+                {selected.pricing && Array.isArray(selected.pricing) && selected.pricing.length > 0 && (
+                  <div className="bg-gradient-to-br from-zinc-900 to-black p-6 md:p-8 rounded-3xl border border-zinc-800">
+                    <h3 className="text-2xl font-bold text-white mb-6">Priser</h3>
+                    <div className="flex flex-col gap-3">
+                      {selected.pricing.map((p: any, i: number) => (
+                        <div key={i} className="flex justify-between items-center border-b border-zinc-800/50 pb-3 last:border-0 last:pb-0">
+                          <span className="text-zinc-400">{p.label}</span>
+                          <span className="text-white font-bold">{p.price} kr</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* BOOK BUTTON */}
+            <div className="mt-16 mb-8 w-full px-4 flex justify-center">
+              <Link href={`/booking?opplevelse=${selected.id}`}>
+                <Button size="lg" className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-12 py-8 text-xl rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] hover:shadow-[0_0_40px_rgba(156,57,255,0.6)] hover:-translate-y-1 transition-all duration-300">
+                  Book {selected.name}
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+          )}
+        </>
+      )}
+
+      {/* VIDEO MODAL */}
+      {isVideoOpen && selected && selected.videoUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+          <div className="relative w-full max-w-5xl aspect-video rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
+            <button 
+              onClick={() => setIsVideoOpen(false)}
+              className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black text-white rounded-full transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <iframe 
+              src={getEmbedUrl(selected.videoUrl) + "?autoplay=1"} 
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe>
           </div>
-        );
-      })()}
+        </div>
+      )}
     </div>
   );
 }
