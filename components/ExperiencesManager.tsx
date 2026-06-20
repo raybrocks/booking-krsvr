@@ -643,7 +643,7 @@ export default function ExperiencesManager() {
                 <div>
                   <label className="block text-xs font-medium text-zinc-400 mb-2">Awards & Recognitions</label>
                   <div className="flex flex-wrap gap-3">
-                    {Array.isArray(editForm.awards) && editForm.awards.map((awardUrl, index) => (
+                    {Array.isArray(editForm.awards) && editForm.awards.map((awardUrl: string, index: number) => (
                       <div key={index} className="relative w-20 h-20 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 flex items-center justify-center p-2">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={awardUrl} alt={`Award ${index + 1}`} className="max-w-full max-h-full object-contain" />
