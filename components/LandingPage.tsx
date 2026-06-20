@@ -51,7 +51,9 @@ export default function LandingPage() {
     "keywords": "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room, Zombie Shooter Kristiansand, Spatial Ops Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bursdag Kristiansand",
     "offers": {
       "@type": "AggregateOffer",
-      "offerCount": "10",
+      "offerCount": 10,
+      "lowPrice": 375,
+      "highPrice": 460,
       "priceCurrency": "NOK"
     }
   };

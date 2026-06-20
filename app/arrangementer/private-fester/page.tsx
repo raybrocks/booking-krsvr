@@ -29,22 +29,22 @@ export default function PrivateFesterPage() {
     "category": "Private Events",
     "offers": {
       "@type": "AggregateOffer",
-      "lowPrice": "375",
-      "highPrice": "460",
+      "lowPrice": 375,
+      "highPrice": 460,
       "priceCurrency": "NOK",
-      "offerCount": "3"
+      "offerCount": 3
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "124"
+      "ratingValue": 4.9,
+      "reviewCount": 124
     },
     "review": [
       {
         "@type": "Review",
         "reviewRating": {
           "@type": "Rating",
-          "ratingValue": "5"
+          "ratingValue": 5
         },
         "author": {
           "@type": "Person",

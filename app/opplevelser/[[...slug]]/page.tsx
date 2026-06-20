@@ -125,21 +125,21 @@ export default async function ExperiencesPage({
         "@type": "AggregateOffer",
         "availability": "https://schema.org/InStock",
         "priceCurrency": "NOK",
-        "lowPrice": "375",
-        "highPrice": "460",
-        "offerCount": "1"
+        "lowPrice": 375,
+        "highPrice": 460,
+        "offerCount": 1
       },
       "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "124"
+        "ratingValue": 4.9,
+        "reviewCount": 124
       },
       "review": [
         {
           "@type": "Review",
           "reviewRating": {
             "@type": "Rating",
-            "ratingValue": "5"
+            "ratingValue": 5
           },
           "author": {
             "@type": "Person",
@@ -167,21 +167,21 @@ export default async function ExperiencesPage({
             "@type": "AggregateOffer",
             "availability": "https://schema.org/InStock",
             "priceCurrency": "NOK",
-            "lowPrice": "375",
-            "highPrice": "460",
-            "offerCount": "1"
+            "lowPrice": 375,
+            "highPrice": 460,
+            "offerCount": 1
           },
           "aggregateRating": {
             "@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "reviewCount": "124"
+            "ratingValue": 4.9,
+            "reviewCount": 124
           },
           "review": [
             {
               "@type": "Review",
               "reviewRating": {
                 "@type": "Rating",
-                "ratingValue": "5"
+                "ratingValue": 5
               },
               "author": {
                 "@type": "Person",
