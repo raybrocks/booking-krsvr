@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import HomeCarousel from "@/components/HomeCarousel";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
-import { motion } from "motion/react";
+import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { useEffect } from "react";
 import { 
   ArrowRight, 
   MapPin, 
@@ -55,6 +56,35 @@ export default function LandingPage() {
     }
   };
 
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  const springConfig = { damping: 25, stiffness: 150 };
+  const springX = useSpring(mouseX, springConfig);
+  const springY = useSpring(mouseY, springConfig);
+
+  const bgX1 = useTransform(springX, [-1000, 1000], [50, -50]);
+  const bgY1 = useTransform(springY, [-1000, 1000], [50, -50]);
+
+  const bgX2 = useTransform(springX, [-1000, 1000], [-30, 30]);
+  const bgY2 = useTransform(springY, [-1000, 1000], [-30, 30]);
+
+  const abstractX1 = useTransform(springX, [-1000, 1000], [-80, 80]);
+  const abstractY1 = useTransform(springY, [-1000, 1000], [-80, 80]);
+  const abstractRotate1 = useTransform(springX, [-1000, 1000], [-45, 45]);
+
+  const abstractX2 = useTransform(springX, [-1000, 1000], [60, -60]);
+  const abstractY2 = useTransform(springY, [-1000, 1000], [60, -60]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX - window.innerWidth / 2);
+      mouseY.set(e.clientY - window.innerHeight / 2);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
   return (
     <main className="min-h-screen">
       <script
@@ -63,8 +93,26 @@ export default function LandingPage() {
       />
       {/* 1. Hero Section */}
       <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden pt-20">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9C39FF]/15 via-black to-black"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#9C39FF]/5 rounded-full blur-3xl -z-10"></div>
+        <motion.div 
+          className="absolute inset-0 -z-10"
+          style={{ x: bgX1, y: bgY1 }}
+        >
+          <div className="absolute inset-[-100px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9C39FF]/15 via-black to-black"></div>
+        </motion.div>
+        <motion.div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#9C39FF]/5 rounded-full blur-3xl -z-10"
+          style={{ x: bgX2, y: bgY2 }}
+        ></motion.div>
+
+        {/* Abstract 2.5D Elements */}
+        <motion.div 
+          className="absolute top-1/4 left-1/4 w-[300px] h-[300px] rounded-full border border-[#9C39FF]/20 -z-10 opacity-50"
+          style={{ x: abstractX1, y: abstractY1, rotate: abstractRotate1 }}
+        ></motion.div>
+        <motion.div 
+          className="absolute bottom-1/4 right-1/4 w-[200px] h-[200px] rounded-full border border-[#9C39FF]/10 -z-10 opacity-30"
+          style={{ x: abstractX2, y: abstractY2 }}
+        ></motion.div>
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}

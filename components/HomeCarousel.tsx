@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Handshake, Crosshair, Skull, Mountain, Ghost, Gamepad2 } from "lucide-react";
+import Tilt from "react-parallax-tilt";
 
 export default function HomeCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -127,21 +128,34 @@ export default function HomeCarousel() {
         <div className="flex items-start justify-start md:justify-center gap-4 md:gap-8 px-8 md:px-4 w-max min-w-full snap-x snap-mandatory pb-4">
         {experiences.map((exp) => {
           return (
-            <Link
+            <Tilt
               key={exp.id}
-              href={`/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`}
-              className="flex flex-col items-center justify-center flex-shrink-0 snap-center group min-w-[140px] px-4 py-8 rounded-3xl border border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)] hover:bg-[#9C39FF]/20 hover:shadow-[0_0_25px_rgba(156,57,255,0.4)] transition-all duration-300"
+              tiltMaxAngleX={15}
+              tiltMaxAngleY={15}
+              glareEnable={true}
+              glareMaxOpacity={0.3}
+              glareColor="#ffffff"
+              glarePosition="all"
+              glareBorderRadius="24px"
+              scale={1.05}
+              transitionSpeed={1500}
+              className="flex-shrink-0 snap-center min-w-[140px]"
             >
-              <div className="mb-4 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] group-hover:scale-110 transition-transform duration-300">
-                {getIconForType(exp.type, exp.name)}
-              </div>
-              <span className="text-sm md:text-base font-bold mb-2 text-white text-center max-w-[120px] leading-tight">
-                {exp.name}
-              </span>
-              <span className="text-[10px] md:text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-medium shadow-[0_0_10px_rgba(156,57,255,0.5)]">
-                {exp.type}
-              </span>
-            </Link>
+              <Link
+                href={`/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`}
+                className="flex flex-col items-center justify-center group w-full h-full px-4 py-8 rounded-3xl border border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)] hover:bg-[#9C39FF]/20 hover:shadow-[0_0_25px_rgba(156,57,255,0.4)] transition-all duration-300"
+              >
+                <div className="mb-4 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] group-hover:scale-110 transition-transform duration-300">
+                  {getIconForType(exp.type, exp.name)}
+                </div>
+                <span className="text-sm md:text-base font-bold mb-2 text-white text-center max-w-[120px] leading-tight">
+                  {exp.name}
+                </span>
+                <span className="text-[10px] md:text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-medium shadow-[0_0_10px_rgba(156,57,255,0.5)]">
+                  {exp.type}
+                </span>
+              </Link>
+            </Tilt>
           );
         })}
         </div>
