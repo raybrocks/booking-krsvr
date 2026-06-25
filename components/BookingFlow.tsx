@@ -33,6 +33,19 @@ export default function BookingFlow() {
     handleApplyDiscount, handleNext, handleBack, handleSubmit
   } = useBookingFlow();
 
+  const [showSameDayWarning, setShowSameDayWarning] = useState(false);
+
+  const onNextClick = () => {
+    if (step === 1 && selectedDate && selectedTime) {
+      const isToday = isSameDay(selectedDate, new Date());
+      if (isToday) {
+        setShowSameDayWarning(true);
+        return;
+      }
+    }
+    handleNext();
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -573,7 +586,7 @@ export default function BookingFlow() {
             
             {step < 6 ? (
               <Button 
-                onClick={handleNext} 
+                onClick={onNextClick} 
                 className="bg-[#9C39FF] text-white hover:bg-[#9C39FF]/90 rounded-full px-8 shadow-[0_0_20px_rgba(156,57,255,0.4)]"
               >
                 Fortsett
@@ -607,6 +620,40 @@ export default function BookingFlow() {
           </div>
         </motion.div>
       </AnimatePresence>
+
+      <Dialog open={showSameDayWarning} onOpenChange={setShowSameDayWarning}>
+        <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:rounded-2xl max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-light">Booking samme dag</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4 text-zinc-300">
+            <p>
+              Du har valgt å booke tid på dagens dato. For bookinger samme dag må dette avklares med oss på forhånd for å bekrefte at vi kan ta imot dere.
+            </p>
+            <p className="p-4 bg-zinc-900 rounded-xl border border-zinc-800 text-center text-lg">
+              Ring eller send SMS: <br/>
+              <strong className="text-white text-xl tracking-wide">+47 40828302</strong>
+            </p>
+            <p className="text-sm text-zinc-400">
+              Dersom du allerede har vært i kontakt med oss, kan du trykke fortsett for å gå til neste steg i bookingen.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button variant="ghost" onClick={() => setShowSameDayWarning(false)} className="hover:bg-zinc-800 text-white rounded-full">
+              Avbryt
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowSameDayWarning(false);
+                handleNext();
+              }} 
+              className="bg-[#9C39FF] text-white hover:bg-[#9C39FF]/90 rounded-full"
+            >
+              Fortsett
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
