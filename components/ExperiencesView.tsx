@@ -510,9 +510,10 @@ export function ExperiencesView({
 
               {/* RIGHT: DETAILS */}
               <div className="flex flex-col gap-8">
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-6">Nøkkelpunkter</h3>
-                  <div className="flex flex-col gap-4">
+                {(selected.familyFriendly || selected.teambuilding || selected.party) && (
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-6">Passer for</h3>
+                    <div className="flex flex-col gap-4">
                     {selected.familyFriendly && (
                       <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
                         <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
@@ -546,7 +547,15 @@ export function ExperiencesView({
                         </div>
                       </div>
                     )}
-                    {selected.action && (
+                  </div>
+                </div>
+                )}
+
+                {(selected.action || selected.jumpScare || selected.highscore || selected.fantasy || selected.mystic || selected.codeSolving) && (
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-6">Nøkkelpunkter</h3>
+                    <div className="flex flex-col gap-4">
+                      {selected.action && (
                       <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
                         <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
                           <Zap className="w-6 h-6 text-[#9C39FF]" />
@@ -612,8 +621,11 @@ export function ExperiencesView({
                         </div>
                       </div>
                     )}
+                      </div>
+                    )}
                   </div>
                 </div>
+                )}
 
                 {/* PRICING IF AVAILABLE */}
                 {selected.pricing && Array.isArray(selected.pricing) && selected.pricing.length > 0 && (
