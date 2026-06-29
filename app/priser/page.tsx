@@ -5,11 +5,11 @@ import { CheckCircle2, Clock, Info } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Priser og prisoversikt for VR opplevelser",
-  description: "Se våre priser for VR Escape Room og VR Arcade. Prisen inkluderer ca 45-55 minutter aktiv spilltid, dedikert gamemaster, bilder og lån av partylounge.",
+  description: "Se våre priser for VR Escape Room og VR Arcade. Prisen inkluderer en 90 minutters totalopplevelse, dedikert gamemaster, bilder og lån av partylounge.",
   keywords: ["Priser VR", "Hva koster VR Kristiansand", "VR priser pr person", "KRS VR Arena pris"],
   openGraph: {
     title: "Priser på VR i Kristiansand",
-    description: "Priser for grupper. Ca 45-55 min aktiv spilletid, inkludert partylounge.",
+    description: "Priser for grupper. 90 minutters totalopplevelse, inkludert partylounge.",
     url: "https://www.krsvr.no/priser",
     type: "website",
   }
@@ -21,7 +21,7 @@ export default function PriserPage() {
     "@type": "PriceSpecification",
     "name": "Priser for VR opplevelser",
     "priceCurrency": "NOK",
-    "description": "Priser inkluderer ca 45-55 minutter aktiv spilltid, gamemaster og lån av partylounge",
+    "description": "Priser inkluderer 90 minutters totalopplevelse, gamemaster og lån av partylounge",
     "price": "375 - 460",
     "eligibleQuantity": {
       "@type": "QuantitativeValue",
@@ -58,8 +58,7 @@ export default function PriserPage() {
             <div className="flex items-center gap-3 mb-8">
               <Clock className="w-6 h-6 text-[#9C39FF]" />
               <div>
-                <h3 className="text-xl font-medium text-white">Normal Booking</h3>
-                <p className="text-sm text-zinc-400">Aktiv spilltid i virtuell verden: ca 45-55 min</p>
+                <h3 className="text-xl font-medium text-white">Normal Booking (90 min)</h3>
               </div>
             </div>
 
@@ -85,7 +84,7 @@ export default function PriserPage() {
             </div>
 
             <div className="mt-8 pt-8 border-t border-zinc-800 flex flex-col gap-3">
-              <Link href="/opplevelser" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-zinc-700 hover:bg-zinc-800 text-white font-bold transition-colors">
+              <Link href="/vr-opplevelser" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-zinc-700 hover:bg-zinc-800 text-white font-bold transition-colors">
                 Se VR opplevelser
               </Link>
               <Link href="/booking" className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white font-bold transition-colors shadow-[0_0_15px_rgba(156,57,255,0.4)] hover:shadow-[0_0_25px_rgba(156,57,255,0.6)]">
@@ -99,10 +98,12 @@ export default function PriserPage() {
             <h2 className="text-2xl font-light tracking-tight text-white mb-6">Dette er inkludert i prisen:</h2>
             <ul className="space-y-5">
               {[
-                "Cirka 45-55 min aktiv spilletid i VR.",
+                "10-15 minutter forberedelse og introduksjon.",
+                "Rundt 60 minutter in-game session i VR.",
                 "Dedikert gamemaster som har ansvar for deres gruppe.",
                 "Gruppebilder etter endt spill.",
                 "Gratis vann å drikke.",
+                "Mission debrief og scoreboard i lounge med gamemaster.",
                 "Tilgang til vår partylounge i 30 minutter etter spillet.",
                 "Mulighet til å nyte medbrakt mat, kake og drikke.",
               ].map((item, idx) => (

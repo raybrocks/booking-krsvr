@@ -42,6 +42,15 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+  async redirects() {
+    return [
+      {
+        source: '/opplevelser/:path*',
+        destination: '/vr-opplevelser/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

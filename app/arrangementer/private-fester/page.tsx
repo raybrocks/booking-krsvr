@@ -131,7 +131,7 @@ export default function PrivateFesterPage() {
                 {[
                   "Oppmøte 15 minutter før spillestart",
                   "Ca. 10 minutter forberedelse og introduksjon",
-                  "Rundt 45 minutter spilletid",
+                  "Rundt 60 minutter in-game session (Total VR-opplevelse 90 minutter)",
                   "Unik VR-opplevelse",
                   "Dedikert gamemaster for gruppen",
                   "Gruppebilde",
@@ -161,7 +161,7 @@ export default function PrivateFesterPage() {
                 {[
                   "Oppmøte 15 minutter før spillestart",
                   "Ca. 10 minutter forberedelse og introduksjon",
-                  "To puljer med rundt 45 minutter spilletid per pulje",
+                  "To puljer med rundt 60 minutter in-game session per pulje (Total VR-opplevelse 90 minutter per pulje)",
                   "Tilgang til partylounge under hele opplegget",
                   "Mulighet til å nyte medbrakt mat og drikke",
                   "De som venter kan høre og følge med på de aktive spillerne fra partyloungen",
@@ -191,7 +191,7 @@ export default function PrivateFesterPage() {
                 {[
                   "Oppmøte 15 minutter før spillestart",
                   "Ca. 10 minutter forberedelse og introduksjon",
-                  "Tre puljer med rundt 45 minutter spilletid per pulje",
+                  "Tre puljer med rundt 60 minutter in-game session per pulje (Total VR-opplevelse 90 minutter per pulje)",
                   "Tilgang til partylounge under hele opplegget",
                   "Mulighet til å nyte medbrakt mat og drikke",
                   "De som venter kan mingle og følge med på spillet fra partyloungen",

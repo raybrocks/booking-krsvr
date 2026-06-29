@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static routes
   const routes: MetadataRoute.Sitemap = [
     '',
-    '/opplevelser',
+    '/vr-opplevelser',
     '/arrangementer/private-fester',
     '/arrangementer/firmaevent',
     '/priser',
@@ -53,14 +53,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     const typeUrls: MetadataRoute.Sitemap = Array.from(typeMap.keys()).map((typeSlug) => ({
-      url: `${baseUrl}/opplevelser/${typeSlug}`,
+      url: `${baseUrl}/vr-opplevelser/${typeSlug}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,
     }));
 
     const detailUrls: MetadataRoute.Sitemap = experiences.map(exp => ({
-      url: `${baseUrl}/opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
+      url: `${baseUrl}/vr-opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,

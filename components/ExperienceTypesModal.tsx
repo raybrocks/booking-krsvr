@@ -133,7 +133,7 @@ export default function ExperienceTypesModal({
                 ) : (
                   <>
                     <div className="font-medium">{type.name}</div>
-                    <div className="text-zinc-500 text-sm flex items-center">/opplevelser/{type.slug}</div>
+                    <div className="text-zinc-500 text-sm flex items-center">/vr-opplevelser/{type.slug}</div>
                   </>
                 )}
               </div>

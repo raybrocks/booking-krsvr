@@ -13,7 +13,7 @@ export default function Header() {
 
   const navLinks = [
     { href: "/", label: "Hovedside" },
-    { href: "/opplevelser", label: "VR Opplevelser" },
+    { href: "/vr-opplevelser", label: "VR Opplevelser" },
     { href: "/arrangementer", label: "Arrangementer" },
     { href: "/priser", label: "Priser" },
     { href: "/faq", label: "FAQ" },

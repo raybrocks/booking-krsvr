@@ -32,7 +32,8 @@ import {
   Maximize,
   Trophy,
   Sparkles,
-  Moon
+  Moon,
+  Info
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -194,7 +195,7 @@ export function ExperiencesView({
     // Update URL when selectedId changes
     const exp = experiences.find(e => e.id === selectedId);
     if (exp) {
-      const newUrl = `/opplevelser/${getTypeSlug(exp)}/${slugify(exp.name)}`;
+      const newUrl = `/vr-opplevelser/${getTypeSlug(exp)}/${slugify(exp.name)}`;
       window.history.replaceState({ path: newUrl }, '', newUrl);
     }
     
@@ -438,12 +439,12 @@ export function ExperiencesView({
                 <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
                   {selected.type}
                 </span>
-                {selected.action && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Action</span>}
-                {selected.jumpScare && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Jump Scare</span>}
-                {selected.highscore && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Highscore</span>}
-                {selected.fantasy && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Fantasy</span>}
-                {selected.mystic && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Mystikk</span>}
-                {selected.codeSolving && <span className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 text-zinc-300 font-medium">Kodeløsning</span>}
+                {selected.action && <span title="Høyt tempo og spenning!" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Action</span>}
+                {selected.jumpScare && <span title="Advarsel: Kan inneholde skremmende elementer" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Jump Scare</span>}
+                {selected.highscore && <span title="Jakt på poeng og sett nye rekorder!" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Highscore</span>}
+                {selected.fantasy && <span title="Opplev magiske og eventyrlige verdener" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Fantasy</span>}
+                {selected.mystic && <span title="Gåtefulle og spennende mysterier venter" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Mystikk</span>}
+                {selected.codeSolving && <span title="Krever kløkt og logisk tenkning for å løse kodene" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Kodeløsning</span>}
               </div>
             </div>
 
@@ -464,9 +465,22 @@ export function ExperiencesView({
 
             {/* STATS ROW */}
             <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto px-4">
-              <div className="flex items-center gap-2 text-sm md:text-base">
+              <div className="flex items-center gap-2 text-sm md:text-base relative group cursor-help">
                 <Timer className="w-5 h-5 text-white" />
-                <span>{selected.duration || "45 min"}</span>
+                <span>{selected.duration || "90 min"}</span>
+                <Info className="w-4 h-4 text-zinc-400" />
+                
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 p-4 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none text-left">
+                  <h4 className="font-bold text-white mb-2 text-sm">90 minutter totalopplevelse</h4>
+                  <ul className="text-xs text-zinc-300 space-y-1 list-disc pl-4">
+                    <li>10-15 min forberedelse og intro</li>
+                    <li>Rundt 60 min in-game session</li>
+                    <li>Gruppebilde og gratis vann</li>
+                    <li>Mission debrief og scoreboard i lounge</li>
+                    <li>Lån av party lounge i 30 min etter spill</li>
+                    <li>Mulighet for medbrakt mat/drikke</li>
+                  </ul>
+                </div>
               </div>
 
               <div className="flex items-center gap-2 text-sm md:text-base">
@@ -496,139 +510,50 @@ export function ExperiencesView({
               )}
             </div>
 
-            {/* CONTENT SPLIT */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full max-w-5xl mx-auto px-4">
-              {/* LEFT: DESCRIPTION */}
-              <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-6">Om opplevelsen</h3>
-                <div className="prose prose-invert prose-lg max-w-none text-zinc-400">
+            {/* CONTENT MERGED */}
+            <div className="flex flex-col gap-12 w-full max-w-3xl mx-auto px-4 items-center">
+              {/* DESCRIPTION & PASSER FOR */}
+              <div className="flex flex-col items-center w-full">
+                {(selected.familyFriendly || selected.teambuilding || selected.party) && (
+                  <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 mb-12 bg-zinc-900/40 p-4 md:px-8 rounded-2xl border border-white/5 w-full">
+                    <span className="text-sm font-bold text-white uppercase tracking-wider">Passer for:</span>
+                    <div className="flex flex-wrap items-center gap-4">
+                      {selected.familyFriendly && (
+                        <div className="flex items-center gap-2 cursor-help" title="Passer perfekt for hele familien">
+                          <Baby className="w-4 h-4 text-[#9C39FF]" />
+                          <span className="text-sm text-zinc-300 font-medium">Familie</span>
+                        </div>
+                      )}
+                      {selected.teambuilding && (
+                        <div className="flex items-center gap-2 cursor-help" title="Krever samarbeid og kommunikasjon">
+                          <Layers className="w-4 h-4 text-[#9C39FF]" />
+                          <span className="text-sm text-zinc-300 font-medium">Teambuilding</span>
+                        </div>
+                      )}
+                      {selected.party && (
+                        <div className="flex items-center gap-2 cursor-help" title="Ypperlig for fest og moro!">
+                          <PartyPopper className="w-4 h-4 text-[#9C39FF]" />
+                          <span className="text-sm text-zinc-300 font-medium">Vennegjeng</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <h3 className="text-2xl font-bold text-white mb-6 text-center">Om opplevelsen</h3>
+                <div className="prose prose-invert prose-lg max-w-none text-zinc-400 text-center">
                   {selected.shortDescription && selected.shortDescription.split('\n').map((paragraph: string, i: number) => (
                     <p key={i} className="mb-4">{paragraph}</p>
                   ))}
                 </div>
               </div>
 
-              {/* RIGHT: DETAILS */}
-              <div className="flex flex-col gap-8">
-                {(selected.familyFriendly || selected.teambuilding || selected.party) && (
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-6">Passer for</h3>
-                    <div className="flex flex-col gap-4">
-                    {selected.familyFriendly && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <Baby className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Familievennlig</h4>
-                          <p className="text-sm text-zinc-400">Passer perfekt for hele familien</p>
-                        </div>
-                      </div>
-                    )}
-                    {selected.teambuilding && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <Layers className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Teambuilding</h4>
-                          <p className="text-sm text-zinc-400">Krever samarbeid og kommunikasjon</p>
-                        </div>
-                      </div>
-                    )}
-                    {selected.party && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <PartyPopper className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Vennegjeng / Feiring</h4>
-                          <p className="text-sm text-zinc-400">Ypperlig for fest og moro!</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                )}
-
-                {(selected.action || selected.jumpScare || selected.highscore || selected.fantasy || selected.mystic || selected.codeSolving) && (
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-6">Nøkkelpunkter</h3>
-                    <div className="flex flex-col gap-4">
-                      {selected.action && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <Zap className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Action</h4>
-                          <p className="text-sm text-zinc-400">Høyt tempo og spenning!</p>
-                        </div>
-                      </div>
-                    )}
-                    {selected.jumpScare && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <Ghost className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Jump Scare</h4>
-                          <p className="text-sm text-zinc-400">Advarsel: Kan inneholde skremmende elementer</p>
-                        </div>
-                      </div>
-                    )}
-                    {selected.highscore && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <Trophy className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Highscore</h4>
-                          <p className="text-sm text-zinc-400">Jakt på poeng og sett nye rekorder!</p>
-                        </div>
-                      </div>
-                    )}
-                    {selected.fantasy && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <Sparkles className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Fantasy</h4>
-                          <p className="text-sm text-zinc-400">Opplev magiske og eventyrlige verdener</p>
-                        </div>
-                      </div>
-                    )}
-                    {selected.mystic && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <Moon className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Mystikk</h4>
-                          <p className="text-sm text-zinc-400">Gåtefulle og spennende mysterier venter</p>
-                        </div>
-                      </div>
-                    )}
-                    {selected.codeSolving && (
-                      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5">
-                        <div className="bg-[#9C39FF]/20 p-3 rounded-xl">
-                          <Key className="w-6 h-6 text-[#9C39FF]" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">Kodeløsning</h4>
-                          <p className="text-sm text-zinc-400">Krever kløkt og logisk tenkning for å løse kodene</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                )}
-
+              {/* PRICING IF AVAILABLE */}
+              <div className="w-full">
                 {/* PRICING IF AVAILABLE */}
                 {selected.pricing && Array.isArray(selected.pricing) && selected.pricing.length > 0 && (
-                  <div className="bg-gradient-to-br from-zinc-900 to-black p-6 md:p-8 rounded-3xl border border-zinc-800">
-                    <h3 className="text-2xl font-bold text-white mb-6">Priser</h3>
+                  <div className="bg-gradient-to-br from-zinc-900 to-black p-6 md:p-8 rounded-3xl border border-zinc-800 w-full">
+                    <h3 className="text-2xl font-bold text-white mb-6 text-center">Priser</h3>
                     <div className="flex flex-col gap-3">
                       {selected.pricing.map((p: any, i: number) => (
                         <div key={i} className="flex justify-between items-center border-b border-zinc-800/50 pb-3 last:border-0 last:pb-0">

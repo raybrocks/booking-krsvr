@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     question: "Hva er inkludert i prisen?",
-    answer: "Prisen inkluderer ca. 45-55 minutter aktiv spilltid i VR, en dedikert gamemaster for deres gruppe, gruppebilder etter endt spill, gratis vann, og tilgang til partylounge i 30 minutter etter spillet med mulighet for å nyte medbrakt mat og drikke. Prisene varierer noe basert på gruppestørrelsen – se vår prisoversikt for detaljer.",
+    answer: "Prisen inkluderer en totalopplevelse på 90 minutter. Dette består av ca. 10-15 minutter forberedelse og introduksjon, rundt 60 minutter aktiv in-game session i VR, gruppebilder etter endt spill, og gratis vann. I tillegg får dere låne partylounge i 30 minutter etter spillet hvor dere har mulighet til å nyte medbrakt mat og drikke. Prisene varierer noe basert på gruppestørrelsen – se vår prisoversikt for detaljer.",
   },
   {
     question: "Må vi ha erfaring med VR fra før av?",

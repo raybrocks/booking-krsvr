@@ -299,7 +299,7 @@ export default function BookingFlow() {
                             <p className="text-zinc-400 text-sm mb-4">{exp.shortDescription}</p>
                             
                             <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
-                              {exp.duration && <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.duration}</span>}
+                              <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.duration || "90 min"}</span>
                               <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Fra {exp.age} år</span>
                               <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Maks {exp.maxPlayers} spillere</span>
                               {exp.difficulty && <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>}

@@ -603,7 +603,7 @@ function KontaktForm() {
               title="KRS VR Arena Kart"
               width="100%" 
               height="450" 
-              src="https://maps.google.com/maps?width=100%25&amp;height=450&amp;hl=no&amp;q=Industrigata%2012,%204632%20Kristiansand+(KRS%20VR%20Arena)&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
+              src="https://maps.google.com/maps?width=100%25&height=450&hl=no&q=Industrigata%2012,%204632%20Kristiansand+(KRS%20VR%20Arena)&t=&z=15&ie=UTF8&iwloc=B&output=embed"
               style={{ border: 0, borderRadius: '0.75rem' }}
               allowFullScreen={true}
               loading="lazy"

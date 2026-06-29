@@ -142,7 +142,7 @@ export default function HomeCarousel() {
               className="flex-shrink-0 snap-center min-w-[140px]"
             >
               <Link
-                href={`/opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`}
+                href={`/vr-opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`}
                 className="flex flex-col items-center justify-center group w-full h-full px-4 py-8 rounded-3xl border border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)] hover:bg-[#9C39FF]/20 hover:shadow-[0_0_25px_rgba(156,57,255,0.4)] transition-all duration-300"
               >
                 <div className="mb-4 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] group-hover:scale-110 transition-transform duration-300">

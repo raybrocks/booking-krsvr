@@ -138,7 +138,7 @@ export default function FirmaeventPage() {
                 {[
                   "Oppmøte 15 minutter før spillestart",
                   "Ca. 10 minutter forberedelse og introduksjon",
-                  "Rundt 45 minutter spilletid",
+                  "Rundt 60 minutter in-game session (Total VR-opplevelse 90 minutter)",
                   "Unik VR-opplevelse",
                   "Dedikert gamemaster for gruppen",
                   "Gruppebilde",
@@ -169,7 +169,7 @@ export default function FirmaeventPage() {
                 {[
                   "Oppmøte 15 minutter før spillestart",
                   "Ca. 10 minutter forberedelse og introduksjon",
-                  "To puljer med rundt 45 minutter spilletid per pulje",
+                  "To puljer med rundt 60 minutter in-game session per pulje (Total VR-opplevelse 90 minutter per pulje)",
                   "Tilgang til partylounge under hele opplegget",
                   "De som venter kan mingle, spise og følge med på de aktive spillerne",
                   "Resultater annonseres underveis",
@@ -201,7 +201,7 @@ export default function FirmaeventPage() {
                 {[
                   "Oppmøte 15 minutter før spillestart",
                   "Ca. 10 minutter forberedelse og introduksjon",
-                  "Tre puljer med rundt 45 minutter spilletid per pulje",
+                  "Tre puljer med rundt 60 minutter in-game session per pulje (Total VR-opplevelse 90 minutter per pulje)",
                   "Tilgang til partylounge under hele opplegget",
                   "De som venter kan mingle, spise og følge med på de aktive spillerne",
                   "Resultater annonseres underveis",

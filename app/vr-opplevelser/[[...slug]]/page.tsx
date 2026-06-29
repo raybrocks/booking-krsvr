@@ -60,7 +60,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `https://www.krsvr.no/opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`,
+      url: `https://www.krsvr.no/vr-opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`,
       type: "website",
     },
     ...(isVippsTest && { robots: { index: false, follow: false } }),
@@ -161,7 +161,7 @@ export default async function ExperiencesPage({
           "@type": "Product",
           "name": exp.name,
           "description": exp.shortDescription || "",
-          "url": `https://www.krsvr.no/opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
+          "url": `https://www.krsvr.no/vr-opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
           "brand": providerInfo,
           "offers": {
             "@type": "AggregateOffer",
