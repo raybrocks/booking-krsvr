@@ -621,8 +621,6 @@ export function ExperiencesView({
                         </div>
                       </div>
                     )}
-                      </div>
-                    )}
                   </div>
                 </div>
                 )}
