@@ -583,7 +583,11 @@ export function ExperiencesView({
       {/* VIDEO MODAL */}
       {isVideoOpen && selected && selected.videoUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-          <div className="relative w-full max-w-5xl aspect-video rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl">
+          <div className={`relative w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl ${
+            selected.videoUrl.includes("shorts") || selected.videoUrl.includes("tiktok") 
+              ? "max-w-md aspect-[9/16]" 
+              : "max-w-5xl aspect-video"
+          }`}>
             <button 
               onClick={() => setIsVideoOpen(false)}
               className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black text-white rounded-full transition-colors"
