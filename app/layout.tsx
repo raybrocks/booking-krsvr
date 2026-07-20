@@ -78,8 +78,36 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "KRS VR Arena",
+    "image": "https://www.krsvr.no/icon.svg",
+    "url": "https://www.krsvr.no",
+    "telephone": "+4740828302",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Industrigata 12",
+      "addressLocality": "Kristiansand",
+      "postalCode": "4632",
+      "addressCountry": "NO"
+    },
+    "sameAs": [
+      "https://www.instagram.com/krs.vr.arena",
+      "https://www.tiktok.com/@krs.vr.arena",
+      "https://www.facebook.com/krs.vr.arena",
+      "https://www.youtube.com/@KrsVRArena"
+    ]
+  };
+
   return (
     <html lang="no" className={cn("dark font-sans", inter.variable)}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-[#9C39FF]/30 flex flex-col" suppressHydrationWarning>
           <Header />
           <div className="flex-1">

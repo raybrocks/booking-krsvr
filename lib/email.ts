@@ -116,8 +116,16 @@ export async function sendBookingConfirmationEmail(
       <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999; line-height: 1.5;">
         <strong>Krs VR Arena AS</strong><br/>
         Organisasjonsnummer: 936318878 MVA<br/>
-        Kristiansand, Norge<br/>
+        Industrigata 12<br/>
+        4632 Kristiansand, Norge<br/>
+        Telefon: <a href="tel:+4740828302" style="color: #9C39FF; text-decoration: none;">+47 408 28 302</a><br/>
         <a href="mailto:${adminEmail}" style="color: #9C39FF; text-decoration: none;">${adminEmail}</a>
+        
+        <div style="margin-top: 15px;">
+          <a href="https://www.instagram.com/krs.vr.arena" style="color: #9C39FF; text-decoration: none; margin-right: 15px;">Instagram</a>
+          <a href="https://www.tiktok.com/@krs.vr.arena" style="color: #9C39FF; text-decoration: none; margin-right: 15px;">TikTok</a>
+          <a href="https://www.youtube.com/@KrsVRArena" style="color: #9C39FF; text-decoration: none;">YouTube</a>
+        </div>
       </div>
     </div>
   `;
@@ -186,6 +194,21 @@ export async function sendBookingCancellationEmail(
       <p style="font-size: 14px; color: #666;">
         Vennlig hilsen,<br/>Krs VR Arena
       </p>
+      
+      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999; line-height: 1.5;">
+        <strong>Krs VR Arena AS</strong><br/>
+        Organisasjonsnummer: 936318878 MVA<br/>
+        Industrigata 12<br/>
+        4632 Kristiansand, Norge<br/>
+        Telefon: <a href="tel:+4740828302" style="color: #9C39FF; text-decoration: none;">+47 408 28 302</a><br/>
+        <a href="mailto:${adminEmail}" style="color: #9C39FF; text-decoration: none;">${adminEmail}</a>
+        
+        <div style="margin-top: 15px;">
+          <a href="https://www.instagram.com/krs.vr.arena" style="color: #9C39FF; text-decoration: none; margin-right: 15px;">Instagram</a>
+          <a href="https://www.tiktok.com/@krs.vr.arena" style="color: #9C39FF; text-decoration: none; margin-right: 15px;">TikTok</a>
+          <a href="https://www.youtube.com/@KrsVRArena" style="color: #9C39FF; text-decoration: none;">YouTube</a>
+        </div>
+      </div>
     </div>
   `;
 
