@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -128,6 +129,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
             }}
           />
           <ScrollToTop />
+          <Analytics />
       </body>
     </html>
   );
