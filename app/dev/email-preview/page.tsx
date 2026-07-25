@@ -209,11 +209,11 @@ export default function EmailPreviewPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={\`px-4 py-2 rounded-lg font-medium transition-colors \${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-[#9C39FF] text-white'
                   : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-              }\`}
+              }`}
             >
               {tab.label}
             </button>
