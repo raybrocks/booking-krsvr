@@ -7,7 +7,7 @@ import { format, addDays } from "date-fns";
 import DiscountCodesManager from "./DiscountCodesManager";
 
 export default function SettingsManager() {
-  const [activeSettingsTab, setActiveSettingsTab] = useState<"general" | "discounts">("general");
+  const [activeSettingsTab, setActiveSettingsTab] = useState<"hours" | "general" | "discounts">("hours");
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -211,7 +211,13 @@ export default function SettingsManager() {
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-2 border-b border-zinc-800 pb-4 mb-6">
+      <div className="flex flex-wrap gap-2 border-b border-zinc-800 pb-4 mb-6">
+        <button 
+          onClick={() => setActiveSettingsTab("hours")} 
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSettingsTab === 'hours' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+        >
+          Åpningstider
+        </button>
         <button 
           onClick={() => setActiveSettingsTab("general")} 
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSettingsTab === 'general' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
@@ -226,29 +232,31 @@ export default function SettingsManager() {
         </button>
       </div>
 
-      {activeSettingsTab === "general" && (
+      {(activeSettingsTab === "general" || activeSettingsTab === "hours") && (
         <div className="space-y-8">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-light">Opening Hours & Settings</h2>
-              <p className="text-zinc-400 text-sm">Manage available time slots for each day of the week.</p>
-        </div>
-        <button 
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors disabled:opacity-50"
-        >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Save Changes
-        </button>
-      </div>
+              <h2 className="text-2xl font-light">
+                {activeSettingsTab === "hours" ? "Åpningstider" : "Generelle Innstillinger"}
+              </h2>
+              <p className="text-zinc-400 text-sm">
+                {activeSettingsTab === "hours" ? "Administrer faste og spesielle åpningstider for arenaen." : "Administrer kontaktinfo, vilkår og sikkerhetsfunksjoner."}
+              </p>
+            </div>
+            <button 
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Lagre Endringer
+            </button>
+          </div>
 
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Reservation fee is now calculated dynamically based on 1 player price */}
-        </div>
-
-        <div className="mb-6 bg-red-950/20 border border-red-900/50 p-6 rounded-2xl">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+            {activeSettingsTab === "general" && (
+              <>
+                <div className="mb-6 bg-red-950/20 border border-red-900/50 p-6 rounded-2xl">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-medium text-red-400 mb-1">Emergency Booking Kill-Switch</h3>
@@ -315,8 +323,12 @@ export default function SettingsManager() {
             className="w-full h-64 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
           />
         </div>
+              </>
+            )}
 
-        <h3 className="text-lg font-medium mb-4 border-b border-zinc-800 pb-2">Weekly Schedule</h3>
+            {activeSettingsTab === "hours" && (
+              <>
+                <h3 className="text-lg font-medium mb-4 border-b border-zinc-800 pb-2">Weekly Schedule</h3>
         <div className="space-y-6">
           {daysOfWeek.map((day, index) => {
             const dayIndex = index.toString();
@@ -485,11 +497,13 @@ export default function SettingsManager() {
                 </div>
               );
             })}
-          </div>
-        )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
-  )}
+    )}
       {activeSettingsTab === "discounts" && (
         <DiscountCodesManager />
       )}
