@@ -238,6 +238,15 @@ export default function TransactionsManager() {
 
   return (
     <div className="space-y-4">
+      <div className="bg-[#9C39FF]/10 border border-[#9C39FF]/20 p-4 rounded-xl text-sm text-zinc-300 flex items-start gap-3">
+        <div className="w-5 h-5 rounded-full bg-[#9C39FF]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <span className="text-[#9C39FF] text-xs font-bold">i</span>
+        </div>
+        <p>
+          Her finner du kun kvitteringer fra utførte betalinger i booking-modulen på nett (betalte reservasjonsgebyrer eller forhåndsbetalinger). Resterende kvitteringer ligger i kassesystemet.
+        </p>
+      </div>
+
       {/* Search */}
       <div className="flex bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 gap-4">
         <div className="flex-1 relative">
