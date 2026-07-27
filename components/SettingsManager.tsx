@@ -70,13 +70,15 @@ export default function SettingsManager() {
       
       // Sort times before saving so they appear chronologically on the website
       if (settingsToSave.openingHours) {
+        settingsToSave.openingHours = { ...settingsToSave.openingHours };
         Object.keys(settingsToSave.openingHours).forEach(day => {
-          settingsToSave.openingHours[day].sort();
+          settingsToSave.openingHours[day] = [...settingsToSave.openingHours[day]].sort();
         });
       }
       if (settingsToSave.specialHours) {
+        settingsToSave.specialHours = { ...settingsToSave.specialHours };
         Object.keys(settingsToSave.specialHours).forEach(date => {
-          settingsToSave.specialHours[date].sort();
+          settingsToSave.specialHours[date] = [...settingsToSave.specialHours[date]].sort();
         });
       }
 
