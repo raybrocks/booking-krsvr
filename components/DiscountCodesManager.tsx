@@ -197,6 +197,7 @@ export default function DiscountCodesManager() {
                     <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
                       <SelectItem value="percentage">Prosent (%)</SelectItem>
                       <SelectItem value="fixed">Fast beløp (NOK)</SelectItem>
+                      <SelectItem value="fixed_per_person">Fast sum pr person (NOK)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -247,7 +248,7 @@ export default function DiscountCodesManager() {
                     <td className="px-6 py-4 font-medium text-white">{c.code}</td>
                     <td className="px-6 py-4">
                       <span className="bg-[#9C39FF]/20 text-[#9C39FF] px-2 py-1 rounded text-xs font-semibold">
-                        {c.type === 'percentage' ? `${c.discount}%` : `${c.discount} NOK`}
+                        {c.type === 'percentage' ? `${c.discount}%` : c.type === 'fixed_per_person' ? `${c.discount} NOK/pers` : `${c.discount} NOK`}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-zinc-400">

@@ -13,17 +13,32 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const supabase = createClient();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      setLoading(false);
-    };
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      try {
+        const res = await fetch('/api/admin/me');
+        if (res.ok) {
+          const data = await res.json();
+          setUser({ ...session.user, employeeProfile: data.user });
+        } else {
+          setUser({ ...session.user, accessDenied: true });
+        }
+      } catch (err) {
+        setUser({ ...session.user, accessDenied: true });
+      }
+    } else {
+      setUser(null);
+    }
+    setLoading(false);
+  };
 
+  useEffect(() => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      // Just check auth again when auth state changes (e.g. login/logout)
+      checkAuth();
     });
 
     return () => subscription.unsubscribe();
@@ -43,7 +58,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
       if (error) {
         setError(error.message === "Invalid login credentials" ? "Feil e-post eller passord." : error.message);
       } else {
-        setUser(data.user);
+        await checkAuth();
       }
     } catch (err: any) {
       console.error(err);
@@ -120,12 +135,12 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   }
 
   // Strict check: Is this the authorized admin email?
-  if (user.email !== "post@krsvr.no") {
+  if (user.accessDenied) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-4 text-center">
         <Lock className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-bold text-white">Ingen tilgang</h2>
-        <p className="text-zinc-400">Kontoen din har ikke administratorrettigheter.</p>
+        <p className="text-zinc-400">Kontoen din har ikke administratorrettigheter, eller er ikke aktivert.</p>
         <button 
           onClick={handleLogout}
           className="mt-4 px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors"

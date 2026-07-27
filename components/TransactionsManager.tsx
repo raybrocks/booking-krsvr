@@ -37,24 +37,37 @@ export default function TransactionsManager() {
           const data = fetchedBookings.map((bookingData: any) => {
             let status = bookingData.status;            
             const createdAtDate = bookingData.createdAt ? new Date(bookingData.createdAt) : new Date();
+            
+            // Map status for Vipps
+            let displayStatus = status;
+            if (bookingData.paymentType === 'vipps' && (status === 'confirmed' || status === 'completed')) {
+               displayStatus = 'AUTHORIZED';
+            }
 
             return {
+              ...bookingData,
               id: bookingData.id,
               bookingId: bookingData.id,
               vippsOrderId: bookingData.id,
-              amount: (bookingData.amountPaid || bookingData.totalPrice || 0) * 100,
+              amount: bookingData.amountPaid ? bookingData.amountPaid * 100 : (bookingData.totalPrice || 0) * 100,
               originalStatus: bookingData.status,
-              status: (status === 'confirmed' || status === 'completed') ? 'AUTHORIZED' : status,
-              ...bookingData,
+              status: displayStatus,
               createdAtDate
             };
           });
           
-          const validReceipts = data.filter((b: any) => 
-            b.originalStatus !== 'cancelled' && 
-            b.originalStatus !== 'pending' && 
-            b.originalStatus !== 'error'
-          );
+          const validReceipts = data.filter((b: any) => {
+            if (b.originalStatus === 'cancelled' || b.originalStatus === 'pending' || b.originalStatus === 'error') {
+               return false;
+            }
+            // Keep if paid
+            if (b.amountPaid > 0) return true;
+            // Keep if pending Vipps reservation
+            if ((b.paymentType === 'vipps' || b.originalStatus === 'epayment.payment.reserved') && (b.amountPaid === 0 || !b.amountPaid)) {
+               return true;
+            }
+            return false;
+          });
           
           setTransactions(validReceipts);
         }
@@ -101,11 +114,16 @@ export default function TransactionsManager() {
   const renderReceipt = () => {
     if (!selectedTx) return null;
     
-    const totalInclVat = selectedTx.amount / 100;
+    // Receipt should purely reflect amountPaid
+    const totalInclVat = selectedTx.amountPaid || 0;
     // 25% MVA is standard. You can make this dynamic if needed.
     const vatRate = 0.25; 
     const totalExVat = totalInclVat / (1 + vatRate);
     const vatAmount = totalInclVat - totalExVat;
+
+    const betalingsform = selectedTx.paymentType === 'vipps' ? 'Vipps' : 
+                         (selectedTx.paymentType === 'manual' ? 'Manuell' : 
+                         (selectedTx.paymentType || 'Ukjent'));
 
     return (
       <div className="bg-white text-black font-mono text-sm max-w-sm mx-auto shadow-md p-8 print:shadow-none print:p-0 print:max-w-none">
@@ -129,10 +147,12 @@ export default function TransactionsManager() {
               <span>Kvitteringsnr:</span>
               <span>{selectedTx.id.substring(0, 8).toUpperCase()}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Ref V-OrderID:</span>
-              <span>{selectedTx.vippsOrderId}</span>
-            </div>
+            {selectedTx.paymentType === 'vipps' && (
+              <div className="flex justify-between">
+                <span>Ref V-OrderID:</span>
+                <span>{selectedTx.vippsOrderId}</span>
+              </div>
+            )}
          </div>
          
          {selectedBooking && (
@@ -190,13 +210,13 @@ export default function TransactionsManager() {
          </div>
 
          <div className="border-t border-zinc-400 pt-4 space-y-1 mb-12">
-            <div className="flex justify-between">
+             <div className="flex justify-between">
                <span>Betalingsform:</span>
-               <span className="font-bold">Vipps</span>
+               <span className="font-bold capitalize">{betalingsform}</span>
              </div>
             <div className="flex justify-between">
                <span>Status:</span>
-               <span>{selectedTx.status === "AUTHORIZED" || selectedTx.status === "epayment.payment.reserved" || selectedTx.status === "transaction.state.changed" ? "Godkjent" : selectedTx.status}</span>
+               <span>{selectedTx.amountPaid > 0 ? "Betalt / Godkjent" : selectedTx.status}</span>
              </div>
          </div>
 
@@ -299,10 +319,16 @@ export default function TransactionsManager() {
                     <div className="font-mono text-zinc-300 text-xs">{tx.bookingId}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-mono text-zinc-300 text-xs">{tx.vippsOrderId}</div>
+                    <div className="font-mono text-zinc-300 text-xs">{tx.paymentType === 'vipps' ? tx.vippsOrderId : 'N/A'}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-zinc-200">{(tx.amount / 100).toFixed(2)} NOK</div>
+                    <div className="text-zinc-200">
+                       {tx.amountPaid > 0 ? (
+                          <span className="text-emerald-400 font-medium">Betalt: {tx.amountPaid.toFixed(2)} NOK</span>
+                       ) : (
+                          <span className="text-amber-400">Reservert: {(tx.totalPrice || 0).toFixed(2)} NOK</span>
+                       )}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`text-xs font-medium px-2 py-1 rounded-full border ${
@@ -313,12 +339,16 @@ export default function TransactionsManager() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleViewReceipt(tx)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded-md transition-colors border border-zinc-700"
-                    >
-                      <Receipt className="w-3.5 h-3.5" /> Kvittering
-                    </button>
+                    {tx.amountPaid > 0 ? (
+                      <button
+                        onClick={() => handleViewReceipt(tx)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded-md transition-colors border border-zinc-700"
+                      >
+                        <Receipt className="w-3.5 h-3.5" /> Kvittering
+                      </button>
+                    ) : (
+                      <span className="text-xs text-zinc-500 italic px-2">Venter...</span>
+                    )}
                   </td>
                 </tr>
               )))}

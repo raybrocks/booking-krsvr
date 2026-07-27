@@ -182,6 +182,8 @@ export function useBookingFlow() {
   if (!isVippsTest && appliedDiscount) {
     if (appliedDiscount.type === "percentage") {
       discountAmount = (rawTotalPrice * appliedDiscount.discount) / 100;
+    } else if (appliedDiscount.type === "fixed_per_person") {
+      discountAmount = appliedDiscount.discount * players;
     } else {
       discountAmount = appliedDiscount.discount;
     }

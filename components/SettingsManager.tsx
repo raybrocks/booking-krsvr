@@ -4,8 +4,10 @@ import React, { useState, useEffect } from "react";
 import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
+import DiscountCodesManager from "./DiscountCodesManager";
 
 export default function SettingsManager() {
+  const [activeSettingsTab, setActiveSettingsTab] = useState<"general" | "discounts">("general");
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -208,11 +210,28 @@ export default function SettingsManager() {
   const specialDates = Object.keys(settings.specialHours || {}).sort();
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-light">Opening Hours & Settings</h2>
-          <p className="text-zinc-400 text-sm">Manage available time slots for each day of the week.</p>
+    <div className="space-y-6">
+      <div className="flex gap-2 border-b border-zinc-800 pb-4 mb-6">
+        <button 
+          onClick={() => setActiveSettingsTab("general")} 
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSettingsTab === 'general' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+        >
+          Generelle Innstillinger
+        </button>
+        <button 
+          onClick={() => setActiveSettingsTab("discounts")} 
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSettingsTab === 'discounts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+        >
+          Rabattkoder
+        </button>
+      </div>
+
+      {activeSettingsTab === "general" && (
+        <div className="space-y-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-light">Opening Hours & Settings</h2>
+              <p className="text-zinc-400 text-sm">Manage available time slots for each day of the week.</p>
         </div>
         <button 
           onClick={handleSave}
@@ -469,6 +488,11 @@ export default function SettingsManager() {
           </div>
         )}
       </div>
+    </div>
+  )}
+      {activeSettingsTab === "discounts" && (
+        <DiscountCodesManager />
+      )}
     </div>
   );
 }

@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import SettingsManager from "./SettingsManager";
 import ExperiencesManager from "./ExperiencesManager";
 import TransactionsManager from "./TransactionsManager";
-import DiscountCodesManager from "./DiscountCodesManager";
 import ManualBookingManager from "./ManualBookingManager";
+import ShiftManager from "./ShiftManager";
+import EmployeesManager from "./EmployeesManager";
 
 const playDing = () => {
   try {
@@ -40,7 +41,7 @@ const playDing = () => {
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "discount-codes" | "settings" | "manual">("upcoming");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "settings" | "manual" | "shifts" | "employees">("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isFirstLoad = useRef(true);
   const notifiedBookingIds = useRef<Set<string>>(new Set());
@@ -545,54 +546,60 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-light tracking-tight">Admin Dashboard</h1>
         </div>
         
-        <div className="flex bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 w-fit shrink-0 overflow-x-auto max-w-full shadow-lg shadow-black/50">
+        <div className="flex flex-wrap bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 shadow-lg shadow-black/50 w-full lg:w-fit gap-1">
           <button 
             onClick={() => {
               setActiveTab("upcoming");
               setSortConfig({ key: 'dateTime', direction: 'asc' });
             }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
             <Clock4 className="w-4 h-4" /> Upcoming
           </button>
           <button 
             onClick={() => setActiveTab("manual")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
-            <Plus className="w-4 h-4" /> Manuell Booking
+            <Plus className="w-4 h-4" /> Booking
           </button>
           <button 
             onClick={() => {
               setActiveTab("archive");
               setSortConfig({ key: 'dateTime', direction: 'desc' });
             }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
-            <ListOrdered className="w-4 h-4" /> Archive
+            <ListOrdered className="w-4 h-4" /> Arkiv
           </button>
           <button 
             onClick={() => setActiveTab("experiences")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
-            <Gamepad2 className="w-4 h-4" /> Experiences
+            <Gamepad2 className="w-4 h-4" /> Spill
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab("transactions")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
-            <Receipt className="w-4 h-4" /> Receipts
+            <Wallet className="w-4 h-4" /> Regnskap
           </button>
-          <button 
-            onClick={() => setActiveTab("discount-codes")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${activeTab === 'discount-codes' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+          <button
+            onClick={() => setActiveTab("shifts")}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
-            Rabattkoder
+            <CalendarIcon className="w-4 h-4" /> Vakter
+          </button>
+          <button
+            onClick={() => setActiveTab("employees")}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+          >
+            <Users className="w-4 h-4" /> Ansatte
           </button>
           <button 
             onClick={() => setActiveTab("settings")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
-            <Settings className="w-4 h-4" /> Settings
+            <Settings className="w-4 h-4" /> Innstillinger
           </button>
         </div>
       </div>
@@ -674,9 +681,10 @@ export default function AdminDashboard() {
 
       {activeTab === "experiences" && <ExperiencesManager />}
       {activeTab === "transactions" && <TransactionsManager />}
-      {activeTab === "discount-codes" && <DiscountCodesManager />}
       {activeTab === "settings" && <SettingsManager />}
       {activeTab === "manual" && <ManualBookingManager />}
+      {activeTab === "shifts" && <ShiftManager />}
+      {activeTab === "employees" && <EmployeesManager />}
     </div>
   );
 }
