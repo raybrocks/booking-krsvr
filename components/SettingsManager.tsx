@@ -19,7 +19,15 @@ export default function SettingsManager() {
   const [vacationWarning, setVacationWarning] = useState<any[] | null>(null);
   const [applyingVacation, setApplyingVacation] = useState(false);
 
-  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const daysOfWeek = [
+    { name: "Monday", index: "1" },
+    { name: "Tuesday", index: "2" },
+    { name: "Wednesday", index: "3" },
+    { name: "Thursday", index: "4" },
+    { name: "Friday", index: "5" },
+    { name: "Saturday", index: "6" },
+    { name: "Sunday", index: "0" }
+  ];
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -330,8 +338,7 @@ export default function SettingsManager() {
               <>
                 <h3 className="text-lg font-medium mb-4 border-b border-zinc-800 pb-2">Weekly Schedule</h3>
         <div className="space-y-6">
-          {daysOfWeek.map((day, index) => {
-            const dayIndex = index.toString();
+          {daysOfWeek.map(({ name: day, index: dayIndex }) => {
             const times = settings.openingHours[dayIndex] || [];
             
             return (
