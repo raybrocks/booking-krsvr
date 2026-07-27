@@ -10,7 +10,9 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const supabase = createClient();
 
   const checkAuth = async () => {
@@ -44,25 +46,41 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
     setError("");
+    setSuccessMsg("");
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
 
-      if (error) {
-        setError(error.message === "Invalid login credentials" ? "Feil e-post eller passord." : error.message);
+        if (error) {
+          setError(error.message);
+        } else {
+          setSuccessMsg("Bruker opprettet! Du kan nå logge inn (hvis de ikke har skrudd på e-postbekreftelse).");
+          setIsSignUp(false);
+          setPassword("");
+        }
       } else {
-        await checkAuth();
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          setError(error.message === "Invalid login credentials" ? "Feil e-post eller passord." : error.message);
+        } else {
+          await checkAuth();
+        }
       }
     } catch (err: any) {
       console.error(err);
-      setError("Feil e-post eller passord.");
+      setError(isSignUp ? "Kunne ikke registrere bruker." : "Feil e-post eller passord.");
     } finally {
       setIsLoggingIn(false);
     }
@@ -90,13 +108,20 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
               <Lock className="w-6 h-6 text-[#9C39FF]" />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Krs VR Arena</h1>
-            <p className="text-zinc-400 text-sm">Logg inn for å få tilgang til backend</p>
+            <p className="text-zinc-400 text-sm">
+              {isSignUp ? "Registrer ny bruker" : "Logg inn for å få tilgang"}
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleAuth} className="space-y-4">
             {error && (
               <div className="p-3 text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg">
                 {error}
+              </div>
+            )}
+            {successMsg && (
+              <div className="p-3 text-sm text-green-400 bg-green-400/10 border border-green-400/20 rounded-lg">
+                {successMsg}
               </div>
             )}
             <div className="space-y-2">
@@ -126,8 +151,18 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
               disabled={isLoggingIn}
               className="w-full py-2.5 bg-[#9C39FF] hover:bg-[#8A2BE2] text-white font-medium rounded-lg transition-colors flex items-center justify-center disabled:opacity-50"
             >
-              {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : "Logg inn"}
+              {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : (isSignUp ? "Registrer deg" : "Logg inn")}
             </button>
+            
+            <div className="text-center pt-2">
+              <button 
+                type="button" 
+                onClick={() => { setIsSignUp(!isSignUp); setError(""); setSuccessMsg(""); }}
+                className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                {isSignUp ? "Har du allerede en bruker? Logg inn" : "Ny ansatt? Registrer deg her"}
+              </button>
+            </div>
           </form>
         </div>
       </div>
