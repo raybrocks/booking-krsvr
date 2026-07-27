@@ -54,6 +54,22 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
     
     try {
       if (isSignUp) {
+        // Sjekk om ansatt-eposten finnes i databasen først
+        const checkRes = await fetch('/api/admin/employees/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        if (checkRes.ok) {
+          const { exists } = await checkRes.json();
+          if (!exists) {
+            setError("Denne e-posten er ikke registrert som ansatt. Eieren må legge deg inn først.");
+            setIsLoggingIn(false);
+            return;
+          }
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
