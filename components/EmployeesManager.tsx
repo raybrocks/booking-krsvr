@@ -12,10 +12,11 @@ export default function EmployeesManager() {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
+    // eslint-disable-next-line
     fetchEmployees();
   }, []);
 
-  const fetchEmployees = async () => {
+  async function fetchEmployees() {
     setLoading(true);
     try {
       const res = await fetch('/api/admin/employees');

@@ -26,6 +26,7 @@ export default function ManualBookingManager() {
   const [totalPrice, setTotalPrice] = useState(0);
   const [sendConfirmation, setSendConfirmation] = useState(true);
   const [customEmailText, setCustomEmailText] = useState("");
+  const [subscribeNewsletter, setSubscribeNewsletter] = useState(false);
 
   // available times based on selected date
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
@@ -154,7 +155,8 @@ export default function ManualBookingManager() {
           status: "confirmed",
           shadowTimes,
           sendConfirmation,
-          customEmailText
+          customEmailText,
+          subscribeNewsletter
         }),
       });
 
@@ -171,6 +173,7 @@ export default function ManualBookingManager() {
         setTotalPrice(0);
         setDuration(90);
         setCustomEmailText("");
+        setSubscribeNewsletter(false);
         // refresh booked times
         setBookedTimes([...bookedTimes, time, ...shadowTimes]);
       } else {
@@ -387,6 +390,16 @@ export default function ManualBookingManager() {
             
             <div className="pt-4 border-t border-zinc-800">
                <label className="flex items-center gap-3 cursor-pointer mb-3">
+                 <input 
+                   type="checkbox" 
+                   checked={subscribeNewsletter}
+                   onChange={(e) => setSubscribeNewsletter(e.target.checked)}
+                   className="w-5 h-5 accent-[#9C39FF] bg-zinc-900 border-zinc-700 rounded cursor-pointer"
+                 />
+                 <span className="text-zinc-200">Kunden ønsker å motta nyhetsbrev (tilbud/nyheter)</span>
+               </label>
+
+               <label className="flex items-center gap-3 cursor-pointer mb-3 mt-4">
                  <input 
                    type="checkbox" 
                    checked={sendConfirmation}

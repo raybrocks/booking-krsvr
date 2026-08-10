@@ -13,11 +13,7 @@ export default function ShiftManager() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  async function fetchData() {
     setLoading(true);
     try {
       const [meRes, shiftsRes] = await Promise.all([
@@ -38,7 +34,12 @@ export default function ShiftManager() {
       console.error(e);
     }
     setLoading(false);
-  };
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchData();
+  }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();

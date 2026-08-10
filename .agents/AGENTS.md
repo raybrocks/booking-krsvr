@@ -20,3 +20,6 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 3. **Semantikk:** Hold strukturert og semantisk HTML (H1, H2, H3) vedlike, og ha alltid beskrivende alt-tekster for bilder.
 4. **Visuelt design:** Ikke gjør store visuelle endringer i UI eller tekster for SEO-ens skyld. Endringer bør gjøres "under the hood" der det er mulig (metadata, aria-labels, json-ld).
 5. **Kontekstuell bruk:** Innarbeid ord naturlig. Ikke fyll siden med overdreven "keyword stuffing". Fokus er på lokal tilstedeværelse i Kristiansand og å formidle opplevelsestypene tydelig til AI og søkemotorer.
+
+# Utvikling og Kjøring
+1. **Port:** Dev-serveren (`npm run dev`) skal *alltid* startes på port 3050.

@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         email: data.email || 'ingen@epost.no',
         phone: data.phone || '',
         acceptedTerms: true,
-        acceptedNewsletter: false,
+        acceptedNewsletter: data.subscribeNewsletter || false,
         paymentType: data.paymentType || 'manual',
         totalPrice: data.totalPrice || 0,
         amountPaid: data.amountPaid || 0,
@@ -137,6 +137,12 @@ export async function POST(req: NextRequest) {
        const { sendBookingConfirmationEmail } = await import('@/lib/email');
        const customText = data.customEmailText || "";
        await sendBookingConfirmationEmail(booking.email, booking, customText);
+    }
+
+    // 5. Add to Newsletter if requested
+    if (data.subscribeNewsletter && booking.email && booking.email !== 'ingen@epost.no') {
+       const { addContactToNewsletter } = await import('@/lib/email');
+       await addContactToNewsletter(booking.email, booking.firstName, booking.lastName);
     }
 
     return NextResponse.json({ success: true, booking });

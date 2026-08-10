@@ -3,8 +3,7 @@ import './globals.css';
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { ConditionalHeader, ConditionalFooter } from "@/components/LayoutVisibilityWrapper";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -110,11 +109,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-[#9C39FF]/30 flex flex-col" suppressHydrationWarning>
-          <Header />
+          <ConditionalHeader />
           <div className="flex-1">
             {children}
           </div>
-          <Footer />
+          <ConditionalFooter />
           <Toaster 
             theme="dark" 
             position="top-center" 
