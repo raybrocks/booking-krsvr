@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Calendar as CalendarIcon, Clock, Plus, Trash2, FileText } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Clock, Plus, Trash2, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ShiftManager() {
   const [view, setView] = useState<'availability' | 'timetracking'>('availability');
@@ -19,6 +19,10 @@ export default function ShiftManager() {
   
   // Form state for Time Tracking
   const [timeNote, setTimeNote] = useState("");
+  
+  // Summary offsets
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [monthOffset, setMonthOffset] = useState(0);
 
   async function fetchData() {
     setLoading(true);
@@ -133,9 +137,29 @@ export default function ShiftManager() {
   };
 
   const now = new Date();
-  const currentWeek = getWeekNumber(now);
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
+
+  const getDisplayWeek = (date: Date, offset: number) => {
+    const targetDate = new Date(date);
+    targetDate.setDate(targetDate.getDate() + (offset * 7));
+    const year = targetDate.getFullYear();
+    // Special case for ISO weeks where Jan 1 might belong to previous year's week
+    const dayNum = targetDate.getUTCDay() || 7;
+    targetDate.setUTCDate(targetDate.getUTCDate() + 4 - dayNum);
+    const isoYear = targetDate.getUTCFullYear();
+    return { week: getWeekNumber(new Date(targetDate)), year: isoYear };
+  };
+
+  const getDisplayMonth = (date: Date, offset: number) => {
+    const targetDate = new Date(date.getFullYear(), date.getMonth() + offset, 1);
+    return {
+      month: targetDate.getMonth(),
+      year: targetDate.getFullYear(),
+      monthName: targetDate.toLocaleString('no-NO', { month: 'long' })
+    };
+  };
+
+  const displayWeekData = getDisplayWeek(now, weekOffset);
+  const displayMonthData = getDisplayMonth(now, monthOffset);
 
   let weekHours = 0;
   let weekEvening = 0;
@@ -146,17 +170,21 @@ export default function ShiftManager() {
     const isMine = currentUser?.id === entry.employeeId;
     const isManager = currentUser?.email === 'post@krsvr.no';
     
-    // Only sum if it belongs to me, OR I am a manager (manager sees global total)
     if (isMine || isManager) {
       const d = new Date(entry.date);
       const w = getWeekNumber(d);
       
-      if (d.getFullYear() === currentYear && w === currentWeek) {
+      const dDayNum = d.getUTCDay() || 7;
+      const dTarget = new Date(d);
+      dTarget.setUTCDate(dTarget.getUTCDate() + 4 - dDayNum);
+      const isoYear = dTarget.getUTCFullYear();
+      
+      if (isoYear === displayWeekData.year && w === displayWeekData.week) {
         weekHours += entry.hours;
         weekEvening += entry.eveningHours;
       }
       
-      if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
+      if (d.getFullYear() === displayMonthData.year && d.getMonth() === displayMonthData.month) {
         monthHours += entry.hours;
         monthEvening += entry.eveningHours;
       }
@@ -276,7 +304,7 @@ export default function ShiftManager() {
       {view === 'timetracking' && (
         <>
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
-            <h2 className="text-lg font-medium text-white mb-4">Før Timer</h2>
+            <h2 className="text-lg font-medium text-white mb-4">Timeføring</h2>
             <form onSubmit={handleLogTime} className="flex flex-col gap-4">
               <div className="flex flex-col md:flex-row gap-4 items-end">
                 <div className="flex-1 space-y-2">
@@ -376,7 +404,14 @@ export default function ShiftManager() {
           {/* Summary Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-              <h3 className="text-zinc-400 text-sm font-medium mb-1">Timer denne uken (Uke {currentWeek})</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-zinc-400 text-sm font-medium">Timer Uke {displayWeekData.week} {displayWeekData.year !== (new Date()).getFullYear() ? displayWeekData.year : ''}</h3>
+                <div className="flex items-center gap-1">
+                  <button type="button" onClick={() => setWeekOffset(prev => prev - 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronLeft className="w-4 h-4"/></button>
+                  <button type="button" onClick={() => setWeekOffset(0)} className="text-xs font-medium text-zinc-500 hover:text-white px-2">I dag</button>
+                  <button type="button" onClick={() => setWeekOffset(prev => prev + 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronRight className="w-4 h-4"/></button>
+                </div>
+              </div>
               <div className="flex items-end gap-3">
                 <span className="text-3xl font-bold text-white">{weekHours.toFixed(1)}t</span>
                 {weekEvening > 0 && (
@@ -388,7 +423,14 @@ export default function ShiftManager() {
             </div>
             
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-              <h3 className="text-zinc-400 text-sm font-medium mb-1">Timer denne måneden</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-zinc-400 text-sm font-medium capitalize">Timer {displayMonthData.monthName} {displayMonthData.year}</h3>
+                <div className="flex items-center gap-1">
+                  <button type="button" onClick={() => setMonthOffset(prev => prev - 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronLeft className="w-4 h-4"/></button>
+                  <button type="button" onClick={() => setMonthOffset(0)} className="text-xs font-medium text-zinc-500 hover:text-white px-2">I dag</button>
+                  <button type="button" onClick={() => setMonthOffset(prev => prev + 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronRight className="w-4 h-4"/></button>
+                </div>
+              </div>
               <div className="flex items-end gap-3">
                 <span className="text-3xl font-bold text-[#9C39FF]">{monthHours.toFixed(1)}t</span>
                 {monthEvening > 0 && (
