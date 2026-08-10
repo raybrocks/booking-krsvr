@@ -541,7 +541,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 pt-0 md:pt-4 pb-20">
-      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sticky top-[72px] md:top-[88px] z-[60] bg-zinc-950/90 backdrop-blur-xl py-4 -mx-6 px-6 md:mx-0 md:px-0 border-b md:border border-zinc-800/80 md:rounded-xl md:px-4 md:py-3 shadow-2xl">
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 sticky top-0 md:top-4 z-[60] bg-zinc-950/90 backdrop-blur-xl py-4 -mx-6 px-6 md:mx-0 md:px-0 border-b md:border border-zinc-800/80 md:rounded-xl md:px-4 md:py-3 shadow-2xl">
         <div>
           <h1 className="text-3xl font-light tracking-tight">Admin Dashboard</h1>
         </div>
