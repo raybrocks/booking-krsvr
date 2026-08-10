@@ -1,12 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET(req: NextRequest) {
   try {
     const employees = await prisma.employee.findMany({
       orderBy: { createdAt: 'desc' }
     });
-    return NextResponse.json(employees);
+
+    let authUsers: any[] = [];
+    try {
+      const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+      if (!error && data?.users) {
+        authUsers = data.users;
+      }
+    } catch (e) {
+      console.error("Failed to fetch auth users", e);
+    }
+    
+    const employeesWithLastLogin = employees.map(emp => {
+      const authUser = authUsers.find(u => u.email === emp.email);
+      return {
+        ...emp,
+        lastLogin: authUser?.last_sign_in_at || null
+      };
+    });
+
+    return NextResponse.json(employeesWithLastLogin);
   } catch (error) {
     console.error("Failed to fetch employees", error);
     return NextResponse.json({ error: 'Failed to fetch employees' }, { status: 500 });

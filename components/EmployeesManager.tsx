@@ -139,6 +139,7 @@ export default function EmployeesManager() {
               <th className="px-6 py-4 font-medium">Navn</th>
               <th className="px-6 py-4 font-medium">E-post</th>
               <th className="px-6 py-4 font-medium">Rolle</th>
+              <th className="px-6 py-4 font-medium">Sist innlogget</th>
               <th className="px-6 py-4 font-medium">Status</th>
               <th className="px-6 py-4 font-medium text-right">Handling</th>
             </tr>
@@ -146,7 +147,7 @@ export default function EmployeesManager() {
           <tbody className="divide-y divide-zinc-800/50">
             {employees.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-zinc-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">
                   Ingen ansatte funnet.
                 </td>
               </tr>
@@ -164,6 +165,11 @@ export default function EmployeesManager() {
                       <Shield className="w-3.5 h-3.5" />
                       Admin
                     </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-zinc-400 text-xs">
+                      {emp.lastLogin ? new Date(emp.lastLogin).toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : "Aldri"}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     {emp.isActive ? (
