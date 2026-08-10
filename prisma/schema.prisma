@@ -149,9 +149,10 @@ model Employee {
   role      String   @default("admin") // "admin"
   isActive  Boolean  @default(true)
   
-  shifts    ShiftAvailability[]
+  shifts      ShiftAvailability[]
+  timeEntries TimeEntry[]
   
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
@@ -166,4 +167,20 @@ model ShiftAvailability {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model TimeEntry {
+  id           String   @id @default(cuid())
+  employeeId   String
+  date         String   // "YYYY-MM-DD"
+  startTime    String   // "HH:mm"
+  endTime      String   // "HH:mm"
+  hours        Float
+  eveningHours Float    @default(0)
+  note         String?
+  
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
