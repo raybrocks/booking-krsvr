@@ -86,7 +86,7 @@ export default function EmployeesManager() {
         <div>
           <p className="font-bold mb-1">Invitasjon av nye ansatte</p>
           <p>
-            Når du legger til en e-post her, vil personen få tilgang til backend. De må registrere seg i Supabase Auth (eller logge inn hvis de har en konto). Sørg for at de bruker nøyaktig samme e-postadresse som du legger inn her.
+            Når du legger til en e-post her, vil personen få tilgang til backend. Husk at webmaster også må opprette brukeren manuelt i Supabase Auth. Sørg for at webmaster bruker nøyaktig samme e-postadresse som du legger inn her.
           </p>
         </div>
       </div>
