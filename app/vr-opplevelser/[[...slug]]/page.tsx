@@ -18,6 +18,20 @@ export async function generateMetadata({
   let title = "VR Opplevelser | KRS VR Arena Kristiansand";
   let description = "Utforsk våre fantastiske VR-opplevelser og Mixed Reality i Kristiansand, fra VR Escape Rooms til actionfylte skytespill og eventyr for hele familien.";
 
+  // Virtual filter alias: /vr-opplevelser/familie aktiverer Familie-filteret
+  if (initialTypeSlug === "familie") {
+    return {
+      title: "Familievennlige VR-opplevelser i Kristiansand | KRS VR Arena",
+      description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Perfekt for familier med barn og ungdom, bursdag og innendørs aktiviteter.",
+      openGraph: {
+        title: "Familievennlige VR-opplevelser i Kristiansand | KRS VR Arena",
+        description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Perfekt for familier med barn og ungdom, bursdag og innendørs aktiviteter.",
+        url: "https://www.krsvr.no/vr-opplevelser/familie",
+        type: "website",
+      },
+    };
+  }
+
   let isVippsTest = false;
 
   if (initialTypeSlug) {

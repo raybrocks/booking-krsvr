@@ -94,9 +94,13 @@ export function ExperiencesView({
     if (initialTypeSlug === "escape-room" || initialTypeSlug === "escape-rooms") return "Escape Room";
     if (initialTypeSlug === "mixed-reality") return "Mixed Reality";
     if (initialTypeSlug === "zombie" || initialTypeSlug === "zombie-shooter") return "Zombie";
+    if (initialTypeSlug === "familie") return "Familie";
     return "Alle";
   });
   const [isExpanded, setIsExpanded] = useState(false);
+  // Prevents selectedId useEffect from overriding a URL already set by a filter button click,
+  // and also skips the initial URL push when arriving via a virtual filter URL like /familie.
+  const skipNextUrlUpdate = useRef(initialTypeSlug === "familie");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const getEmbedUrl = (url: string) => {
@@ -191,8 +195,14 @@ export function ExperiencesView({
         selectedElement.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       }
     }
+
+    // Skip URL update if a filter click (or virtual filter init) already set the URL
+    if (skipNextUrlUpdate.current) {
+      skipNextUrlUpdate.current = false;
+      return;
+    }
     
-    // Update URL when selectedId changes
+    // Update URL when selectedId changes (specific experience navigation)
     const exp = experiences.find(e => e.id === selectedId);
     if (exp) {
       const newUrl = `/vr-opplevelser/${getTypeSlug(exp)}/${slugify(exp.name)}`;
@@ -224,6 +234,18 @@ export function ExperiencesView({
 
   const handlePrimaryFilterClick = (filter: string) => {
     setActivePrimaryFilter(filter);
+
+    // Push filter-specific URL for Familie and Alle so the URL is shareable/crawlable.
+    // Set skip flag so the selectedId useEffect does not immediately override this URL.
+    if (filter === "Familie") {
+      skipNextUrlUpdate.current = true;
+      window.history.pushState({}, '', '/vr-opplevelser/familie');
+    } else if (filter === "Alle") {
+      skipNextUrlUpdate.current = true;
+      window.history.pushState({}, '', '/vr-opplevelser');
+    }
+    // For type-based filters (Escape Room, Mixed Reality, Zombie, Teambuilding),
+    // the selectedId useEffect handles the URL via the specific experience URL.
     
     const newFiltered = experiences.filter(exp => {
       if (filter === "Alle") return true;
