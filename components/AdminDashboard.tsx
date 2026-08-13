@@ -547,7 +547,7 @@ export default function AdminDashboard() {
         {/* Top row: branding + hamburger (mobile) / branding + nav (desktop) */}
         <div className="flex items-center justify-between py-3 md:py-0 md:flex-row md:items-end md:gap-4 md:px-4 md:pt-3">
           <div>
-            <p className="text-[10px] font-semibold tracking-[0.2em] text-[#9C39FF]/80 uppercase mb-0.5">KRS VR Arena</p>
+            <p className="text-[10px] font-bold tracking-[0.15em] text-zinc-900 uppercase bg-white px-2 py-0.5 rounded-[12px] w-fit mb-1.5">KRS VR Arena</p>
             <h1 className="text-2xl md:text-3xl font-light tracking-tight">Admin Dashboard</h1>
           </div>
 
