@@ -590,6 +590,18 @@ export default function AdminDashboard() {
         )}
       </div>
 
+      {/* Section heading */}
+      {{
+        upcoming: <h2 className="text-xl font-semibold text-white mb-6">Kommende bookinger</h2>,
+        archive: <h2 className="text-xl font-semibold text-white mb-6">Arkiv</h2>,
+        manual: <h2 className="text-xl font-semibold text-white mb-6">Manuell booking</h2>,
+        experiences: <h2 className="text-xl font-semibold text-white mb-6">Spill & Opplevelser</h2>,
+        transactions: <h2 className="text-xl font-semibold text-white mb-6">Regnskap</h2>,
+        shifts: <h2 className="text-xl font-semibold text-white mb-6">Vakter & Timeføring</h2>,
+        employees: <h2 className="text-xl font-semibold text-white mb-6">Ansatte</h2>,
+        settings: <h2 className="text-xl font-semibold text-white mb-6">Innstillinger</h2>,
+      }[activeTab]}
+
       {(activeTab === "upcoming" || activeTab === "archive") && (
         <div className="space-y-4">
           {/* Filters */}
