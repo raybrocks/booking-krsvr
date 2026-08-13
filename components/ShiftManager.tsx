@@ -223,25 +223,25 @@ export default function ShiftManager() {
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
             <h2 className="text-lg font-medium text-white mb-4">Registrer Tilgjengelighet</h2>
             <form onSubmit={handleRegisterAvailability} className="flex flex-col md:flex-row gap-4 md:items-end">
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 min-w-0 space-y-2">
                 <label className="text-sm text-zinc-400">Dato</label>
                 <div className="relative">
                   <CalendarIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-                  <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
+                  <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="w-full min-w-0 bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
                 </div>
               </div>
-              <div className="w-full md:w-32 space-y-2">
+              <div className="w-full min-w-0 md:w-32 space-y-2">
                 <label className="text-sm text-zinc-400">Fra (tt:mm)</label>
                 <div className="relative">
                   <Clock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-                  <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
+                  <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full min-w-0 bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
                 </div>
               </div>
-              <div className="w-full md:w-32 space-y-2">
+              <div className="w-full min-w-0 md:w-32 space-y-2">
                 <label className="text-sm text-zinc-400">Til (tt:mm)</label>
                 <div className="relative">
                   <Clock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-                  <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
+                  <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full min-w-0 bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
                 </div>
               </div>
               <button type="submit" disabled={submitting} className="w-full md:w-auto px-6 py-2.5 bg-[#9C39FF] text-white text-sm font-medium rounded-lg hover:bg-[#8A2BE2] transition-colors disabled:opacity-50">
@@ -307,30 +307,30 @@ export default function ShiftManager() {
             <h2 className="text-lg font-medium text-white mb-4">Timeføring</h2>
             <form onSubmit={handleLogTime} className="flex flex-col gap-4">
               <div className="flex flex-col md:flex-row gap-4 md:items-end">
-                <div className="flex-1 space-y-2">
+                <div className="flex-1 min-w-0 space-y-2">
                   <label className="text-sm text-zinc-400">Dato</label>
                   <div className="relative">
                     <CalendarIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-                    <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
+                    <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="w-full min-w-0 bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
                   </div>
                 </div>
-                <div className="w-full md:w-32 space-y-2">
+                <div className="w-full min-w-0 md:w-32 space-y-2">
                   <label className="text-sm text-zinc-400">Fra (tt:mm)</label>
                   <div className="relative">
                     <Clock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-                    <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
+                    <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full min-w-0 bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
                   </div>
                 </div>
-                <div className="w-full md:w-32 space-y-2">
+                <div className="w-full min-w-0 md:w-32 space-y-2">
                   <label className="text-sm text-zinc-400">Til (tt:mm)</label>
                   <div className="relative">
                     <Clock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-                    <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
+                    <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full min-w-0 bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]" />
                   </div>
                 </div>
               </div>
               <div className="flex flex-col md:flex-row gap-4 md:items-end">
-                <div className="flex-1 space-y-2">
+                <div className="flex-1 min-w-0 space-y-2">
                   <label className="text-sm text-zinc-400">Kommentar (valgfri)</label>
                   <div className="relative">
                     <FileText className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />

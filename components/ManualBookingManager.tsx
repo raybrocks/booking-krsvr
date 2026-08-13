@@ -66,7 +66,8 @@ export default function ManualBookingManager() {
         return;
       }
       
-      const selDate = new Date(date);
+      const [year, month, day] = date.split('-').map(Number);
+      const selDate = new Date(year, month - 1, day);
       let times: string[] = [];
       if (settings.specialHours && settings.specialHours[date]) {
         times = settings.specialHours[date];
@@ -222,7 +223,7 @@ export default function ManualBookingManager() {
               <input
                 type="date"
                 required
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                className="w-full min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
               />
@@ -232,7 +233,7 @@ export default function ManualBookingManager() {
               <label className="text-sm text-zinc-400 mb-1 block">Tidspunkt</label>
               <div className="flex gap-2 items-center">
                 <select
-                  className="w-1/2 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                  className="flex-1 min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-2 sm:px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
                   value={availableTimes.includes(time) ? time : (time ? "custom" : "")}
                   onChange={(e) => {
                     if (e.target.value !== "custom") {
@@ -250,10 +251,10 @@ export default function ManualBookingManager() {
                      <option value="custom" hidden>Egendefinert</option>
                   )}
                 </select>
-                <span className="text-zinc-500 text-sm">eller</span>
+                <span className="text-zinc-500 text-sm shrink-0">eller</span>
                 <input
                   type="time"
-                  className="w-1/3 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                  className="flex-1 min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-2 sm:px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   required
