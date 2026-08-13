@@ -222,7 +222,7 @@ export default function ShiftManager() {
         <>
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
             <h2 className="text-lg font-medium text-white mb-4">Registrer Tilgjengelighet</h2>
-            <form onSubmit={handleRegisterAvailability} className="flex flex-col md:flex-row gap-4 items-end">
+            <form onSubmit={handleRegisterAvailability} className="flex flex-col md:flex-row gap-4 md:items-end">
               <div className="flex-1 space-y-2">
                 <label className="text-sm text-zinc-400">Dato</label>
                 <div className="relative">
@@ -306,7 +306,7 @@ export default function ShiftManager() {
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
             <h2 className="text-lg font-medium text-white mb-4">Timeføring</h2>
             <form onSubmit={handleLogTime} className="flex flex-col gap-4">
-              <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex flex-col md:flex-row gap-4 md:items-end">
                 <div className="flex-1 space-y-2">
                   <label className="text-sm text-zinc-400">Dato</label>
                   <div className="relative">
@@ -329,7 +329,7 @@ export default function ShiftManager() {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex flex-col md:flex-row gap-4 md:items-end">
                 <div className="flex-1 space-y-2">
                   <label className="text-sm text-zinc-400">Kommentar (valgfri)</label>
                   <div className="relative">
