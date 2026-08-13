@@ -32,6 +32,15 @@ export async function generateMetadata({
     };
   }
 
+  // Immediately block SEO for vipps-test regardless of DB content
+  if (initialTypeSlug && (initialTypeSlug.includes("vipps-test") || initialTypeSlug.includes("vipps test"))) {
+    return {
+      title: "Test",
+      description: "",
+      robots: { index: false, follow: false },
+    };
+  }
+
   let isVippsTest = false;
 
   if (initialTypeSlug) {
@@ -60,7 +69,7 @@ export async function generateMetadata({
         }
       }
       
-      if (initialTypeSlug.includes("vipps-test") || initialTypeSlug.includes("vipps-test")) {
+      if (initialTypeSlug.includes("vipps-test") || initialTypeSlug.includes("vipps test")) {
           isVippsTest = true;
       }
     } catch (error) {

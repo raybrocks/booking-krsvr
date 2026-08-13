@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/dev/'],
+      disallow: ['/admin/', '/dev/', '/vr-opplevelser/vipps-test'],
     },
     sitemap: 'https://www.krsvr.no/sitemap.xml',
   };
