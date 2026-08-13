@@ -45,7 +45,7 @@ export default function ManualBookingManager() {
           const exps = await expRes.json();
           const sett = await settingsRes.json();
           setExperiences(exps);
-          setSettings(sett);
+          setSettings(sett.general || sett);
           if (exps.length > 0) setExperienceId(exps[0].id);
         }
       } catch (error) {
