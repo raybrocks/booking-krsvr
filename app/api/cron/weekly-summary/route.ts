@@ -48,6 +48,12 @@ export async function GET(req: Request) {
     allBookings.forEach((b: any) => {
       try {
         if (!b.date) return;
+        
+        // Skip auto-generated shadow bookings
+        if (b.internalNotes && b.internalNotes.includes('Auto-generert tids-blokk')) {
+          return;
+        }
+        
         const bookingDate = new Date(b.date);
         
         // Past week stats
