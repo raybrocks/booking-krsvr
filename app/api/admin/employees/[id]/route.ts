@@ -1,12 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    
+    // Get the employee email before deleting
+    const employee = await prisma.employee.findUnique({ where: { id } });
+    
     await prisma.employee.delete({
       where: { id }
     });
+
+    if (employee) {
+      // Also delete from Supabase Auth
+      try {
+        const { data } = await supabaseAdmin.auth.admin.listUsers();
+        if (data?.users) {
+          const authUser = data.users.find(u => u.email === employee.email);
+          if (authUser) {
+            await supabaseAdmin.auth.admin.deleteUser(authUser.id);
+          }
+        }
+      } catch (authErr) {
+        console.error("Failed to delete from Supabase Auth", authErr);
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Failed to delete employee", error);
