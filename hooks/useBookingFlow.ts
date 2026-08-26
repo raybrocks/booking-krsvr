@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { format, getDay } from "date-fns";
+import { format, getDay, isSameDay } from "date-fns";
 import { toast } from "sonner";
 
 export type Experience = {
@@ -293,6 +293,23 @@ export function useBookingFlow() {
     }
   };
 
+  const effectiveBookedTimes = useMemo(() => {
+    let combined = [...bookedTimes];
+    if (selectedDate && isSameDay(selectedDate, new Date())) {
+      const currentHour = new Date().getHours();
+      const currentMinute = new Date().getMinutes();
+      availableTimes.forEach(t => {
+        const [h, m] = t.split(':').map(Number);
+        if (h < currentHour || (h === currentHour && m <= currentMinute)) {
+          if (!combined.includes(t)) {
+            combined.push(t);
+          }
+        }
+      });
+    }
+    return combined;
+  }, [bookedTimes, selectedDate, availableTimes]);
+
   return {
     step, setStep, experiences, settings, loading,
     selectedDate, setSelectedDate, selectedTime, setSelectedTime,
@@ -303,7 +320,7 @@ export function useBookingFlow() {
     paymentType, setPaymentType, isSubmitting, bookingComplete,
     discountCodeInput, setDiscountCodeInput, appliedDiscount, validatingDiscount,
     discountError, discountMessage,
-    globalPricing, bookedTimes, loadingTimes, availableTimes, bookedDates,
+    globalPricing, bookedTimes: effectiveBookedTimes, loadingTimes, availableTimes, bookedDates,
     isVippsTest, pricePerPerson, rawTotalPrice, discountAmount, totalPrice, amountToPay,
     handleApplyDiscount, handleNext, handleBack, handleSubmit
   };
