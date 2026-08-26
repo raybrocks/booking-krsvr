@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     }
 
     const employee = await prisma.employee.findUnique({
-      where: { email: user.email }
+      where: { email: user.email.toLowerCase() }
     });
 
     if (!employee || !employee.isActive) {

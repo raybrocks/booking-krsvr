@@ -39,14 +39,15 @@ export async function POST(req: NextRequest) {
     if (!data.email || !data.name) {
        return NextResponse.json({ error: 'Missing email or name' }, { status: 400 });
     }
-    const existing = await prisma.employee.findUnique({ where: { email: data.email } });
+    const email = data.email.toLowerCase().trim();
+    const existing = await prisma.employee.findUnique({ where: { email } });
     if (existing) {
        return NextResponse.json({ error: 'Employee with this email already exists.' }, { status: 400 });
     }
 
     const employee = await prisma.employee.create({
       data: {
-        email: data.email,
+        email,
         name: data.name,
         role: data.role || 'admin',
         isActive: data.isActive !== undefined ? data.isActive : true
