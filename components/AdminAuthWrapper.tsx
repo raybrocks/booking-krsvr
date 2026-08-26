@@ -46,6 +46,21 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const prefillEmail = params.get("email");
+      const isRegister = params.get("register");
+      
+      if (prefillEmail) {
+        setEmail(prefillEmail);
+      }
+      if (isRegister === "true") {
+        setIsSignUp(true);
+      }
+    }
+  }, []);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);

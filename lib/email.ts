@@ -395,7 +395,8 @@ export async function sendEmployeeInviteEmail(to: string, name: string) {
     return;
   }
 
-  const loginUrl = `https://krsvr.no/admin`;
+  const encodedEmail = encodeURIComponent(to);
+  const loginUrl = `https://krsvr.no/admin?email=${encodedEmail}&register=true`;
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
