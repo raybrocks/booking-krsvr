@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { supabaseAdmin } from '@/lib/supabase';
+import { sendEmployeeInviteEmail } from '@/lib/email';
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,6 +54,9 @@ export async function POST(req: NextRequest) {
         isActive: data.isActive !== undefined ? data.isActive : true
       }
     });
+
+    // Send invitation email asynchronously so it doesn't block the response
+    sendEmployeeInviteEmail(email, data.name).catch(console.error);
 
     return NextResponse.json({ success: true, employee });
   } catch (error: any) {

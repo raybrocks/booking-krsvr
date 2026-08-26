@@ -389,6 +389,55 @@ export async function sendWeeklyAdminSummary(
   }
 }
 
+export async function sendEmployeeInviteEmail(to: string, name: string) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Email not sent.");
+    return;
+  }
+
+  const loginUrl = `https://krsvr.no/admin`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h1 style="color: #9C39FF;">Velkommen til Krs VR Arena, ${name}!</h1>
+      <p>Du har blitt lagt til som ansatt i vårt system.</p>
+      <p>Før du kan logge inn, må du opprette en bruker med denne e-postadressen (<strong>${to}</strong>).</p>
+      
+      <div style="margin: 30px 0;">
+        <a href="${loginUrl}" style="background-color: #9C39FF; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+          Gå til Admin-panelet for å registrere deg
+        </a>
+      </div>
+
+      <p style="font-size: 14px; color: #555;">
+        <strong>Slik gjør du det:</strong><br>
+        1. Trykk på knappen over for å gå til admin-panelet.<br>
+        2. Trykk på <em>"Ny ansatt? Registrer deg her"</em> nederst på skjermen.<br>
+        3. Skriv inn denne e-posten og lag deg et passord.<br>
+        4. Logg inn med den nye brukeren din!
+      </p>
+
+      <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+      <p style="font-size: 12px; color: #999;">
+        Dette er en automatisk generert e-post fra Krs VR Arena systemet.<br>
+        Dersom dette er en feil, kan du se bort fra denne e-posten.
+      </p>
+    </div>
+  `;
+
+  try {
+    const { error } = await resend.emails.send({
+      from: 'Krs VR Arena <booking@donotreply.krsvr.no>',
+      to: to,
+      subject: 'Invitasjon til Krs VR Arena Admin',
+      html,
+    });
+    if (error) console.error("Resend employee invite error:", error);
+  } catch (err) {
+    console.error("Failed to send employee invite email:", err);
+  }
+}
+
 export async function addContactToNewsletter(email: string, firstName: string, lastName: string) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY is not set. Contact not added to newsletter.");
