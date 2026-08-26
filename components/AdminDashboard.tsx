@@ -224,6 +224,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleEditNote = async (id: string, currentNote: string) => {
+    const newNote = window.prompt("Rediger kommentar for booking:", currentNote || "");
+    if (newNote === null) return; // Avbrutt
+
+    try {
+      const response = await fetch(`/api/admin/bookings/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ internalNotes: newNote.trim() })
+      });
+      
+      if (!response.ok) {
+        toast.error("Feilet ved oppdatering av kommentar");
+      } else {
+        toast.success("Kommentar oppdatert!");
+        setBookings(prev => prev.map(b => b.id === id ? { ...b, internalNotes: newNote.trim() } : b));
+      }
+    } catch (error) {
+       toast.error("Nettverksfeil oppstod.");
+    }
+  };
+
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -409,10 +431,21 @@ export default function AdminDashboard() {
                       </span>
                       <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
                     </div>
-                    {booking.internalNotes && (
-                       <div className="mt-2 text-xs text-zinc-400 bg-zinc-800/40 p-2 rounded-lg border border-zinc-700/50 italic max-w-xs whitespace-normal">
+                    {booking.internalNotes ? (
+                       <div 
+                         className="mt-2 text-xs text-zinc-400 bg-zinc-800/40 p-2 rounded-lg border border-zinc-700/50 italic max-w-xs whitespace-normal cursor-pointer hover:bg-zinc-800 transition-colors"
+                         onClick={() => handleEditNote(booking.id, booking.internalNotes)}
+                         title="Klikk for å redigere kommentar"
+                       >
                           {booking.internalNotes}
                        </div>
+                    ) : (
+                       <button 
+                         onClick={() => handleEditNote(booking.id, "")} 
+                         className="mt-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors underline decoration-dotted underline-offset-2"
+                       >
+                         + Legg til kommentar
+                       </button>
                     )}
                   </td>
                   <td className="px-6 py-4">
