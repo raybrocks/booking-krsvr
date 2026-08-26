@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
         players: data.players || 1,
         firstName: data.firstName || 'Manuell',
         lastName: data.lastName || 'Booking',
+        playerNames: [],
         email: data.email || 'ingen@epost.no',
         phone: data.phone || '',
         acceptedTerms: true,

@@ -44,6 +44,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
     });
 
     return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase.auth]);
 
   useEffect(() => {

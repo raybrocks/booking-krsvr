@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
           data: {
              experienceId: data.experienceId,
              players: data.players,
+             playerNames: data.playerNames || [],
              firstName: data.firstName,
              lastName: data.lastName,
              email: data.email,
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
              paymentRef: null,
              cancellationEmailSent: false,
              discountCode: data.discountCode,
+             internalNotes: data.internalNotes,
           }
         });
         return NextResponse.json({ id: resetBooking.id }, { status: 201 });
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
                paymentRef: null,
                cancellationEmailSent: false,
                discountCode: data.discountCode,
+               internalNotes: data.internalNotes,
                manageToken: crypto.randomBytes(32).toString('hex'),
             }
           });
@@ -85,6 +88,7 @@ export async function POST(req: NextRequest) {
         date: data.date,
         time: data.time,
         players: data.players,
+        playerNames: data.playerNames || [],
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
@@ -96,6 +100,7 @@ export async function POST(req: NextRequest) {
         amountPaid: data.amountPaid,
         status: data.status || 'pending',
         discountCode: data.discountCode,
+        internalNotes: data.internalNotes,
         manageToken: crypto.randomBytes(32).toString('hex'),
       }
     });

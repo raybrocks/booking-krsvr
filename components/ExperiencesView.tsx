@@ -475,6 +475,7 @@ export function ExperiencesView({
               <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mb-8 max-w-4xl mx-auto px-4">
                 {selected.awards.map((awardUrl: string, index: number) => (
                   <div key={index} className="relative h-12 md:h-16 flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src={awardUrl} 
                       alt={`Utmerkelse for ${selected.name}`} 

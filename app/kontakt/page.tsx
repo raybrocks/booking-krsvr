@@ -522,13 +522,16 @@ function KontaktForm() {
 
                       <div>
                         <label className="block text-sm font-medium text-zinc-300 mb-2">Fortell oss gjerne litt mer *</label>
+                        <p className="text-sm text-zinc-400 mb-3">
+                          For at vi skal kunne gi dere best mulig service, er det supert om dere forteller litt om anledningen, samt <strong>aldersspredning og erfaringsnivå</strong> i gruppa (om dere er erfarne gamere eller helt nybegynnere). Våre opplevelser passer for alle!
+                        </p>
                         <textarea 
                           required
                           rows={4}
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
                           className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[#9C39FF] outline-none transition-colors resize-y"
-                          placeholder="Eksempel: anledning, alder på deltakere, ønsket stemning, spesielle behov, matønsker, tidsramme eller andre spørsmål."
+                          placeholder="F.eks. anledning, erfaringsnivå i gruppa, matønsker eller andre behov..."
                         ></textarea>
                       </div>
 

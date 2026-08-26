@@ -414,8 +414,17 @@ export default function AdminDashboard() {
                   <td className="px-6 py-4">
                     <div className="text-zinc-300">{experiencesMap[booking.experienceId] || booking.experienceId}</div>
                     <div className="flex items-center gap-1 mt-1 text-xs text-zinc-500">
-                      <Users className="w-3 h-3" /> {booking.players} Players
+                      <Users className="w-3 h-3" /> {booking.players} Spillere
                     </div>
+                    {booking.playerNames && booking.playerNames.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {booking.playerNames.filter((n: string) => n.trim() !== '').map((name: string, idx: number) => (
+                          <span key={idx} className="bg-zinc-800 text-zinc-400 text-[10px] px-1.5 py-0.5 rounded border border-zinc-700/50">
+                            {name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="font-medium text-zinc-200">

@@ -21,9 +21,10 @@ export default function BookingFlow() {
   const {
     step, setStep, experiences, settings, loading,
     selectedDate, setSelectedDate, selectedTime, setSelectedTime,
-    players, setPlayers, selectedExperience, setSelectedExperience,
+    players, setPlayers, playerNames, setPlayerNames, selectedExperience, setSelectedExperience,
     filterType, setFilterType,
     firstName, setFirstName, lastName, setLastName, email, setEmail, phone, setPhone,
+    customerNote, setCustomerNote,
     acceptedTerms, setAcceptedTerms, acceptedNewsletter, setAcceptedNewsletter,
     paymentType, setPaymentType, isSubmitting, bookingComplete,
     discountCodeInput, setDiscountCodeInput, appliedDiscount, validatingDiscount,
@@ -402,6 +403,46 @@ export default function BookingFlow() {
                     className="bg-zinc-900 border-zinc-800 focus-visible:ring-zinc-700"
                   />
                 </div>
+              </div>
+
+              <div className="mt-8 space-y-4">
+                <div className="bg-zinc-900/50 p-4 rounded-xl border border-zinc-800/50">
+                  <h3 className="text-lg font-medium text-white mb-2">Hvem skal spille?</h3>
+                  <p className="text-sm text-zinc-400 mb-4">
+                    For raskere kalibrering i arenaen, ber vi deg fylle inn fornavnet på spillerne. Er ikke alle navnene klare enda? Ikke noe problem – du kan gjerne bare skrive inn et tall (f.eks. &quot;3&quot;).
+                  </p>
+                  <div className="space-y-3">
+                    {Array.from({ length: players }).map((_, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <Label className="text-zinc-500 w-16">Spiller {i + 1}</Label>
+                        <Input
+                          placeholder={`Fornavn`}
+                          value={playerNames[i] || ""}
+                          onChange={(e) => {
+                            const newNames = [...playerNames];
+                            newNames[i] = e.target.value;
+                            setPlayerNames(newNames);
+                          }}
+                          className="flex-1 bg-zinc-950 border-zinc-800 focus-visible:ring-zinc-700 text-sm h-9"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 space-y-2">
+                <Label htmlFor="customerNote" className="text-zinc-300">Kommentar til bookingen (valgfritt)</Label>
+                <p className="text-sm text-zinc-400 mb-2">
+                  Fortell oss gjerne litt om aldersspredningen og erfaringsnivået i gruppa (f.eks. om dere er erfarne gamere eller helt nybegynnere). Våre opplevelser er designet for å passe absolutt alle, men med litt info på forhånd kan vi tilpasse servicen og gi dere en enda bedre opplevelse!
+                </p>
+                <textarea
+                  id="customerNote"
+                  placeholder="Skriv litt om gruppa, erfaringsnivå, eller andre beskjeder til oss..."
+                  value={customerNote}
+                  onChange={(e) => setCustomerNote(e.target.value)}
+                  className="flex min-h-[80px] w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm ring-offset-background placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-white mt-2"
+                />
               </div>
             </div>
           )}

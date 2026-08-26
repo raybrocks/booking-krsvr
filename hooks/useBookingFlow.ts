@@ -40,6 +40,7 @@ export function useBookingFlow() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [players, setPlayers] = useState<number>(5);
+  const [playerNames, setPlayerNames] = useState<string[]>(Array(5).fill(""));
   const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
   const [filterType, setFilterType] = useState<string>("All");
   
@@ -48,6 +49,7 @@ export function useBookingFlow() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [customerNote, setCustomerNote] = useState("");
   
   // Terms
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -247,7 +249,9 @@ export function useBookingFlow() {
           date: format(selectedDate, "yyyy-MM-dd"),
           time: selectedTime,
           players,
+          playerNames: playerNames.slice(0, players), // Only send names for actual players
           firstName, lastName, email, phone,
+          internalNotes: customerNote.trim() !== '' ? customerNote : undefined,
           acceptedTerms, acceptedNewsletter,
           paymentType, totalPrice, amountPaid: amountToPay,
           status: "pending", discountCode: appliedDiscount?.code,
@@ -313,9 +317,10 @@ export function useBookingFlow() {
   return {
     step, setStep, experiences, settings, loading,
     selectedDate, setSelectedDate, selectedTime, setSelectedTime,
-    players, setPlayers, selectedExperience, setSelectedExperience,
+    players, setPlayers, playerNames, setPlayerNames, selectedExperience, setSelectedExperience,
     filterType, setFilterType,
     firstName, setFirstName, lastName, setLastName, email, setEmail, phone, setPhone,
+    customerNote, setCustomerNote,
     acceptedTerms, setAcceptedTerms, acceptedNewsletter, setAcceptedNewsletter,
     paymentType, setPaymentType, isSubmitting, bookingComplete,
     discountCodeInput, setDiscountCodeInput, appliedDiscount, validatingDiscount,
