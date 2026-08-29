@@ -399,36 +399,51 @@ export default function TransactionsManager() {
 
                       if (isRefunded) {
                         return (
-                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                            🔵 Refundert (Vipps)
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-blue-400 font-medium text-xs">refundert</span>
+                            <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-sm w-fit">
+                              REFUNDERT (VIPPS)
+                            </span>
+                          </div>
                         );
                       }
                       if (isFree) {
                         return (
-                          <span className="text-[11px] font-medium px-2 py-0.5 rounded inline-flex items-center gap-1 bg-zinc-800 text-zinc-400 border border-zinc-700/50">
-                            ⚪ Gratis / 0 kr
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-zinc-400 font-medium text-xs">gratis</span>
+                            <span className="text-[11px] font-medium uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-zinc-800 text-zinc-400 border border-zinc-700/50 shadow-sm w-fit">
+                              0 KR
+                            </span>
+                          </div>
                         );
                       }
                       if (isFullyPaid) {
                         return (
-                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            🟢 Fullt oppgjort
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-emerald-400 font-medium text-xs">fullt betalt</span>
+                            <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm w-fit">
+                              FULLT OPPGJORT
+                            </span>
+                          </div>
                         );
                       }
                       if (amountPaid > 0 && remaining > 0) {
                         return (
-                          <span className="text-[11px] font-bold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-sm">
-                            🟡 Krev inn: {remaining} NOK
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-amber-400 font-medium text-xs">delbetalt</span>
+                            <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm w-fit">
+                              KREV INN: {remaining} NOK
+                            </span>
+                          </div>
                         );
                       }
                       return (
-                        <span className="text-[11px] font-bold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-red-500/20 text-red-300 border border-red-500/40 shadow-sm">
-                          🔴 Krev inn: {remaining} NOK
-                        </span>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-red-400 font-medium text-xs">ubetalt</span>
+                          <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-red-500/15 text-red-300 border border-red-500/40 shadow-sm w-fit">
+                            KREV INN: {remaining} NOK
+                          </span>
+                        </div>
                       );
                     })()}
                   </td>
