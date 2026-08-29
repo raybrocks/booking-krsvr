@@ -414,7 +414,7 @@ export default function TransactionsManager() {
                       if (isFullyPaid) {
                         return (
                           <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            🟢 Fullt oppgjort (0 kr)
+                            🟢 Fullt oppgjort
                           </span>
                         );
                       }
