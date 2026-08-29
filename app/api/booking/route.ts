@@ -129,8 +129,10 @@ export async function GET(req: NextRequest) {
       select: {
         id: true,
         time: true,
+        duration: true,
         status: true,
         createdAt: true,
+        experienceId: true,
       }
     });
 

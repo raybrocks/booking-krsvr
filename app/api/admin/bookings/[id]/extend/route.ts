@@ -11,12 +11,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // Finn out what the next timeslot should be
     // Usually + 90 mins? But wait, what if the timeslots in openingHours are not exactly 90 min separated?
-    // It is simpler to just accept an explicit `nextTime` string in the request body.
-    const body = await req.json();
-    const { nextTime } = body;
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch (e) {
+      body = {};
+    }
+    
+    let nextTime = body?.nextTime;
 
     if (!nextTime) {
-       return NextResponse.json({ error: 'Mangler neste tidspunkt for utvidelse' }, { status: 400 });
+      const [h, m] = (booking.time || "12:00").split(':').map(Number);
+      const curDur = booking.duration || 90;
+      const totalMinutes = (h || 0) * 60 + (m || 0) + curDur;
+      const endHours = Math.floor(totalMinutes / 60) % 24;
+      const endMinutes = totalMinutes % 60;
+      nextTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
     }
 
     // Check if `nextTime` is already booked

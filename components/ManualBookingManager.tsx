@@ -91,8 +91,30 @@ export default function ManualBookingManager() {
             }
             return true;
           });
-          const bTimes = activeBookings.map((b: any) => typeof b.time === 'string' ? b.time.trim() : b.time);
-          setBookedTimes(bTimes);
+
+          const timeToMinutes = (t: string) => {
+            if (!t || !t.includes(':')) return 0;
+            const [h, m] = t.split(':').map(Number);
+            return (h || 0) * 60 + (m || 0);
+          };
+
+          const blocked = new Set<string>();
+          activeBookings.forEach((b: any) => {
+            if (b.time) blocked.add(b.time.trim());
+            const bStart = timeToMinutes(b.time);
+            const bDuration = Number(b.duration) || 90;
+            const bEnd = bStart + bDuration;
+
+            times.forEach(slot => {
+              const slotStart = timeToMinutes(slot);
+              const slotEnd = slotStart + 90;
+              if (slotStart < bEnd && bStart < slotEnd) {
+                blocked.add(slot.trim());
+              }
+            });
+          });
+
+          setBookedTimes(Array.from(blocked));
         }
       } catch (error) {
         console.error("Failed to fetch blocked times:", error);

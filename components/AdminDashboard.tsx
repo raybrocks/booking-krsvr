@@ -197,21 +197,19 @@ export default function AdminDashboard() {
   };
 
   const extendBooking = async (id: string) => {
-    const nextTime = window.prompt("Tast inn nøyaktig klokkeslett for tidspunktet som skal blokkeres for utvidelsen (eks: 14:30):");
-    if (!nextTime) return;
-
     try {
       const response = await fetch(`/api/admin/bookings/${id}/extend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nextTime: nextTime.trim() })
+        body: JSON.stringify({})
       });
       const data = await response.json();
       
       if (!response.ok) {
         toast.error(data.error || "Feilet ved utvidelse");
       } else {
-        toast.success(`Suksess! Utvidet til ${data.newDuration} minutter totalt.`);
+        toast.success(`Suksess! Utvidet med 90 minutter (${data.newDuration} min totalt).`);
+        setBookings(prev => prev.map(b => b.id === id ? { ...b, duration: data.newDuration } : b));
       }
     } catch (error) {
        toast.error("Nettverksfeil oppstod.");
@@ -219,21 +217,19 @@ export default function AdminDashboard() {
   };
 
   const reduceBooking = async (id: string) => {
-    const timeToRemove = window.prompt("Hvilket tidspunkt vil du fjerne utvidelsen for? Tast inn nøyaktig klokkeslett (eks: 14:30):");
-    if (!timeToRemove) return;
-
     try {
       const response = await fetch(`/api/admin/bookings/${id}/reduce`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timeToRemove: timeToRemove.trim() })
+        body: JSON.stringify({})
       });
       const data = await response.json();
       
       if (!response.ok) {
         toast.error(data.error || "Feilet ved fjerning av utvidet tid");
       } else {
-        toast.success(`Suksess! Tiden ble redusert, total tid er nå ${data.newDuration} minutter.`);
+        toast.success(`Suksess! Redusert med 90 minutter (${data.newDuration} min totalt).`);
+        setBookings(prev => prev.map(b => b.id === id ? { ...b, duration: data.newDuration } : b));
       }
     } catch (error) {
        toast.error("Nettverksfeil oppstod.");
@@ -399,29 +395,29 @@ export default function AdminDashboard() {
                       <Clock className="w-3.5 h-3.5 text-zinc-500" />
                       {getBookingTimeRange(booking.time, booking.duration)}
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-1.5 mt-1 text-xs">
                       <span className="text-[11px] text-zinc-400 font-medium pl-5">
                         {booking.duration || 90} min
                       </span>
                       {booking.status !== 'cancelled' && (
-                        <>
+                        <div className="flex items-center gap-1">
                           <button 
                             onClick={() => extendBooking(booking.id)} 
-                            className="text-[11px] text-zinc-400 hover:text-white px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50" 
-                            title="Legg til en ekstra tidsslot (utvid ++)"
+                            className="text-[11px] text-zinc-400 hover:text-white px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50 font-mono font-medium" 
+                            title="Legg til 90 minutter (+90 min)"
                           >
-                            + Tid
+                            (+)
                           </button>
                           {booking.duration && booking.duration > 90 && (
                             <button 
                               onClick={() => reduceBooking(booking.id)} 
-                              className="text-[11px] text-zinc-400 hover:text-red-400 px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50" 
-                              title="Slett ekstra tidsslot (reduser --)"
+                              className="text-[11px] text-zinc-400 hover:text-red-400 px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50 font-mono font-medium" 
+                              title="Trekk fra 90 minutter (-90 min)"
                             >
-                              - Tid
+                              (-)
                             </button>
                           )}
-                        </>
+                        </div>
                       )}
                     </div>
                   </td>

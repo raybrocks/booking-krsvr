@@ -74,6 +74,7 @@ export function useBookingFlow() {
   
   // Booked Times
   const [bookedTimes, setBookedTimes] = useState<string[]>([]);
+  const [rawBookingsForDate, setRawBookingsForDate] = useState<any[]>([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
   const [bookedDates, setBookedDates] = useState<string[]>([]);
 
@@ -151,6 +152,7 @@ export function useBookingFlow() {
         });
         
         const times = activeBookings.map((b: any) => typeof b.time === 'string' ? b.time.trim() : b.time);
+        setRawBookingsForDate(activeBookings);
         setBookedTimes(times);
         setSelectedTime(prev => times.includes(prev?.trim()) ? "" : prev);
       } catch (error) {
@@ -298,21 +300,46 @@ export function useBookingFlow() {
   };
 
   const effectiveBookedTimes = useMemo(() => {
-    let combined = [...bookedTimes];
+    const timeToMinutes = (t: string) => {
+      if (!t || !t.includes(':')) return 0;
+      const [h, m] = t.split(':').map(Number);
+      return (h || 0) * 60 + (m || 0);
+    };
+
+    const blocked = new Set<string>();
+
+    // 1. Direct booking times & overlapping slots based on duration
+    rawBookingsForDate.forEach((b: any) => {
+      if (b.time) blocked.add(b.time.trim());
+
+      const bStart = timeToMinutes(b.time);
+      const bDuration = Number(b.duration) || 90;
+      const bEnd = bStart + bDuration;
+
+      availableTimes.forEach(slot => {
+        const slotStart = timeToMinutes(slot);
+        const slotEnd = slotStart + 90;
+        // Overlap condition: slotStart < bEnd && bStart < slotEnd
+        if (slotStart < bEnd && bStart < slotEnd) {
+          blocked.add(slot.trim());
+        }
+      });
+    });
+
+    // 2. If selected date is today, block past timeslots
     if (selectedDate && isSameDay(selectedDate, new Date())) {
       const currentHour = new Date().getHours();
       const currentMinute = new Date().getMinutes();
       availableTimes.forEach(t => {
         const [h, m] = t.split(':').map(Number);
         if (h < currentHour || (h === currentHour && m <= currentMinute)) {
-          if (!combined.includes(t)) {
-            combined.push(t);
-          }
+          blocked.add(t.trim());
         }
       });
     }
-    return combined;
-  }, [bookedTimes, selectedDate, availableTimes]);
+
+    return Array.from(blocked);
+  }, [rawBookingsForDate, selectedDate, availableTimes]);
 
   return {
     step, setStep, experiences, settings, loading,

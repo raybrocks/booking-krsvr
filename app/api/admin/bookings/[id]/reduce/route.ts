@@ -13,31 +13,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         return NextResponse.json({ error: 'Ingen utvidet tid er registrert på denne bookingen' }, { status: 400 });
     }
 
-    const { timeToRemove } = await req.json();
-
-    if (!timeToRemove) {
-       return NextResponse.json({ error: 'Mangler klokkeslett som skal fjernes' }, { status: 400 });
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch (e) {
+      body = {};
     }
 
-    // Find the shadow booking
+    let timeToRemove = body?.timeToRemove;
+
+    // Find the shadow booking (if any)
     const shadowBooking = await prisma.booking.findFirst({
-        where: {
-            parentBookingId: booking.id,
-            time: timeToRemove
-        }
+      where: {
+        parentBookingId: booking.id,
+        ...(timeToRemove ? { time: timeToRemove } : {})
+      },
+      orderBy: { time: 'desc' }
     });
 
-    if (!shadowBooking) {
-        return NextResponse.json({ error: `Fant ingen ekstra tidsslot for klokken ${timeToRemove} som tilhører denne bookingen.` }, { status: 404 });
-    }
-
-    // Delete shadow booking
-    await prisma.booking.delete({
+    if (shadowBooking) {
+      // Delete shadow booking
+      await prisma.booking.delete({
         where: { id: shadowBooking.id }
-    });
+      });
+    }
 
     // Update main booking duration
-    const newDuration = booking.duration - 90;
+    const newDuration = Math.max(90, (booking.duration || 90) - 90);
     const updated = await prisma.booking.update({
       where: { id: booking.id },
       data: { duration: newDuration }
