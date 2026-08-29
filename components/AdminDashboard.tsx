@@ -462,7 +462,7 @@ export default function AdminDashboard() {
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 whitespace-normal">
                     <div className="font-medium text-zinc-200">
                       {booking.bookingType === 'corporate' && booking.companyName ? (
                         <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded mr-2">Bedrift</span>
@@ -478,7 +478,7 @@ export default function AdminDashboard() {
                     </div>
                     {booking.internalNotes ? (
                        <div 
-                         className="mt-2 text-xs text-zinc-400 bg-zinc-800/40 p-2 rounded-lg border border-zinc-700/50 italic max-w-sm break-words cursor-pointer hover:bg-zinc-800 transition-colors"
+                         className="mt-2 text-xs text-zinc-400 bg-zinc-800/40 p-2.5 rounded-lg border border-zinc-700/50 italic w-full whitespace-normal break-words cursor-pointer hover:bg-zinc-800 transition-colors"
                          onClick={() => handleEditNote(booking.id, booking.internalNotes)}
                          title="Klikk for å redigere kommentar"
                        >
@@ -552,7 +552,7 @@ export default function AdminDashboard() {
                               <div className="flex flex-col gap-1">
                                 <span className="text-amber-400 font-medium text-xs">delbetalt</span>
                                 <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm w-fit">
-                                  KREV INN: {remaining} NOK
+                                  GJENSTÅR: {remaining} NOK
                                 </span>
                               </div>
                             );
@@ -561,7 +561,7 @@ export default function AdminDashboard() {
                             <div className="flex flex-col gap-1">
                               <span className="text-red-400 font-medium text-xs">ubetalt</span>
                               <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-red-500/15 text-red-300 border border-red-500/40 shadow-sm w-fit">
-                                KREV INN: {remaining} NOK
+                                GJENSTÅR: {remaining} NOK
                               </span>
                             </div>
                           );

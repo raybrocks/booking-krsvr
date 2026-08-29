@@ -649,7 +649,7 @@ export async function sendWeeklyAdminSummary(
                   <div>
                     ${b.remainingCash > 0 ? `
                       <span style="background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">
-                        KREV INN: ${b.remainingCash} NOK
+                        GJENSTÅR: ${b.remainingCash} NOK
                       </span>
                     ` : `
                       <span style="background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">

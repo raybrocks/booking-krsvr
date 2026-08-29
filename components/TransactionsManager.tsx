@@ -432,7 +432,7 @@ export default function TransactionsManager() {
                           <div className="flex flex-col gap-1">
                             <span className="text-amber-400 font-medium text-xs">delbetalt</span>
                             <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm w-fit">
-                              KREV INN: {remaining} NOK
+                              GJENSTÅR: {remaining} NOK
                             </span>
                           </div>
                         );
@@ -441,7 +441,7 @@ export default function TransactionsManager() {
                         <div className="flex flex-col gap-1">
                           <span className="text-red-400 font-medium text-xs">ubetalt</span>
                           <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-red-500/15 text-red-300 border border-red-500/40 shadow-sm w-fit">
-                            KREV INN: {remaining} NOK
+                            GJENSTÅR: {remaining} NOK
                           </span>
                         </div>
                       );
