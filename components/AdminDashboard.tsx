@@ -663,7 +663,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6 pt-0 md:pt-4 pb-20">
+    <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 xl:px-12 pt-0 md:pt-4 pb-20">
       {/* Sticky header */}
       <div className="mb-8 sticky top-0 md:top-4 z-[60] bg-zinc-950/90 backdrop-blur-xl -mx-6 px-6 md:mx-0 md:px-0 border-b md:border border-zinc-800/80 md:rounded-xl shadow-2xl">
         {/* Top row: branding + hamburger (mobile) / branding + nav (desktop) */}
