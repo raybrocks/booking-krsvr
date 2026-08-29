@@ -222,18 +222,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="relative min-h-screen">
-      {/* Small floating logout button for admin */}
-      <div className="absolute top-4 right-4 z-50">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 rounded-lg transition-colors shadow-lg"
-          title="Logg ut"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>Ut</span>
-        </button>
-      </div>
+    <div className="min-h-screen">
       {children}
     </div>
   );

@@ -385,13 +385,6 @@ export default function TransactionsManager() {
                        ) : (
                          <div className="text-zinc-500 text-[11px] italic">Innbetalt: 0 NOK</div>
                        )}
-                       {((tx.totalPrice || 0) - (tx.amountPaid || 0)) > 0 ? (
-                         <div className="text-amber-400 font-semibold text-[11px]">Gjenstår: {((tx.totalPrice || 0) - (tx.amountPaid || 0)).toFixed(2)} NOK</div>
-                       ) : (
-                         (tx.totalPrice || 0) > 0 ? (
-                           <div className="text-emerald-400 font-medium text-[11px]">Alt betalt på forhånd</div>
-                         ) : null
-                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4">

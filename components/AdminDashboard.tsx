@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut } from "lucide-react";
 import { toast } from "sonner";
+import { createClient } from "@/utils/supabase/client";
 import SettingsManager from "./SettingsManager";
 import ExperiencesManager from "./ExperiencesManager";
 import TransactionsManager from "./TransactionsManager";
@@ -69,6 +70,12 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [experiencesMap, setExperiencesMap] = useState<Record<string, string>>({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -563,17 +570,6 @@ export default function AdminDashboard() {
                               Innbetalt: 0 NOK
                             </div>
                           )}
-                          {(booking.totalPrice || 0) > (booking.amountPaid || 0) ? (
-                            <div className="text-amber-400 font-semibold text-[11px]">
-                              Gjenstår i kasse: {(booking.totalPrice || 0) - (booking.amountPaid || 0)} NOK
-                            </div>
-                          ) : (
-                            (booking.totalPrice || 0) > 0 ? (
-                              <div className="text-emerald-400 font-medium text-[11px]">
-                                Alt er betalt på forhånd
-                              </div>
-                            ) : null
-                          )}
                         </div>
                       )}
 
@@ -665,40 +661,56 @@ export default function AdminDashboard() {
   return (
     <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 xl:px-12 pt-0 md:pt-4 pb-20">
       {/* Sticky header */}
-      <div className="mb-8 sticky top-0 md:top-4 z-[60] bg-zinc-950/90 backdrop-blur-xl -mx-6 px-6 md:mx-0 md:px-0 border-b md:border border-zinc-800/80 md:rounded-xl shadow-2xl">
-        {/* Top row: branding + hamburger (mobile) / branding + nav (desktop) */}
-        <div className="flex items-center justify-between py-3 md:py-0 md:flex-row md:items-end md:gap-4 md:px-4 md:pt-3">
-          <div>
-            <p className="text-[10px] font-bold tracking-[0.15em] text-zinc-900 uppercase bg-white px-2 py-0.5 rounded-[12px] w-fit mb-1.5">KRS VR Arena</p>
-            <h1 className="text-2xl md:text-3xl font-light tracking-tight">Admin Dashboard</h1>
+      <header className="mb-8 sticky top-0 md:top-4 z-40 bg-zinc-950/95 backdrop-blur-xl border border-zinc-800/80 rounded-2xl px-4 py-3 md:px-6 md:py-3.5 shadow-2xl">
+        <div className="flex items-center justify-between gap-4">
+          {/* Left: Branding */}
+          <div className="flex-shrink-0">
+            <span className="text-[10px] font-bold tracking-[0.15em] text-zinc-950 uppercase bg-white px-2.5 py-0.5 rounded-full inline-block mb-1 shadow-sm">
+              KRS VR Arena
+            </span>
+            <h1 className="text-xl md:text-2xl font-light tracking-tight text-white">
+              Admin Dashboard
+            </h1>
           </div>
 
-          {/* Hamburger button – mobile only */}
-          <button
-            className="md:hidden p-2 -mr-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800"
-            onClick={() => setMobileMenuOpen(prev => !prev)}
-            aria-label={mobileMenuOpen ? 'Lukk meny' : 'Åpne meny'}
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Center: Desktop nav pill menu */}
+          <nav className="hidden xl:flex items-center bg-zinc-900/90 p-1.5 rounded-xl border border-zinc-800/80 shadow-inner gap-1 flex-wrap">
+            <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Upcoming</button>
+            <button onClick={() => setActiveTab("manual")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-4 h-4" /> Booking</button>
+            <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
+            <button onClick={() => setActiveTab("experiences")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-4 h-4" /> Spill</button>
+            <button onClick={() => setActiveTab("transactions")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
+            <button onClick={() => setActiveTab("shifts")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
+            <button onClick={() => setActiveTab("employees")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
+            <button onClick={() => setActiveTab("settings")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
+          </nav>
 
-          {/* Desktop nav – always visible */}
-          <div className="hidden md:flex flex-wrap bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 shadow-lg shadow-black/50 lg:w-fit gap-1">
-            <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); }} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Upcoming</button>
-            <button onClick={() => setActiveTab("manual")} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-4 h-4" /> Booking</button>
-            <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); }} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
-            <button onClick={() => setActiveTab("experiences")} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-4 h-4" /> Spill</button>
-            <button onClick={() => setActiveTab("transactions")} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
-            <button onClick={() => setActiveTab("shifts")} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
-            <button onClick={() => setActiveTab("employees")} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
-            <button onClick={() => setActiveTab("settings")} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
+          {/* Right: Logout button + Mobile/Tablet Hamburger */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={handleLogout}
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-zinc-900/90 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 text-zinc-300 border border-zinc-800 rounded-xl transition-all shadow-sm"
+              title="Logg ut av admin"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logg ut</span>
+            </button>
+
+            {/* Hamburger button – mobile/tablet only */}
+            <button
+              className="xl:hidden p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800"
+              onClick={() => setMobileMenuOpen(prev => !prev)}
+              aria-label={mobileMenuOpen ? 'Lukk meny' : 'Åpne meny'}
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
 
-        {/* Mobile nav dropdown */}
+        {/* Mobile / Tablet nav dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden pb-3 pt-1">
-            <div className="grid grid-cols-2 gap-1 bg-zinc-900/80 p-1.5 rounded-xl border border-zinc-800">
+          <div className="xl:hidden mt-3 pt-3 border-t border-zinc-800/80">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-zinc-900/80 p-2 rounded-xl border border-zinc-800">
               <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Upcoming</button>
               <button onClick={() => { setActiveTab("manual"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-4 h-4" /> Booking</button>
               <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
@@ -707,10 +719,13 @@ export default function AdminDashboard() {
               <button onClick={() => { setActiveTab("shifts"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
               <button onClick={() => { setActiveTab("employees"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
               <button onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
+              <button onClick={handleLogout} className="col-span-2 sm:col-span-4 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 border border-red-500/20 mt-1">
+                <LogOut className="w-4 h-4" /> Logg ut
+              </button>
             </div>
           </div>
         )}
-      </div>
+      </header>
 
       {/* Section heading */}
       {{
