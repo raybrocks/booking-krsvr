@@ -291,8 +291,8 @@ export default function TransactionsManager() {
         </div>
       </div>
 
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col">
-        <div className="overflow-auto max-h-[70vh] rounded-2xl relative">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col w-full max-w-full">
+        <div className="overflow-x-auto max-h-[70vh] rounded-2xl relative w-full">
           <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[1100px]">
             <colgroup>
               <col className="w-[18%]" />

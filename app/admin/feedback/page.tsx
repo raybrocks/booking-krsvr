@@ -68,8 +68,8 @@ export default async function AdminFeedbackPage() {
 
         {/* Tabell */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-zinc-300">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left text-sm text-zinc-300 min-w-[650px]">
               <thead className="bg-zinc-950/50 text-xs uppercase text-zinc-500 border-b border-zinc-800">
                 <tr>
                   <th className="px-6 py-4 font-medium">Dato</th>

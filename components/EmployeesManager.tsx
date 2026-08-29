@@ -91,33 +91,33 @@ export default function EmployeesManager() {
         </div>
       </div>
 
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 sm:p-6 max-w-full overflow-hidden">
         <h2 className="text-lg font-medium text-white mb-4">Legg til Ansatt</h2>
-        <form onSubmit={handleCreate} className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1 space-y-2">
+        <form onSubmit={handleCreate} className="flex flex-col md:flex-row gap-4 md:items-end w-full max-w-full">
+          <div className="flex-1 w-full min-w-0 max-w-full space-y-2">
             <label className="text-sm text-zinc-400">Navn</label>
-            <div className="relative">
-              <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <div className="relative w-full min-w-0 max-w-full">
+              <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
+                className="w-full max-w-full box-border block bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
                 placeholder="F.eks. Kari Nordmann"
               />
             </div>
           </div>
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 w-full min-w-0 max-w-full space-y-2">
             <label className="text-sm text-zinc-400">E-post</label>
-            <div className="relative">
-              <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <div className="relative w-full min-w-0 max-w-full">
+              <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
+                className="w-full max-w-full box-border block bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
                 placeholder="kari@example.com"
               />
             </div>
@@ -125,15 +125,15 @@ export default function EmployeesManager() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full md:w-auto px-6 py-2.5 bg-[#9C39FF] text-white text-sm font-medium rounded-lg hover:bg-[#8A2BE2] transition-colors disabled:opacity-50"
+            className="w-full md:w-auto px-6 py-2.5 bg-[#9C39FF] text-white text-sm font-medium rounded-lg hover:bg-[#8A2BE2] transition-colors disabled:opacity-50 flex-shrink-0"
           >
-            {submitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : <span className="flex items-center gap-2"><UserPlus className="w-4 h-4"/> Legg til</span>}
+            {submitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : <span className="flex items-center justify-center gap-2"><UserPlus className="w-4 h-4"/> Legg til</span>}
           </button>
         </form>
       </div>
 
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
-        <table className="w-full text-left text-sm whitespace-nowrap">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-x-auto w-full">
+        <table className="w-full text-left text-sm whitespace-nowrap min-w-[650px]">
           <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400">
             <tr>
               <th className="px-6 py-4 font-medium">Navn</th>

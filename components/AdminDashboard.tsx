@@ -364,8 +364,8 @@ export default function AdminDashboard() {
   const renderBookingsTable = (tableBookings: any[], title?: string) => (
     <div className="mb-8 last:mb-0" key={title || 'table'}>
       {title && <h2 className="text-xl font-medium mb-4 text-zinc-200">{title}</h2>}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col">
-        <div className="overflow-auto max-h-[70vh] rounded-2xl relative">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col w-full max-w-full">
+        <div className="overflow-x-auto max-h-[70vh] rounded-2xl relative w-full">
           <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[1150px]">
             <colgroup>
               <col className="w-[16%]" />
@@ -768,33 +768,33 @@ export default function AdminDashboard() {
       {(activeTab === "upcoming" || activeTab === "archive") && (
         <div className="space-y-4">
           {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-4 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
-            <div className="flex-1">
+          <div className="flex flex-col md:flex-row gap-4 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 w-full max-w-full">
+            <div className="flex-1 w-full min-w-0">
               <input
                 type="text"
-                placeholder="Search name or email..."
+                placeholder="Søk navn eller e-post..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
+                className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
               />
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
+                className="w-full sm:w-auto max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
               />
               {activeTab === "archive" && (
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF] appearance-none min-w-[120px]"
+                  className="w-full sm:w-auto max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF] min-w-[120px]"
                 >
-                  <option value="all">All Statuses</option>
+                  <option value="all">Alle statuser</option>
                   <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="confirmed">Bekreftet</option>
+                  <option value="cancelled">Kansellert</option>
                 </select>
               )}
               {(searchQuery || dateFilter || (activeTab === "archive" && statusFilter !== 'all')) && (
@@ -804,9 +804,9 @@ export default function AdminDashboard() {
                     setDateFilter("");
                     setStatusFilter("all");
                   }}
-                  className="text-xs text-zinc-400 hover:text-white px-2"
+                  className="text-xs text-zinc-400 hover:text-white px-2 py-1 bg-zinc-800 rounded-md transition-colors"
                 >
-                  Clear
+                  Nullstill
                 </button>
               )}
             </div>

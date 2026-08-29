@@ -230,8 +230,8 @@ export default function DiscountCodesManager() {
             Ingen rabattkoder opprettet enda.
           </div>
         ) : (
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
-            <table className="w-full text-left text-sm whitespace-nowrap">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-x-auto w-full">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-[700px]">
               <thead className="bg-zinc-900 text-zinc-400">
                 <tr>
                   <th className="px-6 py-4 font-medium">Kode</th>

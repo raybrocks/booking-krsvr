@@ -118,11 +118,26 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+    box-sizing: border-box;
+  }
+  input, select, textarea, button {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    max-width: 100%;
+    min-width: 0;
+  }
   body {
     @apply bg-background text-foreground;
-    }
+  }
   html {
     @apply font-sans;
-    }
+  }
+}
+
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
 }

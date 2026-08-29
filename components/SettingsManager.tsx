@@ -377,17 +377,17 @@ export default function SettingsManager() {
         <h3 className="text-lg font-medium mb-4 border-b border-zinc-800 pb-2 mt-10">Special Dates & Exceptions</h3>
         <p className="text-sm text-zinc-400 mb-4">Override opening hours for specific dates (e.g. holidays). To close for a full day, add the date and remove all time slots.</p>
         
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <input 
             type="date" 
             value={newOverrideDate}
             onChange={(e) => setNewOverrideDate(e.target.value)}
-            className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+            className="w-full sm:w-auto max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
           />
           <button 
             onClick={addOverrideDate}
             disabled={!newOverrideDate}
-            className="flex items-center gap-2 bg-zinc-800 text-white px-4 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center gap-2 bg-zinc-800 text-white px-4 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50"
           >
             <Plus className="w-4 h-4" /> Add Date Exception
           </button>
@@ -399,29 +399,29 @@ export default function SettingsManager() {
           </h4>
           <p className="text-sm text-zinc-400 mb-4">Close all booking slots between two dates.</p>
           
-          <div className="flex flex-wrap gap-4 items-end">
-            <div>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end">
+            <div className="w-full sm:w-auto">
               <label className="block text-xs text-zinc-500 mb-1">From</label>
               <input 
                 type="date" 
                 value={vacationStart}
                 onChange={(e) => setVacationStart(e.target.value)}
-                className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                className="w-full sm:w-auto max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
               />
             </div>
-            <div>
+            <div className="w-full sm:w-auto">
               <label className="block text-xs text-zinc-500 mb-1">To</label>
               <input 
                 type="date" 
                 value={vacationEnd}
                 onChange={(e) => setVacationEnd(e.target.value)}
-                className="bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                className="w-full sm:w-auto max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
               />
             </div>
             <button 
               onClick={() => handleApplyVacation(false)}
               disabled={!vacationStart || !vacationEnd || applyingVacation}
-              className="flex items-center gap-2 bg-zinc-800 text-white px-4 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50 h-[42px]"
+              className="flex items-center justify-center gap-2 bg-zinc-800 text-white px-4 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50 h-[42px]"
             >
               {applyingVacation ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply Vacation"}
             </button>

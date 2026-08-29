@@ -245,7 +245,7 @@ export default function ManualBookingManager() {
               <input
                 type="date"
                 required
-                className="w-full min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                className="w-full max-w-full box-border block min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
               />
@@ -253,9 +253,9 @@ export default function ManualBookingManager() {
             
             <div>
               <label className="text-sm text-zinc-400 mb-1 block">Tidspunkt</label>
-              <div className="flex gap-2 items-center">
+              <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                 <select
-                  className="flex-1 min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-2 sm:px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                  className="flex-1 min-w-0 max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-white outline-none focus:border-[#9C39FF]"
                   value={availableTimes.includes(time) ? time : (time ? "custom" : "")}
                   onChange={(e) => {
                     if (e.target.value !== "custom") {
@@ -273,10 +273,10 @@ export default function ManualBookingManager() {
                      <option value="custom" hidden>Egendefinert</option>
                   )}
                 </select>
-                <span className="text-zinc-500 text-sm shrink-0">eller</span>
+                <span className="text-zinc-500 text-xs sm:text-sm text-center shrink-0">eller</span>
                 <input
                   type="time"
-                  className="flex-1 min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl px-2 sm:px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                  className="flex-1 min-w-0 max-w-full box-border block bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-white outline-none focus:border-[#9C39FF]"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   required
@@ -287,7 +287,7 @@ export default function ManualBookingManager() {
             <div>
               <label className="text-sm text-zinc-400 mb-1 block">Varighet (minutter)</label>
               <select
-                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                 className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
                  value={duration}
                  onChange={(e) => setDuration(Number(e.target.value))}
               >
@@ -307,7 +307,7 @@ export default function ManualBookingManager() {
                 type="number"
                 min="1"
                 required
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
                 value={players}
                 onChange={(e) => setPlayers(Number(e.target.value))}
               />
@@ -318,7 +318,8 @@ export default function ManualBookingManager() {
               <input
                 type="number"
                 min="0"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                required
+                className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
                 value={totalPrice}
                 onChange={(e) => setTotalPrice(Number(e.target.value))}
               />
