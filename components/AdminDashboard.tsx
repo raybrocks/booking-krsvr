@@ -157,7 +157,21 @@ export default function AdminDashboard() {
 
       const data = await res?.json();
       if (res?.ok) {
-        toast.success(`Vipps ${action} vellykket!`, { id: loadingToastId });
+        toast.success(data?.message || `Vipps ${action} vellykket!`, { id: loadingToastId });
+        setBookings(prev => prev.map(b => {
+          if (b.id === bookingId) {
+            if (action === 'refund') {
+              return { ...b, vippsStatus: 'REFUNDED', status: 'cancelled' };
+            }
+            if (action === 'capture') {
+              return { ...b, vippsStatus: 'CAPTURED', amountPaid: amount || b.totalPrice };
+            }
+            if (action === 'cancel') {
+              return { ...b, vippsStatus: 'CANCELLED', status: 'cancelled' };
+            }
+          }
+          return b;
+        }));
       } else {
         toast.error(`Feil: ${data?.error || data?.message || 'Ukjent feil'}`, { id: loadingToastId });
       }

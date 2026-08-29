@@ -232,6 +232,129 @@ export async function sendBookingCancellationEmail(
   }
 }
 
+export async function sendRefundReceiptEmail(
+  to: string, 
+  details: {
+    booking: any;
+    refundAmount: number;
+    receiptId: string;
+  }
+) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Refund receipt email not sent.");
+    return;
+  }
+
+  const adminEmail = await getAdminEmail();
+  const { booking, refundAmount, receiptId } = details;
+  const { firstName, lastName, date, time, experienceId } = booking;
+  
+  let experienceTitle = "VR Opplevelse";
+  if (experienceId) {
+    try {
+      const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
+      if (exp && exp.name) {
+        experienceTitle = exp.name;
+      }
+    } catch (e) {}
+  }
+
+  const vatRate = 0.25;
+  const refundExVat = refundAmount / (1 + vatRate);
+  const vatAmount = refundAmount - refundExVat;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+      <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
+        <h1 style="color: #9C39FF; margin-bottom: 5px; font-size: 24px;">Krs VR Arena AS</h1>
+        <p style="margin: 0; font-size: 13px; color: #777;">Org.nr: 936318878 MVA | Kristiansand, Norge</p>
+      </div>
+
+      <div style="padding: 25px 0;">
+        <div style="background-color: #f3e8ff; border-left: 4px solid #9C39FF; padding: 15px; border-radius: 6px; margin-bottom: 25px;">
+          <h2 style="color: #6b21a8; margin: 0 0 5px 0; font-size: 18px;">Kreditnota / Refusjonskvittering</h2>
+          <p style="margin: 0; font-size: 14px; color: #581c87;">
+            Hei ${firstName} ${lastName}, din betaling har blitt refundert via Vipps.
+          </p>
+        </div>
+
+        <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #222;">
+          Refusjonsdetaljer
+        </h3>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
+          <tr>
+            <td style="padding: 8px 0; color: #666;">Kvitteringsnummer:</td>
+            <td style="padding: 8px 0; font-weight: bold; text-align: right; font-family: monospace;">${receiptId.slice(0, 8).toUpperCase()}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666;">Dato for refusjon:</td>
+            <td style="padding: 8px 0; text-align: right;">${new Intl.DateTimeFormat("no-NO", { dateStyle: "long" }).format(new Date())}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666;">Opplevelse:</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: bold;">${experienceTitle}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666;">Opprinnelig booking:</td>
+            <td style="padding: 8px 0; text-align: right;">${date} kl. ${time}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666;">Utbetalingsmetode:</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: bold; color: #ff5b24;">Vipps</td>
+          </tr>
+          <tr style="border-top: 2px solid #eee; font-size: 16px;">
+            <td style="padding: 12px 0; font-weight: bold;">Refundert beløp:</td>
+            <td style="padding: 12px 0; font-weight: bold; text-align: right; color: #16a34a;">NOK ${refundAmount.toFixed(2)}</td>
+          </tr>
+        </table>
+
+        <div style="background-color: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 12px 15px; margin-bottom: 25px; font-size: 12px; color: #666;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>MVA-grunnlag (Netto):</span>
+            <span>NOK ${refundExVat.toFixed(2)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>MVA (25%):</span>
+            <span>NOK ${vatAmount.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <p style="font-size: 13px; color: #666; margin: 20px 0;">
+          💡 <em>Beløpet er tilbakeført via Vipps og vil være synlig på kontoen eller kortet du betalte med i løpet av kort tid (normalt 1–3 virkedager avhengig av din bank).</em>
+        </p>
+
+        <p style="font-size: 14px; color: #444; margin-top: 30px;">
+          Har du spørsmål vedrørende refusjonen, kan du svare direkte på denne e-posten eller kontakte oss på <a href="mailto:${adminEmail}" style="color: #9C39FF;">${adminEmail}</a>.
+        </p>
+      </div>
+
+      <div style="border-top: 1px solid #eee; padding-top: 20px; text-align: center; font-size: 12px; color: #999;">
+        <p style="margin: 0 0 5px 0;"><strong>Krs VR Arena AS</strong> | Industrigata 12, 4632 Kristiansand</p>
+        <p style="margin: 0;">Tlf: <a href="tel:+4740828302" style="color: #999; text-decoration: none;">+47 408 28 302</a> | <a href="https://krsvr.no" style="color: #9C39FF; text-decoration: none;">krsvr.no</a></p>
+      </div>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Krs VR Arena <booking@donotreply.krsvr.no>',
+      to,
+      replyTo: adminEmail,
+      subject: `Refusjonskvittering: NOK ${refundAmount} - Krs VR Arena`,
+      html,
+    });
+    
+    if (error) {
+      console.error("Resend error on refund email:", error);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error("Failed to send refund email:", error);
+    return null;
+  }
+}
+
 export async function sendAdminNewBookingNotification(bookingDetails: any) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY is not set. Admin email not sent.");

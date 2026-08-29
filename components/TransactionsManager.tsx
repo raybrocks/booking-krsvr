@@ -15,70 +15,109 @@ export default function TransactionsManager() {
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [loadingReceipt, setLoadingReceipt] = useState(false);
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const [bookingsRes, experiencesRes] = await Promise.all([
-          fetch('/api/admin/bookings'),
-          fetch('/api/experiences')
-        ]);
+  const [refundingId, setRefundingId] = useState<string | null>(null);
 
-        if (experiencesRes.ok) {
-          const exps = await experiencesRes.json();
-          const expsMap: Record<string, string> = {};
-          exps.forEach((e: any) => {
-            expsMap[e.id] = e.title || e.name || e.id;
-          });
-          setExperiencesMap(expsMap);
-        }
+  const fetchTransactions = async () => {
+    try {
+      const [bookingsRes, experiencesRes] = await Promise.all([
+        fetch('/api/admin/bookings'),
+        fetch('/api/experiences')
+      ]);
 
-        if (bookingsRes.ok) {
-          const fetchedBookings = await bookingsRes.json();
-          const data = fetchedBookings.map((bookingData: any) => {
-            let status = bookingData.status;            
-            const createdAtDate = bookingData.createdAt ? new Date(bookingData.createdAt) : new Date();
-            
-            // Map status for Vipps
-            let displayStatus = status;
-            if (bookingData.paymentType === 'vipps' && (status === 'confirmed' || status === 'completed')) {
-               displayStatus = 'AUTHORIZED';
-            }
-
-            return {
-              ...bookingData,
-              id: bookingData.id,
-              bookingId: bookingData.id,
-              vippsOrderId: bookingData.id,
-              amount: bookingData.amountPaid ? bookingData.amountPaid * 100 : (bookingData.totalPrice || 0) * 100,
-              originalStatus: bookingData.status,
-              status: displayStatus,
-              createdAtDate
-            };
-          });
-          
-          const validReceipts = data.filter((b: any) => {
-            if (b.originalStatus === 'cancelled' || b.originalStatus === 'pending' || b.originalStatus === 'error') {
-               return false;
-            }
-            // Keep if paid
-            if (b.amountPaid > 0) return true;
-            // Keep if pending Vipps reservation
-            if ((b.paymentType === 'vipps' || b.originalStatus === 'epayment.payment.reserved') && (b.amountPaid === 0 || !b.amountPaid)) {
-               return true;
-            }
-            return false;
-          });
-          
-          setTransactions(validReceipts);
-        }
-      } catch (err) {
-        console.error("Failed fetching transactions:", err);
+      if (experiencesRes.ok) {
+        const exps = await experiencesRes.json();
+        const expsMap: Record<string, string> = {};
+        exps.forEach((e: any) => {
+          expsMap[e.id] = e.title || e.name || e.id;
+        });
+        setExperiencesMap(expsMap);
       }
-      setLoading(false);
-    };
 
+      if (bookingsRes.ok) {
+        const fetchedBookings = await bookingsRes.json();
+        const data = fetchedBookings.map((bookingData: any) => {
+          const createdAtDate = bookingData.createdAt ? new Date(bookingData.createdAt) : new Date();
+          
+          return {
+            ...bookingData,
+            id: bookingData.id,
+            bookingId: bookingData.id,
+            vippsOrderId: bookingData.paymentRef || bookingData.id,
+            amount: bookingData.amountPaid ? bookingData.amountPaid * 100 : (bookingData.totalPrice || 0) * 100,
+            originalStatus: bookingData.status,
+            createdAtDate
+          };
+        });
+        
+        const validReceipts = data.filter((b: any) => {
+          if (b.originalStatus === 'error') {
+             return false;
+          }
+          // Keep if paid
+          if (b.amountPaid > 0) return true;
+          // Keep if Vipps booking or refunded
+          if (['reservation', 'full', 'vipps'].includes(b.paymentType) || b.vippsStatus === 'REFUNDED') {
+             return true;
+          }
+          return false;
+        });
+        
+        setTransactions(validReceipts);
+      }
+    } catch (err) {
+      console.error("Failed fetching transactions:", err);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchTransactions();
   }, []);
+
+  const handleRefund = async (tx: any) => {
+    const defaultAmount = tx.amountPaid || tx.totalPrice || 0;
+    const input = prompt(
+      `Hvor mye ønsker du å refundere til ${tx.firstName} ${tx.lastName} via Vipps? (i NOK)\n\nKunden vil automatisk motta en refusjonskvittering / kreditnota på e-post (${tx.email || 'kunden'}).`,
+      String(defaultAmount)
+    );
+
+    if (!input) return;
+    const amountNum = parseFloat(input.replace(',', '.'));
+    if (isNaN(amountNum) || amountNum <= 0) {
+      alert("Vennligst oppgi et gyldig refusjonsbeløp.");
+      return;
+    }
+
+    if (amountNum > defaultAmount) {
+      if (!confirm(`Beløpet (${amountNum} NOK) er høyere enn innbetalt beløp (${defaultAmount} NOK). Er du sikker på at du vil fortsette?`)) {
+        return;
+      }
+    }
+
+    setRefundingId(tx.id);
+    try {
+      const res = await fetch('/api/vipps/refund', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId: tx.bookingId || tx.id,
+          amount: amountNum
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(`✅ ${data.message}`);
+        await fetchTransactions();
+      } else {
+        alert(`❌ Refusjon feilet: ${data.error || 'Ukjent feil fra Vipps'}`);
+      }
+    } catch (e: any) {
+      alert(`❌ Feil ved forespørsel: ${e.message}`);
+    } finally {
+      setRefundingId(null);
+    }
+  };
 
   const handleViewReceipt = async (tx: any) => {
     setSelectedTx(tx);
@@ -114,9 +153,8 @@ export default function TransactionsManager() {
   const renderReceipt = () => {
     if (!selectedTx) return null;
     
-    // Receipt should purely reflect amountPaid
-    const totalInclVat = selectedTx.amountPaid || 0;
-    // 25% MVA is standard. You can make this dynamic if needed.
+    const isRefund = selectedTx.vippsStatus === 'REFUNDED' || selectedTx.type === 'refund';
+    const totalInclVat = selectedTx.amountPaid || (isRefund ? (selectedTx.totalPrice || 0) : 0);
     const vatRate = 0.25; 
     const totalExVat = totalInclVat / (1 + vatRate);
     const vatAmount = totalInclVat - totalExVat;
@@ -131,7 +169,9 @@ export default function TransactionsManager() {
             <h1 className="text-2xl font-bold uppercase tracking-widest mb-1">Krs VR Arena AS</h1>
             <p>Organisasjonsnummer: 936318878 MVA</p>
             <p>Kristiansand, Norge</p>
-            <p className="mt-2 font-bold uppercase">Salgskvittering</p>
+            <p className={`mt-2 font-bold uppercase ${isRefund ? 'text-red-600' : ''}`}>
+              {isRefund ? 'KREDITNOTA / REFUSJONSKVITTERING' : 'Salgskvittering'}
+            </p>
          </div>
          
          <div className="mb-6 space-y-1">
@@ -147,9 +187,9 @@ export default function TransactionsManager() {
               <span>Kvitteringsnr:</span>
               <span>{selectedTx.id.substring(0, 8).toUpperCase()}</span>
             </div>
-            {selectedTx.paymentType === 'vipps' && (
+            {selectedTx.vippsOrderId && (
               <div className="flex justify-between">
-                <span>Ref V-OrderID:</span>
+                <span>Vipps Ref:</span>
                 <span>{selectedTx.vippsOrderId}</span>
               </div>
             )}
@@ -180,17 +220,20 @@ export default function TransactionsManager() {
                        ) : (
                          selectedBooking?.experienceId ? (experiencesMap[selectedBooking.experienceId] || `VR Opplevelse (${selectedBooking.experienceId})`) : "VR Opplevelse"
                        )}
+                       {isRefund && <div className="text-xs text-red-600 font-bold mt-0.5">REFUNDERT</div>}
                    </td>
                    <td className="text-center py-2">{selectedBooking?.players || 1}</td>
-                   <td className="text-right py-2">{totalInclVat.toFixed(2)}</td>
+                   <td className="text-right py-2">{isRefund ? `-${totalInclVat.toFixed(2)}` : totalInclVat.toFixed(2)}</td>
                 </tr>
              </tbody>
          </table>
          
          <div className="mb-6 space-y-1">
              <div className="flex justify-between font-bold text-lg border-t border-dashed border-zinc-400 pt-2">
-               <span>TOTAL (NOK)</span>
-               <span>{totalInclVat.toFixed(2)}</span>
+               <span>{isRefund ? 'REFUNDERT TOTAL (NOK)' : 'TOTAL (NOK)'}</span>
+               <span className={isRefund ? 'text-red-600' : ''}>
+                 {isRefund ? `-${totalInclVat.toFixed(2)}` : totalInclVat.toFixed(2)}
+               </span>
              </div>
          </div>
 
@@ -200,11 +243,11 @@ export default function TransactionsManager() {
                <span>MVA %</span>
              </div>
              <div className="flex justify-between text-zinc-600">
-               <span>Netto u/MVA: {totalExVat.toFixed(2)}</span>
+               <span>Netto u/MVA: {isRefund ? `-${totalExVat.toFixed(2)}` : totalExVat.toFixed(2)}</span>
                <span>25%</span>
              </div>
              <div className="flex justify-between text-zinc-600">
-               <span>MVA beløp: {vatAmount.toFixed(2)}</span>
+               <span>MVA beløp: {isRefund ? `-${vatAmount.toFixed(2)}` : vatAmount.toFixed(2)}</span>
                <span></span>
              </div>
          </div>
@@ -216,7 +259,9 @@ export default function TransactionsManager() {
              </div>
             <div className="flex justify-between">
                <span>Status:</span>
-               <span>{selectedTx.amountPaid > 0 ? "Betalt / Godkjent" : selectedTx.status}</span>
+               <span className="font-bold">
+                 {isRefund ? "Refundert via Vipps" : (selectedTx.amountPaid > 0 ? "Betalt / Godkjent" : selectedTx.status)}
+               </span>
              </div>
          </div>
 
@@ -393,16 +438,33 @@ export default function TransactionsManager() {
                     })()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    {tx.amountPaid > 0 ? (
-                      <button
-                        onClick={() => handleViewReceipt(tx)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded-md transition-colors border border-zinc-700"
-                      >
-                        <Receipt className="w-3.5 h-3.5" /> Kvittering
-                      </button>
-                    ) : (
-                      <span className="text-xs text-zinc-500 italic px-2">Venter...</span>
-                    )}
+                    <div className="flex items-center justify-end gap-2">
+                      {/* Refunder-knapp for Vipps transaksjoner som har betalt beløp */}
+                      {['vipps', 'reservation', 'full'].includes(tx.paymentType) && tx.amountPaid > 0 && tx.vippsStatus !== 'REFUNDED' && (
+                        <button
+                          onClick={() => handleRefund(tx)}
+                          disabled={refundingId === tx.id}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 text-xs rounded-md transition-colors border border-orange-500/30 disabled:opacity-50 font-medium"
+                          title="Refunder transaksjon via Vipps ePayment og send refusjonskvittering på e-post"
+                        >
+                          {refundingId === tx.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : null}
+                          Refunder (Vipps)
+                        </button>
+                      )}
+
+                      {tx.amountPaid > 0 || tx.vippsStatus === 'REFUNDED' ? (
+                        <button
+                          onClick={() => handleViewReceipt(tx)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded-md transition-colors border border-zinc-700 font-medium"
+                        >
+                          <Receipt className="w-3.5 h-3.5" /> Kvittering
+                        </button>
+                      ) : (
+                        <span className="text-xs text-zinc-500 italic px-2">Venter...</span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               )))}
