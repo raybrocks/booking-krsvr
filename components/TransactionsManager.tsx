@@ -378,61 +378,63 @@ export default function TransactionsManager() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-zinc-200">
+                    <div className="text-xs space-y-0.5">
+                       <div className="text-zinc-200 font-medium">Totalt: {tx.totalPrice || tx.amountPaid || 0} NOK</div>
                        {tx.amountPaid > 0 ? (
-                          <span className="text-emerald-400 font-medium">Betalt: {tx.amountPaid.toFixed(2)} NOK</span>
+                         <div className="text-zinc-400 text-[11px]">Innbetalt (Vipps): <span className="text-zinc-200">{tx.amountPaid.toFixed(2)} NOK</span></div>
                        ) : (
-                          <span className="text-amber-400">Reservert: {(tx.totalPrice || 0).toFixed(2)} NOK</span>
+                         <div className="text-zinc-500 text-[11px] italic">Innbetalt: 0 NOK</div>
+                       )}
+                       {((tx.totalPrice || 0) - (tx.amountPaid || 0)) > 0 ? (
+                         <div className="text-amber-400 font-semibold text-[11px]">Gjenstår: {((tx.totalPrice || 0) - (tx.amountPaid || 0)).toFixed(2)} NOK</div>
+                       ) : (
+                         (tx.totalPrice || 0) > 0 ? (
+                           <div className="text-emerald-400 font-medium text-[11px]">Alt betalt på forhånd</div>
+                         ) : null
                        )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     {(() => {
+                      const totalPrice = tx.totalPrice || 0;
+                      const amountPaid = tx.amountPaid || 0;
+                      const remaining = Math.max(0, totalPrice - amountPaid);
                       const status = (tx.vippsStatus || '').toUpperCase();
-                      const isCaptured = status === 'CAPTURED' || status === 'SALE' || status.includes('CAPTURED');
-                      const isReserved = status === 'RESERVED' || status === 'AUTHORIZED' || status.includes('RESERVED');
-                      const isRefunded = status === 'REFUNDED' || status.includes('REFUND');
-                      const isManual = status === 'MANUELL' || tx.paymentType === 'manual' || tx.paymentType === 'system' || (!isCaptured && !isReserved && (!tx.amountPaid || tx.amountPaid === 0));
-                      const isPending = status === 'VENTER_PAA_BETALING' || (tx.paymentType === 'vipps' && !isCaptured && tx.status === 'pending');
+                      const isRefunded = status === 'REFUNDED' || tx.type === 'refund';
+                      const isFullyPaid = (tx.paymentType === 'full' || amountPaid >= totalPrice) && totalPrice > 0;
+                      const isFree = totalPrice === 0;
 
-                      if (isCaptured) {
-                        return (
-                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            🟢 Betalt (Vipps)
-                          </span>
-                        );
-                      }
-                      if (isReserved) {
-                        return (
-                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            🟡 Reservert (Vipps)
-                          </span>
-                        );
-                      }
                       if (isRefunded) {
                         return (
                           <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                            🔵 Refundert
+                            🔵 Refundert (Vipps)
                           </span>
                         );
                       }
-                      if (isManual) {
+                      if (isFree) {
                         return (
-                          <span className="text-[11px] font-medium px-2 py-0.5 rounded inline-flex items-center gap-1 bg-zinc-800/80 text-zinc-400 border border-zinc-700/50">
-                            ⚪ Betales ved oppmøte
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded inline-flex items-center gap-1 bg-zinc-800 text-zinc-400 border border-zinc-700/50">
+                            ⚪ Gratis / 0 kr
                           </span>
                         );
                       }
-                      if (isPending) {
+                      if (isFullyPaid) {
                         return (
-                          <span className="text-[11px] font-medium px-2 py-0.5 rounded inline-flex items-center gap-1 bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">
-                            🟠 Venter på Vipps
+                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            🟢 Fullt oppgjort (0 kr)
+                          </span>
+                        );
+                      }
+                      if (amountPaid > 0 && remaining > 0) {
+                        return (
+                          <span className="text-[11px] font-bold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-sm">
+                            🟡 Krev inn: {remaining} NOK
                           </span>
                         );
                       }
                       return (
-                        <span className="text-[11px] font-medium px-2 py-0.5 rounded inline-flex items-center bg-zinc-800 text-zinc-400">
-                          {tx.vippsStatus || tx.status || "-"}
+                        <span className="text-[11px] font-bold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-zinc-800 text-amber-300 border border-zinc-700/60">
+                          ⚪ Krev inn: {remaining} NOK (Oppmøte)
                         </span>
                       );
                     })()}
