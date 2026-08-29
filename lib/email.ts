@@ -457,58 +457,264 @@ export async function sendAdminBookingCancellationNotification(bookingDetails: a
   } catch (err) {}
 }
 
+export interface WeeklySummaryReportData {
+  pastWeek: {
+    periodLabel: string;
+    completedBookingsCount: number;
+    totalPlayers: number;
+    avgGroupSize: number | string;
+    vippsPaid: number;
+    expectedCash: number;
+    totalEstimatedRevenue: number;
+    cancelledCount: number;
+    popularExperiences: { name: string; count: number }[];
+  };
+  upcomingWeek: {
+    periodLabel: string;
+    bookingCount: number;
+    totalPlayers: number;
+    vippsPaid: number;
+    expectedCash: number;
+    totalEstimatedRevenue: number;
+    bookings: Array<{
+      id?: string;
+      dateNice: string;
+      time: string;
+      duration?: number;
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone: string;
+      players: number;
+      experienceName: string;
+      totalPrice: number;
+      amountPaid: number;
+      remainingCash: number;
+      paymentType: string;
+      internalNotes?: string;
+      companyName?: string;
+      bookingType?: string;
+    }>;
+  };
+}
+
 export async function sendWeeklyAdminSummary(
   to: string,
-  weeklyStats: { totalRevenue: number, vippsRevenue: number, manualRevenue: number, numExperiences: number },
-  upcomingBookings: any[]
+  reportData: WeeklySummaryReportData
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY is not set. Weekly summary email not sent.");
     return;
   }
 
+  const recipient = to || (await getAdminEmail());
+  const { pastWeek, upcomingWeek } = reportData;
+
   const html = `
-    <div style="font-family: sans-serif; max-width: 600px; color: #333;">
-      <h1 style="color: #9C39FF;">Ukentlig Oppsummering & Vaktliste</h1>
-      <p>Her er en oversikt over uken som gikk, og uken som kommer.</p>
-      
-      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Uken som gikk</h2>
-      <ul style="list-style: none; padding: 0; background: #f9f9f9; padding: 15px; border-left: 4px solid #9C39FF;">
-        <li style="margin-bottom: 8px;"><strong>Total omsetning:</strong> NOK ${weeklyStats.totalRevenue}</li>
-        <li style="margin-bottom: 8px;"><strong>Hvorav Vipps:</strong> NOK ${weeklyStats.vippsRevenue}</li>
-        <li style="margin-bottom: 8px;"><strong>Hvorav Manuelle bookinger:</strong> NOK ${weeklyStats.manualRevenue}</li>
-        <li style="margin-bottom: 8px;"><strong>Antall bookinger:</strong> ${weeklyStats.numExperiences}</li>
-      </ul>
-
-      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Uken som kommer (Neste 7 dager)</h2>
-      ${upcomingBookings.length === 0 ? '<p>Ingen bookinger registrert for neste uke enda.</p>' : ''}
-      ${upcomingBookings.map(b => `
-        <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #eee; border-radius: 8px;">
-          <p style="margin: 0 0 5px 0;"><strong>Dato:</strong> ${b.date} kl ${b.time}</p>
-          <p style="margin: 0 0 5px 0;"><strong>Navn:</strong> ${b.firstName} ${b.lastName} (${b.players} pers)</p>
-          <p style="margin: 0 0 5px 0;"><strong>Opplevelse:</strong> ${b.experience?.name || 'Ukjent'} (${b.duration} min)</p>
-          ${b.paymentType === 'manual' ? '<p style="margin: 0; color: #d97706; font-size: 12px;"><strong>Manuell Booking</strong></p>' : ''}
-          ${b.paymentType === 'vipps' ? '<p style="margin: 0; color: #9C39FF; font-size: 12px;"><strong>Vipps Booking</strong></p>' : ''}
-          ${b.internalNotes ? `<div style="margin-top: 10px; padding: 10px; background-color: #fff9c4; border-left: 3px solid #fbc02d; font-size: 13px;"><strong style="color: #f57f17">Notat/Kommentar:</strong><br/>${b.internalNotes}</div>` : ''}
+    <!DOCTYPE html>
+    <html lang="no">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Ukentlig Oppsummering & Vaktgrunnlag</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #18181b; -webkit-font-smoothing: antialiased;">
+      <div style="max-width: 640px; margin: 20px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e4e4e7;">
+        
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #09090b 0%, #18181b 100%); padding: 32px 28px; text-align: center; border-bottom: 3px solid #9C39FF;">
+          <div style="display: inline-block; background-color: #ffffff; color: #09090b; font-size: 10px; font-weight: 800; letter-spacing: 0.15em; padding: 4px 12px; border-radius: 9999px; text-transform: uppercase; margin-bottom: 12px;">
+            KRS VR Arena
+          </div>
+          <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">
+            Ukentlig Oppsummering & Vaktgrunnlag
+          </h1>
+          <p style="margin: 8px 0 0 0; color: #a1a1aa; font-size: 13px;">
+            ${pastWeek.periodLabel} (forrige uke) & oversikt for de neste 7 dagene
+          </p>
         </div>
-      `).join('')}
 
-      <p style="margin-top: 40px; font-size: 12px; color: #999;">Dette er en automatisk generert ukentlig oppsummering fra Krs VR Arena systemet.</p>
-    </div>
+        <!-- Innhold -->
+        <div style="padding: 28px 24px;">
+
+          <!-- Seksjon 1: Uken som gikk -->
+          <div style="margin-bottom: 32px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 2px solid #f4f4f5; padding-bottom: 8px;">
+              <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #09090b;">
+                📊 Uken som gikk (${pastWeek.periodLabel})
+              </h2>
+            </div>
+
+            <!-- Nøkkeltall Grid -->
+            <table style="width: 100%; border-collapse: separate; border-spacing: 8px; margin-bottom: 16px;">
+              <tr>
+                <td style="width: 50%; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 14px; vertical-align: top;">
+                  <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #065f46; letter-spacing: 0.05em; margin-bottom: 4px;">
+                    💳 Innbetalt (Vipps)
+                  </div>
+                  <div style="font-size: 20px; font-weight: 800; color: #047857;">
+                    ${pastWeek.vippsPaid.toLocaleString('nb-NO')} NOK
+                  </div>
+                  <div style="font-size: 11px; color: #065f46; margin-top: 2px;">
+                    Garantert innbetalt i systemet
+                  </div>
+                </td>
+                <td style="width: 50%; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 14px; vertical-align: top;">
+                  <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #92400e; letter-spacing: 0.05em; margin-bottom: 4px;">
+                    🏢 Forventet kasse (Rest)
+                  </div>
+                  <div style="font-size: 20px; font-weight: 800; color: #b45309;">
+                    ${pastWeek.expectedCash.toLocaleString('nb-NO')} NOK
+                  </div>
+                  <div style="font-size: 11px; color: #92400e; margin-top: 2px;">
+                    Estimert restbeløp ved oppmøte
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="background-color: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 10px; padding: 14px; vertical-align: top;">
+                  <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #52525b; letter-spacing: 0.05em; margin-bottom: 4px;">
+                    💰 Estimert Totalomsetning
+                  </div>
+                  <div style="font-size: 18px; font-weight: 700; color: #18181b;">
+                    ${pastWeek.totalEstimatedRevenue.toLocaleString('nb-NO')} NOK
+                  </div>
+                  <div style="font-size: 11px; color: #71717a; margin-top: 2px;">
+                    Forhåndsbetalt + forventet kasse
+                  </div>
+                </td>
+                <td style="background-color: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 10px; padding: 14px; vertical-align: top;">
+                  <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #52525b; letter-spacing: 0.05em; margin-bottom: 4px;">
+                    👥 Gjennomførte Bookinger
+                  </div>
+                  <div style="font-size: 18px; font-weight: 700; color: #18181b;">
+                    ${pastWeek.completedBookingsCount} (${pastWeek.totalPlayers} spillere)
+                  </div>
+                  <div style="font-size: 11px; color: #71717a; margin-top: 2px;">
+                    Snitt ${pastWeek.avgGroupSize} pers per booking
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Tilleggsdetaljer for uken -->
+            <div style="background-color: #fafafa; border: 1px solid #f4f4f5; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; font-size: 13px; color: #3f3f46;">
+              ${pastWeek.popularExperiences.length > 0 ? `
+                <div style="margin-bottom: 6px;">
+                  <strong>🎮 Mest populære opplevelser:</strong> ${pastWeek.popularExperiences.map(e => `${e.name} (${e.count})`).join(', ')}
+                </div>
+              ` : ''}
+              <div>
+                <strong>❌ Kanselleringer denne uken:</strong> ${pastWeek.cancelledCount} booking(er)
+              </div>
+            </div>
+
+            <!-- Disclaimer boks -->
+            <div style="background-color: #f8fafc; border-left: 3px solid #64748b; padding: 10px 14px; border-radius: 6px; font-size: 12px; color: #64748b; line-height: 1.5;">
+              <strong>💡 Viktig merknad om kassetall:</strong> Bookingsystemet kjenner det nøyaktige forhåndsbetalte Vipps-beløpet. Restbeløpet i kassen er et estimat basert på opprinnelig bestilt antall spillere. Faktisk innkrevd beløp på kortterminal/Zettle i arenaen kan variere dersom kunden møtte opp med flere eller færre deltakere, eller la til kiosksalg.
+            </div>
+          </div>
+
+          <!-- Seksjon 2: Uken som kommer (Vaktgrunnlag) -->
+          <div style="margin-bottom: 32px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 2px solid #f4f4f5; padding-bottom: 8px;">
+              <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #09090b;">
+                📅 Uken som kommer (${upcomingWeek.periodLabel})
+              </h2>
+            </div>
+
+            <!-- Prognose header -->
+            <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 1px solid #ddd6fe; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px;">
+              <div style="font-size: 14px; font-weight: 700; color: #5b21b6; margin-bottom: 4px;">
+                Prognose for neste 7 dager:
+              </div>
+              <div style="font-size: 13px; color: #6d28d9; line-height: 1.5;">
+                • <strong>${upcomingWeek.bookingCount}</strong> registrerte bookinger (<strong>${upcomingWeek.totalPlayers}</strong> forventede spillere)<br>
+                • <strong>${upcomingWeek.vippsPaid.toLocaleString('nb-NO')} NOK</strong> allerede forhåndsbetalt via Vipps<br>
+                • <strong>${upcomingWeek.expectedCash.toLocaleString('nb-NO')} NOK</strong> forventes krevd inn i kassen ved oppmøte
+              </div>
+            </div>
+
+            <!-- Liste over kommende bookinger -->
+            ${upcomingWeek.bookings.length === 0 ? `
+              <div style="padding: 24px; text-align: center; background-color: #fafafa; border: 1px dashed #e4e4e7; border-radius: 10px; color: #71717a; font-size: 14px;">
+                Ingen bookinger registrert for de neste 7 dagene enda.
+              </div>
+            ` : upcomingWeek.bookings.map(b => `
+              <div style="background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                  <div style="font-size: 14px; font-weight: 700; color: #09090b;">
+                    🕒 ${b.dateNice} kl ${b.time} <span style="font-size: 12px; font-weight: 500; color: #71717a;">(${b.duration || 90} min)</span>
+                  </div>
+                  <div>
+                    ${b.remainingCash > 0 ? `
+                      <span style="background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">
+                        KREV INN: ${b.remainingCash} NOK
+                      </span>
+                    ` : `
+                      <span style="background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">
+                        FULLT OPPGJORT
+                      </span>
+                    `}
+                  </div>
+                </div>
+
+                <div style="font-size: 13px; color: #27272a; margin-bottom: 4px;">
+                  <strong>🎮 ${b.experienceName}</strong> • ${b.players} spillere
+                </div>
+
+                <div style="font-size: 12px; color: #52525b; margin-bottom: 6px;">
+                  👤 ${b.companyName ? `<strong>${b.companyName}</strong> (${b.firstName} ${b.lastName})` : `<strong>${b.firstName} ${b.lastName}</strong>`} • 📞 ${b.phone} • ✉️ ${b.email}
+                </div>
+
+                <div style="font-size: 12px; color: #71717a;">
+                  Totalt: ${b.totalPrice} NOK • Innbetalt Vipps: ${b.amountPaid} NOK
+                </div>
+
+                ${b.internalNotes ? `
+                  <div style="margin-top: 8px; padding: 8px 12px; background-color: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 4px; font-size: 12px; color: #92400e;">
+                    <strong>Notat/Kommentar:</strong> ${b.internalNotes}
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Handling: Knapp til admin -->
+          <div style="text-align: center; margin: 32px 0 16px 0;">
+            <a href="https://krsvr.no/admin" style="display: inline-block; background-color: #9C39FF; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 14px 32px; border-radius: 10px; box-shadow: 0 4px 12px rgba(156, 57, 255, 0.25);">
+              Åpne Admin Dashboard →
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f4f4f5; padding: 20px 24px; text-align: center; border-top: 1px solid #e4e4e7; font-size: 12px; color: #71717a; line-height: 1.5;">
+          <strong>KRS VR Arena</strong> • Skippergata 24, 4611 Kristiansand<br>
+          E-post: <a href="mailto:post@krsvr.no" style="color: #9C39FF; text-decoration: none;">post@krsvr.no</a> • Tlf: 919 09 460<br>
+          <span style="font-size: 11px; color: #a1a1aa; display: inline-block; margin-top: 8px;">
+            Generert automatisk via Vercel Cron hver søndag kl 07:00.
+          </span>
+        </div>
+
+      </div>
+    </body>
+    </html>
   `;
 
   try {
     const { data, error } = await resend.emails.send({
       from: 'Krs VR Arena Admin <booking@donotreply.krsvr.no>',
-      to,
-      subject: `Ukentlig Oppsummering & Vaktliste`,
+      to: recipient,
+      subject: `Ukentlig Oppsummering & Vaktgrunnlag (${pastWeek.periodLabel})`,
       html,
     });
-    
-    if (error) console.error("Admin resend error:", error);
+
+    if (error) console.error("Admin resend error in weekly summary:", error);
     return data;
   } catch (err) {
-    console.error("Failed to send admin email:", err);
+    console.error("Failed to send admin weekly summary email:", err);
   }
 }
 

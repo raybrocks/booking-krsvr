@@ -420,7 +420,7 @@ export default function TransactionsManager() {
                       if (isFullyPaid) {
                         return (
                           <div className="flex flex-col gap-1">
-                            <span className="text-emerald-400 font-medium text-xs">fullt betalt</span>
+                            <span className="text-emerald-400 font-medium text-xs">betalt</span>
                             <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm w-fit">
                               FULLT OPPGJORT
                             </span>

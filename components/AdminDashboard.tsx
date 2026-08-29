@@ -366,25 +366,33 @@ export default function AdminDashboard() {
       {title && <h2 className="text-xl font-medium mb-4 text-zinc-200">{title}</h2>}
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col">
         <div className="overflow-auto max-h-[70vh] rounded-2xl relative">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+          <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[1150px]">
+            <colgroup>
+              <col className="w-[16%]" />
+              <col className="w-[18%]" />
+              <col className="w-[28%]" />
+              <col className="w-[18%]" />
+              <col className="w-[10%]" />
+              <col className="w-[10%]" />
+            </colgroup>
             <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">
               <tr>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('dateTime')}>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[16%]" onClick={() => handleSort('dateTime')}>
                   Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('experienceId')}>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('experienceId')}>
                   Experience {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('customer')}>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[28%]" onClick={() => handleSort('customer')}>
                   Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('totalPrice')}>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('totalPrice')}>
                   Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('createdAt')}>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[10%]" onClick={() => handleSort('createdAt')}>
                   Placed At {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors" onClick={() => handleSort('status')}>
+                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[10%]" onClick={() => handleSort('status')}>
                   Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
               </tr>
@@ -470,7 +478,7 @@ export default function AdminDashboard() {
                     </div>
                     {booking.internalNotes ? (
                        <div 
-                         className="mt-2 text-xs text-zinc-400 bg-zinc-800/40 p-2 rounded-lg border border-zinc-700/50 italic max-w-xs whitespace-normal cursor-pointer hover:bg-zinc-800 transition-colors"
+                         className="mt-2 text-xs text-zinc-400 bg-zinc-800/40 p-2 rounded-lg border border-zinc-700/50 italic max-w-sm break-words cursor-pointer hover:bg-zinc-800 transition-colors"
                          onClick={() => handleEditNote(booking.id, booking.internalNotes)}
                          title="Klikk for å redigere kommentar"
                        >
@@ -532,7 +540,7 @@ export default function AdminDashboard() {
                           if (isFullyPaid) {
                             return (
                               <div className="flex flex-col gap-1">
-                                <span className="text-emerald-400 font-medium text-xs">fullt betalt</span>
+                                <span className="text-emerald-400 font-medium text-xs">betalt</span>
                                 <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm w-fit">
                                   FULLT OPPGJORT
                                 </span>
