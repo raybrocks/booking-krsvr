@@ -3,20 +3,61 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
-    const bookings = await prisma.booking.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        experience: {
-          select: { name: true }
+    const [bookings, receipts] = await Promise.all([
+      prisma.booking.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          experience: {
+            select: { name: true }
+          }
         }
+      }),
+      prisma.receipt.findMany({
+        orderBy: { createdAt: 'desc' }
+      })
+    ]);
+
+    // Create lookup map for latest receipt per bookingId / paymentRef
+    const receiptMap = new Map<string, typeof receipts[0]>();
+    receipts.forEach((r) => {
+      if (r.bookingId && !receiptMap.has(r.bookingId)) {
+        receiptMap.set(r.bookingId, r);
+      }
+      if (r.paymentRef && !receiptMap.has(r.paymentRef)) {
+        receiptMap.set(r.paymentRef, r);
       }
     });
 
     // Formatting for frontend compatibility
-    const formattedBookings = bookings.map(b => ({
-      ...b,
-      experienceName: b.experience?.name || b.experienceId
-    }));
+    const formattedBookings = bookings.map(b => {
+      const receipt = receiptMap.get(b.id) || (b.paymentRef ? receiptMap.get(b.paymentRef) : null);
+      
+      let vippsStatus: string | null = null;
+      let vippsAmount: number = 0;
+
+      if (receipt) {
+        vippsStatus = receipt.status;
+        vippsAmount = Math.round(receipt.amount * 100);
+      } else if (['reservation', 'full', 'vipps'].includes(b.paymentType)) {
+        if (b.amountPaid > 0 || b.status === 'confirmed') {
+          vippsStatus = 'CAPTURED';
+          vippsAmount = Math.round((b.amountPaid || 0) * 100);
+        } else if (b.status === 'pending') {
+          vippsStatus = 'VENTER_PAA_BETALING';
+          vippsAmount = 0;
+        }
+      } else if (['manual', 'system'].includes(b.paymentType) || b.amountPaid === 0) {
+        vippsStatus = 'MANUELL';
+        vippsAmount = 0;
+      }
+
+      return {
+        ...b,
+        experienceName: b.experience?.name || b.experienceId,
+        vippsStatus,
+        vippsAmount,
+      };
+    });
 
     return NextResponse.json(formattedBookings);
   } catch (error) {

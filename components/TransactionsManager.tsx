@@ -121,9 +121,9 @@ export default function TransactionsManager() {
     const totalExVat = totalInclVat / (1 + vatRate);
     const vatAmount = totalInclVat - totalExVat;
 
-    const betalingsform = selectedTx.paymentType === 'vipps' ? 'Vipps' : 
-                         (selectedTx.paymentType === 'manual' ? 'Manuell' : 
-                         (selectedTx.paymentType || 'Ukjent'));
+    const betalingsform = (selectedTx.paymentType === 'vipps' || selectedTx.paymentType === 'reservation' || selectedTx.paymentType === 'full') 
+      ? 'Vipps' 
+      : (selectedTx.paymentType === 'manual' || selectedTx.paymentType === 'system' ? 'Manuell / Oppmøte' : (selectedTx.paymentType || 'Ukjent'));
 
     return (
       <div className="bg-white text-black font-mono text-sm max-w-sm mx-auto shadow-md p-8 print:shadow-none print:p-0 print:max-w-none">
@@ -328,7 +328,9 @@ export default function TransactionsManager() {
                     <div className="font-mono text-zinc-300 text-xs">{tx.bookingId}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-mono text-zinc-300 text-xs">{tx.paymentType === 'vipps' ? tx.vippsOrderId : 'N/A'}</div>
+                    <div className="font-mono text-zinc-300 text-xs">
+                      {tx.paymentRef || (['vipps', 'reservation', 'full'].includes(tx.paymentType) ? tx.bookingId : 'N/A')}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-zinc-200">
@@ -340,12 +342,55 @@ export default function TransactionsManager() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full border ${
-                      (tx.status === 'AUTHORIZED' || tx.status === 'epayment.payment.reserved' || tx.status === 'transaction.state.changed') ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
-                      'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                    }`}>
-                      {tx.status}
-                    </span>
+                    {(() => {
+                      const status = (tx.vippsStatus || '').toUpperCase();
+                      const isCaptured = status === 'CAPTURED' || status === 'SALE' || status.includes('CAPTURED');
+                      const isReserved = status === 'RESERVED' || status === 'AUTHORIZED' || status.includes('RESERVED');
+                      const isRefunded = status === 'REFUNDED' || status.includes('REFUND');
+                      const isManual = status === 'MANUELL' || tx.paymentType === 'manual' || tx.paymentType === 'system' || (!isCaptured && !isReserved && (!tx.amountPaid || tx.amountPaid === 0));
+                      const isPending = status === 'VENTER_PAA_BETALING' || (tx.paymentType === 'vipps' && !isCaptured && tx.status === 'pending');
+
+                      if (isCaptured) {
+                        return (
+                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            🟢 Betalt (Vipps)
+                          </span>
+                        );
+                      }
+                      if (isReserved) {
+                        return (
+                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            🟡 Reservert (Vipps)
+                          </span>
+                        );
+                      }
+                      if (isRefunded) {
+                        return (
+                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                            🔵 Refundert
+                          </span>
+                        );
+                      }
+                      if (isManual) {
+                        return (
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded inline-flex items-center gap-1 bg-zinc-800/80 text-zinc-400 border border-zinc-700/50">
+                            ⚪ Betales ved oppmøte
+                          </span>
+                        );
+                      }
+                      if (isPending) {
+                        return (
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded inline-flex items-center gap-1 bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">
+                            🟠 Venter på Vipps
+                          </span>
+                        );
+                      }
+                      return (
+                        <span className="text-[11px] font-medium px-2 py-0.5 rounded inline-flex items-center bg-zinc-800 text-zinc-400">
+                          {tx.vippsStatus || tx.status || "-"}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="px-6 py-4 text-right">
                     {tx.amountPaid > 0 ? (
