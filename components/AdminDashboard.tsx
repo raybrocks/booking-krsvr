@@ -403,18 +403,18 @@ export default function AdminDashboard() {
                         <div className="flex items-center gap-1">
                           <button 
                             onClick={() => extendBooking(booking.id)} 
-                            className="text-[11px] text-zinc-400 hover:text-white px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50 font-mono font-medium" 
+                            className="text-xs text-zinc-400 hover:text-white px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50 font-medium leading-none" 
                             title="Legg til 90 minutter (+90 min)"
                           >
-                            (+)
+                            +
                           </button>
                           {booking.duration && booking.duration > 90 && (
                             <button 
                               onClick={() => reduceBooking(booking.id)} 
-                              className="text-[11px] text-zinc-400 hover:text-red-400 px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50 font-mono font-medium" 
+                              className="text-xs text-zinc-400 hover:text-red-400 px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50 font-medium leading-none" 
                               title="Trekk fra 90 minutter (-90 min)"
                             >
-                              (-)
+                              -
                             </button>
                           )}
                         </div>
