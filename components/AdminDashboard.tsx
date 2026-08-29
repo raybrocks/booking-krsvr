@@ -536,7 +536,7 @@ export default function AdminDashboard() {
                           }
                           return (
                             <span className="text-[11px] font-bold uppercase px-2 py-0.5 rounded inline-flex items-center gap-1 bg-red-500/20 text-red-300 border border-red-500/40 shadow-sm">
-                              🔴 Krev inn: {remaining} NOK (Oppmøte)
+                              🔴 Krev inn: {remaining} NOK
                             </span>
                           );
                         })()}
