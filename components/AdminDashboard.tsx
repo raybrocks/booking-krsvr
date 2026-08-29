@@ -38,7 +38,7 @@ const playDing = () => {
   }
 };
 
-const formatBookingTimeRange = (startTime: string, durationMinutes?: number) => {
+const getBookingTimeRange = (startTime: string, durationMinutes?: number) => {
   if (!startTime || !startTime.includes(':')) return startTime || '';
   const [hoursStr, minutesStr] = startTime.split(':');
   const hours = parseInt(hoursStr, 10);
@@ -51,7 +51,7 @@ const formatBookingTimeRange = (startTime: string, durationMinutes?: number) => 
   const endMinutes = totalMinutes % 60;
 
   const endTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
-  return `${startTime}–${endTime} (${duration} min)`;
+  return `${startTime}–${endTime}`;
 };
 
 export default function AdminDashboard() {
@@ -395,31 +395,34 @@ export default function AdminDashboard() {
                       <CalendarIcon className="w-4 h-4 text-zinc-500" />
                       {booking.date}
                     </div>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                       <span className="flex items-center gap-1 text-zinc-300 text-xs font-semibold whitespace-nowrap">
-                         <Clock className="w-3 h-3 text-zinc-500" />
-                         {formatBookingTimeRange(booking.time, booking.duration)}
-                       </span>
-                       {booking.status !== 'cancelled' && (
-                         <>
-                           <button 
-                             onClick={() => extendBooking(booking.id)} 
-                             className="text-xs text-zinc-500 hover:text-white px-1.5 py-0.5 rounded transition-colors ml-0.5 bg-zinc-800/80 border border-zinc-700/50" 
-                             title="Legg til en ekstra tidsslot (utvid ++)"
-                           >
-                             + Tid
-                           </button>
-                           {booking.duration && booking.duration > 90 && (
-                             <button 
-                               onClick={() => reduceBooking(booking.id)} 
-                               className="text-xs text-zinc-500 hover:text-red-400 px-1.5 py-0.5 rounded transition-colors ml-0.5 bg-zinc-800/80 border border-zinc-700/50" 
-                               title="Slett ekstra tidsslot (reduser --)"
-                             >
-                               - Tid
-                             </button>
-                           )}
-                         </>
-                       )}
+                    <div className="flex items-center gap-1.5 mt-1 text-zinc-200 text-xs font-semibold whitespace-nowrap">
+                      <Clock className="w-3.5 h-3.5 text-zinc-500" />
+                      {getBookingTimeRange(booking.time, booking.duration)}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[11px] text-zinc-400 font-medium pl-5">
+                        {booking.duration || 90} min
+                      </span>
+                      {booking.status !== 'cancelled' && (
+                        <>
+                          <button 
+                            onClick={() => extendBooking(booking.id)} 
+                            className="text-[11px] text-zinc-400 hover:text-white px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50" 
+                            title="Legg til en ekstra tidsslot (utvid ++)"
+                          >
+                            + Tid
+                          </button>
+                          {booking.duration && booking.duration > 90 && (
+                            <button 
+                              onClick={() => reduceBooking(booking.id)} 
+                              className="text-[11px] text-zinc-400 hover:text-red-400 px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50" 
+                              title="Slett ekstra tidsslot (reduser --)"
+                            >
+                              - Tid
+                            </button>
+                          )}
+                        </>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
