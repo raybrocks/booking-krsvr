@@ -38,6 +38,22 @@ const playDing = () => {
   }
 };
 
+const formatBookingTimeRange = (startTime: string, durationMinutes?: number) => {
+  if (!startTime || !startTime.includes(':')) return startTime || '';
+  const [hoursStr, minutesStr] = startTime.split(':');
+  const hours = parseInt(hoursStr, 10);
+  const minutes = parseInt(minutesStr, 10);
+  if (isNaN(hours) || isNaN(minutes)) return startTime;
+
+  const duration = durationMinutes || 90;
+  const totalMinutes = hours * 60 + minutes + duration;
+  const endHours = Math.floor(totalMinutes / 60) % 24;
+  const endMinutes = totalMinutes % 60;
+
+  const endTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+  return `${startTime}–${endTime} (${duration} min)`;
+};
+
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -379,21 +395,16 @@ export default function AdminDashboard() {
                       <CalendarIcon className="w-4 h-4 text-zinc-500" />
                       {booking.date}
                     </div>
-                    <div className="flex items-center gap-3 mt-1">
-                       <span className="flex items-center gap-1 text-zinc-400 text-xs font-semibold">
-                         <Clock className="w-3 h-3" />
-                         {booking.time}
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                       <span className="flex items-center gap-1 text-zinc-300 text-xs font-semibold whitespace-nowrap">
+                         <Clock className="w-3 h-3 text-zinc-500" />
+                         {formatBookingTimeRange(booking.time, booking.duration)}
                        </span>
-                       {booking.duration && booking.duration > 90 && (
-                          <span className="bg-[#9C39FF]/10 text-[#9C39FF] text-[10px] px-1.5 py-0.5 rounded-full font-bold cursor-help" title={`Dette er en utvidet gruppe-booking. Parent-ID: ${booking.id}`}>
-                            {booking.duration} minutter
-                          </span>
-                       )}
                        {booking.status !== 'cancelled' && (
                          <>
                            <button 
                              onClick={() => extendBooking(booking.id)} 
-                             className="text-xs text-zinc-500 hover:text-white px-1 py-0.5 rounded transition-colors ml-1 bg-zinc-800/80 border border-zinc-700/50" 
+                             className="text-xs text-zinc-500 hover:text-white px-1.5 py-0.5 rounded transition-colors ml-0.5 bg-zinc-800/80 border border-zinc-700/50" 
                              title="Legg til en ekstra tidsslot (utvid ++)"
                            >
                              + Tid
@@ -401,7 +412,7 @@ export default function AdminDashboard() {
                            {booking.duration && booking.duration > 90 && (
                              <button 
                                onClick={() => reduceBooking(booking.id)} 
-                               className="text-xs text-zinc-500 hover:text-red-400 px-1 py-0.5 rounded transition-colors ml-1 bg-zinc-800/80 border border-zinc-700/50" 
+                               className="text-xs text-zinc-500 hover:text-red-400 px-1.5 py-0.5 rounded transition-colors ml-0.5 bg-zinc-800/80 border border-zinc-700/50" 
                                title="Slett ekstra tidsslot (reduser --)"
                              >
                                - Tid
