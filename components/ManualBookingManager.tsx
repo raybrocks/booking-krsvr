@@ -4,7 +4,29 @@ import React, { useState, useEffect } from "react";
 import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-export default function ManualBookingManager() {
+export interface ManualBookingInitialData {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  companyName?: string;
+  bookingType?: string;
+  date?: string;
+  time?: string;
+  duration?: number;
+  players?: number;
+  internalNotes?: string;
+  totalPrice?: number;
+  inquiryId?: string;
+}
+
+interface ManualBookingManagerProps {
+  initialData?: ManualBookingInitialData | null;
+  onBookingCreated?: (booking: any, inquiryId?: string) => void;
+  onClearInitialData?: () => void;
+}
+
+export default function ManualBookingManager({ initialData, onBookingCreated, onClearInitialData }: ManualBookingManagerProps = {}) {
   const [experiences, setExperiences] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +53,23 @@ export default function ManualBookingManager() {
   // available times based on selected date
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [bookedTimes, setBookedTimes] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (initialData) {
+      if (initialData.firstName !== undefined) setFirstName(initialData.firstName);
+      if (initialData.lastName !== undefined) setLastName(initialData.lastName);
+      if (initialData.email !== undefined) setEmail(initialData.email);
+      if (initialData.phone !== undefined) setPhone(initialData.phone);
+      if (initialData.companyName !== undefined) setCompanyName(initialData.companyName);
+      if (initialData.bookingType !== undefined) setBookingType(initialData.bookingType);
+      if (initialData.date !== undefined) setDate(initialData.date);
+      if (initialData.time !== undefined) setTime(initialData.time);
+      if (initialData.duration !== undefined) setDuration(initialData.duration);
+      if (initialData.players !== undefined) setPlayers(initialData.players);
+      if (initialData.internalNotes !== undefined) setInternalNotes(initialData.internalNotes);
+      if (initialData.totalPrice !== undefined) setTotalPrice(initialData.totalPrice);
+    }
+  }, [initialData]);
 
   useEffect(() => {
     async function loadData() {
@@ -186,6 +225,26 @@ export default function ManualBookingManager() {
       const data = await response.json();
       if (response.ok) {
         toast.success("Booking opprettet!");
+        
+        if (initialData?.inquiryId) {
+          try {
+            await fetch(`/api/admin/inquiries/${initialData.inquiryId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                status: "booked",
+                bookingId: data.id,
+              }),
+            });
+          } catch (inqErr) {
+            console.error("Failed to update inquiry status to booked:", inqErr);
+          }
+        }
+
+        if (onBookingCreated) {
+          onBookingCreated(data, initialData?.inquiryId);
+        }
+
         // Reset form except standard selections
         setFirstName("");
         setLastName("");
@@ -197,6 +256,8 @@ export default function ManualBookingManager() {
         setDuration(90);
         setCustomEmailText("");
         setSubscribeNewsletter(false);
+        if (onClearInitialData) onClearInitialData();
+
         // refresh booked times
         setBookedTimes([...bookedTimes, time, ...shadowTimes]);
       } else {
@@ -219,6 +280,23 @@ export default function ManualBookingManager() {
 
   return (
     <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+      {initialData?.inquiryId && (
+        <div className="mb-6 p-4 bg-[#9C39FF]/15 border border-[#9C39FF]/30 rounded-xl flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-[#9C39FF]">
+            <span className="font-semibold">Fyller ut fra henvendelse:</span>
+            <span className="text-white font-medium">{initialData.firstName} {initialData.lastName} {initialData.companyName ? `(${initialData.companyName})` : ''}</span>
+          </div>
+          {onClearInitialData && (
+            <button
+              type="button"
+              onClick={onClearInitialData}
+              className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              Nullstill forhåndsutfylling
+            </button>
+          )}
+        </div>
+      )}
       <h2 className="text-xl font-medium mb-6">Opprett Manuell Booking</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

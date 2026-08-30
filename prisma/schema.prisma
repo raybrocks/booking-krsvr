@@ -185,3 +185,34 @@ model TimeEntry {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model ContactInquiry {
+  id            String    @id @default(cuid())
+  formType      String    @default("arrangement") // "arrangement" or "annet"
+  name          String
+  email         String
+  phone         String?
+  message       String
+  
+  // Arrangement specific
+  groupType     String?   // "privat" or "bedrift"
+  companyName   String?
+  eventType     String?
+  packageType   String?
+  peopleCount   String?
+  date          String?   // "YYYY-MM-DD"
+  altDate       String?
+  time          String?
+  food          String?
+
+  status        String    @default("new") // "new", "contacted", "booked", "rejected"
+  internalNotes String?
+  bookingId     String?   // Linked booking if converted to booking
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([formType])
+}

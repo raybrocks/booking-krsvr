@@ -22,6 +22,31 @@ export async function POST(req: Request) {
       );
     }
     
+    let createdInquiry = null;
+    try {
+      createdInquiry = await prisma.contactInquiry.create({
+        data: {
+          formType: data.formType || 'arrangement',
+          name: data.name,
+          email: data.email,
+          phone: data.phone || null,
+          message: data.message,
+          groupType: data.groupType || null,
+          companyName: data.companyName || null,
+          eventType: data.eventType || null,
+          packageType: data.packageType || null,
+          peopleCount: data.peopleCount ? String(data.peopleCount) : null,
+          date: data.date || null,
+          altDate: data.altDate || null,
+          time: data.time || null,
+          food: data.food || null,
+          status: 'new',
+        }
+      });
+    } catch (dbError) {
+      console.error("Failed to save inquiry to database:", dbError);
+    }
+
     let toEmail = 'post@krsvr.no';
     try {
       const settingsDoc = await prisma.setting.findUnique({
@@ -42,40 +67,48 @@ export async function POST(req: Request) {
     htmlContent += `<p><strong>Type:</strong> ${data.formType === 'arrangement' ? 'Arrangement / Gruppbooking' : 'Annen henvendelse'}</p>`;
     htmlContent += `<p><strong>Navn:</strong> ${data.name}</p>`;
     htmlContent += `<p><strong>E-post:</strong> ${data.email}</p>`;
-    htmlContent += `<p><strong>Telefon:</strong> ${data.phone}</p>`;
+    htmlContent += `<p><strong>Telefon:</strong> ${data.phone || 'Ikke oppgitt'}</p>`;
     
     if (data.formType === 'arrangement') {
       htmlContent += `<p><strong>Gruppe:</strong> ${data.groupType === 'privat' ? 'Privat gruppe' : 'Bedrift / organisasjon'}</p>`;
       if (data.companyName) {
         htmlContent += `<p><strong>Bedriftsnavn:</strong> ${data.companyName}</p>`;
       }
-      htmlContent += `<p><strong>Type arrangement:</strong> ${data.eventType}</p>`;
-      htmlContent += `<p><strong>Ønsket opplegg:</strong> ${data.packageType}</p>`;
-      htmlContent += `<p><strong>Antall personer:</strong> ${data.peopleCount}</p>`;
-      htmlContent += `<p><strong>Dato:</strong> ${data.date}</p>`;
+      htmlContent += `<p><strong>Type arrangement:</strong> ${data.eventType || 'Ikke spesifisert'}</p>`;
+      htmlContent += `<p><strong>Ønsket opplegg:</strong> ${data.packageType || 'Ikke spesifisert'}</p>`;
+      htmlContent += `<p><strong>Antall personer:</strong> ${data.peopleCount || 'Ikke spesifisert'}</p>`;
+      htmlContent += `<p><strong>Dato:</strong> ${data.date || 'Ikke spesifisert'}</p>`;
       if (data.altDate) {
         htmlContent += `<p><strong>Alternativ dato:</strong> ${data.altDate}</p>`;
       }
-      htmlContent += `<p><strong>Tidspunkt:</strong> ${data.time}</p>`;
-      htmlContent += `<p><strong>Matønsker:</strong> ${data.food}</p>`;
+      htmlContent += `<p><strong>Tidspunkt:</strong> ${data.time || 'Ikke spesifisert'}</p>`;
+      htmlContent += `<p><strong>Matønsker:</strong> ${data.food || 'Ingen'}</p>`;
     }
     
-    htmlContent += `<p><strong>Melding:</strong></p><p>${data.message.replace(/\\n/g, '<br/>')}</p>`;
+    htmlContent += `<p><strong>Melding:</strong></p><p>${data.message.replace(/\n/g, '<br/>')}</p>`;
 
-    const { data: resendData, error } = await resend.emails.send({
-      from: 'Krs VR Arena Form <booking@donotreply.krsvr.no>',
-      to: toEmail,
-      replyTo: data.email,
-      subject: `Ny forespørsel: ${data.formType === 'arrangement' ? data.eventType || 'Arrangement' : 'Henvendelse'} fra ${data.name}`,
-      html: htmlContent,
-    });
-
-    if (error) {
-      console.error('Resend email error:', error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    let resendData = null;
+    try {
+      const sendResult = await resend.emails.send({
+        from: 'Krs VR Arena Form <booking@donotreply.krsvr.no>',
+        to: toEmail,
+        replyTo: data.email,
+        subject: `Ny forespørsel: ${data.formType === 'arrangement' ? data.eventType || 'Arrangement' : 'Henvendelse'} fra ${data.name}`,
+        html: htmlContent,
+      });
+      resendData = sendResult.data;
+      if (sendResult.error) {
+        console.error('Resend email error:', sendResult.error);
+      }
+    } catch (emailErr) {
+      console.error('Resend email send exception:', emailErr);
     }
 
-    return NextResponse.json({ success: true, data: resendData }, { status: 200 });
+    return NextResponse.json({ 
+      success: true, 
+      inquiryId: createdInquiry?.id, 
+      data: resendData 
+    }, { status: 200 });
   } catch (error) {
     console.error('Contact form exception:', error);
     return NextResponse.json(

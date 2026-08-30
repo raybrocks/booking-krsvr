@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import SettingsManager from "./SettingsManager";
 import ExperiencesManager from "./ExperiencesManager";
 import TransactionsManager from "./TransactionsManager";
-import ManualBookingManager from "./ManualBookingManager";
+import ManualBookingManager, { ManualBookingInitialData } from "./ManualBookingManager";
 import ShiftManager from "./ShiftManager";
 import EmployeesManager from "./EmployeesManager";
+import InquiriesManager, { ContactInquiryItem } from "./InquiriesManager";
 
 const playDing = () => {
   try {
@@ -72,10 +73,14 @@ const formatDateShort = (dateStr: string) => {
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "experiences" | "transactions" | "settings" | "manual" | "shifts" | "employees">("upcoming");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "inquiries" | "experiences" | "transactions" | "settings" | "manual" | "shifts" | "employees">("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isFirstLoad = useRef(true);
   const notifiedBookingIds = useRef<Set<string>>(new Set());
+
+  // Manual booking pre-fill state & Inquiries count
+  const [manualBookingInitialData, setManualBookingInitialData] = useState<ManualBookingInitialData | null>(null);
+  const [newInquiriesCount, setNewInquiriesCount] = useState<number>(0);
 
   // Sorting and Filtering State
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'dateTime', direction: 'asc' });
@@ -89,6 +94,55 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.reload();
+  };
+
+  const fetchInquiriesCount = async () => {
+    try {
+      const res = await fetch('/api/admin/inquiries?t=' + Date.now());
+      if (res.ok) {
+        const data = await res.json();
+        const newCount = data.filter((item: any) => item.status === 'new').length;
+        setNewInquiriesCount(newCount);
+      }
+    } catch (e) {
+      console.error("Failed to fetch inquiries count:", e);
+    }
+  };
+
+  const handleCreateBookingFromInquiry = (inquiry: ContactInquiryItem) => {
+    const nameParts = (inquiry.name || "").trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    let playersCount = 1;
+    if (inquiry.peopleCount) {
+      const match = inquiry.peopleCount.match(/\d+/);
+      if (match) playersCount = parseInt(match[0], 10) || 1;
+    }
+
+    const notesParts = [];
+    if (inquiry.eventType) notesParts.push(`Type arrangement: ${inquiry.eventType}`);
+    if (inquiry.packageType) notesParts.push(`Pakke: ${inquiry.packageType}`);
+    if (inquiry.food) notesParts.push(`Matønsker: ${inquiry.food}`);
+    if (inquiry.message) notesParts.push(`Kundens melding: ${inquiry.message}`);
+    const internalNotes = notesParts.join("\n\n");
+
+    setManualBookingInitialData({
+      firstName,
+      lastName,
+      email: inquiry.email,
+      phone: inquiry.phone || "",
+      companyName: inquiry.companyName || "",
+      bookingType: (inquiry.groupType === "bedrift" || inquiry.companyName) ? "corporate" : "private",
+      date: inquiry.date || "",
+      time: inquiry.time || "",
+      players: playersCount,
+      internalNotes,
+      inquiryId: inquiry.id,
+    });
+    setActiveTab("manual");
+    setMobileMenuOpen(false);
+    toast.info(`Forhåndsutfylte data fra ${inquiry.name}`);
   };
 
   useEffect(() => {
@@ -134,6 +188,8 @@ export default function AdminDashboard() {
           });
           setExperiencesMap(expsMap);
         }
+
+        fetchInquiriesCount();
       } catch (error) {
         console.error("Error fetching data:", error);
         setLoading(false);
@@ -717,6 +773,15 @@ export default function AdminDashboard() {
           <nav className="hidden xl:flex items-center bg-zinc-900/90 p-1.5 rounded-xl border border-zinc-800/80 shadow-inner gap-1 flex-wrap">
             <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Upcoming</button>
             <button onClick={() => setActiveTab("manual")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-4 h-4" /> Booking</button>
+            <button onClick={() => setActiveTab("inquiries")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'inquiries' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}>
+              <MailQuestion className="w-4 h-4" /> 
+              Forespørsler
+              {newInquiriesCount > 0 && (
+                <span className="ml-1 bg-amber-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                  {newInquiriesCount}
+                </span>
+              )}
+            </button>
             <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
             <button onClick={() => setActiveTab("experiences")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-4 h-4" /> Spill</button>
             <button onClick={() => setActiveTab("transactions")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
@@ -753,6 +818,15 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-zinc-900/80 p-2 rounded-xl border border-zinc-800">
               <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Upcoming</button>
               <button onClick={() => { setActiveTab("manual"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-4 h-4" /> Booking</button>
+              <button onClick={() => { setActiveTab("inquiries"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'inquiries' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}>
+                <MailQuestion className="w-4 h-4" /> 
+                Forespørsler
+                {newInquiriesCount > 0 && (
+                  <span className="ml-auto bg-amber-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                    {newInquiriesCount}
+                  </span>
+                )}
+              </button>
               <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
               <button onClick={() => { setActiveTab("experiences"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-4 h-4" /> Spill</button>
               <button onClick={() => { setActiveTab("transactions"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
@@ -771,6 +845,7 @@ export default function AdminDashboard() {
       {{
         upcoming: <h2 className="text-xl font-semibold text-white mb-6">Kommende bookinger</h2>,
         archive: <h2 className="text-xl font-semibold text-white mb-6">Arkiv</h2>,
+        inquiries: <h2 className="text-xl font-semibold text-white mb-6">Forespørsler & Arrangementer</h2>,
         manual: <h2 className="text-xl font-semibold text-white mb-6">Manuell booking</h2>,
         experiences: <h2 className="text-xl font-semibold text-white mb-6">Spill & Opplevelser</h2>,
         transactions: <h2 className="text-xl font-semibold text-white mb-6">Regnskap</h2>,
@@ -854,10 +929,24 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {activeTab === "inquiries" && (
+        <InquiriesManager 
+          onCreateBooking={handleCreateBookingFromInquiry} 
+          onInquiriesUpdated={fetchInquiriesCount} 
+        />
+      )}
       {activeTab === "experiences" && <ExperiencesManager />}
       {activeTab === "transactions" && <TransactionsManager />}
       {activeTab === "settings" && <SettingsManager />}
-      {activeTab === "manual" && <ManualBookingManager />}
+      {activeTab === "manual" && (
+        <ManualBookingManager 
+          initialData={manualBookingInitialData} 
+          onClearInitialData={() => setManualBookingInitialData(null)}
+          onBookingCreated={() => {
+            fetchInquiriesCount();
+          }} 
+        />
+      )}
       {activeTab === "shifts" && <ShiftManager />}
       {activeTab === "employees" && <EmployeesManager />}
     </div>
