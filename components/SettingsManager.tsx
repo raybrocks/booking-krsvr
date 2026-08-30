@@ -314,6 +314,19 @@ export default function SettingsManager() {
         </div>
 
         <div className="mb-6">
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Påminnelse om Navneliste (Dager før ankomst)</label>
+          <p className="text-zinc-500 text-xs mb-2">Hvor mange dager før arrangementsdatoen den daglige påminnelsesjobben skal begynne å purre kunden på e-post dersom navnelisten ikke er registrert (standard: 3 dager).</p>
+          <input 
+            type="number"
+            min="1"
+            max="30"
+            value={settings.nameListReminderDays ?? 3} 
+            onChange={(e) => setSettings({...settings, nameListReminderDays: parseInt(e.target.value, 10) || 3})} 
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
+          />
+        </div>
+
+        <div className="mb-6">
           <label className="block text-sm font-medium text-zinc-300 mb-2">Booking Confirmation Email Text</label>
           <p className="text-zinc-500 text-xs mb-2">This text will be included in the booking confirmation and receipt email sent to the customer.</p>
           <textarea 

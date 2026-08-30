@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import crypto from 'crypto';
 
 export async function GET(req: NextRequest) {
   try {
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
         players: data.players || 1,
         firstName: data.firstName || 'Manuell',
         lastName: data.lastName || 'Booking',
-        playerNames: [],
+        playerNames: data.playerNames || [],
         email: data.email || 'ingen@epost.no',
         phone: data.phone || '',
         acceptedTerms: true,
@@ -131,6 +132,7 @@ export async function POST(req: NextRequest) {
         companyName: data.companyName,
         internalNotes: data.internalNotes,
         duration: data.duration || 90,
+        manageToken: crypto.randomBytes(32).toString('hex'),
       }
     });
 

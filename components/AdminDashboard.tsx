@@ -518,19 +518,58 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                   <td className="px-3 sm:px-5 py-3.5 sm:py-4">
-                    <div className="text-zinc-300">{experiencesMap[booking.experienceId] || booking.experienceId}</div>
-                    <div className="flex items-center gap-1 mt-1 text-xs text-zinc-500">
-                      <Users className="w-3 h-3" /> {booking.players} Spillere
+                    <div className="text-zinc-200 font-medium">{experiencesMap[booking.experienceId] || booking.experienceId}</div>
+                    <div className="flex items-center gap-1.5 mt-1 text-xs text-zinc-400">
+                      <Users className="w-3 h-3 text-zinc-500" /> {booking.players} {booking.players === 1 ? 'spiller' : 'spillere'}
                     </div>
-                    {booking.playerNames && booking.playerNames.length > 0 && (
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {booking.playerNames.filter((n: string) => n.trim() !== '').map((name: string, idx: number) => (
-                          <span key={idx} className="bg-zinc-800 text-zinc-400 text-[10px] px-1.5 py-0.5 rounded border border-zinc-700/50">
-                            {name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {(() => {
+                      if (!booking.players || booking.players <= 0 || booking.bookingType === 'system') return null;
+                      const validNames = (booking.playerNames || []).filter((n: string) => n && n.trim() !== '');
+                      const isComplete = validNames.length >= booking.players;
+                      const hasSome = validNames.length > 0;
+                      
+                      const today = new Date().toISOString().split('T')[0];
+                      const isUpcomingSoon = booking.date >= today;
+
+                      return (
+                        <div className="mt-1.5 space-y-1">
+                          {isComplete ? (
+                            <div className="flex flex-wrap items-center gap-1">
+                              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                ✓ Navneliste ({validNames.length}/{booking.players})
+                              </span>
+                            </div>
+                          ) : hasSome ? (
+                            <div className="flex flex-wrap items-center gap-1">
+                              <span className="text-[10px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                                Delvis navneliste ({validNames.length}/{booking.players})
+                              </span>
+                            </div>
+                          ) : isUpcomingSoon ? (
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                                Mangler navn (0/{booking.players})
+                              </span>
+                              {booking.reminderCount > 0 && (
+                                <span className="text-[10px] text-zinc-500" title={`Purret ${booking.reminderCount}x, sist ${booking.lastReminderDate}`}>
+                                  ({booking.reminderCount}x purret)
+                                </span>
+                              )}
+                            </div>
+                          ) : null}
+
+                          {validNames.length > 0 && (
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {validNames.map((name: string, idx: number) => (
+                                <span key={idx} className="bg-zinc-800 text-zinc-300 text-[10px] px-1.5 py-0.5 rounded border border-zinc-700/50">
+                                  {name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td className="px-3 sm:px-5 py-3.5 sm:py-4 whitespace-normal">
                     <div className="font-medium text-zinc-200">

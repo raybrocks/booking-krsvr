@@ -72,6 +72,8 @@ model Booking {
   parentBookingId   String?  // References main booking if this is a duplicated blocked slot
   manageToken       String?  @unique
   playerNames       String[] @default([])
+  lastReminderDate  String?  // "YYYY-MM-DD" of last reminder sent to prevent duplicate same-day emails
+  reminderCount     Int      @default(0)
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

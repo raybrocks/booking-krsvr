@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Loader2, Calendar as CalendarIcon, Clock, AlertTriangle, ArrowRight, XCircle, Info } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Clock, AlertTriangle, ArrowRight, XCircle, Info, Users, Plus, Minus, CheckCircle2, Save } from 'lucide-react';
 import { format, differenceInHours, getDay } from 'date-fns';
 import { nb } from "date-fns/locale";
 import { toast } from "sonner";
@@ -17,6 +17,11 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
   const [error, setError] = useState<string | null>(null);
   const [booking, setBooking] = useState<any>(null);
   
+  // Player names & participant state
+  const [playerCount, setPlayerCount] = useState<number>(1);
+  const [namesList, setNamesList] = useState<string[]>([]);
+  const [isSavingNames, setIsSavingNames] = useState(false);
+
   const [experiences, setExperiences] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [bookedDates, setBookedDates] = useState<string[]>([]);
@@ -56,6 +61,15 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
         setBooking(bData);
         setSelectedExperienceId(bData.experienceId);
         
+        // Initialize player names
+        const pCount = bData.players || 1;
+        setPlayerCount(pCount);
+        const existingNames = Array.isArray(bData.playerNames) ? [...bData.playerNames] : [];
+        while (existingNames.length < pCount) {
+          existingNames.push("");
+        }
+        setNamesList(existingNames);
+
         // Initialize date if it's in the future
         const bDate = new Date(bData.date);
         bDate.setHours(0,0,0,0);
@@ -222,6 +236,59 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
     }
   };
 
+  const handlePlayerCountChange = (newCount: number) => {
+    if (newCount < 1) return;
+    const max = booking?.experience?.maxPlayers || 16;
+    if (newCount > max) {
+      toast.error(`Maksimal kapasitet for dette spillet er ${max} personer.`);
+      return;
+    }
+    setPlayerCount(newCount);
+    setNamesList(prev => {
+      const updated = [...prev];
+      while (updated.length < newCount) {
+        updated.push("");
+      }
+      return updated.slice(0, newCount);
+    });
+  };
+
+  const handleNameChange = (index: number, value: string) => {
+    setNamesList(prev => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
+
+  const handleSaveNames = async () => {
+    setIsSavingNames(true);
+    try {
+      const res = await fetch(`/api/booking/${bookingId}/manage?token=${token}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerNames: namesList,
+          players: playerCount
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Klarte ikke å lagre navneliste");
+      }
+
+      const updated = await res.json();
+      setBooking(updated);
+      setPlayerCount(updated.players);
+      toast.success("Navneliste og spillere er lagret!");
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setIsSavingNames(false);
+    }
+  };
+
   const allDisplayTimes = Array.from(new Set([...availableTimes, ...bookedTimesForDate])).sort();
 
   return (
@@ -245,6 +312,81 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
           <div>
             <p className="text-sm text-zinc-500 mb-1">Antall personer</p>
             <p className="font-medium">{booking.players} personer</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navneliste & Juster Spillere Seksjon */}
+      <div className="bg-zinc-900 border border-[#9C39FF]/40 rounded-2xl p-6 md:p-8 shadow-lg shadow-[#9C39FF]/5 space-y-6">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-zinc-800 pb-5">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Users className="w-5 h-5 text-[#9C39FF]" />
+              <h2 className="text-xl font-medium text-white">Navneliste & Justering av Spillere</h2>
+            </div>
+            <p className="text-xs text-zinc-400 max-w-xl leading-relaxed">
+              Legg inn fornavn/kallenavn på alle deltakerne slik at vi kan klargjøre VR-headsettene og opplegget før dere ankommer. Du kan også justere antall spillere ved behov.
+            </p>
+          </div>
+
+          {/* Antall spillere stepper */}
+          <div className="flex items-center gap-3 bg-zinc-950 px-4 py-2 rounded-xl border border-zinc-800">
+            <span className="text-xs text-zinc-400">Antall:</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handlePlayerCountChange(playerCount - 1)}
+                disabled={playerCount <= 1 || isSavingNames}
+                className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 flex items-center justify-center text-white transition-colors"
+                title="Reduser antall"
+              >
+                <Minus className="w-3.5 h-3.5" />
+              </button>
+              <span className="font-semibold text-white min-w-[24px] text-center">{playerCount}</span>
+              <button
+                type="button"
+                onClick={() => handlePlayerCountChange(playerCount + 1)}
+                disabled={playerCount >= (booking?.experience?.maxPlayers || 16) || isSavingNames}
+                className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 flex items-center justify-center text-white transition-colors"
+                title="Øk antall"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Name Inputs Grid */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {Array.from({ length: playerCount }).map((_, idx) => (
+              <div key={idx} className="space-y-1">
+                <label className="text-xs text-zinc-400 block font-medium">
+                  Spiller {idx + 1} {idx === 0 ? "(Hovedbestiller)" : ""}
+                </label>
+                <input
+                  type="text"
+                  placeholder={idx === 0 ? `${booking.firstName} (eller kallenavn)` : `Navn på spiller ${idx + 1}`}
+                  value={namesList[idx] || ""}
+                  onChange={(e) => handleNameChange(idx, e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#9C39FF] transition-colors"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-zinc-800/80">
+            <p className="text-xs text-zinc-500">
+              💡 {namesList.filter(n => n && n.trim()).length} av {playerCount} navn er fylt ut.
+            </p>
+            <button
+              onClick={handleSaveNames}
+              disabled={isSavingNames}
+              className="flex items-center gap-2 bg-[#9C39FF] hover:bg-[#8b32e6] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md shadow-[#9C39FF]/20 disabled:opacity-50"
+            >
+              {isSavingNames ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Lagre navneliste
+            </button>
           </div>
         </div>
       </div>

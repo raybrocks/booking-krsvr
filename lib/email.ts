@@ -40,8 +40,21 @@ export async function sendBookingConfirmationEmail(
   }
 
   const adminEmail = await getAdminEmail();
-  const { id, manageToken, firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId } = bookingDetails;
+  let { id, manageToken, firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId } = bookingDetails;
   
+  if (!manageToken && id) {
+    const crypto = await import('crypto');
+    manageToken = crypto.randomBytes(32).toString('hex');
+    try {
+      await prisma.booking.update({
+        where: { id },
+        data: { manageToken }
+      });
+    } catch (e) {
+      console.error("Failed to set manageToken on booking:", e);
+    }
+  }
+
   const manageUrl = `https://krsvr.no/booking/manage/${id}?token=${manageToken}`;
   
   let experienceTitle = "VR Experience";
@@ -58,39 +71,49 @@ export async function sendBookingConfirmationEmail(
 
   // Basic HTML template for the email
   const html = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-      <h1 style="color: #9C39FF;">Bestillingsbekreftelse og Kvittering</h1>
-      <p>Hei ${firstName} ${lastName},</p>
-      <p>Takk for din bestilling! Din betaling er registrert.</p>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #222; line-height: 1.5;">
+      <h1 style="color: #9C39FF; font-size: 24px; margin-bottom: 8px;">Bestillingsbekreftelse og Kvittering</h1>
+      <p style="font-size: 15px; margin-top: 0;">Hei ${firstName} ${lastName},</p>
+      <p style="font-size: 15px;">Takk for din bestilling hos KRS VR Arena!</p>
       
-      ${customText ? `<div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9C39FF;">
-        <p style="margin: 0;">${customText.replace(/\n/g, '<br/>')}</p>
+      ${customText ? `<div style="background: #fdf4ff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9C39FF;">
+        <p style="margin: 0; font-size: 14px; color: #4a044e;">${customText.replace(/\n/g, '<br/>')}</p>
       </div>` : ''}
 
-      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Bestillingsdetaljer</h2>
-      <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 10px;"><strong>Opplevelse:</strong> ${experienceTitle}</li>
-        <li style="margin-bottom: 10px;"><strong>Dato:</strong> ${date}</li>
-        <li style="margin-bottom: 10px;"><strong>Tidspunkt:</strong> ${time}</li>
-        <li style="margin-bottom: 10px;"><strong>Antall personer:</strong> ${players}</li>
-      </ul>
+      <!-- Navneliste & Portal Boks -->
+      <div style="margin: 25px 0; background: #faf5ff; border: 1.5px solid #d8b4fe; border-radius: 12px; padding: 20px;">
+        <h3 style="color: #7e22ce; font-size: 16px; margin-top: 0; margin-bottom: 8px;">📋 Navneliste & Justering av deltakere</h3>
+        <p style="font-size: 14px; color: #3b0764; margin: 0 0 10px 0;">
+          For at vi skal kunne klargjøre VR-headset, tilpasse spillene og gi dere en sømløs og rå opplevelse fra første sekund, trenger vi en navneliste over deltakerne <strong>senest 3 dager før ankomst</strong>.
+        </p>
+        <p style="font-size: 13px; color: #6b21a8; margin: 0 0 16px 0;">
+          💡 <em>Du trenger ikke å vente – hvis du allerede vet hvem som skal være med, kan du legge inn navnene med en gang. Her kan du også justere antall spillere dersom det blir endringer i gruppen. Dersom navnelisten ikke er fylt ut når det nærmer seg, vil du motta en vennlig påminnelse fra oss.</em>
+        </p>
+        <a href="${manageUrl}" style="display: inline-block; background: #9C39FF; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+          Fyll ut navneliste / Juster spillere &rarr;
+        </a>
+      </div>
 
-      <p style="margin-top: 15px; font-size: 14px; background: #fff8e1; padding: 15px; border-radius: 6px; border-left: 4px solid #ffc107; color: #665000;">
-        <strong>Merk:</strong> Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk spillets makskapasitet før dere ankommer arenaen.<br/>
-      </p>
+      <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Bestillingsdetaljer</h2>
+      <ul style="list-style: none; padding: 0; font-size: 14px;">
+        <li style="margin-bottom: 8px;"><strong>Opplevelse:</strong> ${experienceTitle}</li>
+        <li style="margin-bottom: 8px;"><strong>Dato:</strong> ${date}</li>
+        <li style="margin-bottom: 8px;"><strong>Tidspunkt:</strong> ${time}</li>
+        <li style="margin-bottom: 8px;"><strong>Antall personer:</strong> ${players}</li>
+      </ul>
 
       <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Betalingskvittering</h2>
-      <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 10px;"><strong>Totalpris:</strong> NOK ${totalPrice}</li>
-        <li style="margin-bottom: 10px;"><strong>Betalt beløp (Reservasjonsgebyr/Fullt):</strong> NOK ${amountPaid}</li>
-        <li style="margin-bottom: 10px;"><strong>Gjenstående beløp:</strong> NOK ${totalPrice - amountPaid} (betales ved oppmøte)</li>
+      <ul style="list-style: none; padding: 0; font-size: 14px;">
+        <li style="margin-bottom: 8px;"><strong>Totalpris:</strong> NOK ${totalPrice}</li>
+        <li style="margin-bottom: 8px;"><strong>Betalt beløp:</strong> NOK ${amountPaid}</li>
+        <li style="margin-bottom: 8px;"><strong>Gjenstående beløp:</strong> NOK ${totalPrice - amountPaid} (betales ved oppmøte/faktura)</li>
       </ul>
 
-      <div style="margin-top: 40px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
-        <h3 style="font-size: 16px; margin-top: 0; margin-bottom: 15px; color: #333;">Nyttig før ankomst</h3>
-        <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
+      <div style="margin-top: 30px; background: #f9f9f9; padding: 18px; border-radius: 8px; border: 1px solid #eee;">
+        <h3 style="font-size: 15px; margin-top: 0; margin-bottom: 12px; color: #333;">Nyttig før ankomst</h3>
+        <p style="margin: 0 0 12px 0; font-size: 14px; color: #555;">
           <strong>Slik finner du oss:</strong><br/>
-          <a href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" target="_blank" rel="noopener noreferrer" style="color: #9C39FF; text-decoration: none; font-weight: bold;">📍 Google Maps Veibeskrivelse</a>
+          <a href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" target="_blank" rel="noopener noreferrer" style="color: #9C39FF; text-decoration: none; font-weight: bold;">📍 Google Maps Veibeskrivelse</a> (Industrigata 12, Lund)
         </p>
         <p style="margin: 0; font-size: 14px; color: #555;">
           <strong>Lurer du på noe?</strong><br/>
@@ -98,34 +121,26 @@ export async function sendBookingConfirmationEmail(
         </p>
       </div>
 
-      <div style="margin-top: 20px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
-        <h3 style="font-size: 16px; margin-top: 0; margin-bottom: 10px; color: #333;">Endre bookingen din?</h3>
+      <div style="margin-top: 20px; background: #fff; padding: 18px; border-radius: 8px; border: 1px solid #eee;">
+        <h3 style="font-size: 15px; margin-top: 0; margin-bottom: 8px; color: #333;">Endre tidspunkt eller opplevelse?</h3>
         <p style="margin: 0; font-size: 14px; color: #555;">
-          Du kan selv endre tidspunkt eller spill for bookingen din inntil 48 timer før start. <br/><br/>
-          <a href="${manageUrl}" style="color: #9C39FF; text-decoration: underline; font-weight: bold;">Klikk her for å administrere din booking</a>.
+          Du kan selv endre tidspunkt eller opplevelse inntil 48 timer før start i administrasjonsportalen.<br/><br/>
+          <a href="${manageUrl}" style="color: #9C39FF; text-decoration: underline; font-weight: bold;">Administrer din booking her</a>.
         </p>
       </div>
 
-      <p style="margin-top: 40px; font-size: 14px; color: #666;">
-        Har du spørsmål eller behov for å endre på din bestilling, vennligst svar på denne e-posten, eller ta kontakt med oss på ${adminEmail}.
+      <p style="margin-top: 35px; font-size: 14px; color: #666;">
+        Har du spørsmål eller spesielle ønsker, svar gjerne direkte på denne e-posten eller kontakt oss på ${adminEmail}.
       </p>
       <p style="font-size: 14px; color: #666;">
-        Med vennlig hilsen,<br/>Krs VR Arena
+        Med vennlig hilsen,<br/><strong>KRS VR Arena</strong>
       </p>
       
-      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999; line-height: 1.5;">
+      <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999; line-height: 1.5;">
         <strong>Krs VR Arena AS</strong><br/>
         Organisasjonsnummer: 936318878 MVA<br/>
-        Industrigata 12<br/>
-        4632 Kristiansand, Norge<br/>
-        Telefon: <a href="tel:+4740828302" style="color: #9C39FF; text-decoration: none;">+47 408 28 302</a><br/>
-        <a href="mailto:${adminEmail}" style="color: #9C39FF; text-decoration: none;">${adminEmail}</a>
-        
-        <div style="margin-top: 15px;">
-          <a href="https://www.instagram.com/krs.vr.arena" style="color: #9C39FF; text-decoration: none; margin-right: 15px;">Instagram</a>
-          <a href="https://www.tiktok.com/@krs.vr.arena" style="color: #9C39FF; text-decoration: none; margin-right: 15px;">TikTok</a>
-          <a href="https://www.youtube.com/@KrsVRArena" style="color: #9C39FF; text-decoration: none;">YouTube</a>
-        </div>
+        Industrigata 12, 4632 Kristiansand<br/>
+        Telefon: <a href="tel:+4740828302" style="color: #9C39FF; text-decoration: none;">+47 408 28 302</a> | <a href="mailto:${adminEmail}" style="color: #9C39FF; text-decoration: none;">${adminEmail}</a>
       </div>
     </div>
   `;
@@ -144,10 +159,109 @@ export async function sendBookingConfirmationEmail(
       return null;
     }
     
-    console.log("Email sent successfully:", data);
     return data;
   } catch (error) {
     console.error("Failed to send email (exception):", error);
+    return null;
+  }
+}
+
+export async function sendNameListDailyReminderEmail(bookingDetails: any) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Reminder email not sent.");
+    return null;
+  }
+
+  const adminEmail = await getAdminEmail();
+  let { id, manageToken, firstName, lastName, date, time, players, email, experienceId } = bookingDetails;
+  
+  if (!manageToken && id) {
+    const crypto = await import('crypto');
+    manageToken = crypto.randomBytes(32).toString('hex');
+    try {
+      await prisma.booking.update({
+        where: { id },
+        data: { manageToken }
+      });
+    } catch (e) {
+      console.error("Failed to set manageToken on booking in reminder:", e);
+    }
+  }
+
+  const manageUrl = `https://krsvr.no/booking/manage/${id}?token=${manageToken}`;
+  
+  let experienceTitle = "VR Experience";
+  if (experienceId) {
+    try {
+      const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
+      if (exp && exp.name) {
+        experienceTitle = exp.name;
+      }
+    } catch (e) {}
+  }
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #222; line-height: 1.5;">
+      <h1 style="color: #9C39FF; font-size: 22px; margin-bottom: 8px;">Påminnelse: Navneliste til deres VR-opplevelse 🎮</h1>
+      <p style="font-size: 15px; margin-top: 0;">Hei ${firstName} ${lastName},</p>
+      <p style="font-size: 15px;">
+        Vi gleder oss til å ta dere imot hos KRS VR Arena <strong>${date} kl. ${time}</strong> (${players} spillere / ${experienceTitle})!
+      </p>
+      
+      <!-- Navneliste Callout -->
+      <div style="margin: 25px 0; background: #faf5ff; border: 1.5px solid #c084fc; border-radius: 12px; padding: 22px; text-align: left;">
+        <h3 style="color: #7e22ce; font-size: 17px; margin-top: 0; margin-bottom: 8px;">📋 Vennligst registrer navneliste før ankomst</h3>
+        <p style="font-size: 14px; color: #3b0764; margin: 0 0 12px 0; line-height: 1.5;">
+          For at vi skal kunne klargjøre VR-headsettene, sette opp lagene i spillet og gi dere en sømløs og fantastisk opplevelse fra første sekund, trenger vi fornavn (eller kallenavn) på alle som skal spille.
+        </p>
+        <p style="font-size: 13px; color: #6b21a8; margin: 0 0 18px 0;">
+          Det tar under 1 minutt å fylle ut. Du kan også justere antall spillere dersom det har blitt endringer i gruppen.
+        </p>
+        <a href="${manageUrl}" style="display: inline-block; background: #9C39FF; color: #ffffff; text-decoration: none; padding: 13px 26px; border-radius: 8px; font-weight: bold; font-size: 15px; box-shadow: 0 2px 4px rgba(156,57,255,0.2);">
+          Klikk her for å fylle inn navn nå &rarr;
+        </a>
+      </div>
+
+      <div style="background: #f9f9f9; padding: 18px; border-radius: 8px; border: 1px solid #eee; margin-top: 25px;">
+        <h3 style="font-size: 15px; margin-top: 0; margin-bottom: 10px; color: #333;">Oppmøte & Praktisk info</h3>
+        <p style="margin: 0 0 8px 0; font-size: 14px; color: #555;">
+          📍 <strong>Adresse:</strong> Industrigata 12, 4632 Kristiansand (<a href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" target="_blank" style="color: #9C39FF;">Google Maps</a>)
+        </p>
+        <p style="margin: 0; font-size: 14px; color: #555;">
+          ⏰ <strong>Oppmøtetid:</strong> Vennligst møt opp 10-15 minutter før spillstart for enkel briefing og tilpasning av briller.
+        </p>
+      </div>
+
+      <p style="margin-top: 30px; font-size: 14px; color: #666;">
+        Har du spørsmål, svar gjerne direkte på denne e-posten eller kontakt oss på ${adminEmail}.
+      </p>
+      <p style="font-size: 14px; color: #666;">
+        Med vennlig hilsen,<br/><strong>KRS VR Arena</strong>
+      </p>
+      
+      <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999; line-height: 1.5;">
+        <strong>Krs VR Arena AS</strong><br/>
+        Industrigata 12, 4632 Kristiansand | Telefon: +47 408 28 302
+      </div>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Krs VR Arena <booking@donotreply.krsvr.no>',
+      to: email,
+      replyTo: adminEmail,
+      subject: `Påminnelse: Vi trenger navneliste til deres VR-opplevelse den ${date} kl. ${time}`,
+      html,
+    });
+    
+    if (error) {
+      console.error("Resend reminder error:", error);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error("Failed to send reminder email:", error);
     return null;
   }
 }
