@@ -55,6 +55,20 @@ const getBookingTimeRange = (startTime: string, durationMinutes?: number) => {
   return `${startTime}–${endTime}`;
 };
 
+const formatDateShort = (dateStr: string) => {
+  if (!dateStr) return '';
+  if (dateStr.includes('-')) {
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      const year = parts[0].slice(-2);
+      const month = parts[1];
+      const day = parts[2];
+      return `${day}.${month}.${year}`;
+    }
+  }
+  return dateStr;
+};
+
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -366,33 +380,33 @@ export default function AdminDashboard() {
       {title && <h2 className="text-xl font-medium mb-4 text-zinc-200">{title}</h2>}
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col w-full max-w-full">
         <div className="overflow-x-auto max-h-[70vh] rounded-2xl relative w-full">
-          <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[1150px]">
+          <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[950px]">
             <colgroup>
-              <col className="w-[16%]" />
-              <col className="w-[18%]" />
+              <col className="w-[11%]" />
+              <col className="w-[19%]" />
               <col className="w-[28%]" />
               <col className="w-[18%]" />
-              <col className="w-[10%]" />
-              <col className="w-[10%]" />
+              <col className="w-[12%]" />
+              <col className="w-[12%]" />
             </colgroup>
             <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">
               <tr>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[16%]" onClick={() => handleSort('dateTime')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[11%]" onClick={() => handleSort('dateTime')}>
                   Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('experienceId')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[19%]" onClick={() => handleSort('experienceId')}>
                   Experience {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[28%]" onClick={() => handleSort('customer')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[28%]" onClick={() => handleSort('customer')}>
                   Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('totalPrice')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('totalPrice')}>
                   Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[10%]" onClick={() => handleSort('createdAt')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[12%]" onClick={() => handleSort('createdAt')}>
                   Placed At {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[10%]" onClick={() => handleSort('status')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[12%]" onClick={() => handleSort('status')}>
                   Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
               </tr>
@@ -412,18 +426,18 @@ export default function AdminDashboard() {
                   
                   return (
                 <tr key={booking.id} className={`transition-colors ${isExpired ? 'bg-red-950/10 opacity-70' : 'hover:bg-zinc-800/20'}`}>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-zinc-300">
-                      <CalendarIcon className="w-4 h-4 text-zinc-500" />
-                      {booking.date}
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4">
+                    <div className="flex items-center gap-1.5 text-zinc-300 font-mono text-xs sm:text-sm">
+                      <CalendarIcon className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                      {formatDateShort(booking.date)}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1 text-zinc-200 text-xs font-semibold whitespace-nowrap">
-                      <Clock className="w-3.5 h-3.5 text-zinc-500" />
+                    <div className="flex items-center gap-1 mt-1 text-zinc-200 text-xs font-semibold whitespace-nowrap">
+                      <Clock className="w-3 h-3 text-zinc-500 shrink-0" />
                       {getBookingTimeRange(booking.time, booking.duration)}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1 text-xs">
-                      <span className="text-[11px] text-zinc-400 font-medium pl-5">
-                        {booking.duration || 90} min
+                    <div className="flex items-center gap-1 mt-1 text-xs">
+                      <span className="text-[11px] text-zinc-400 font-medium pl-4">
+                        {booking.duration || 90}m
                       </span>
                       {booking.status !== 'cancelled' && (
                         <div className="flex items-center gap-1">
@@ -447,7 +461,7 @@ export default function AdminDashboard() {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4">
                     <div className="text-zinc-300">{experiencesMap[booking.experienceId] || booking.experienceId}</div>
                     <div className="flex items-center gap-1 mt-1 text-xs text-zinc-500">
                       <Users className="w-3 h-3" /> {booking.players} Spillere
@@ -462,7 +476,7 @@ export default function AdminDashboard() {
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-normal">
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 whitespace-normal">
                     <div className="font-medium text-zinc-200">
                       {booking.bookingType === 'corporate' && booking.companyName ? (
                         <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded mr-2">Bedrift</span>
@@ -493,7 +507,7 @@ export default function AdminDashboard() {
                        </button>
                     )}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4">
                     <div className="flex flex-col gap-1.5">
                       {/* Handlingsorientert betalingsmerke */}
                       <div>
@@ -628,7 +642,7 @@ export default function AdminDashboard() {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-xs text-zinc-400">
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 text-xs text-zinc-400">
                     {booking.createdAt ? (
                       <div>
                         <div>{new Intl.DateTimeFormat("no-NO", { dateStyle: "short" }).format(new Date(booking.createdAt))}</div>
@@ -636,7 +650,7 @@ export default function AdminDashboard() {
                       </div>
                     ) : "N/A"}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4">
                     <div className="flex items-center gap-2">
                       <select
                         value={booking.status}

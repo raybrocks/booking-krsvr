@@ -3,6 +3,15 @@
 import React, { useState, useEffect } from "react";
 import { Loader2, Calendar as CalendarIcon, Clock, Plus, Trash2, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 
+function formatDateShort(dateStr: string | Date) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = String(d.getFullYear()).slice(-2);
+  return `${day}.${month}.${year}`;
+}
+
 export default function ShiftManager() {
   const [view, setView] = useState<'availability' | 'timetracking'>('availability');
   
@@ -274,53 +283,56 @@ export default function ShiftManager() {
             </form>
           </div>
 
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-x-auto w-full">
-            <table className="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
-              <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Dato</th>
-                  <th className="px-6 py-4 font-medium">Tidsrom</th>
-                  <th className="px-6 py-4 font-medium">Ansatt</th>
-                  <th className="px-6 py-4 font-medium text-right">Handling</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/50">
-                {shifts.length === 0 ? (
+          <div className="mt-6">
+            <h3 className="text-md font-medium text-zinc-300 mb-3">Registrert Tilgjengelighet</h3>
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-x-auto w-full">
+              <table className="w-full text-left text-sm whitespace-nowrap min-w-[500px]">
+                <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400">
                   <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">Ingen tilgjengelighet registrert.</td>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium">Dato</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium">Tidsrom</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium">Ansatt</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-right">Handling</th>
                   </tr>
-                ) : (
-                  shifts.map((shift) => {
-                    const isMine = currentUser?.id === shift.employeeId;
-                    return (
-                      <tr key={shift.id} className="hover:bg-zinc-800/20 transition-colors">
-                        <td className="px-6 py-4 text-zinc-300">
-                          {new Date(shift.date).toLocaleDateString('no-NO', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
-                        </td>
-                        <td className="px-6 py-4 text-zinc-200 font-medium">{shift.startTime} - {shift.endTime}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400">
-                              {shift.employee?.name?.charAt(0).toUpperCase()}
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
+                  {shifts.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">Ingen tilgjengelighet registrert.</td>
+                    </tr>
+                  ) : (
+                    shifts.map((shift) => {
+                      const isMine = currentUser?.id === shift.employeeId;
+                      return (
+                        <tr key={shift.id} className="hover:bg-zinc-800/20 transition-colors">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-zinc-300 font-mono text-sm">
+                            {formatDateShort(shift.date)}
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-zinc-200 font-medium">{shift.startTime} - {shift.endTime}</td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400">
+                                {shift.employee?.name?.charAt(0).toUpperCase()}
+                              </div>
+                              <span className={isMine ? "text-[#9C39FF] font-medium" : "text-zinc-300"}>
+                                {shift.employee?.name} {isMine && "(Deg)"}
+                              </span>
                             </div>
-                            <span className={isMine ? "text-[#9C39FF] font-medium" : "text-zinc-300"}>
-                              {shift.employee?.name} {isMine && "(Deg)"}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {(isMine || currentUser?.email === 'post@krsvr.no') && (
-                            <button onClick={() => handleDeleteAvailability(shift.id)} className="p-2 hover:bg-red-500/10 text-zinc-500 hover:text-red-400 rounded-lg transition-colors" title="Slett">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
+                            {(isMine || currentUser?.email === 'post@krsvr.no') && (
+                              <button onClick={() => handleDeleteAvailability(shift.id)} className="p-2 hover:bg-red-500/10 text-zinc-500 hover:text-red-400 rounded-lg transition-colors" title="Slett">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}
@@ -398,68 +410,71 @@ export default function ShiftManager() {
             </form>
           </div>
 
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-x-auto w-full">
-            <table className="w-full text-left text-sm whitespace-nowrap min-w-[750px]">
-              <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Dato</th>
-                  <th className="px-6 py-4 font-medium">Tidsrom</th>
-                  <th className="px-6 py-4 font-medium">Timer (Kveld)</th>
-                  <th className="px-6 py-4 font-medium">Ansatt</th>
-                  <th className="px-6 py-4 font-medium">Kommentar</th>
-                  <th className="px-6 py-4 font-medium text-right">Handling</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/50">
-                {timeEntries.length === 0 ? (
+          <div className="mt-6">
+            <h3 className="text-md font-medium text-zinc-300 mb-3">Timeliste / Registrerte timer</h3>
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-x-auto w-full">
+              <table className="w-full text-left text-sm whitespace-nowrap min-w-[620px]">
+                <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400">
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">Ingen timer registrert.</td>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium">Dato</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium">Tidsrom</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium">Timer</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium">Ansatt</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium">Kommentar</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-right">Handling</th>
                   </tr>
-                ) : (
-                  timeEntries.map((entry) => {
-                    const isMine = currentUser?.id === entry.employeeId;
-                    return (
-                      <tr key={entry.id} className="hover:bg-zinc-800/20 transition-colors">
-                        <td className="px-6 py-4 text-zinc-300">
-                          {new Date(entry.date).toLocaleDateString('no-NO', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
-                        </td>
-                        <td className="px-6 py-4 text-zinc-200 font-medium">{entry.startTime} - {entry.endTime}</td>
-                        <td className="px-6 py-4">
-                          <span className="font-bold text-white">{entry.hours}t</span>
-                          {entry.eveningHours > 0 && (
-                            <span className="ml-2 text-xs text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded">
-                              +{entry.eveningHours}t kveld
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
+                  {timeEntries.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">Ingen timer registrert.</td>
+                    </tr>
+                  ) : (
+                    timeEntries.map((entry) => {
+                      const isMine = currentUser?.id === entry.employeeId;
+                      return (
+                        <tr key={entry.id} className="hover:bg-zinc-800/20 transition-colors">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-zinc-300 font-mono text-sm">
+                            {formatDateShort(entry.date)}
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-zinc-200 font-medium">{entry.startTime} - {entry.endTime}</td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4">
+                            <span className="font-bold text-white">{entry.hours}t</span>
+                            {entry.eveningHours > 0 && (
+                              <span className="ml-2 text-xs text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded">
+                                +{entry.eveningHours}t
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4">
+                            <span className={isMine ? "text-[#9C39FF] font-medium" : "text-zinc-300"}>
+                              {entry.employee?.name}
                             </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={isMine ? "text-[#9C39FF] font-medium" : "text-zinc-300"}>
-                            {entry.employee?.name}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-zinc-400 max-w-[200px] truncate" title={entry.note}>
-                          {entry.note || "-"}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {(isMine || currentUser?.email === 'post@krsvr.no') && (
-                            <button onClick={() => handleDeleteTimeEntry(entry.id)} className="p-2 hover:bg-red-500/10 text-zinc-500 hover:text-red-400 rounded-lg transition-colors" title="Slett">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-zinc-400 max-w-[160px] truncate" title={entry.note}>
+                            {entry.note || "-"}
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
+                            {(isMine || currentUser?.email === 'post@krsvr.no') && (
+                              <button onClick={() => handleDeleteTimeEntry(entry.id)} className="p-2 hover:bg-red-500/10 text-zinc-500 hover:text-red-400 rounded-lg transition-colors" title="Slett">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
           
           {/* Summary Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-zinc-400 text-sm font-medium">Timer Uke {displayWeekData.week} {displayWeekData.year !== (new Date()).getFullYear() ? displayWeekData.year : ''}</h3>
+                <h3 className="text-zinc-400 text-sm font-medium">Ukesoversikt (Uke {displayWeekData.week}{displayWeekData.year !== (new Date()).getFullYear() ? ` ${displayWeekData.year}` : ''})</h3>
                 <div className="flex items-center gap-1">
                   <button type="button" onClick={() => setWeekOffset(prev => prev - 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronLeft className="w-4 h-4"/></button>
                   <button type="button" onClick={() => setWeekOffset(0)} className="text-xs font-medium text-zinc-500 hover:text-white px-2">I dag</button>
@@ -478,7 +493,7 @@ export default function ShiftManager() {
             
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-zinc-400 text-sm font-medium capitalize">Timer {displayMonthData.monthName} {displayMonthData.year}</h3>
+                <h3 className="text-zinc-400 text-sm font-medium capitalize">Månedsoversikt ({displayMonthData.monthName} {displayMonthData.year})</h3>
                 <div className="flex items-center gap-1">
                   <button type="button" onClick={() => setMonthOffset(prev => prev - 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronLeft className="w-4 h-4"/></button>
                   <button type="button" onClick={() => setMonthOffset(0)} className="text-xs font-medium text-zinc-500 hover:text-white px-2">I dag</button>
