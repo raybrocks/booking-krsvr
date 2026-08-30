@@ -79,31 +79,32 @@ export default async function AdminFeedbackPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800">
-                {submissions?.length === 0 && (
+                {submissions.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
-                      Ingen tilbakemeldinger enda.
+                    <td colSpan={4} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">
+                      Ingen tilbakemeldinger registrert enda.
                     </td>
                   </tr>
+                ) : (
+                  submissions.map((sub) => (
+                    <tr key={sub.id} className="hover:bg-zinc-800/50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {format(new Date(sub.created_at), 'dd. MMM yyyy HH:mm', { locale: nb })}
+                      </td>
+                      <td className="px-6 py-4">
+                        {sub.rating === 'happy' && <span className="text-xl" title="Happy">😄</span>}
+                        {sub.rating === 'neutral' && <span className="text-xl" title="Neutral">😐</span>}
+                        {sub.rating === 'sad' && <span className="text-xl" title="Sad">😞</span>}
+                      </td>
+                      <td className="px-6 py-4 max-w-md">
+                        <div className="whitespace-pre-wrap">{sub.comments || <span className="text-zinc-600 italic">Ingen kommentar</span>}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {sub.phone || <span className="text-zinc-600 italic">Ikke oppgitt</span>}
+                      </td>
+                    </tr>
+                  ))
                 )}
-                {submissions?.map((sub) => (
-                  <tr key={sub.id} className="hover:bg-zinc-800/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {format(new Date(sub.created_at), 'dd. MMM yyyy HH:mm', { locale: nb })}
-                    </td>
-                    <td className="px-6 py-4">
-                      {sub.rating === 'happy' && <span className="text-xl" title="Happy">😄</span>}
-                      {sub.rating === 'neutral' && <span className="text-xl" title="Neutral">😐</span>}
-                      {sub.rating === 'sad' && <span className="text-xl" title="Sad">😞</span>}
-                    </td>
-                    <td className="px-6 py-4 max-w-md">
-                      <div className="whitespace-pre-wrap">{sub.comments || <span className="text-zinc-600 italic">Ingen kommentar</span>}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {sub.phone || <span className="text-zinc-600 italic">Ikke oppgitt</span>}
-                    </td>
-                  </tr>
-                ))}
               </tbody>
             </table>
           </div>

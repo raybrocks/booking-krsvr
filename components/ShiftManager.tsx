@@ -298,7 +298,7 @@ export default function ShiftManager() {
                 <tbody className="divide-y divide-zinc-800/50">
                   {shifts.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">Ingen tilgjengelighet registrert.</td>
+                      <td colSpan={4} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">Ingen tilgjengelighet registrert.</td>
                     </tr>
                   ) : (
                     shifts.map((shift) => {
@@ -427,7 +427,7 @@ export default function ShiftManager() {
                 <tbody className="divide-y divide-zinc-800/50">
                   {timeEntries.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">Ingen timer registrert.</td>
+                      <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">Ingen timer registrert.</td>
                     </tr>
                   ) : (
                     timeEntries.map((entry) => {

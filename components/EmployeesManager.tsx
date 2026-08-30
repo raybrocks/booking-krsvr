@@ -145,13 +145,13 @@ export default function EmployeesManager() {
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800/50">
-            {employees.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">
-                  Ingen ansatte funnet.
-                </td>
-              </tr>
-            ) : (
+              {employees.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">
+                    Ingen ansatte funnet.
+                  </td>
+                </tr>
+              ) : (
               employees.map((emp) => (
                 <tr key={emp.id} className="hover:bg-zinc-800/20 transition-colors">
                   <td className="px-6 py-4 text-zinc-200 font-medium">

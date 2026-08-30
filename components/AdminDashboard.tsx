@@ -414,7 +414,7 @@ export default function AdminDashboard() {
             <tbody className="divide-y divide-zinc-800/50">
               {tableBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">
+                  <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">
                     No bookings yet.
                   </td>
                 </tr>
