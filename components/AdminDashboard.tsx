@@ -572,18 +572,29 @@ export default function AdminDashboard() {
                     })()}
                   </td>
                   <td className="px-3 sm:px-5 py-3.5 sm:py-4 whitespace-normal">
-                    <div className="font-medium text-zinc-200">
+                    <div className="font-medium text-zinc-200 flex items-center flex-wrap gap-1.5">
                       {booking.bookingType === 'corporate' && booking.companyName ? (
-                        <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded mr-2">Bedrift</span>
+                        <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border border-amber-500/30">Bedrift</span>
                       ) : null}
-                      {booking.companyName ? `${booking.companyName} (${booking.firstName} ${booking.lastName})` : `${booking.firstName} ${booking.lastName}`}
+                      {booking.bookingType === 'system' || booking.email?.includes('system@sperret') || booking.firstName === 'Sperret' ? (
+                        <span className="bg-red-500/20 text-red-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border border-red-500/30">Sperret</span>
+                      ) : null}
+                      <span>
+                        {booking.companyName ? `${booking.companyName} (${booking.firstName} ${booking.lastName})` : `${booking.firstName} ${booking.lastName}`}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
-                      <span className="flex items-center gap-1">
-                        <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
-                        {booking.email}
-                      </span>
-                      <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
+                      {booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') ? (
+                        <>
+                          <span className="flex items-center gap-1">
+                            <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
+                            {booking.email}
+                          </span>
+                          <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
+                        </>
+                      ) : (
+                        <span className="text-[11px] text-zinc-500 italic">Blokkert tidspunkt (ikke tilgjengelig for kunder)</span>
+                      )}
                     </div>
                     {booking.internalNotes ? (
                        <div 
