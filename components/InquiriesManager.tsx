@@ -192,6 +192,10 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
     return dateStr < today;
   };
 
+  const isClosedInquiry = (item: ContactInquiryItem) => {
+    return item.status === "booked" || !!item.bookingId || item.status === "rejected" || isDatePassed(item.date);
+  };
+
   // Filter items
   const filteredInquiries = inquiries.filter(item => {
     // Search
@@ -216,20 +220,18 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
 
   // Split into active and archive
   const activeInquiries = filteredInquiries.filter(item => {
-    // If date passed or status is rejected/booked, belongs to archive unless explicitly filtering
+    // If explicitly filtering (by status, type, or search), show all matches directly in main list
     if (statusFilter !== "all" || typeFilter !== "all" || searchQuery) {
-      return true; // when filtering, show all matches in main list
+      return true;
     }
-    const passed = isDatePassed(item.date);
-    return !passed && item.status !== "rejected";
+    return !isClosedInquiry(item);
   });
 
   const archiveInquiries = filteredInquiries.filter(item => {
     if (statusFilter !== "all" || typeFilter !== "all" || searchQuery) {
       return false; // already shown above
     }
-    const passed = isDatePassed(item.date);
-    return passed || item.status === "rejected";
+    return isClosedInquiry(item);
   });
 
   if (loading) {
@@ -487,7 +489,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
         )}
       </div>
 
-      {/* Archive Accordion (for passed dates & completed/rejected) */}
+      {/* Archive Accordion (for booked / rejected / passed inquiries) */}
       {statusFilter === "all" && typeFilter === "all" && !searchQuery && archiveInquiries.length > 0 && (
         <div className="border border-zinc-800 rounded-2xl overflow-hidden bg-zinc-900/30 mt-8">
           <button
@@ -495,8 +497,9 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
             className="w-full flex items-center justify-between p-4 sm:p-5 bg-zinc-900/60 hover:bg-zinc-800/40 transition-colors text-left"
           >
             <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400/80" />
               <h3 className="text-sm font-semibold text-zinc-300">
-                Arkiv (Passerte datoer / Fullførte henvendelser)
+                Avsluttede henvendelser (Booket, fullført eller passert)
               </h3>
               <span className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-medium">
                 {archiveInquiries.length}

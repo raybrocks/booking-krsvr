@@ -101,8 +101,12 @@ export default function AdminDashboard() {
       const res = await fetch('/api/admin/inquiries?t=' + Date.now());
       if (res.ok) {
         const data = await res.json();
-        const newCount = data.filter((item: any) => item.status === 'new').length;
-        setNewInquiriesCount(newCount);
+        const today = new Date().toISOString().split("T")[0];
+        const openCount = data.filter((item: any) => {
+          const isClosed = item.status === 'booked' || !!item.bookingId || item.status === 'rejected' || (item.date && item.date < today);
+          return !isClosed;
+        }).length;
+        setNewInquiriesCount(openCount);
       }
     } catch (e) {
       console.error("Failed to fetch inquiries count:", e);
