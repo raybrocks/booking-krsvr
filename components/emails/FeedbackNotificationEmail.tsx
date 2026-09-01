@@ -16,30 +16,30 @@ export const FeedbackNotificationEmail: React.FC<FeedbackNotificationEmailProps>
   adminEmail = 'post@krsvr.no',
 }) => {
   const getRatingDisplay = (r: string) => {
-    if (r === 'happy') return { emoji: '😄', text: 'Kjempefornøyd (Happy)', color: '#16a34a' };
-    if (r === 'neutral') return { emoji: '😐', text: 'Helt ok (Neutral)', color: '#ca8a04' };
-    if (r === 'sad') return { emoji: '😞', text: 'Misfornøyd (Sad)', color: '#dc2626' };
-    return { emoji: '⭐', text: r, color: '#9C39FF' };
+    if (r === 'happy') return { text: 'Kjempefornøyd', color: '#16a34a' };
+    if (r === 'neutral') return { text: 'Helt ok', color: '#ca8a04' };
+    if (r === 'sad') return { text: 'Misfornøyd', color: '#dc2626' };
+    return { text: r, color: '#7c3aed' };
   };
 
   const ratingInfo = getRatingDisplay(rating);
 
   return (
-    <EmailLayout previewText={`Ny tilbakemelding mottatt: ${ratingInfo.text}`} adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Ny Tilbakemelding fra Kunde ✨</Heading>
+    <EmailLayout previewText={`Ny tilbakemelding: ${ratingInfo.text}`} adminEmail={adminEmail}>
+      <Heading style={headingStyle}>Ny tilbakemelding fra kunde</Heading>
 
       <Text style={paragraphStyle}>
-        En kunde har lagt igjen en tilbakemelding på <Link href="https://krsvr.no/feedback" style={{ color: '#9C39FF' }}>krsvr.no/feedback</Link>:
+        En kunde har lagt igjen en tilbakemelding på <Link href="https://krsvr.no/feedback" style={{ color: '#7c3aed' }}>krsvr.no/feedback</Link>:
       </Text>
 
       <Section style={{ ...ratingCardStyle, borderLeftColor: ratingInfo.color }}>
-        <Text style={{ fontSize: '20px', margin: '0 0 6px 0' }}>
-          {ratingInfo.emoji} <strong style={{ color: ratingInfo.color }}>{ratingInfo.text}</strong>
+        <Text style={{ fontSize: '16px', margin: '0 0 6px 0' }}>
+          Opplevelse: <strong style={{ color: ratingInfo.color }}>{ratingInfo.text}</strong>
         </Text>
 
         {comments && (
           <Section style={commentBoxStyle}>
-            <Text style={{ fontSize: '14px', color: '#1f2937', margin: 0, lineHeight: '1.5', fontStyle: 'italic' }}>
+            <Text style={{ fontSize: '13.5px', color: '#1f2937', margin: 0, lineHeight: '1.5' }}>
               &ldquo;{comments}&rdquo;
             </Text>
           </Section>
@@ -47,7 +47,7 @@ export const FeedbackNotificationEmail: React.FC<FeedbackNotificationEmailProps>
 
         {phone && (
           <Text style={{ fontSize: '13px', color: '#4b5563', margin: '12px 0 0 0' }}>
-            📞 <strong>Telefon for oppfølging:</strong> <Link href={`tel:${phone}`} style={{ color: '#9C39FF' }}>{phone}</Link>
+            <strong>Telefon for oppfølging:</strong> <Link href={`tel:${phone}`} style={{ color: '#7c3aed' }}>{phone}</Link>
           </Text>
         )}
       </Section>
@@ -62,7 +62,7 @@ export const FeedbackNotificationEmail: React.FC<FeedbackNotificationEmailProps>
 const headingStyle: React.CSSProperties = {
   fontSize: '20px',
   fontWeight: '700',
-  color: '#9C39FF',
+  color: '#111827',
   margin: '0 0 14px 0',
 };
 
@@ -75,7 +75,7 @@ const paragraphStyle: React.CSSProperties = {
 
 const ratingCardStyle: React.CSSProperties = {
   backgroundColor: '#f9fafb',
-  borderLeft: '4px solid #9C39FF',
+  borderLeft: '3px solid #7c3aed',
   borderRadius: '4px',
   padding: '16px',
   margin: '16px 0 24px 0',
@@ -90,10 +90,10 @@ const commentBoxStyle: React.CSSProperties = {
 };
 
 const primaryButtonStyle: React.CSSProperties = {
-  backgroundColor: '#9C39FF',
+  backgroundColor: '#7c3aed',
   color: '#ffffff',
   borderRadius: '8px',
-  padding: '10px 20px',
+  padding: '10px 18px',
   fontSize: '13px',
   fontWeight: '600',
   textDecoration: 'none',

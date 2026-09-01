@@ -38,9 +38,9 @@ export const ContactInquiryNotificationEmail: React.FC<ContactInquiryNotificatio
   const isArrangement = formType === 'arrangement';
 
   return (
-    <EmailLayout previewText={`Ny ${isArrangement ? eventType || 'Arrangementsforespørsel' : 'Kontakthenvendelse'} fra ${name}`} adminEmail={adminEmail}>
+    <EmailLayout previewText={`Ny ${isArrangement ? eventType || 'arrangementsforespørsel' : 'kontakthenvendelse'} fra ${name}`} adminEmail={adminEmail}>
       <Heading style={headingStyle}>
-        {isArrangement ? 'Ny Arrangementsforespørsel 🏢' : 'Ny Kontakthenvendelse ✉️'}
+        {isArrangement ? 'Ny arrangementsforespørsel' : 'Ny henvendelse'}
       </Heading>
 
       <Text style={paragraphStyle}>
@@ -49,8 +49,8 @@ export const ContactInquiryNotificationEmail: React.FC<ContactInquiryNotificatio
 
       <Section style={detailsTableStyle}>
         <Text style={detailRowStyle}><strong>Navn:</strong> {name}</Text>
-        <Text style={detailRowStyle}><strong>E-post:</strong> <Link href={`mailto:${email}`} style={{ color: '#9C39FF' }}>{email}</Link></Text>
-        {phone && <Text style={detailRowStyle}><strong>Telefon:</strong> <Link href={`tel:${phone}`} style={{ color: '#9C39FF' }}>{phone}</Link></Text>}
+        <Text style={detailRowStyle}><strong>E-post:</strong> <Link href={`mailto:${email}`} style={{ color: '#7c3aed' }}>{email}</Link></Text>
+        {phone && <Text style={detailRowStyle}><strong>Telefon:</strong> <Link href={`tel:${phone}`} style={{ color: '#7c3aed' }}>{phone}</Link></Text>}
         {companyName && <Text style={detailRowStyle}><strong>Bedrift:</strong> {companyName}</Text>}
         {eventType && <Text style={detailRowStyle}><strong>Type arrangement:</strong> {eventType}</Text>}
         {packageType && <Text style={detailRowStyle}><strong>Ønsket opplegg:</strong> {packageType}</Text>}
@@ -62,10 +62,10 @@ export const ContactInquiryNotificationEmail: React.FC<ContactInquiryNotificatio
       </Section>
 
       <Section style={messageBoxStyle}>
-        <Text style={{ fontSize: '12px', fontWeight: '700', color: '#6b7280', margin: '0 0 6px 0', textTransform: 'uppercase' }}>
+        <Text style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', margin: '0 0 6px 0', textTransform: 'uppercase' }}>
           Melding fra kunde:
         </Text>
-        <Text style={{ fontSize: '14px', color: '#1f2937', margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+        <Text style={{ fontSize: '13.5px', color: '#1f2937', margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
           {message}
         </Text>
       </Section>
@@ -80,7 +80,7 @@ export const ContactInquiryNotificationEmail: React.FC<ContactInquiryNotificatio
 const headingStyle: React.CSSProperties = {
   fontSize: '20px',
   fontWeight: '700',
-  color: '#9C39FF',
+  color: '#111827',
   margin: '0 0 14px 0',
 };
 
@@ -93,14 +93,14 @@ const paragraphStyle: React.CSSProperties = {
 
 const detailsTableStyle: React.CSSProperties = {
   backgroundColor: '#f9fafb',
-  borderLeft: '4px solid #9C39FF',
+  borderLeft: '3px solid #7c3aed',
   borderRadius: '4px',
   padding: '16px',
   margin: '16px 0',
 };
 
 const detailRowStyle: React.CSSProperties = {
-  fontSize: '14px',
+  fontSize: '13.5px',
   color: '#374151',
   margin: '6px 0',
   lineHeight: '1.4',
@@ -115,10 +115,10 @@ const messageBoxStyle: React.CSSProperties = {
 };
 
 const primaryButtonStyle: React.CSSProperties = {
-  backgroundColor: '#9C39FF',
+  backgroundColor: '#7c3aed',
   color: '#ffffff',
   borderRadius: '8px',
-  padding: '10px 20px',
+  padding: '10px 18px',
   fontSize: '13px',
   fontWeight: '600',
   textDecoration: 'none',

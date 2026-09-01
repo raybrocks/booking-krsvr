@@ -15,73 +15,73 @@ export const EmployeeInviteEmail: React.FC<EmployeeInviteEmailProps> = ({
 }) => {
   return (
     <EmailLayout previewText="Invitasjon som ansatt hos KRS VR Arena" adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Velkommen til teamet! 👋</Heading>
+      <Heading style={headingStyle}>Velkommen som ansatt</Heading>
 
       <Text style={paragraphStyle}>Hei {name},</Text>
       <Text style={paragraphStyle}>
-        Du har blitt lagt til som ansatt i bookingsystemet til <strong>KRS VR Arena</strong>.
+        Du er lagt til som ansatt i systemet til <strong>KRS VR Arena</strong>.
       </Text>
 
       <Section style={calloutBoxStyle}>
-        <Text style={calloutTitleStyle}>Aktiver din brukerkonto</Text>
+        <Text style={calloutTitleStyle}>Opprett passord og få tilgang</Text>
         <Text style={calloutTextStyle}>
-          Klikk på knappen under for å registrere passord og få tilgang til vaktliste, bookingkalender og administrasjonspanel.
+          Klikk på knappen under for å opprette ditt passord og få tilgang til vaktliste, bookingkalender og administrasjonspanel.
         </Text>
         <Button href={inviteUrl} style={primaryButtonStyle}>
-          Opprett bruker & Logg inn &rarr;
+          Opprett bruker og logg inn &rarr;
         </Button>
       </Section>
 
       <Text style={footnoteStyle}>
-        Dersom du har spørsmål om vakter eller innlogging, kontakt leder på <Link href={`mailto:${adminEmail}`} style={{ color: '#9C39FF' }}>{adminEmail}</Link>.
+        Har du spørsmål, ta kontakt med leder på <Link href={`mailto:${adminEmail}`} style={{ color: '#7c3aed' }}>{adminEmail}</Link>.
       </Text>
     </EmailLayout>
   );
 };
 
 const headingStyle: React.CSSProperties = {
-  fontSize: '22px',
+  fontSize: '20px',
   fontWeight: '700',
-  color: '#9C39FF',
+  color: '#111827',
   margin: '0 0 16px 0',
 };
 
 const paragraphStyle: React.CSSProperties = {
-  fontSize: '15px',
+  fontSize: '14px',
   lineHeight: '1.6',
   color: '#374151',
   margin: '0 0 12px 0',
 };
 
 const calloutBoxStyle: React.CSSProperties = {
-  backgroundColor: '#faf5ff',
-  border: '1.5px solid #d8b4fe',
-  borderRadius: '12px',
+  backgroundColor: '#fbfbfe',
+  border: '1px solid #e0e7ff',
+  borderRadius: '10px',
   padding: '20px',
   margin: '24px 0',
   textAlign: 'center',
 };
 
 const calloutTitleStyle: React.CSSProperties = {
-  color: '#7e22ce',
-  fontSize: '16px',
-  fontWeight: '700',
+  color: '#4338ca',
+  fontSize: '15px',
+  fontWeight: '600',
   margin: '0 0 8px 0',
 };
 
 const calloutTextStyle: React.CSSProperties = {
-  color: '#3b0764',
-  fontSize: '14px',
+  color: '#374151',
+  fontSize: '13.5px',
   lineHeight: '1.5',
   margin: '0 0 16px 0',
 };
 
 const primaryButtonStyle: React.CSSProperties = {
-  backgroundColor: '#9C39FF',
+  backgroundColor: '#7c3aed',
   color: '#ffffff',
   borderRadius: '8px',
-  padding: '12px 24px',
-  fontSize: '14px',
+  padding: '11px 20px',
+  fontSize: '13px',
   fontWeight: '600',
   textDecoration: 'none',
   textAlign: 'center',
@@ -89,7 +89,7 @@ const primaryButtonStyle: React.CSSProperties = {
 };
 
 const footnoteStyle: React.CSSProperties = {
-  fontSize: '13px',
+  fontSize: '12.5px',
   color: '#6b7280',
   marginTop: '24px',
 };

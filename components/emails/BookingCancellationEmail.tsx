@@ -23,11 +23,11 @@ export const BookingCancellationEmail: React.FC<BookingCancellationEmailProps> =
 }) => {
   return (
     <EmailLayout previewText={`Bekreftelse på kansellering for ${experienceTitle}`} adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Booking Kansellert</Heading>
+      <Heading style={headingStyle}>Kansellering av booking</Heading>
 
       <Text style={paragraphStyle}>Hei {firstName} {lastName},</Text>
       <Text style={paragraphStyle}>
-        Din bestilling hos KRS VR Arena har blitt kansellert.
+        Din bestilling hos KRS VR Arena er nå kansellert.
       </Text>
 
       <Section style={detailsTableStyle}>
@@ -40,21 +40,21 @@ export const BookingCancellationEmail: React.FC<BookingCancellationEmailProps> =
       </Section>
 
       <Text style={paragraphStyle}>
-        Dersom du har spørsmål eller ønsker å booke en ny tid senere, er du hjertelig velkommen til å besøke <Link href="https://krsvr.no/booking" style={{ color: '#9C39FF' }}>vår nettside</Link> eller kontakte oss på <Link href={`mailto:${adminEmail}`} style={{ color: '#9C39FF' }}>{adminEmail}</Link>.
+        Dersom du har spørsmål eller ønsker å booke en ny tid senere, er du velkommen til å besøke <Link href="https://krsvr.no/booking" style={{ color: '#7c3aed' }}>krsvr.no</Link> eller kontakte oss på <Link href={`mailto:${adminEmail}`} style={{ color: '#7c3aed' }}>{adminEmail}</Link>.
       </Text>
     </EmailLayout>
   );
 };
 
 const headingStyle: React.CSSProperties = {
-  fontSize: '22px',
+  fontSize: '20px',
   fontWeight: '700',
-  color: '#dc2626',
+  color: '#b91c1c',
   margin: '0 0 16px 0',
 };
 
 const paragraphStyle: React.CSSProperties = {
-  fontSize: '15px',
+  fontSize: '14px',
   lineHeight: '1.6',
   color: '#374151',
   margin: '0 0 12px 0',
@@ -69,7 +69,7 @@ const detailsTableStyle: React.CSSProperties = {
 };
 
 const detailRowStyle: React.CSSProperties = {
-  fontSize: '14px',
+  fontSize: '13.5px',
   color: '#991b1b',
-  margin: '6px 0',
+  margin: '5px 0',
 };

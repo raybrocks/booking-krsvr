@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Html, Head, Body, Container, Section, Text, Link, Hr } from '@react-email/components';
+import { Html, Head, Body, Container, Section, Text, Link, Hr, Img } from '@react-email/components';
 
 interface EmailLayoutProps {
   previewText?: string;
@@ -17,11 +17,17 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({
       <Head />
       <Body style={mainStyle}>
         <Container style={containerStyle}>
-          {/* Header */}
+          {/* Clean Website Header */}
           <Section style={headerStyle}>
-            <Text style={brandTitleStyle}>
-              KRS <span style={{ color: '#9C39FF' }}>VR</span> ARENA
-            </Text>
+            <Link href="https://krsvr.no" style={{ textDecoration: 'none', display: 'inline-block' }}>
+              <Img
+                src="https://krsvr.no/logo.svg"
+                alt="KRS VR ARENA"
+                width="140"
+                height="34"
+                style={logoImgStyle}
+              />
+            </Link>
             {previewText && (
               <Text style={{ display: 'none', fontSize: '1px', color: '#ffffff', lineHeight: '1px', maxHeight: '0px', maxWidth: '0px', opacity: 0, overflow: 'hidden' }}>
                 {previewText}
@@ -39,14 +45,13 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
               <strong>Krs VR Arena AS</strong> &bull; Org.nr: 936318878 MVA<br />
-              Industrigata 12, 4632 Kristiansand, Norge<br />
+              Industrigata 12, 4632 Kristiansand<br />
               Telefon: <Link href="tel:+4740828302" style={linkStyle}>+47 408 28 302</Link> &bull; E-post: <Link href={`mailto:${adminEmail}`} style={linkStyle}>{adminEmail}</Link>
             </Text>
             <Section style={socialLinksStyle}>
-              <Link href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" style={socialLinkItem}>📍 Google Maps</Link>
-              <Link href="https://krsvr.no/faq" style={socialLinkItem}>❓ FAQ</Link>
-              <Link href="https://www.instagram.com/krs.vr.arena" style={socialLinkItem}>Instagram</Link>
-              <Link href="https://www.tiktok.com/@krs.vr.arena" style={socialLinkItem}>TikTok</Link>
+              <Link href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" style={socialLinkItem}>Google Maps</Link>
+              <Link href="https://krsvr.no/faq" style={socialLinkItem}>Ofte stilte spørsmål (FAQ)</Link>
+              <Link href="https://krsvr.no" style={socialLinkItem}>krsvr.no</Link>
             </Section>
           </Section>
         </Container>
@@ -56,10 +61,10 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({
 };
 
 const mainStyle: React.CSSProperties = {
-  backgroundColor: '#f6f7fb',
+  backgroundColor: '#f3f4f6',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   margin: 0,
-  padding: '24px 12px',
+  padding: '32px 12px',
 };
 
 const containerStyle: React.CSSProperties = {
@@ -69,22 +74,22 @@ const containerStyle: React.CSSProperties = {
   borderRadius: '12px',
   overflow: 'hidden',
   border: '1px solid #e5e7eb',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)',
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
 };
 
 const headerStyle: React.CSSProperties = {
-  backgroundColor: '#0f0f13',
-  padding: '24px 32px',
+  backgroundColor: '#ffffff',
+  padding: '28px 32px 20px 32px',
   textAlign: 'left',
-  borderBottom: '2px solid #9C39FF',
+  borderBottom: '1px solid #f0f0f2',
 };
 
-const brandTitleStyle: React.CSSProperties = {
-  color: '#ffffff',
-  fontSize: '22px',
-  fontWeight: '800',
-  letterSpacing: '1px',
-  margin: 0,
+const logoImgStyle: React.CSSProperties = {
+  display: 'block',
+  maxWidth: '140px',
+  height: 'auto',
+  border: '0',
+  outline: 'none',
 };
 
 const contentStyle: React.CSSProperties = {
@@ -93,12 +98,12 @@ const contentStyle: React.CSSProperties = {
 };
 
 const hrStyle: React.CSSProperties = {
-  borderColor: '#f3f4f6',
+  borderColor: '#f1f2f4',
   margin: '0',
 };
 
 const footerStyle: React.CSSProperties = {
-  backgroundColor: '#fafafa',
+  backgroundColor: '#fafbfc',
   padding: '24px 32px',
   textAlign: 'center',
 };
@@ -107,24 +112,24 @@ const footerTextStyle: React.CSSProperties = {
   color: '#6b7280',
   fontSize: '12px',
   lineHeight: '1.6',
-  margin: '0 0 12px 0',
+  margin: '0 0 10px 0',
 };
 
 const socialLinksStyle: React.CSSProperties = {
   textAlign: 'center',
-  marginTop: '8px',
+  marginTop: '4px',
 };
 
 const socialLinkItem: React.CSSProperties = {
-  color: '#9C39FF',
+  color: '#6b7280',
   fontSize: '12px',
-  fontWeight: '600',
-  textDecoration: 'none',
+  fontWeight: '500',
+  textDecoration: 'underline',
   margin: '0 8px',
 };
 
 const linkStyle: React.CSSProperties = {
-  color: '#9C39FF',
+  color: '#7c3aed',
   textDecoration: 'none',
   fontWeight: '500',
 };

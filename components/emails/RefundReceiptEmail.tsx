@@ -23,11 +23,11 @@ export const RefundReceiptEmail: React.FC<RefundReceiptEmailProps> = ({
 }) => {
   return (
     <EmailLayout previewText={`Kvittering for refusjon - NOK ${refundAmount}`} adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Kvittering for Refusjon 💳</Heading>
+      <Heading style={headingStyle}>Kvittering for refusjon</Heading>
 
       <Text style={paragraphStyle}>Hei {firstName} {lastName},</Text>
       <Text style={paragraphStyle}>
-        Vi har gjennomført en refusjon via Vipps for din bestilling ({date} kl {time}).
+        Vi har gjennomført en refusjon via Vipps for din bestilling ({date} kl. {time}).
       </Text>
 
       <Section style={detailsTableStyle}>
@@ -37,25 +37,25 @@ export const RefundReceiptEmail: React.FC<RefundReceiptEmailProps> = ({
       </Section>
 
       <Text style={paragraphStyle}>
-        Beløpet overføres automatisk tilbake til betalingskortet / kontoen som ble benyttet i Vipps. Dette tar normalt 1-3 virkedager avhengig av banken din.
+        Beløpet tilbakeføres automatisk til kontoen / kortet som ble benyttet i Vipps. Dette tar normalt 1–3 virkedager avhengig av bankforbindelse.
       </Text>
 
       <Text style={footnoteStyle}>
-        Har du spørsmål rundt refusjonen, ta gjerne kontakt med oss på <Link href={`mailto:${adminEmail}`} style={{ color: '#9C39FF' }}>{adminEmail}</Link>.
+        Har du spørsmål rundt refusjonen, kan du kontakte oss på <Link href={`mailto:${adminEmail}`} style={{ color: '#7c3aed' }}>{adminEmail}</Link>.
       </Text>
     </EmailLayout>
   );
 };
 
 const headingStyle: React.CSSProperties = {
-  fontSize: '22px',
+  fontSize: '20px',
   fontWeight: '700',
-  color: '#9C39FF',
+  color: '#111827',
   margin: '0 0 16px 0',
 };
 
 const paragraphStyle: React.CSSProperties = {
-  fontSize: '15px',
+  fontSize: '14px',
   lineHeight: '1.6',
   color: '#374151',
   margin: '0 0 12px 0',
@@ -70,13 +70,13 @@ const detailsTableStyle: React.CSSProperties = {
 };
 
 const detailRowStyle: React.CSSProperties = {
-  fontSize: '14px',
+  fontSize: '13.5px',
   color: '#166534',
-  margin: '6px 0',
+  margin: '5px 0',
 };
 
 const footnoteStyle: React.CSSProperties = {
-  fontSize: '13px',
+  fontSize: '12.5px',
   color: '#6b7280',
   marginTop: '24px',
 };

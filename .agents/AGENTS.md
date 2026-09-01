@@ -33,5 +33,10 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - Foreslått emnefelt (`subject`)
    - Nøyaktig utsendelses-trigger (`trigger`)
    - Filsti i prosjektet (`filePath`)
-   Dette sikrer at admin-forhåndsviseren alltid reflekterer alle aktive e-postmaler med korrekte testdata.
+# Tone of Voice og Språk
+1. **Rolig og profesjonell varm tone:** Tekster på nettsiden og i alle e-poster skal alltid skrives i en rolig, profesjonell, trygg og varm tone.
+2. **Unngå overentusiasme og klisjeer:** Ikke bruk overentusiastiske vendinger som «uforglemmelig VR-opplevelse», «fantastisk opplevelse», «rå opplevelse fra første sekund» eller livlige emojier i overskrifter (f.eks. 🎉, 🎮, 🎯, ✨).
+3. **Trygge og imøtekommende formuleringer:** Bruk formuleringer som «Vi gleder oss til å ta imot dere».
+4. **Oppmøtetekst:** Bruk alltid «Møt presist for å ikke miste spilletid.» i stedet for referanser til 10-15 minutter før med klokke-emojier.
+5. **Navneliste og justering i kvittering:** Formuler tydelig at kunden kan justere antall og navneliste helt frem til ankomst, men at sene endringer ved oppmøte kan skape forsinkelser og redusert spilletid.
 

@@ -33,21 +33,21 @@ export const WeeklySummaryEmail: React.FC<WeeklySummaryEmailProps> = ({
 }) => {
   return (
     <EmailLayout previewText={`Ukentlig rapport for uke ${weekNumber}`} adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Ukentlig Oppsummering & Vaktplan 📊</Heading>
+      <Heading style={headingStyle}>Ukentlig oppsummering og vaktplan</Heading>
 
       <Text style={paragraphStyle}>
-        Her er oppsummeringen for <strong>Uke {weekNumber}</strong> med resultater og plan for de neste 7 dagene:
+        Her er oppsummeringen for <strong>uke {weekNumber}</strong> med resultater og planlagte opplevelser for de neste 7 dagene:
       </Text>
 
       {/* Finansoversikt */}
-      <Text style={subheadingStyle}>Økonomi & Nøkkeltall</Text>
+      <Text style={subheadingStyle}>Nøkkeltall</Text>
       <Section style={kpiGridStyle}>
         <Section style={kpiCardStyle}>
-          <Text style={kpiLabelStyle}>Total Omsetning</Text>
+          <Text style={kpiLabelStyle}>Total omsetning</Text>
           <Text style={kpiValueStyle}>NOK {totalRevenue.toLocaleString('no-NO')}</Text>
         </Section>
         <Section style={kpiCardStyle}>
-          <Text style={kpiLabelStyle}>Antall Bookinger</Text>
+          <Text style={kpiLabelStyle}>Antall bookinger</Text>
           <Text style={kpiValueStyle}>{bookingCount} stk</Text>
         </Section>
       </Section>
@@ -58,7 +58,7 @@ export const WeeklySummaryEmail: React.FC<WeeklySummaryEmailProps> = ({
       </Section>
 
       {/* Kommende 7 dager */}
-      <Text style={subheadingStyle}>Kommende 7 Dager ({upcomingBookings.length} bookinger)</Text>
+      <Text style={subheadingStyle}>Planlagte bookinger neste 7 dager ({upcomingBookings.length})</Text>
       {upcomingBookings.length === 0 ? (
         <Text style={{ fontSize: '13px', color: '#6b7280', fontStyle: 'italic' }}>Ingen bookinger registrert for neste uke enda.</Text>
       ) : (
@@ -66,10 +66,10 @@ export const WeeklySummaryEmail: React.FC<WeeklySummaryEmailProps> = ({
           {upcomingBookings.map((b, idx) => (
             <Section key={idx} style={bookingRowStyle}>
               <Text style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: '#111827' }}>
-                📅 {b.date} kl. {b.time} &bull; {b.experienceTitle}
+                {b.date} kl. {b.time} &bull; {b.experienceTitle}
               </Text>
               <Text style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#6b7280' }}>
-                {b.firstName} {b.lastName} ({b.players} spillere) &bull; <span style={{ color: '#9C39FF' }}>{b.paymentType}</span>
+                {b.firstName} {b.lastName} ({b.players} deltakere) &bull; <span style={{ color: '#7c3aed' }}>{b.paymentType}</span>
               </Text>
             </Section>
           ))}
@@ -77,7 +77,7 @@ export const WeeklySummaryEmail: React.FC<WeeklySummaryEmailProps> = ({
       )}
 
       <Button href="https://krsvr.no/admin" style={primaryButtonStyle}>
-        Gå til Vaktliste & Admin &rarr;
+        Gå til Vaktliste og Admin &rarr;
       </Button>
     </EmailLayout>
   );
@@ -86,13 +86,13 @@ export const WeeklySummaryEmail: React.FC<WeeklySummaryEmailProps> = ({
 const headingStyle: React.CSSProperties = {
   fontSize: '20px',
   fontWeight: '700',
-  color: '#9C39FF',
+  color: '#111827',
   margin: '0 0 14px 0',
 };
 
 const subheadingStyle: React.CSSProperties = {
   fontSize: '15px',
-  fontWeight: '700',
+  fontWeight: '600',
   color: '#111827',
   margin: '20px 0 8px 0',
   borderBottom: '1px solid #e5e7eb',
@@ -111,25 +111,25 @@ const kpiGridStyle: React.CSSProperties = {
 };
 
 const kpiCardStyle: React.CSSProperties = {
-  backgroundColor: '#faf5ff',
-  border: '1px solid #e9d5ff',
+  backgroundColor: '#f9fafb',
+  border: '1px solid #e5e7eb',
   borderRadius: '8px',
   padding: '12px 16px',
   margin: '6px 0',
 };
 
 const kpiLabelStyle: React.CSSProperties = {
-  fontSize: '12px',
-  color: '#6b21a8',
+  fontSize: '11.5px',
+  color: '#6b7280',
   textTransform: 'uppercase',
   fontWeight: '600',
   margin: 0,
 };
 
 const kpiValueStyle: React.CSSProperties = {
-  fontSize: '20px',
-  fontWeight: '800',
-  color: '#581c87',
+  fontSize: '18px',
+  fontWeight: '700',
+  color: '#111827',
   margin: '4px 0 0 0',
 };
 
@@ -156,10 +156,10 @@ const bookingRowStyle: React.CSSProperties = {
 };
 
 const primaryButtonStyle: React.CSSProperties = {
-  backgroundColor: '#9C39FF',
+  backgroundColor: '#7c3aed',
   color: '#ffffff',
   borderRadius: '8px',
-  padding: '10px 20px',
+  padding: '10px 18px',
   fontSize: '13px',
   fontWeight: '600',
   textDecoration: 'none',

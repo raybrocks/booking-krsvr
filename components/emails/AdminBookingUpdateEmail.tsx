@@ -24,16 +24,16 @@ export const AdminBookingUpdateEmail: React.FC<AdminBookingUpdateEmailProps> = (
   adminEmail = 'post@krsvr.no',
 }) => {
   return (
-    <EmailLayout previewText={`Booking Endret av Kunde: ${firstName} ${lastName}`} adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Booking Endret av Kunde ✏️</Heading>
+    <EmailLayout previewText={`Booking endret av kunde: ${firstName} ${lastName}`} adminEmail={adminEmail}>
+      <Heading style={headingStyle}>Booking endret av kunde</Heading>
 
       <Text style={paragraphStyle}>
-        Kunden <strong>{firstName} {lastName}</strong> ({email}) har oppdatert sin booking via kundeportalen.
+        Kunden <strong>{firstName} {lastName}</strong> ({email}) har oppdatert bookingen sin via kundeportalen.
       </Text>
 
       <Section style={detailsTableStyle}>
         <Text style={detailRowStyle}><strong>Kunde:</strong> {firstName} {lastName}</Text>
-        <Text style={detailRowStyle}><strong>Nytt Tidspunkt:</strong> {date} kl {time}</Text>
+        <Text style={detailRowStyle}><strong>Nytt tidspunkt:</strong> {date} kl {time}</Text>
         {experienceTitle && <Text style={detailRowStyle}><strong>Opplevelse:</strong> {experienceTitle}</Text>}
         {players && <Text style={detailRowStyle}><strong>Antall deltakere:</strong> {players} pers</Text>}
       </Section>
@@ -48,7 +48,7 @@ export const AdminBookingUpdateEmail: React.FC<AdminBookingUpdateEmailProps> = (
 const headingStyle: React.CSSProperties = {
   fontSize: '20px',
   fontWeight: '700',
-  color: '#9C39FF',
+  color: '#111827',
   margin: '0 0 14px 0',
 };
 
@@ -61,24 +61,24 @@ const paragraphStyle: React.CSSProperties = {
 
 const detailsTableStyle: React.CSSProperties = {
   backgroundColor: '#fefce8',
-  borderLeft: '4px solid #eab308',
+  borderLeft: '3px solid #ca8a04',
   borderRadius: '4px',
   padding: '16px',
   margin: '16px 0 24px 0',
 };
 
 const detailRowStyle: React.CSSProperties = {
-  fontSize: '14px',
+  fontSize: '13.5px',
   color: '#713f12',
   margin: '6px 0',
   lineHeight: '1.4',
 };
 
 const primaryButtonStyle: React.CSSProperties = {
-  backgroundColor: '#9C39FF',
+  backgroundColor: '#7c3aed',
   color: '#ffffff',
   borderRadius: '8px',
-  padding: '10px 20px',
+  padding: '10px 18px',
   fontSize: '13px',
   fontWeight: '600',
   textDecoration: 'none',

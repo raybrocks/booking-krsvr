@@ -24,8 +24,8 @@ export const AdminBookingCancellationEmail: React.FC<AdminBookingCancellationEma
   adminEmail = 'post@krsvr.no',
 }) => {
   return (
-    <EmailLayout previewText={`Booking Kansellert av Kunde: ${firstName} ${lastName}`} adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Booking Kansellert av Kunde ⚠️</Heading>
+    <EmailLayout previewText={`Booking kansellert av kunde: ${firstName} ${lastName}`} adminEmail={adminEmail}>
+      <Heading style={headingStyle}>Booking kansellert av kunde</Heading>
 
       <Text style={paragraphStyle}>
         Kunden <strong>{firstName} {lastName}</strong> ({email}) har kansellert sin booking via kundeportalen.
@@ -40,7 +40,7 @@ export const AdminBookingCancellationEmail: React.FC<AdminBookingCancellationEma
         )}
       </Section>
 
-      <Text style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 16px 0' }}>
+      <Text style={{ fontSize: '12.5px', color: '#6b7280', margin: '0 0 16px 0' }}>
         <em>Merk: Eventuelt reservasjonsgebyr er ikke refundert automatisk. Behandle eventuell refusjon i admin-panelet ved behov.</em>
       </Text>
 
@@ -54,7 +54,7 @@ export const AdminBookingCancellationEmail: React.FC<AdminBookingCancellationEma
 const headingStyle: React.CSSProperties = {
   fontSize: '20px',
   fontWeight: '700',
-  color: '#dc2626',
+  color: '#b91c1c',
   margin: '0 0 14px 0',
 };
 
@@ -67,24 +67,24 @@ const paragraphStyle: React.CSSProperties = {
 
 const detailsTableStyle: React.CSSProperties = {
   backgroundColor: '#fef2f2',
-  borderLeft: '4px solid #dc2626',
+  borderLeft: '3px solid #dc2626',
   borderRadius: '4px',
   padding: '16px',
   margin: '16px 0 16px 0',
 };
 
 const detailRowStyle: React.CSSProperties = {
-  fontSize: '14px',
+  fontSize: '13.5px',
   color: '#991b1b',
   margin: '6px 0',
   lineHeight: '1.4',
 };
 
 const primaryButtonStyle: React.CSSProperties = {
-  backgroundColor: '#9C39FF',
+  backgroundColor: '#7c3aed',
   color: '#ffffff',
   borderRadius: '8px',
-  padding: '10px 20px',
+  padding: '10px 18px',
   fontSize: '13px',
   fontWeight: '600',
   textDecoration: 'none',
