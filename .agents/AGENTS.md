@@ -23,3 +23,15 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 
 # Utvikling og Kjøring
 1. **Port:** Dev-serveren (`npm run dev`) skal *alltid* startes på port 3050.
+
+# E-postmaler og Forhåndsvisning
+1. **React Email:** Alle nye e-postmaler skal bygges som modulære React Email-komponenter under `components/emails/` og benytte `EmailLayout.tsx`.
+2. **Sentralt register:** Hver gang en ny e-postmal opprettes eller en eksisterende endres, **SKAL** den registreres i `components/emails/registry.ts` med:
+   - Unik `id` og beskrivende `title`
+   - Kategori (`customer`, `internal` eller `marketing`) og `categoryLabel`
+   - Realistiske testdata / mock-props
+   - Foreslått emnefelt (`subject`)
+   - Nøyaktig utsendelses-trigger (`trigger`)
+   - Filsti i prosjektet (`filePath`)
+   Dette sikrer at admin-forhåndsviseren alltid reflekterer alle aktive e-postmaler med korrekte testdata.
+
