@@ -33,6 +33,9 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - Foreslått emnefelt (`subject`)
    - Nøyaktig utsendelses-trigger (`trigger`)
    - Filsti i prosjektet (`filePath`)
+3. **Logo-format (PNG fremfor SVG):** I alle e-postmaler og HTML-e-poster (Resend / React Email) skal det alltid benyttes PNG-format for logoer i stedet for SVG for å sikre stabil visning i e-postklienter:
+   - Lys bakgrunn (standard): `https://krsvr.no/krsvrarena_logo_sort.png`
+   - Mørk bakgrunn: `https://krsvr.no/krsvrarena_logo_hvit.png`
 # Tone of Voice og Språk
 1. **Rolig og profesjonell varm tone:** Tekster på nettsiden og i alle e-poster skal alltid skrives i en rolig, profesjonell, trygg og varm tone.
 2. **Unngå overentusiasme og klisjeer:** Ikke bruk overentusiastiske vendinger som «uforglemmelig VR-opplevelse», «fantastisk opplevelse», «rå opplevelse fra første sekund» eller livlige emojier i overskrifter (f.eks. 🎉, 🎮, 🎯, ✨).

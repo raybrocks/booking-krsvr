@@ -488,7 +488,7 @@ export async function sendWeeklyAdminSummary(
     <body style="background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 32px 12px;">
       <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
         <div style="padding: 28px 32px 20px 32px; border-bottom: 1px solid #f0f0f2;">
-          <img src="https://krsvr.no/logo.svg" alt="KRS VR ARENA" width="140" style="display: block; max-width: 140px; height: auto;" />
+          <img src="https://krsvr.no/krsvrarena_logo_sort.png" alt="KRS VR ARENA" width="140" style="display: block; max-width: 140px; height: auto;" />
         </div>
         <div style="padding: 32px; color: #1f2937;">
           <h1 style="font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 16px 0;">Ukentlig oppsummering og vaktplan</h1>

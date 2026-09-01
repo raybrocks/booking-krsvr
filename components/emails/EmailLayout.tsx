@@ -21,7 +21,7 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({
           <Section style={headerStyle}>
             <Link href="https://krsvr.no" style={{ textDecoration: 'none', display: 'inline-block' }}>
               <Img
-                src="https://krsvr.no/logo.svg"
+                src="https://krsvr.no/krsvrarena_logo_sort.png"
                 alt="KRS VR ARENA"
                 width="140"
                 height="34"
