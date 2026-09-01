@@ -6,9 +6,10 @@ import { toast } from "sonner";
 import { format, addDays } from "date-fns";
 import { nb } from "date-fns/locale";
 import DiscountCodesManager from "./DiscountCodesManager";
+import EmailPreviewClient from "./EmailPreviewClient";
 
 export default function SettingsManager() {
-  const [activeSettingsTab, setActiveSettingsTab] = useState<"hours" | "general" | "discounts">("hours");
+  const [activeSettingsTab, setActiveSettingsTab] = useState<"hours" | "general" | "discounts" | "emails">("hours");
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -347,6 +348,12 @@ export default function SettingsManager() {
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSettingsTab === 'discounts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
         >
           Rabattkoder
+        </button>
+        <button 
+          onClick={() => setActiveSettingsTab("emails")} 
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSettingsTab === 'emails' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+        >
+          E-postmaler
         </button>
       </div>
 
@@ -801,6 +808,9 @@ export default function SettingsManager() {
     )}
       {activeSettingsTab === "discounts" && (
         <DiscountCodesManager />
+      )}
+      {activeSettingsTab === "emails" && (
+        <EmailPreviewClient />
       )}
     </div>
   );

@@ -11,7 +11,6 @@ import ManualBookingManager, { ManualBookingInitialData } from "./ManualBookingM
 import ShiftManager from "./ShiftManager";
 import EmployeesManager from "./EmployeesManager";
 import InquiriesManager, { ContactInquiryItem } from "./InquiriesManager";
-import EmailPreviewClient from "./EmailPreviewClient";
 
 const playDing = () => {
   try {
@@ -74,7 +73,7 @@ const formatDateShort = (dateStr: string) => {
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "inquiries" | "experiences" | "transactions" | "settings" | "manual" | "shifts" | "employees" | "emails">("upcoming");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "inquiries" | "experiences" | "transactions" | "settings" | "manual" | "shifts" | "employees">("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isFirstLoad = useRef(true);
   const notifiedBookingIds = useRef<Set<string>>(new Set());
@@ -838,7 +837,6 @@ export default function AdminDashboard() {
             <button onClick={() => setActiveTab("transactions")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
             <button onClick={() => setActiveTab("shifts")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
             <button onClick={() => setActiveTab("employees")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
-            <button onClick={() => setActiveTab("emails")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'emails' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Mail className="w-4 h-4" /> E-postmaler</button>
             <button onClick={() => setActiveTab("settings")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
           </nav>
 
@@ -884,7 +882,6 @@ export default function AdminDashboard() {
               <button onClick={() => { setActiveTab("transactions"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
               <button onClick={() => { setActiveTab("shifts"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
               <button onClick={() => { setActiveTab("employees"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
-              <button onClick={() => { setActiveTab("emails"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'emails' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Mail className="w-4 h-4" /> E-postmaler</button>
               <button onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
               <button onClick={handleLogout} className="col-span-2 sm:col-span-4 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 border border-red-500/20 mt-1">
                 <LogOut className="w-4 h-4" /> Logg ut
@@ -904,7 +901,6 @@ export default function AdminDashboard() {
         transactions: <h2 className="text-xl font-semibold text-white mb-6">Regnskap</h2>,
         shifts: <h2 className="text-xl font-semibold text-white mb-6">Vakter & Timeføring</h2>,
         employees: <h2 className="text-xl font-semibold text-white mb-6">Ansatte</h2>,
-        emails: <h2 className="text-xl font-semibold text-white mb-6">Forhåndsvisning av E-postmaler</h2>,
         settings: <h2 className="text-xl font-semibold text-white mb-6">Innstillinger</h2>,
       }[activeTab]}
 
@@ -1003,7 +999,6 @@ export default function AdminDashboard() {
       )}
       {activeTab === "shifts" && <ShiftManager />}
       {activeTab === "employees" && <EmployeesManager />}
-      {activeTab === "emails" && <EmailPreviewClient />}
     </div>
   );
 }
