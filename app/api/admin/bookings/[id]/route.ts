@@ -7,32 +7,47 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const data = await req.json();
     
-    // Remove complex fields
+    // Remove complex or read-only fields
     if (data.id) delete data.id;
     if (data.experience) delete data.experience;
     if (data.experienceName) delete data.experienceName;
     if (data.createdAt) delete data.createdAt;
     if (data.updatedAt) delete data.updatedAt;
 
+    // Type casting
+    if (data.players !== undefined) data.players = parseInt(data.players, 10) || 1;
+    if (data.totalPrice !== undefined) data.totalPrice = parseFloat(data.totalPrice) || 0;
+    if (data.amountPaid !== undefined) data.amountPaid = parseFloat(data.amountPaid) || 0;
+    if (data.duration !== undefined) data.duration = parseInt(data.duration, 10) || 90;
+    if (data.playerNames && Array.isArray(data.playerNames)) {
+      data.playerNames = data.playerNames.map((n: any) => String(n || '').trim());
+    }
+
     const updatedBooking = await prisma.booking.update({
       where: { id: id },
       data,
     });
 
-    // Also cascade status update to shadow bookings 
-    if (data.status) {
-       await prisma.booking.updateMany({
-         where: { parentBookingId: id },
-         data: { status: data.status }
-       });
-       
-       if (data.status === 'cancelled') {
-         await sendBookingCancellationEmail(updatedBooking.email, updatedBooking);
-       }
+    // Cascade status and details to shadow bookings 
+    const shadowUpdate: any = {};
+    if (data.status) shadowUpdate.status = data.status;
+    if (data.experienceId) shadowUpdate.experienceId = data.experienceId;
+    if (data.date) shadowUpdate.date = data.date;
+    
+    if (Object.keys(shadowUpdate).length > 0) {
+      await prisma.booking.updateMany({
+        where: { parentBookingId: id },
+        data: shadowUpdate
+      });
+    }
+
+    if (data.status === 'cancelled') {
+      await sendBookingCancellationEmail(updatedBooking.email, updatedBooking);
     }
     
     return NextResponse.json(updatedBooking);
   } catch (error) {
+    console.error("Failed to update booking:", error);
     return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
   }
 }

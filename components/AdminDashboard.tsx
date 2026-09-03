@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import SettingsManager from "./SettingsManager";
@@ -11,6 +11,7 @@ import ManualBookingManager, { ManualBookingInitialData } from "./ManualBookingM
 import ShiftManager from "./ShiftManager";
 import EmployeesManager from "./EmployeesManager";
 import InquiriesManager, { ContactInquiryItem } from "./InquiriesManager";
+import EditBookingModal from "./EditBookingModal";
 
 const playDing = () => {
   try {
@@ -88,6 +89,9 @@ export default function AdminDashboard() {
   const [dateFilter, setDateFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [experiencesMap, setExperiencesMap] = useState<Record<string, string>>({});
+  const [experiencesList, setExperiencesList] = useState<any[]>([]);
+  const [pricingTiers, setPricingTiers] = useState<Record<string, number> | undefined>(undefined);
+  const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const supabase = createClient();
 
@@ -152,9 +156,10 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [bookingsRes, experiencesRes] = await Promise.all([
+        const [bookingsRes, experiencesRes, settingsRes] = await Promise.all([
           fetch('/api/admin/bookings'),
-          fetch('/api/experiences') 
+          fetch('/api/experiences'),
+          fetch('/api/settings')
         ]);
 
         if (bookingsRes.ok) {
@@ -186,11 +191,19 @@ export default function AdminDashboard() {
 
         if (experiencesRes.ok) {
           const exps = await experiencesRes.json();
+          setExperiencesList(exps);
           const expsMap: Record<string, string> = {};
           exps.forEach((e: any) => {
             expsMap[e.id] = e.title || e.name || e.id;
           });
           setExperiencesMap(expsMap);
+        }
+
+        if (settingsRes.ok) {
+          const sett = await settingsRes.json();
+          if (sett?.general?.pricing) {
+            setPricingTiers(sett.general.pricing);
+          }
         }
 
         fetchInquiriesCount();
@@ -522,8 +535,19 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                   <td className="px-3 sm:px-5 py-3.5 sm:py-4">
-                    <div className="text-zinc-200 font-medium">{experiencesMap[booking.experienceId] || booking.experienceId}</div>
-                    <div className="flex items-center gap-1.5 mt-1 text-xs text-zinc-400">
+                    <div 
+                      className="text-zinc-200 font-medium hover:text-[#9C39FF] cursor-pointer transition-colors flex items-center gap-1.5 group w-fit"
+                      onClick={() => setEditingBooking(booking)}
+                      title="Klikk for å endre opplevelse eller deltakere"
+                    >
+                      <span>{experiencesMap[booking.experienceId] || booking.experienceId}</span>
+                      <Pencil className="w-3 h-3 text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <div 
+                      className="flex items-center gap-1.5 mt-1 text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors w-fit"
+                      onClick={() => setEditingBooking(booking)}
+                      title="Klikk for å endre antall spillere"
+                    >
                       <Users className="w-3 h-3 text-zinc-500" /> {booking.players} {booking.players === 1 ? 'spiller' : 'spillere'}
                     </div>
                     {(() => {
@@ -536,22 +560,26 @@ export default function AdminDashboard() {
                       const isUpcomingSoon = booking.date >= today;
 
                       return (
-                        <div className="mt-1.5 space-y-1">
+                        <div 
+                          className="mt-1.5 space-y-1 cursor-pointer group"
+                          onClick={() => setEditingBooking(booking)}
+                          title="Klikk for å fylle ut eller redigere navneliste"
+                        >
                           {isComplete ? (
                             <div className="flex flex-wrap items-center gap-1">
-                              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-1 group-hover:border-emerald-500/40">
                                 ✓ Navneliste ({validNames.length}/{booking.players})
                               </span>
                             </div>
                           ) : hasSome ? (
                             <div className="flex flex-wrap items-center gap-1">
-                              <span className="text-[10px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                              <span className="text-[10px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded group-hover:border-amber-500/40">
                                 Delvis navneliste ({validNames.length}/{booking.players})
                               </span>
                             </div>
                           ) : isUpcomingSoon ? (
                             <div className="flex items-center gap-1">
-                              <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                              <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded group-hover:border-amber-500/50">
                                 Mangler navn (0/{booking.players})
                               </span>
                               {booking.reminderCount > 0 && (
@@ -565,7 +593,7 @@ export default function AdminDashboard() {
                           {validNames.length > 0 && (
                             <div className="mt-1 flex flex-wrap gap-1">
                               {validNames.map((name: string, idx: number) => (
-                                <span key={idx} className="bg-zinc-800 text-zinc-300 text-[10px] px-1.5 py-0.5 rounded border border-zinc-700/50">
+                                <span key={idx} className="bg-zinc-800 text-zinc-300 text-[10px] px-1.5 py-0.5 rounded border border-zinc-700/50 group-hover:border-purple-500/40">
                                   {name}
                                 </span>
                               ))}
@@ -576,7 +604,11 @@ export default function AdminDashboard() {
                     })()}
                   </td>
                   <td className="px-3 sm:px-5 py-3.5 sm:py-4 whitespace-normal">
-                    <div className="font-medium text-zinc-200 flex items-center flex-wrap gap-1.5">
+                    <div 
+                      className="font-medium text-zinc-200 flex items-center flex-wrap gap-1.5 hover:text-[#9C39FF] cursor-pointer transition-colors group w-fit"
+                      onClick={() => setEditingBooking(booking)}
+                      title="Klikk for å redigere kundeinformasjon"
+                    >
                       {booking.bookingType === 'corporate' && booking.companyName ? (
                         <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border border-amber-500/30">Bedrift</span>
                       ) : null}
@@ -586,6 +618,7 @@ export default function AdminDashboard() {
                       <span>
                         {booking.companyName ? `${booking.companyName} (${booking.firstName} ${booking.lastName})` : `${booking.firstName} ${booking.lastName}`}
                       </span>
+                      <Pencil className="w-3 h-3 text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
                       {booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') ? (
@@ -761,7 +794,16 @@ export default function AdminDashboard() {
                     ) : "N/A"}
                   </td>
                   <td className="px-3 sm:px-5 py-3.5 sm:py-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <button
+                        onClick={() => setEditingBooking(booking)}
+                        className="text-xs text-purple-300 hover:text-white bg-[#9C39FF]/15 hover:bg-[#9C39FF]/30 border border-[#9C39FF]/30 px-2.5 py-1.5 rounded-lg transition-colors font-medium inline-flex items-center gap-1 shadow-sm"
+                        title="Rediger opplevelse, deltakere, navneliste, tidspunkt og kundedetaljer"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Rediger</span>
+                      </button>
+
                       <select
                         value={booking.status}
                         onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
@@ -782,7 +824,7 @@ export default function AdminDashboard() {
                             // TODO: Add email alert integration here later
                             updateBookingStatus(booking.id, 'cancelled');
                           }}
-                          className="text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 px-2 py-1.5 rounded-lg transition-colors"
+                          className="text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors"
                           title="Cancel Booking"
                         >
                           <XCircle className="w-4 h-4" />
@@ -790,7 +832,7 @@ export default function AdminDashboard() {
                       )}
                       <button
                         onClick={() => deleteBooking(booking.id)}
-                        className="text-xs text-zinc-500 hover:text-red-400 hover:bg-red-400/10 px-2 py-1.5 rounded-lg transition-colors ml-1"
+                        className="text-xs text-zinc-500 hover:text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors ml-1"
                         title="Permanently Delete Booking"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1003,6 +1045,20 @@ export default function AdminDashboard() {
       )}
       {activeTab === "shifts" && <ShiftManager />}
       {activeTab === "employees" && <EmployeesManager />}
+
+      {/* Edit Booking Modal */}
+      <EditBookingModal
+        booking={editingBooking}
+        isOpen={!!editingBooking}
+        onClose={() => setEditingBooking(null)}
+        onSave={(updated) => {
+          setBookings((prev) =>
+            prev.map((b) => (b.id === updated.id ? { ...b, ...updated } : b))
+          );
+        }}
+        experiences={experiencesList}
+        pricingTiers={pricingTiers}
+      />
     </div>
   );
 }
