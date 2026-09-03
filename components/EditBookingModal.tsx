@@ -15,7 +15,8 @@ import {
   Plus, 
   Minus, 
   RotateCcw,
-  Tag
+  Tag,
+  Lock
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -197,7 +198,6 @@ export default function EditBookingModal({
         players: Number(players) || 1,
         playerNames: playerNames.map((n) => n.trim()),
         totalPrice: Number(totalPrice) || 0,
-        amountPaid: Number(amountPaid) || 0,
       };
 
       const res = await fetch(`/api/admin/bookings/${booking.id}`, {
@@ -552,18 +552,20 @@ export default function EditBookingModal({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1">
-                  Innbetalt beløp (NOK)
+                <label className="text-xs font-medium text-zinc-400 mb-1 flex items-center justify-between">
+                  <span>Innbetalt beløp (NOK)</span>
+                  <span className="text-[10px] text-zinc-500 font-normal flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-zinc-500" /> Låst
+                  </span>
                 </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={amountPaid}
-                  onChange={(e) => setAmountPaid(Number(e.target.value))}
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm font-bold text-emerald-400 focus:outline-none focus:border-[#9C39FF]"
-                />
+                <div className="w-full bg-zinc-950/80 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm font-bold text-emerald-400 flex items-center justify-between">
+                  <span>{amountPaid} NOK</span>
+                  <span className="text-[10px] text-zinc-500 font-normal">
+                    {amountPaid > 0 ? "Vipps / Kort" : "0 NOK"}
+                  </span>
+                </div>
                 <span className="text-[10px] text-zinc-500 mt-1 block">
-                  Forhåndsbetalt via Vipps/Kort
+                  Registrert via betalingsløsning
                 </span>
               </div>
 

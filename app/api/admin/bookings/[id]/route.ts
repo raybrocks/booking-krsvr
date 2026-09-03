@@ -17,8 +17,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Type casting
     if (data.players !== undefined) data.players = parseInt(data.players, 10) || 1;
     if (data.totalPrice !== undefined) data.totalPrice = parseFloat(data.totalPrice) || 0;
-    if (data.amountPaid !== undefined) data.amountPaid = parseFloat(data.amountPaid) || 0;
     if (data.duration !== undefined) data.duration = parseInt(data.duration, 10) || 90;
+    if (data.amountPaid !== undefined) delete data.amountPaid;
     if (data.playerNames && Array.isArray(data.playerNames)) {
       data.playerNames = data.playerNames.map((n: any) => String(n || '').trim());
     }
