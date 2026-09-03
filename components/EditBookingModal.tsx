@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   X, 
   Loader2, 
@@ -81,9 +81,12 @@ export default function EditBookingModal({
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [amountPaid, setAmountPaid] = useState<number>(0);
 
-  // Initialize form whenever booking changes
+  const initializedBookingId = useRef<string | null>(null);
+
+  // Initialize form ONLY when modal opens for a new booking ID
   useEffect(() => {
-    if (booking) {
+    if (isOpen && booking && booking.id !== initializedBookingId.current) {
+      initializedBookingId.current = booking.id;
       setFirstName(booking.firstName || "");
       setLastName(booking.lastName || "");
       setEmail(booking.email || "");
@@ -109,8 +112,10 @@ export default function EditBookingModal({
 
       setTotalPrice(Number(booking.totalPrice) || 0);
       setAmountPaid(Number(booking.amountPaid) || 0);
+    } else if (!isOpen) {
+      initializedBookingId.current = null;
     }
-  }, [booking, experiences]);
+  }, [isOpen, booking, experiences]);
 
   if (!isOpen || !booking) return null;
 
