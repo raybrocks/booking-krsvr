@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendBookingCancellationEmail } from '@/lib/email';
+import { sendBookingCancellationEmail, sendBookingConfirmationEmail } from '@/lib/email';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const data = await req.json();
     
+    // Check for confirmation email flag
+    const sendConfirmation = !!data.sendConfirmation;
+    const customEmailText = typeof data.customEmailText === 'string' ? data.customEmailText.trim() : '';
+    if ('sendConfirmation' in data) delete data.sendConfirmation;
+    if ('customEmailText' in data) delete data.customEmailText;
+
     // Remove complex or read-only fields
     if (data.id) delete data.id;
     if (data.experience) delete data.experience;
@@ -43,6 +49,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (data.status === 'cancelled') {
       await sendBookingCancellationEmail(updatedBooking.email, updatedBooking);
+    } else if (sendConfirmation && updatedBooking.email && !updatedBooking.email.includes('system@sperret')) {
+      await sendBookingConfirmationEmail(
+        updatedBooking.email,
+        updatedBooking,
+        customEmailText,
+        { isUpdate: true }
+      );
     }
     
     return NextResponse.json(updatedBooking);

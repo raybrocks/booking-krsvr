@@ -92,6 +92,7 @@ export default function AdminDashboard() {
   const [experiencesList, setExperiencesList] = useState<any[]>([]);
   const [pricingTiers, setPricingTiers] = useState<Record<string, number> | undefined>(undefined);
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
+  const [resendingEmailId, setResendingEmailId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const supabase = createClient();
 
@@ -304,6 +305,34 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleResendConfirmation = async (booking: any) => {
+    if (!booking.email || booking.email.includes('system@sperret')) {
+      toast.error("Ingen gyldig e-post registrert på denne bookingen");
+      return;
+    }
+    const confirmSend = window.confirm(`Ønsker du å sende bestillingsbekreftelse på nytt til ${booking.email}?`);
+    if (!confirmSend) return;
+
+    setResendingEmailId(booking.id);
+    const loadingToastId = toast.loading(`Sender bekreftelse til ${booking.email}...`);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.id}/send-confirmation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isUpdate: false }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Kunne ikke sende bekreftelse");
+      }
+      toast.success(data.message || `Bekreftelse sendt til ${booking.email}!`, { id: loadingToastId });
+    } catch (err: any) {
+      toast.error(err.message || "Kunne ikke sende e-post", { id: loadingToastId });
+    } finally {
+      setResendingEmailId(null);
+    }
+  };
+
   const extendBooking = async (id: string) => {
     try {
       const response = await fetch(`/api/admin/bookings/${id}/extend`, {
@@ -456,30 +485,30 @@ export default function AdminDashboard() {
           <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[950px]">
             <colgroup>
               <col className="w-[11%]" />
-              <col className="w-[19%]" />
-              <col className="w-[28%]" />
               <col className="w-[18%]" />
-              <col className="w-[12%]" />
-              <col className="w-[12%]" />
+              <col className="w-[26%]" />
+              <col className="w-[18%]" />
+              <col className="w-[10%]" />
+              <col className="w-[17%]" />
             </colgroup>
             <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">
               <tr>
                 <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[11%]" onClick={() => handleSort('dateTime')}>
                   Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[19%]" onClick={() => handleSort('experienceId')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('experienceId')}>
                   Experience {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[28%]" onClick={() => handleSort('customer')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[26%]" onClick={() => handleSort('customer')}>
                   Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('totalPrice')}>
                   Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[12%]" onClick={() => handleSort('createdAt')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[10%]" onClick={() => handleSort('createdAt')}>
                   Placed At {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[12%]" onClick={() => handleSort('status')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[17%]" onClick={() => handleSort('status')}>
                   Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
               </tr>
@@ -802,6 +831,19 @@ export default function AdminDashboard() {
                       >
                         <Pencil className="w-3.5 h-3.5" />
                         <span>Rediger</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleResendConfirmation(booking)}
+                        disabled={resendingEmailId === booking.id || !booking.email || booking.email.includes('system@sperret')}
+                        className="text-xs text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800 border border-zinc-700/60 p-1.5 rounded-lg transition-colors inline-flex items-center gap-1 disabled:opacity-30"
+                        title={booking.email ? `Send bestillingsbekreftelse på nytt til ${booking.email}` : "Mangler e-post"}
+                      >
+                        {resendingEmailId === booking.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+                        ) : (
+                          <Mail className="w-3.5 h-3.5" />
+                        )}
                       </button>
 
                       <select

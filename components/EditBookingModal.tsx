@@ -82,6 +82,11 @@ export default function EditBookingModal({
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [amountPaid, setAmountPaid] = useState<number>(0);
 
+  // Email Notification State
+  const [sendConfirmation, setSendConfirmation] = useState(true);
+  const [customEmailText, setCustomEmailText] = useState("");
+  const [showCustomEmailInput, setShowCustomEmailInput] = useState(false);
+
   const initializedBookingId = useRef<string | null>(null);
 
   // Initialize form ONLY when modal opens for a new booking ID
@@ -113,6 +118,10 @@ export default function EditBookingModal({
 
       setTotalPrice(Number(booking.totalPrice) || 0);
       setAmountPaid(Number(booking.amountPaid) || 0);
+
+      setSendConfirmation(true);
+      setCustomEmailText("");
+      setShowCustomEmailInput(false);
     } else if (!isOpen) {
       initializedBookingId.current = null;
     }
@@ -198,6 +207,8 @@ export default function EditBookingModal({
         players: Number(players) || 1,
         playerNames: playerNames.map((n) => n.trim()),
         totalPrice: Number(totalPrice) || 0,
+        sendConfirmation,
+        customEmailText: showCustomEmailInput ? customEmailText.trim() : "",
       };
 
       const res = await fetch(`/api/admin/bookings/${booking.id}`, {
@@ -213,7 +224,7 @@ export default function EditBookingModal({
 
       const updated = await res.json();
       await onSave(updated);
-      toast.success("Booking ble oppdatert!");
+      toast.success(sendConfirmation && email ? "Booking oppdatert og bekreftelse sendt til kunden!" : "Booking ble oppdatert!");
       onClose();
     } catch (err: any) {
       console.error("Error saving booking:", err);
@@ -588,6 +599,69 @@ export default function EditBookingModal({
                 </span>
               </div>
             </div>
+          </div>
+
+          <hr className="border-zinc-800/80" />
+
+          {/* Section 5: E-postbekreftelse */}
+          <div className="p-4 bg-zinc-950/70 rounded-xl border border-zinc-800 space-y-3">
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="sendConfirmation"
+                checked={sendConfirmation}
+                onChange={(e) => setSendConfirmation(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-[#9C39FF] focus:ring-[#9C39FF] cursor-pointer"
+              />
+              <div className="flex-1">
+                <label htmlFor="sendConfirmation" className="text-xs font-medium text-zinc-200 cursor-pointer select-none flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-[#9C39FF]" />
+                  Send oppdatert bekreftelse på e-post til kunden
+                </label>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  Sender automatisk en oppdatert bekreftelse til <span className="text-zinc-200 font-mono">{email || "kunden"}</span> med ny dato, tidspunkt, opplevelse og navneliste.
+                </p>
+              </div>
+            </div>
+
+            {sendConfirmation && (
+              <div className="pt-2 pl-7 border-t border-zinc-800/60">
+                {!showCustomEmailInput ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowCustomEmailInput(true)}
+                    className="text-xs text-[#9C39FF] hover:text-purple-300 transition-colors underline decoration-dotted underline-offset-2"
+                  >
+                    + Legg til personlig melding i e-posten (valgfritt)
+                  </button>
+                ) : (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-medium text-zinc-300">
+                        Personlig melding i e-posten:
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowCustomEmailInput(false);
+                          setCustomEmailText("");
+                        }}
+                        className="text-[11px] text-zinc-500 hover:text-zinc-300"
+                      >
+                        Fjern melding
+                      </button>
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={customEmailText}
+                      onChange={(e) => setCustomEmailText(e.target.value)}
+                      placeholder="F.eks: Hei! Vi har nå flyttet bookingen deres til ny dato som avtalt..."
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#9C39FF]"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Footer Actions */}

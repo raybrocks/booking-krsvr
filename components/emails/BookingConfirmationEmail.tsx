@@ -14,6 +14,7 @@ export interface BookingConfirmationEmailProps {
   manageUrl: string;
   customText?: string;
   adminEmail?: string;
+  isUpdate?: boolean;
 }
 
 export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> = ({
@@ -28,15 +29,25 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
   manageUrl,
   customText,
   adminEmail = 'post@krsvr.no',
+  isUpdate = false,
 }) => {
   const remainingAmount = totalPrice - amountPaid;
 
   return (
-    <EmailLayout previewText={`Bestillingsbekreftelse for ${experienceTitle} den ${date}`} adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Bestillingsbekreftelse og kvittering</Heading>
+    <EmailLayout 
+      previewText={isUpdate ? `Oppdatert bestilling for ${experienceTitle} den ${date}` : `Bestillingsbekreftelse for ${experienceTitle} den ${date}`} 
+      adminEmail={adminEmail}
+    >
+      <Heading style={headingStyle}>
+        {isUpdate ? 'Oppdatert bestillingsbekreftelse' : 'Bestillingsbekreftelse og kvittering'}
+      </Heading>
       
       <Text style={paragraphStyle}>Hei {firstName} {lastName},</Text>
-      <Text style={paragraphStyle}>Takk for din bestilling. Vi gleder oss til å ta imot dere hos KRS VR Arena.</Text>
+      <Text style={paragraphStyle}>
+        {isUpdate 
+          ? 'Her er en oppdatert bekreftelse på din bestilling hos KRS VR Arena. Nedenfor finner du de oppdaterte detaljene.'
+          : 'Takk for din bestilling. Vi gleder oss til å ta imot dere hos KRS VR Arena.'}
+      </Text>
 
       {customText && (
         <Section style={customTextBoxStyle}>

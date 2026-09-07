@@ -42,7 +42,8 @@ export async function sendEmail(
 export async function sendBookingConfirmationEmail(
   to: string, 
   bookingDetails: any,
-  customText: string
+  customText: string = "",
+  options?: { subject?: string; isUpdate?: boolean }
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY is not set. Email not sent.");
@@ -79,6 +80,12 @@ export async function sendBookingConfirmationEmail(
     }
   }
 
+  const isUpdate = !!options?.isUpdate;
+  const defaultSubject = isUpdate 
+    ? 'Oppdatert bestillingsbekreftelse - KRS VR Arena' 
+    : 'Bestillingsbekreftelse og kvittering - KRS VR Arena';
+  const emailSubject = options?.subject || defaultSubject;
+
   try {
     const html = await render(
       React.createElement(BookingConfirmationEmail, {
@@ -93,6 +100,7 @@ export async function sendBookingConfirmationEmail(
         manageUrl,
         customText,
         adminEmail,
+        isUpdate,
       })
     );
 
@@ -100,7 +108,7 @@ export async function sendBookingConfirmationEmail(
       from: 'KRS VR Arena <booking@donotreply.krsvr.no>',
       to,
       replyTo: adminEmail,
-      subject: 'Bestillingsbekreftelse og kvittering - KRS VR Arena',
+      subject: emailSubject,
       html,
     });
     
