@@ -23,6 +23,11 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 
 # Utvikling og Kjøring
 1. **Port:** Dev-serveren (`npm run dev`) skal *alltid* startes på port 3050.
+2. **`lbp` (Lint -> Build -> Push):**
+   Når brukeren skriver `lbp` (eller ber om «lint, build, push»), skal agenten automatisk gjennomføre følgende tre steg i rekkefølge:
+   - **1. Lint:** Kjør `npm run lint` for å verifisere kodekvalitet. Eventuelle feil eller advarsler skal feilsøkes og rettes automatisk.
+   - **2. Build:** Kjør `npm run build` for å sikre at prosjektet bygger og typer uten feil. Eventuelle byggfeil skal rettes opp.
+   - **3. Push:** Når alt passerer med null feil, legg til endringer (`git add`), opprett en presis commit-melding og kjør `git push origin main`.
 
 # E-postmaler og Forhåndsvisning
 1. **React Email:** Alle nye e-postmaler skal bygges som modulære React Email-komponenter under `components/emails/` og benytte `EmailLayout.tsx`.

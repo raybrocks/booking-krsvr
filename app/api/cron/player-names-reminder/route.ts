@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendNameListDailyReminderEmail } from '@/lib/email';
+import { sendNameListDailyReminderEmail, sendAdminNameListReminderNotification } from '@/lib/email';
 import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
+    // 0. Verify Vercel Cron Request
+    const authHeader = request.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+    
+    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
+
     // 1. Fetch settings to get configured reminder days
     let reminderDays = 3;
     try {
@@ -91,6 +99,8 @@ export async function GET(request: Request) {
       const emailResult = await sendNameListDailyReminderEmail(booking);
 
       if (emailResult) {
+        const newReminderCount = (booking.reminderCount || 0) + 1;
+
         // Update booking lastReminderDate and reminderCount
         await prisma.booking.update({
           where: { id: booking.id },
@@ -100,6 +110,16 @@ export async function GET(request: Request) {
           }
         });
 
+        // Send confirmation/notification to admin
+        try {
+          await sendAdminNameListReminderNotification(booking, {
+            validNamesCount: validNames.length,
+            reminderCount: newReminderCount
+          });
+        } catch (adminErr) {
+          console.error("Failed to send admin notification for player names reminder:", adminErr);
+        }
+
         sentTo.push({
           id: booking.id,
           name: `${booking.firstName} ${booking.lastName}`,
@@ -108,7 +128,7 @@ export async function GET(request: Request) {
           time: booking.time,
           players: booking.players,
           namesCount: validNames.length,
-          reminderCount: (booking.reminderCount || 0) + 1
+          reminderCount: newReminderCount
         });
       } else {
         skipped.push({ id: booking.id, reason: 'Email send failed' });

@@ -7,6 +7,7 @@ import { EmployeeInviteEmail } from './EmployeeInviteEmail';
 import { AdminNewBookingEmail } from './AdminNewBookingEmail';
 import { AdminBookingUpdateEmail } from './AdminBookingUpdateEmail';
 import { AdminBookingCancellationEmail } from './AdminBookingCancellationEmail';
+import { AdminNameListReminderEmail } from './AdminNameListReminderEmail';
 import { ContactInquiryNotificationEmail } from './ContactInquiryNotificationEmail';
 import { FeedbackNotificationEmail } from './FeedbackNotificationEmail';
 import { WeeklySummaryEmail } from './WeeklySummaryEmail';
@@ -195,6 +196,30 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
       time: '18:00',
       experienceTitle: 'Mixed Reality Shooter (90 min)',
       amountPaid: 500,
+      adminEmail: 'post@krsvr.no',
+    },
+  },
+  {
+    id: 'admin-name-list-reminder',
+    title: 'Varsel: Påminnelse om navneliste sendt',
+    category: 'internal',
+    categoryLabel: 'Interne varslinger',
+    subject: 'Kunde purret for navneliste: Henrik Hoang (04. september 2026 kl 15:30)',
+    trigger: 'Sendes til post@krsvr.no når systemets daglige cron-jobb automatisk purrer en kunde for manglende navneliste.',
+    filePath: 'components/emails/AdminNameListReminderEmail.tsx',
+    Component: AdminNameListReminderEmail,
+    mockProps: {
+      firstName: 'Henrik',
+      lastName: 'Hoang',
+      email: 'henrik2lyne@hotmail.no',
+      phone: '+47 900 12 345',
+      date: '04. september 2026',
+      time: '15:30',
+      players: 13,
+      validNamesCount: 0,
+      reminderCount: 1,
+      experienceTitle: 'Mixed Reality Shooter (90 min)',
+      bookingType: 'private',
       adminEmail: 'post@krsvr.no',
     },
   },

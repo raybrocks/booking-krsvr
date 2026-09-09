@@ -9,6 +9,7 @@ import { RefundReceiptEmail } from '@/components/emails/RefundReceiptEmail';
 import { AdminNewBookingEmail } from '@/components/emails/AdminNewBookingEmail';
 import { AdminBookingUpdateEmail } from '@/components/emails/AdminBookingUpdateEmail';
 import { AdminBookingCancellationEmail } from '@/components/emails/AdminBookingCancellationEmail';
+import { AdminNameListReminderEmail } from '@/components/emails/AdminNameListReminderEmail';
 import { EmployeeInviteEmail } from '@/components/emails/EmployeeInviteEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -406,6 +407,64 @@ export async function sendAdminBookingCancellationNotification(bookingDetails: a
     });
   } catch (err) {
     console.error("Failed to send admin cancellation email:", err);
+  }
+}
+
+export async function sendAdminNameListReminderNotification(
+  bookingDetails: any,
+  meta?: { validNamesCount?: number; reminderCount?: number }
+) {
+  if (!process.env.RESEND_API_KEY) return null;
+  const adminEmail = await getAdminEmail();
+  const { firstName, lastName, email, phone, date, time, players, bookingType, companyName, experienceId, playerNames, reminderCount: bookingReminderCount } = bookingDetails;
+  
+  let experienceTitle: string | undefined;
+  if (experienceId) {
+    try {
+      const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
+      if (exp && exp.name) experienceTitle = exp.name;
+    } catch (e) {}
+  }
+
+  const validNamesCount = meta?.validNamesCount !== undefined 
+    ? meta.validNamesCount 
+    : (playerNames || []).filter((n: string) => n && n.trim().length > 0).length;
+    
+  const reminderNumber = meta?.reminderCount !== undefined
+    ? meta.reminderCount
+    : (bookingReminderCount || 1);
+
+  try {
+    const html = await render(
+      React.createElement(AdminNameListReminderEmail, {
+        firstName,
+        lastName,
+        email,
+        phone,
+        date,
+        time,
+        players: Number(players) || 1,
+        validNamesCount,
+        reminderCount: reminderNumber,
+        experienceTitle,
+        bookingType,
+        companyName,
+        adminEmail,
+      })
+    );
+
+    const { data, error } = await resend.emails.send({
+      from: 'KRS VR Arena Admin <booking@donotreply.krsvr.no>',
+      to: adminEmail,
+      subject: `Kunde purret for navneliste: ${firstName} ${lastName} (${date} kl ${time})`,
+      html,
+    });
+
+    if (error) console.error("Admin name list reminder resend error:", error);
+    return data;
+  } catch (err) {
+    console.error("Failed to send admin name list reminder notification:", err);
+    return null;
   }
 }
 
