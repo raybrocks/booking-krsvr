@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle, Lock, Unlock, Users, RotateCcw, X, ShieldAlert, Pencil, Clock } from "lucide-react";
+import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle, Lock, Unlock, Users, RotateCcw, X, ShieldAlert, Pencil, Clock, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -30,6 +30,15 @@ export default function SettingsManager() {
     oldTime: string;
     newTime: string;
   } | null>(null);
+
+  // Modal state for duplicating times from one date to other date(s)
+  const [duplicateSourceDate, setDuplicateSourceDate] = useState<string | null>(null);
+  const [duplicateMode, setDuplicateMode] = useState<"specific" | "range">("specific");
+  const [targetDates, setTargetDates] = useState<string[]>([]);
+  const [targetDateInput, setTargetDateInput] = useState<string>("");
+  const [targetRangeStart, setTargetRangeStart] = useState<string>("");
+  const [targetRangeEnd, setTargetRangeEnd] = useState<string>("");
+  const [duplicateMergeStrategy, setDuplicateMergeStrategy] = useState<"overwrite" | "merge">("overwrite");
   
   // Vacation Mode States
   const [vacationStart, setVacationStart] = useState("");
@@ -307,6 +316,111 @@ export default function SettingsManager() {
     setSettings(newSettings);
     await handleSave(newSettings);
     toast.success("Tilbakestilt til ordinære åpningstider.");
+  };
+
+  const openDuplicateModal = (sourceDate: string) => {
+    setDuplicateSourceDate(sourceDate);
+    setDuplicateMode("specific");
+    setTargetDates([]);
+    const nextDay = format(addDays(new Date(sourceDate + "T12:00:00"), 1), "yyyy-MM-dd");
+    setTargetDateInput(nextDay);
+    setTargetRangeStart(nextDay);
+    setTargetRangeEnd(format(addDays(new Date(sourceDate + "T12:00:00"), 5), "yyyy-MM-dd"));
+    setDuplicateMergeStrategy("overwrite");
+  };
+
+  const handleAddTargetDate = (dateToAdd?: string) => {
+    const val = (dateToAdd || targetDateInput).trim();
+    if (!val) return;
+    if (val === duplicateSourceDate) {
+      toast.error("Kan ikke duplisere til samme dato som kilden.");
+      return;
+    }
+    if (!targetDates.includes(val)) {
+      setTargetDates(prev => [...prev, val].sort());
+      setTargetDateInput("");
+    } else {
+      toast.error("Datoen er allerede lagt til i listen.");
+    }
+  };
+
+  const handleRemoveTargetDate = (dateToRemove: string) => {
+    setTargetDates(prev => prev.filter(d => d !== dateToRemove));
+  };
+
+  const handleAddNextDayPreset = () => {
+    if (!duplicateSourceDate) return;
+    const nextDay = format(addDays(new Date(duplicateSourceDate + "T12:00:00"), 1), "yyyy-MM-dd");
+    handleAddTargetDate(nextDay);
+  };
+
+  const handleAddNextWeekSameDayPreset = () => {
+    if (!duplicateSourceDate) return;
+    const nextWeek = format(addDays(new Date(duplicateSourceDate + "T12:00:00"), 7), "yyyy-MM-dd");
+    handleAddTargetDate(nextWeek);
+  };
+
+  const handleExecuteDuplicate = async () => {
+    if (!duplicateSourceDate) return;
+    const sourceTimes = settings.specialHours?.[duplicateSourceDate] || [];
+    if (sourceTimes.length === 0) {
+      toast.error("Kildedatoen har ingen klokkeslett å duplisere.");
+      return;
+    }
+
+    let finalTargetDates: string[] = [];
+    if (duplicateMode === "specific") {
+      finalTargetDates = [...targetDates];
+      if (targetDateInput && !finalTargetDates.includes(targetDateInput) && targetDateInput !== duplicateSourceDate) {
+        finalTargetDates.push(targetDateInput);
+      }
+    } else {
+      if (!targetRangeStart || !targetRangeEnd) {
+        toast.error("Vennligst oppgi både fra- og til-dato for intervallet.");
+        return;
+      }
+      if (targetRangeStart > targetRangeEnd) {
+        toast.error("Fra-dato må være før eller lik til-dato.");
+        return;
+      }
+      let curr = new Date(targetRangeStart + "T12:00:00");
+      const end = new Date(targetRangeEnd + "T12:00:00");
+      while (curr <= end) {
+        const dStr = format(curr, "yyyy-MM-dd");
+        if (dStr !== duplicateSourceDate && !finalTargetDates.includes(dStr)) {
+          finalTargetDates.push(dStr);
+        }
+        curr = addDays(curr, 1);
+      }
+    }
+
+    if (finalTargetDates.length === 0) {
+      toast.error("Vennligst velg minst én måldato.");
+      return;
+    }
+
+    const newSettings = {
+      ...settings,
+      specialHours: {
+        ...(settings.specialHours || {})
+      }
+    };
+
+    finalTargetDates.forEach(tDate => {
+      if (duplicateMergeStrategy === "overwrite" || !newSettings.specialHours[tDate]) {
+        newSettings.specialHours[tDate] = [...sourceTimes];
+      } else {
+        newSettings.specialHours[tDate] = Array.from(
+          new Set([...(newSettings.specialHours[tDate] || []), ...sourceTimes])
+        ).sort();
+      }
+    });
+
+    setSettings(newSettings);
+    setDuplicateSourceDate(null);
+    await handleSave(newSettings);
+    fetchBookingsForDates();
+    toast.success(`Dupliserte ${sourceTimes.length} klokkeslett til ${finalTargetDates.length} dato(er)!`);
   };
 
   const handleToggleSlotBlock = async (date: string, time: string, isBlocked: boolean) => {
@@ -740,6 +854,17 @@ export default function SettingsManager() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
+                      {times.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => openDuplicateModal(date)}
+                          className="text-xs bg-[#9C39FF]/15 hover:bg-[#9C39FF]/30 text-purple-200 hover:text-white border border-[#9C39FF]/30 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 font-medium shadow-sm cursor-pointer"
+                          title="Dupliser disse klokkeslettene til en annen dato eller flere datoer"
+                        >
+                          <Copy className="w-3.5 h-3.5" /> Dupliser tider
+                        </button>
+                      )}
+
                       {times.length > 0 && availableTimes.length > 0 && (
                         <button
                           type="button"
@@ -1145,6 +1270,236 @@ export default function SettingsManager() {
                   <>
                     <Save className="w-3.5 h-3.5" />
                     Lagre endring
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for duplicating times to other date(s) */}
+      {duplicateSourceDate && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-5 my-8 animate-in fade-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-zinc-800/80 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#9C39FF]/15 border border-[#9C39FF]/30 flex items-center justify-center text-[#9C39FF]">
+                  <Copy className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-white">Dupliser klokkeslett</h3>
+                  <p className="text-xs text-zinc-400 capitalize">
+                    Fra {format(new Date(duplicateSourceDate + "T12:00:00"), "EEEE d. MMMM yyyy", { locale: nb })}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDuplicateSourceDate(null)}
+                className="text-zinc-500 hover:text-white p-1 rounded-lg hover:bg-zinc-900 transition-colors"
+                title="Lukk"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Source times preview */}
+            <div className="p-3 bg-zinc-900/60 rounded-xl border border-zinc-800/80 text-xs">
+              <span className="text-zinc-400 block mb-1.5 font-medium">
+                Klokkeslett som kopieres ({settings.specialHours?.[duplicateSourceDate]?.length || 0} tider):
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {(settings.specialHours?.[duplicateSourceDate] || []).map((t: string) => (
+                  <span key={t} className="px-2 py-0.5 bg-zinc-800 text-purple-200 border border-purple-500/20 rounded font-mono text-[11px]">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Mode selection: specific vs range */}
+            <div className="flex items-center gap-2 p-1 bg-zinc-900 rounded-xl border border-zinc-800 text-xs">
+              <button
+                type="button"
+                onClick={() => setDuplicateMode("specific")}
+                className={`flex-1 py-1.5 rounded-lg font-medium transition-all ${
+                  duplicateMode === "specific"
+                    ? "bg-[#9C39FF] text-white shadow"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                Velg spesifikke datoer
+              </button>
+              <button
+                type="button"
+                onClick={() => setDuplicateMode("range")}
+                className={`flex-1 py-1.5 rounded-lg font-medium transition-all ${
+                  duplicateMode === "range"
+                    ? "bg-[#9C39FF] text-white shadow"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                Datointervall (fra - til)
+              </button>
+            </div>
+
+            {duplicateMode === "specific" ? (
+              <div className="space-y-3">
+                <label className="text-xs text-zinc-300 font-medium block">
+                  Velg måldato(er) som skal få disse tidene:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    value={targetDateInput}
+                    onChange={(e) => setTargetDateInput(e.target.value)}
+                    className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-[#9C39FF]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddTargetDate()}
+                    disabled={!targetDateInput}
+                    className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 text-white rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Legg til dato
+                  </button>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="text-zinc-500">Hurtigvalg:</span>
+                  <button
+                    type="button"
+                    onClick={handleAddNextDayPreset}
+                    className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  >
+                    + Neste dag
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAddNextWeekSameDayPreset}
+                    className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  >
+                    + Samme ukedag neste uke
+                  </button>
+                </div>
+
+                {/* Target dates list */}
+                {targetDates.length > 0 ? (
+                  <div className="space-y-1.5 pt-2">
+                    <span className="text-xs text-zinc-400 font-medium block">
+                      Valgte måldatoer ({targetDates.length}):
+                    </span>
+                    <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-1">
+                      {targetDates.map(d => (
+                        <span
+                          key={d}
+                          className="inline-flex items-center gap-1.5 bg-zinc-900 border border-zinc-700 text-white text-xs px-2.5 py-1 rounded-lg"
+                        >
+                          <span className="capitalize">{format(new Date(d + "T12:00:00"), "EEE d. MMM", { locale: nb })}</span>
+                          <span className="text-zinc-500 font-mono text-[10px]">({d})</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTargetDate(d)}
+                            className="text-zinc-500 hover:text-red-400 p-0.5 rounded transition-colors ml-1"
+                            title="Fjern dato"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-zinc-500 italic">
+                    Ingen måldatoer lagt til ennå. Velg en dato ovenfor og klikk «Legg til dato».
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <label className="text-xs text-zinc-300 font-medium block">
+                  Velg datointervall:
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <span className="text-[11px] text-zinc-500 block mb-1">Fra og med:</span>
+                    <input
+                      type="date"
+                      value={targetRangeStart}
+                      onChange={(e) => setTargetRangeStart(e.target.value)}
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-[#9C39FF]"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-zinc-500 block mb-1">Til og med:</span>
+                    <input
+                      type="date"
+                      value={targetRangeEnd}
+                      onChange={(e) => setTargetRangeEnd(e.target.value)}
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-[#9C39FF]"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Overwrite vs merge strategy */}
+            <div className="p-3 bg-zinc-900/50 rounded-xl border border-zinc-800 space-y-2 text-xs">
+              <span className="text-zinc-400 block font-medium">Håndtering av eksisterende tider på måldato:</span>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <label className="flex items-center gap-2 cursor-pointer text-zinc-200">
+                  <input
+                    type="radio"
+                    name="mergeStrategy"
+                    value="overwrite"
+                    checked={duplicateMergeStrategy === "overwrite"}
+                    onChange={() => setDuplicateMergeStrategy("overwrite")}
+                    className="text-[#9C39FF] focus:ring-[#9C39FF] bg-zinc-900 border-zinc-700"
+                  />
+                  <span>Overskriv (erstatt tider)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-zinc-200">
+                  <input
+                    type="radio"
+                    name="mergeStrategy"
+                    value="merge"
+                    checked={duplicateMergeStrategy === "merge"}
+                    onChange={() => setDuplicateMergeStrategy("merge")}
+                    className="text-[#9C39FF] focus:ring-[#9C39FF] bg-zinc-900 border-zinc-700"
+                  />
+                  <span>Slå sammen med eksisterende</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-zinc-800/80">
+              <button
+                type="button"
+                onClick={() => setDuplicateSourceDate(null)}
+                disabled={saving}
+                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded-xl text-xs font-semibold border border-zinc-700 transition-colors"
+              >
+                Avbryt
+              </button>
+              <button
+                type="button"
+                disabled={saving || (duplicateMode === "specific" && targetDates.length === 0 && !targetDateInput) || (duplicateMode === "range" && (!targetRangeStart || !targetRangeEnd))}
+                onClick={handleExecuteDuplicate}
+                className="px-5 py-2 bg-[#9C39FF] hover:bg-[#8A2BE2] disabled:opacity-50 text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-[#9C39FF]/20"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Dupliserer...
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    Dupliser klokkeslett
                   </>
                 )}
               </button>
