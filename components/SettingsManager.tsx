@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle, Lock, Unlock, Users, RotateCcw, X, ShieldAlert } from "lucide-react";
+import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle, Lock, Unlock, Users, RotateCcw, X, ShieldAlert, Pencil, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -18,6 +18,18 @@ export default function SettingsManager() {
   // Real-time bookings lookup for special dates
   const [dateBookings, setDateBookings] = useState<Record<string, any[]>>({});
   const [togglingSlot, setTogglingSlot] = useState<string | null>(null);
+
+  // Modal states for adding multiple times to a special date
+  const [addingTimeToDate, setAddingTimeToDate] = useState<string | null>(null);
+  const [newTimeSlots, setNewTimeSlots] = useState<string[]>(["", "", "", "", ""]);
+
+  // Modal state for editing an existing time slot
+  const [editingSlot, setEditingSlot] = useState<{
+    date: string;
+    timeIndex: number;
+    oldTime: string;
+    newTime: string;
+  } | null>(null);
   
   // Vacation Mode States
   const [vacationStart, setVacationStart] = useState("");
@@ -89,10 +101,10 @@ export default function SettingsManager() {
     fetchSettings();
   }, [fetchBookingsForDates]);
 
-  const handleSave = async () => {
+  const handleSave = async (explicitSettings?: any) => {
     setSaving(true);
     try {
-      const settingsToSave = { ...settings };
+      const settingsToSave = explicitSettings ? { ...explicitSettings } : { ...settings };
       
       // Sort times before saving so they appear chronologically on the website
       if (settingsToSave.openingHours) {
@@ -120,11 +132,14 @@ export default function SettingsManager() {
       
       setSettings(settingsToSave);
       toast.success("Innstillinger lagret!");
+      return true;
     } catch (error) {
       console.error("Error saving settings:", error);
       toast.error("Kunne ikke lagre innstillinger");
+      return false;
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const addTimeSlot = (dayIndex: string) => {
@@ -154,7 +169,7 @@ export default function SettingsManager() {
     if (!newSettings.specialHours) newSettings.specialHours = {};
     
     // Initialize with default hours for that day of week to make it easier to edit
-    const dayOfWeek = new Date(newOverrideDate).getDay().toString();
+    const dayOfWeek = new Date(newOverrideDate + "T12:00:00").getDay().toString();
     newSettings.specialHours[newOverrideDate] = [...(newSettings.openingHours[dayOfWeek] || [])];
     
     setSettings(newSettings);
@@ -162,39 +177,136 @@ export default function SettingsManager() {
     fetchBookingsForDates();
   };
 
-  const removeOverrideDate = (date: string) => {
+  const removeOverrideDate = async (date: string) => {
+    if (!window.confirm(`Er du sikker på at du vil fjerne unntaksdatoen ${date}?`)) return;
     const newSettings = { ...settings };
     delete newSettings.specialHours[date];
     setSettings(newSettings);
+    await handleSave(newSettings);
+    toast.success(`Fjernet unntaksdato ${date}.`);
   };
 
-  const addSpecialTimeSlot = (date: string) => {
-    const newSettings = { ...settings };
-    if (!newSettings.specialHours[date]) newSettings.specialHours[date] = [];
-    newSettings.specialHours[date].push("12:00");
-    newSettings.specialHours[date].sort();
+  const openAddTimeModal = (date: string) => {
+    setAddingTimeToDate(date);
+    setNewTimeSlots(["", "", "", "", ""]);
+  };
+
+  const handleFill90MinIntervals = () => {
+    const startTime = newTimeSlots.find(t => t.trim().length > 0) || "10:30";
+    const [hStr, mStr] = startTime.split(":");
+    let totalMins = (parseInt(hStr, 10) || 10) * 60 + (parseInt(mStr, 10) || 0);
+
+    const generated: string[] = [];
+    for (let i = 0; i < newTimeSlots.length; i++) {
+      const mins = totalMins + i * 90;
+      const hours = Math.floor(mins / 60) % 24;
+      const remainingMins = mins % 60;
+      generated.push(`${String(hours).padStart(2, "0")}:${String(remainingMins).padStart(2, "0")}`);
+    }
+    setNewTimeSlots(generated);
+  };
+
+  const handleAddField = () => {
+    setNewTimeSlots(prev => [...prev, ""]);
+  };
+
+  const handleSaveNewTimes = async () => {
+    if (!addingTimeToDate) return;
+
+    const validTimes = newTimeSlots
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
+
+    if (validTimes.length === 0) {
+      toast.error("Vennligst fyll ut minst ett klokkeslett.");
+      return;
+    }
+
+    const existing: string[] = settings.specialHours?.[addingTimeToDate] || [];
+    const alreadyExist = validTimes.filter(t => existing.includes(t));
+    const toAdd = Array.from(new Set(validTimes.filter(t => !existing.includes(t))));
+
+    if (toAdd.length === 0) {
+      toast.error(
+        alreadyExist.length > 0 
+          ? `Alle de oppgitte tidspunktene (${alreadyExist.join(", ")}) finnes allerede på denne datoen.`
+          : "Ingen nye tidspunkter å legge til."
+      );
+      return;
+    }
+
+    const updatedTimes = Array.from(new Set([...existing, ...toAdd])).sort();
+    const newSettings = {
+      ...settings,
+      specialHours: {
+        ...(settings.specialHours || {}),
+        [addingTimeToDate]: updatedTimes
+      }
+    };
+
     setSettings(newSettings);
+    setAddingTimeToDate(null);
+    await handleSave(newSettings);
+    toast.success(`La til ${toAdd.length} nye klokkeslett for ${addingTimeToDate}!`);
   };
 
-  const removeSpecialTimeSlot = (date: string, timeIndex: number) => {
-    const newSettings = { ...settings };
-    newSettings.specialHours[date].splice(timeIndex, 1);
+  const handleSaveEditSlot = async () => {
+    if (!editingSlot || !editingSlot.newTime) return;
+    const { date, timeIndex, oldTime, newTime } = editingSlot;
+    const trimmedNew = newTime.trim();
+
+    if (!trimmedNew) {
+      toast.error("Vennligst oppgi et gyldig klokkeslett.");
+      return;
+    }
+
+    if (oldTime === trimmedNew) {
+      setEditingSlot(null);
+      return;
+    }
+
+    const currentTimes = [...(settings.specialHours?.[date] || [])];
+    if (currentTimes.includes(trimmedNew) && currentTimes[timeIndex] !== trimmedNew) {
+      toast.error(`Klokkeslettet ${trimmedNew} finnes allerede på denne datoen.`);
+      return;
+    }
+
+    currentTimes[timeIndex] = trimmedNew;
+    currentTimes.sort();
+
+    const newSettings = {
+      ...settings,
+      specialHours: {
+        ...(settings.specialHours || {}),
+        [date]: currentTimes
+      }
+    };
+
     setSettings(newSettings);
+    setEditingSlot(null);
+    await handleSave(newSettings);
+    toast.success(`Endret klokkeslett fra ${oldTime} til ${trimmedNew}!`);
   };
 
-  const updateSpecialTimeSlot = (date: string, timeIndex: number, value: string) => {
+  const removeSpecialTimeSlot = async (date: string, timeIndex: number) => {
+    const timeToRemove = settings.specialHours?.[date]?.[timeIndex];
     const newSettings = { ...settings };
-    newSettings.specialHours[date][timeIndex] = value;
+    if (newSettings.specialHours?.[date]) {
+      newSettings.specialHours[date].splice(timeIndex, 1);
+    }
     setSettings(newSettings);
+    await handleSave(newSettings);
+    toast.success(`Fjernet klokkeslett ${timeToRemove || ''}.`);
   };
 
-  const resetSpecialHoursToDefault = (date: string) => {
-    const dayOfWeek = new Date(date).getDay().toString();
+  const resetSpecialHoursToDefault = async (date: string) => {
+    const dayOfWeek = new Date(date + "T12:00:00").getDay().toString();
     const defaultHours = [...(settings.openingHours[dayOfWeek] || [])];
     const newSettings = { ...settings };
     newSettings.specialHours[date] = defaultHours;
     setSettings(newSettings);
-    toast.success("Tilbakestilt til ordinære åpningstider. Husk å lagre!");
+    await handleSave(newSettings);
+    toast.success("Tilbakestilt til ordinære åpningstider.");
   };
 
   const handleToggleSlotBlock = async (date: string, time: string, isBlocked: boolean) => {
@@ -740,6 +852,14 @@ export default function SettingsManager() {
                                 </button>
                                 <button
                                   type="button"
+                                  onClick={() => setEditingSlot({ date, timeIndex: tIndex, oldTime: time, newTime: time })}
+                                  className="p-1 text-zinc-500 hover:text-purple-300 hover:bg-purple-500/10 rounded transition-colors"
+                                  title="Endre dette klokkeslettet"
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </button>
+                                <button
+                                  type="button"
                                   onClick={() => removeSpecialTimeSlot(date, tIndex)}
                                   className="p-1 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
                                   title="Slett klokkeslett helt fra denne datoen"
@@ -775,6 +895,14 @@ export default function SettingsManager() {
                               </button>
                               <button
                                 type="button"
+                                onClick={() => setEditingSlot({ date, timeIndex: tIndex, oldTime: time, newTime: time })}
+                                className="p-1 text-zinc-500 hover:text-purple-300 hover:bg-purple-500/10 rounded transition-colors"
+                                title="Endre dette klokkeslettet"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => removeSpecialTimeSlot(date, tIndex)}
                                 className="p-1 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
                                 title="Slett klokkeslett helt fra denne datoen"
@@ -788,8 +916,9 @@ export default function SettingsManager() {
                         {/* Add custom time button */}
                         <button
                           type="button"
-                          onClick={() => addSpecialTimeSlot(date)}
-                          className="flex items-center gap-1 text-xs bg-[#9C39FF]/10 hover:bg-[#9C39FF]/20 text-[#9C39FF] px-3 py-1.5 rounded-xl transition-colors border border-dashed border-[#9C39FF]/30 h-[34px] font-medium"
+                          onClick={() => openAddTimeModal(date)}
+                          className="flex items-center gap-1.5 text-xs bg-[#9C39FF]/15 hover:bg-[#9C39FF]/30 text-purple-200 hover:text-white px-3.5 py-1.5 rounded-xl transition-all border border-dashed border-[#9C39FF]/40 hover:border-[#9C39FF] h-[34px] font-medium shadow-sm cursor-pointer"
+                          title="Åpne pop-up for å legge til nye klokkeslett"
                         >
                           <Plus className="w-3.5 h-3.5" /> Legg til tid
                         </button>
@@ -811,6 +940,217 @@ export default function SettingsManager() {
       )}
       {activeSettingsTab === "emails" && (
         <EmailPreviewClient />
+      )}
+
+      {/* Modal for adding multiple time slots */}
+      {addingTimeToDate && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-5 my-8 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between border-b border-zinc-800/80 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#9C39FF]/15 border border-[#9C39FF]/30 flex items-center justify-center text-[#9C39FF]">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-white">Legg til klokkeslett</h3>
+                  <p className="text-xs text-zinc-400 capitalize">
+                    {format(new Date(addingTimeToDate + "T12:00:00"), "EEEE d. MMMM yyyy", { locale: nb })}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAddingTimeToDate(null)}
+                className="text-zinc-500 hover:text-white p-1 rounded-lg hover:bg-zinc-900 transition-colors"
+                title="Lukk"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Existing slots preview */}
+            {settings.specialHours?.[addingTimeToDate] && settings.specialHours[addingTimeToDate].length > 0 && (
+              <div className="p-3 bg-zinc-900/60 rounded-xl border border-zinc-800/80 text-xs">
+                <span className="text-zinc-400 block mb-1.5 font-medium">Allerede oppsatte tider for denne datoen:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {settings.specialHours[addingTimeToDate].map((t: string) => (
+                    <span key={t} className="px-2 py-0.5 bg-zinc-800 text-zinc-300 rounded font-mono text-[11px]">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-400">Fyll inn opptil 5 nye klokkeslett:</span>
+                <button
+                  type="button"
+                  onClick={handleFill90MinIntervals}
+                  className="text-xs text-[#9C39FF] hover:text-purple-300 font-medium transition-colors cursor-pointer"
+                  title="Auto-fyll 90 minutters intervaller fra første felt (eller 10:30)"
+                >
+                  ⚡ Fyll 90 min intervaller
+                </button>
+              </div>
+
+              {/* 5+ Input fields */}
+              <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                {newTimeSlots.map((time, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <span className="text-xs text-zinc-500 font-mono w-14 shrink-0">Felt {idx + 1}:</span>
+                    <div className="relative flex-1">
+                      <input
+                        type="time"
+                        value={time}
+                        onChange={(e) => {
+                          const updated = [...newTimeSlots];
+                          updated[idx] = e.target.value;
+                          setNewTimeSlots(updated);
+                        }}
+                        className="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-[#9C39FF] transition-colors"
+                      />
+                    </div>
+                    {time && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...newTimeSlots];
+                          updated[idx] = "";
+                          setNewTimeSlots(updated);
+                        }}
+                        className="p-1.5 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors"
+                        title="Tøm dette feltet"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between pt-1">
+                <button
+                  type="button"
+                  onClick={handleAddField}
+                  className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Legg til ett felt til
+                </button>
+                {newTimeSlots.some((t) => t.trim().length > 0) && (
+                  <button
+                    type="button"
+                    onClick={() => setNewTimeSlots(["", "", "", "", ""])}
+                    className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+                  >
+                    Tøm alle felter
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-zinc-800/80">
+              <button
+                type="button"
+                onClick={() => setAddingTimeToDate(null)}
+                disabled={saving}
+                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded-xl text-xs font-semibold border border-zinc-700 transition-colors"
+              >
+                Avbryt
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={handleSaveNewTimes}
+                className="px-5 py-2 bg-[#9C39FF] hover:bg-[#8A2BE2] disabled:opacity-50 text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-[#9C39FF]/20"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Lagrer...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-3.5 h-3.5" />
+                    Legg til klokkeslett
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for editing a single slot */}
+      {editingSlot && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between border-b border-zinc-800/80 pb-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#9C39FF]/15 border border-[#9C39FF]/30 flex items-center justify-center text-[#9C39FF]">
+                  <Pencil className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-white">Endre klokkeslett</h3>
+                  <p className="text-xs text-zinc-400 capitalize">
+                    {format(new Date(editingSlot.date + "T12:00:00"), "EEEE d. MMMM yyyy", { locale: nb })}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingSlot(null)}
+                className="text-zinc-500 hover:text-white p-1 rounded-lg hover:bg-zinc-900 transition-colors"
+                title="Lukk"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs text-zinc-300 font-medium block">
+                Nytt tidspunkt (erstatter <span className="font-mono text-[#9C39FF]">{editingSlot.oldTime}</span>):
+              </label>
+              <input
+                type="time"
+                value={editingSlot.newTime}
+                onChange={(e) => setEditingSlot({ ...editingSlot, newTime: e.target.value })}
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-base focus:outline-none focus:border-[#9C39FF]"
+                autoFocus
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-zinc-800/80">
+              <button
+                type="button"
+                onClick={() => setEditingSlot(null)}
+                disabled={saving}
+                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded-xl text-xs font-semibold border border-zinc-700 transition-colors"
+              >
+                Avbryt
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={handleSaveEditSlot}
+                className="px-5 py-2 bg-[#9C39FF] hover:bg-[#8A2BE2] disabled:opacity-50 text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-[#9C39FF]/20"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Lagrer...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-3.5 h-3.5" />
+                    Lagre endring
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
