@@ -6,6 +6,9 @@ export async function middleware(request: NextRequest) {
     request,
   });
 
+  const authHeader = request.headers.get("authorization");
+  const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.substring(7) : undefined;
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -29,7 +32,7 @@ export async function middleware(request: NextRequest) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await (bearerToken ? supabase.auth.getUser(bearerToken) : supabase.auth.getUser());
 
   if (
     !user &&
