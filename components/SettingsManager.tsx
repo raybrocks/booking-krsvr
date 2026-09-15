@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle, Lock, Unlock, Users, RotateCcw, X, ShieldAlert, Pencil, Clock, Copy } from "lucide-react";
+import { Loader2, Plus, Trash2, Save, Calendar as CalendarIcon, AlertTriangle, Lock, Unlock, Users, RotateCcw, X, ShieldAlert, Pencil, Clock, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -47,13 +47,13 @@ export default function SettingsManager() {
   const [applyingVacation, setApplyingVacation] = useState(false);
 
   const daysOfWeek = [
-    { name: "Monday", index: "1" },
-    { name: "Tuesday", index: "2" },
-    { name: "Wednesday", index: "3" },
-    { name: "Thursday", index: "4" },
-    { name: "Friday", index: "5" },
-    { name: "Saturday", index: "6" },
-    { name: "Sunday", index: "0" }
+    { name: "Mandag", index: "1" },
+    { name: "Tirsdag", index: "2" },
+    { name: "Onsdag", index: "3" },
+    { name: "Torsdag", index: "4" },
+    { name: "Fredag", index: "5" },
+    { name: "Lørdag", index: "6" },
+    { name: "Søndag", index: "0" }
   ];
 
   const fetchBookingsForDates = useCallback(async () => {
@@ -110,7 +110,7 @@ export default function SettingsManager() {
     fetchSettings();
   }, [fetchBookingsForDates]);
 
-  const handleSave = async (explicitSettings?: any) => {
+  const handleSave = async (explicitSettings?: any, suppressToast: boolean = false) => {
     setSaving(true);
     try {
       const settingsToSave = explicitSettings ? { ...explicitSettings } : { ...settings };
@@ -140,7 +140,9 @@ export default function SettingsManager() {
       }
       
       setSettings(settingsToSave);
-      toast.success("Innstillinger lagret!");
+      if (!suppressToast) {
+        toast.success("Innstillinger lagret!");
+      }
       return true;
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -151,18 +153,22 @@ export default function SettingsManager() {
     }
   };
 
-  const addTimeSlot = (dayIndex: string) => {
+  const addTimeSlot = async (dayIndex: string) => {
     const newSettings = { ...settings };
     if (!newSettings.openingHours[dayIndex]) newSettings.openingHours[dayIndex] = [];
     newSettings.openingHours[dayIndex].push("12:00");
     newSettings.openingHours[dayIndex].sort();
     setSettings(newSettings);
+    await handleSave(newSettings, true);
+    toast.success("Lagt til klokkeslett i ukeplan");
   };
 
-  const removeTimeSlot = (dayIndex: string, timeIndex: number) => {
+  const removeTimeSlot = async (dayIndex: string, timeIndex: number) => {
     const newSettings = { ...settings };
     newSettings.openingHours[dayIndex].splice(timeIndex, 1);
     setSettings(newSettings);
+    await handleSave(newSettings, true);
+    toast.success("Fjernet klokkeslett fra ukeplan");
   };
 
   const updateTimeSlot = (dayIndex: string, timeIndex: number, value: string) => {
@@ -171,8 +177,13 @@ export default function SettingsManager() {
     setSettings(newSettings);
   };
 
+  const handleBlurTimeSlot = async () => {
+    await handleSave(settings, true);
+    toast.success("Oppdatert klokkeslett i ukeplan");
+  };
+
   // Special Hours Handlers
-  const addOverrideDate = () => {
+  const addOverrideDate = async () => {
     if (!newOverrideDate) return;
     const newSettings = { ...settings };
     if (!newSettings.specialHours) newSettings.specialHours = {};
@@ -181,9 +192,12 @@ export default function SettingsManager() {
     const dayOfWeek = new Date(newOverrideDate + "T12:00:00").getDay().toString();
     newSettings.specialHours[newOverrideDate] = [...(newSettings.openingHours[dayOfWeek] || [])];
     
+    const addedDate = newOverrideDate;
     setSettings(newSettings);
     setNewOverrideDate("");
+    await handleSave(newSettings, true);
     fetchBookingsForDates();
+    toast.success(`La til unntaksdato ${addedDate}`);
   };
 
   const removeOverrideDate = async (date: string) => {
@@ -191,7 +205,7 @@ export default function SettingsManager() {
     const newSettings = { ...settings };
     delete newSettings.specialHours[date];
     setSettings(newSettings);
-    await handleSave(newSettings);
+    await handleSave(newSettings, true);
     toast.success(`Fjernet unntaksdato ${date}.`);
   };
 
@@ -255,7 +269,7 @@ export default function SettingsManager() {
 
     setSettings(newSettings);
     setAddingTimeToDate(null);
-    await handleSave(newSettings);
+    await handleSave(newSettings, true);
     toast.success(`La til ${toAdd.length} nye klokkeslett for ${addingTimeToDate}!`);
   };
 
@@ -293,7 +307,7 @@ export default function SettingsManager() {
 
     setSettings(newSettings);
     setEditingSlot(null);
-    await handleSave(newSettings);
+    await handleSave(newSettings, true);
     toast.success(`Endret klokkeslett fra ${oldTime} til ${trimmedNew}!`);
   };
 
@@ -304,7 +318,7 @@ export default function SettingsManager() {
       newSettings.specialHours[date].splice(timeIndex, 1);
     }
     setSettings(newSettings);
-    await handleSave(newSettings);
+    await handleSave(newSettings, true);
     toast.success(`Fjernet klokkeslett ${timeToRemove || ''}.`);
   };
 
@@ -314,7 +328,7 @@ export default function SettingsManager() {
     const newSettings = { ...settings };
     newSettings.specialHours[date] = defaultHours;
     setSettings(newSettings);
-    await handleSave(newSettings);
+    await handleSave(newSettings, true);
     toast.success("Tilbakestilt til ordinære åpningstider.");
   };
 
@@ -418,7 +432,7 @@ export default function SettingsManager() {
 
     setSettings(newSettings);
     setDuplicateSourceDate(null);
-    await handleSave(newSettings);
+    await handleSave(newSettings, true);
     fetchBookingsForDates();
     toast.success(`Dupliserte ${sourceTimes.length} klokkeslett til ${finalTargetDates.length} dato(er)!`);
   };
@@ -540,10 +554,12 @@ export default function SettingsManager() {
       setVacationStart("");
       setVacationEnd("");
       setVacationWarning(null);
-      toast.success("Vacation mode applied. Don't forget to save changes!");
+      await handleSave(newSettings, true);
+      fetchBookingsForDates();
+      toast.success("Feriemodus er aktivert og lagret!");
     } catch (error) {
       console.error("Error applying vacation:", error);
-      toast.error("Failed to apply vacation mode");
+      toast.error("Kunne ikke aktivere feriemodus");
     }
     setApplyingVacation(false);
   };
@@ -594,14 +610,30 @@ export default function SettingsManager() {
                 {activeSettingsTab === "hours" ? "Administrer faste og spesielle åpningstider for arenaen." : "Administrer kontaktinfo, vilkår og sikkerhetsfunksjoner."}
               </p>
             </div>
-            <button 
-              onClick={handleSave}
-              disabled={saving}
-              className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Lagre Endringer
-            </button>
+            {activeSettingsTab === "general" ? (
+              <button 
+                onClick={() => handleSave()}
+                disabled={saving}
+                className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors disabled:opacity-50 text-sm font-medium shadow-lg shadow-[#9C39FF]/20"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Lagre Endringer
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-900/90 border border-zinc-800 text-xs shadow-sm">
+                {saving ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#9C39FF]" />
+                    <span className="text-[#9C39FF] font-medium">Lagrer endringer...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    <span className="text-zinc-400 font-medium">Endringer lagres automatisk</span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
@@ -692,7 +724,7 @@ export default function SettingsManager() {
 
             {activeSettingsTab === "hours" && (
               <>
-                <h3 className="text-lg font-medium mb-4 border-b border-zinc-800 pb-2">Weekly Schedule</h3>
+                <h3 className="text-lg font-medium mb-4 border-b border-zinc-800 pb-2">Faste åpningstider (ukentlig)</h3>
         <div className="space-y-6">
           {daysOfWeek.map(({ name: day, index: dayIndex }) => {
             const times = settings.openingHours[dayIndex] || [];
@@ -707,11 +739,13 @@ export default function SettingsManager() {
                         type="time" 
                         value={time}
                         onChange={(e) => updateTimeSlot(dayIndex, tIndex, e.target.value)}
+                        onBlur={handleBlurTimeSlot}
                         className="bg-transparent text-sm text-white px-2 py-1 focus:outline-none"
                       />
                       <button 
                         onClick={() => removeTimeSlot(dayIndex, tIndex)}
                         className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-md transition-colors"
+                        title="Fjern tidspunkt"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -721,15 +755,15 @@ export default function SettingsManager() {
                     onClick={() => addTimeSlot(dayIndex)}
                     className="flex items-center gap-1 text-sm bg-zinc-800/50 hover:bg-zinc-800 text-zinc-300 px-3 py-2 rounded-lg transition-colors border border-dashed border-zinc-700"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Add Time
+                    <Plus className="w-3.5 h-3.5" /> Legg til tid
                   </button>
                 </div>
               </div>
             );
           })}
         </div>
-        <h3 className="text-lg font-medium mb-4 border-b border-zinc-800 pb-2 mt-10">Special Dates & Exceptions</h3>
-        <p className="text-sm text-zinc-400 mb-4">Override opening hours for specific dates (e.g. holidays). To close for a full day, add the date and remove all time slots.</p>
+        <h3 className="text-lg font-medium mb-4 border-b border-zinc-800 pb-2 mt-10">Spesielle datoer og unntak</h3>
+        <p className="text-sm text-zinc-400 mb-4">Overstyr åpningstider for enkeltdatoer (f.eks. helligdager eller ferier). For å stenge en hel dag, legg til datoen og fjern alle tidspunkter.</p>
         
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <input 
@@ -743,19 +777,19 @@ export default function SettingsManager() {
             disabled={!newOverrideDate}
             className="flex items-center justify-center gap-2 bg-zinc-800 text-white px-4 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50"
           >
-            <Plus className="w-4 h-4" /> Add Date Exception
+            <Plus className="w-4 h-4" /> Legg til unntaksdato
           </button>
         </div>
 
         <div className="mb-8 p-5 bg-zinc-900/80 border border-zinc-800 rounded-xl">
           <h4 className="text-md font-medium text-zinc-200 mb-2 flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-[#9C39FF]" /> Vacation Mode (Bulk Close)
+            <CalendarIcon className="w-4 h-4 text-[#9C39FF]" /> Feriemodus (steng datointervall)
           </h4>
-          <p className="text-sm text-zinc-400 mb-4">Close all booking slots between two dates.</p>
+          <p className="text-sm text-zinc-400 mb-4">Steng alle bookingtider mellom to datoer.</p>
           
           <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end">
             <div className="w-full sm:w-auto">
-              <label className="block text-xs text-zinc-500 mb-1">From</label>
+              <label className="block text-xs text-zinc-500 mb-1">Fra og med</label>
               <input 
                 type="date" 
                 value={vacationStart}
@@ -764,7 +798,7 @@ export default function SettingsManager() {
               />
             </div>
             <div className="w-full sm:w-auto">
-              <label className="block text-xs text-zinc-500 mb-1">To</label>
+              <label className="block text-xs text-zinc-500 mb-1">Til og med</label>
               <input 
                 type="date" 
                 value={vacationEnd}
@@ -777,30 +811,30 @@ export default function SettingsManager() {
               disabled={!vacationStart || !vacationEnd || applyingVacation}
               className="flex items-center justify-center gap-2 bg-zinc-800 text-white px-4 py-2 rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50 h-[42px]"
             >
-              {applyingVacation ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply Vacation"}
+              {applyingVacation ? <Loader2 className="w-4 h-4 animate-spin" /> : "Aktiver feriemodus"}
             </button>
           </div>
 
           {vacationWarning && (
             <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
               <h5 className="text-amber-400 font-medium mb-2 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" /> Warning: Conflicting Bookings Found
+                <AlertTriangle className="w-4 h-4" /> Advarsel: Aktive bookinger funnet
               </h5>
               <p className="text-sm text-amber-200/70 mb-4">
-                There are {vacationWarning.length} active booking(s) during this period. Applying vacation mode will close the slots, but you still need to manually cancel these bookings and notify the customers.
+                Det finnes {vacationWarning.length} aktiv(e) booking(er) i denne perioden. Aktivering av feriemodus vil stenge tidspunktene, men du må manuelt kansellere disse bookingene og varsle kundene.
               </p>
               <div className="flex gap-3">
                 <button 
                   onClick={() => handleApplyVacation(true)}
                   className="bg-amber-500/20 text-amber-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-500/30 transition-colors"
                 >
-                  Apply Anyway
+                  Aktiver likevel
                 </button>
                 <button 
                   onClick={() => setVacationWarning(null)}
                   className="bg-zinc-800 text-zinc-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-700 transition-colors"
                 >
-                  Cancel
+                  Avbryt
                 </button>
               </div>
             </div>
