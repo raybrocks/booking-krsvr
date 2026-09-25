@@ -1,7 +1,7 @@
 import AdminAuthWrapper from "@/components/AdminAuthWrapper";
 import EmailPreviewClient from "@/components/EmailPreviewClient";
 import Link from "next/link";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft, Mail, Sparkles } from "lucide-react";
 
 export const metadata = {
   title: "E-postmaler | KRS VR Arena Admin",
@@ -29,6 +29,14 @@ export default function AdminEmailsPage() {
                 <h1 className="text-xl font-bold text-white tracking-tight">Forhåndsvisning av E-postmaler</h1>
               </div>
             </div>
+
+            <Link
+              href="/admin/newsletter"
+              className="flex items-center gap-1.5 text-xs text-white bg-[#9C39FF] hover:bg-[#8A2BE2] px-4 py-2 rounded-xl transition-all font-medium shadow-md shadow-[#9C39FF]/20 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Åpne Nyhetsbrev Designer</span>
+            </Link>
           </div>
 
           <EmailPreviewClient />

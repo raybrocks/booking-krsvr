@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
@@ -926,6 +927,7 @@ export default function AdminDashboard() {
             <button onClick={() => setActiveTab("shifts")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
             <button onClick={() => setActiveTab("employees")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
             <button onClick={() => setActiveTab("settings")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
+            <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-purple-300 hover:text-white hover:bg-purple-900/20 border border-purple-500/20"><Mail className="w-4 h-4 text-purple-400" /> Nyhetsbrev</Link>
           </nav>
 
           {/* Right: Logout button + Mobile/Tablet Hamburger */}
@@ -971,6 +973,7 @@ export default function AdminDashboard() {
               <button onClick={() => { setActiveTab("shifts"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
               <button onClick={() => { setActiveTab("employees"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
               <button onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
+              <Link href="/admin/newsletter" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-purple-300 hover:text-white bg-purple-900/10 border border-purple-500/20"><Mail className="w-4 h-4 text-purple-400" /> Nyhetsbrev</Link>
               <button onClick={handleLogout} className="col-span-2 sm:col-span-4 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 border border-red-500/20 mt-1">
                 <LogOut className="w-4 h-4" /> Logg ut
               </button>

@@ -304,12 +304,21 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
     Component: NewsletterBroadcastEmail,
     mockProps: {
       headline: 'Nyheter fra KRS VR Arena',
+      preheader: 'Oppgraderte lokaler, høsttilbud og nye opplevelser i Kristiansand.',
       teaser: 'Vi utvider kapasiteten og lanserer nye opplevelser for høsten.',
       bodyParagraphs: [
         'Vi i KRS VR Arena jobber kontinuerlig med å tilby de beste VR- og Mixed Reality-opplevelsene i Kristiansand.',
         'Nå har vi oppgradert lokalene og lagt til rette for enda bedre tilpasning for grupper, teambuilding og private arrangementer.',
         'Bruk koden under ved bestilling for 15% rabatt på din neste spilløkt.'
       ],
+      featuredExperience: {
+        name: 'Mixed Reality Shooter (Spatial Ops)',
+        type: 'Mixed Reality',
+        shortDescription: 'Løp fritt rundt i arenaen og kjemp mot venner eller roboter i Norges råeste Mixed Reality-opplevelse.',
+        picture: 'https://krsvr.no/experiences/spatial-ops.jpg',
+        buttonText: 'Se opplevelse og bestill',
+        buttonUrl: 'https://krsvr.no/vr-opplevelser/mixed-reality/spatial-ops',
+      },
       ctaButtonText: 'Bestill tid på nett',
       ctaButtonUrl: 'https://krsvr.no/booking',
       discountCode: 'VR15',

@@ -48,3 +48,13 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 4. **Oppmøtetekst:** Bruk alltid «Møt presist for å ikke miste spilletid.» i stedet for referanser til 10-15 minutter før med klokke-emojier.
 5. **Navneliste og justering i kvittering:** Formuler tydelig at kunden kan justere antall og navneliste helt frem til ankomst, men at sene endringer ved oppmøte kan skape forsinkelser og redusert spilletid.
 
+# Database og Supabase Data API (Krav fra 30. oktober)
+1. **Obligatoriske GRANTs for nye tabeller:** Hver gang en ny tabell opprettes i `public`-skjemaet (i SQL-migrasjoner, skript eller databaseendringer), **MÅ** det alltid inkluderes eksplisitte `GRANT`-setninger i samme migrasjon:
+   ```sql
+   grant select on public.din_tabell to anon; -- (dersom tabellen skal leses av uinnloggede, styres videre av RLS)
+   grant select, insert, update, delete on public.din_tabell to authenticated;
+   grant select, insert, update, delete on public.din_tabell to service_role;
+   ```
+2. **Skille mellom GRANT og RLS:** `GRANT` gir Data API / PostgREST tillatelse til å nå tabellen. `RLS` (`alter table public.din_tabell enable row level security;` + policies) styrer hvilke rader som kan aksesseres. Begge deler må **alltid** settes opp sammen.
+
+
