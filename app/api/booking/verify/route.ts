@@ -155,6 +155,16 @@ export async function POST(req: Request) {
                   });
                   
                   if (verifiedBooking) {
+                    // Auto-sync customer contact to Resend (Audience + Segment)
+                    if (verifiedBooking.email) {
+                      const { addContactToNewsletter } = await import('@/lib/email');
+                      addContactToNewsletter(
+                        verifiedBooking.email,
+                        verifiedBooking.firstName,
+                        verifiedBooking.lastName
+                      ).catch((e) => console.error("Failed to sync contact to Resend in booking verify:", e));
+                    }
+
                     const experienceData = verifiedBooking.experience || {
                       name: 'Valgt VR Opplevelse', 
                       picture: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc07d',

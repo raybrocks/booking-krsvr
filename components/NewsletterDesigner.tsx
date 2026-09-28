@@ -194,9 +194,11 @@ export default function NewsletterDesigner() {
   const [experiences, setExperiences] = useState<any[]>([]);
   const [loadingExperiences, setLoadingExperiences] = useState(true);
 
-  // Subscriber count
+  // Subscriber & Customer count
   const [subscribersCount, setSubscribersCount] = useState<number | null>(null);
+  const [allBookingsCount, setAllBookingsCount] = useState<number | null>(null);
   const [downloadingCsv, setDownloadingCsv] = useState(false);
+  const [isSyncingResend, setIsSyncingResend] = useState(false);
 
   // Saved drafts
   const [drafts, setDrafts] = useState<SavedDraft[]>([]);
@@ -230,7 +232,8 @@ export default function NewsletterDesigner() {
         const res = await fetch("/api/admin/newsletter/subscribers");
         if (res.ok) {
           const data = await res.json();
-          setSubscribersCount(data.totalCount || 0);
+          setSubscribersCount(data.optInCount ?? data.totalCount ?? 0);
+          setAllBookingsCount(data.allBookingsCount ?? 0);
         }
       } catch (e) {
         console.error("Failed to load subscriber count:", e);
@@ -380,15 +383,39 @@ export default function NewsletterDesigner() {
   };
 
   // Download subscribers CSV
-  const handleDownloadCsv = () => {
+  const handleDownloadCsv = (all: boolean = true) => {
     setDownloadingCsv(true);
     try {
-      window.location.href = "/api/admin/newsletter/subscribers?format=csv";
-      toast.success("Laster ned CSV med abonnenter");
+      window.location.href = `/api/admin/newsletter/subscribers?format=csv${all ? '&all=true' : ''}`;
+      toast.success("Laster ned CSV med kunder");
     } catch (e) {
       toast.error("Feil ved nedlasting av CSV");
     } finally {
       setTimeout(() => setDownloadingCsv(false), 1500);
+    }
+  };
+
+  // Sync all booking customers to Resend
+  const handleSyncToResend = async () => {
+    setIsSyncingResend(true);
+    try {
+      const res = await fetch("/api/admin/newsletter/subscribers", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success(`Synkroniserte ${data.synced} kunder til Resend segment (General)`);
+        const subRes = await fetch("/api/admin/newsletter/subscribers");
+        if (subRes.ok) {
+          const subData = await subRes.json();
+          setSubscribersCount(subData.optInCount ?? subData.totalCount ?? 0);
+          setAllBookingsCount(subData.allBookingsCount ?? 0);
+        }
+      } else {
+        toast.error("Kunne ikke synkronisere: " + (data.error || "Ukjent feil"));
+      }
+    } catch (err: any) {
+      toast.error("Feil ved synkronisering: " + err.message);
+    } finally {
+      setIsSyncingResend(false);
     }
   };
 
@@ -465,20 +492,33 @@ export default function NewsletterDesigner() {
 
           {/* Quick Actions / Subscriber count */}
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            {subscribersCount !== null && (
-              <button
-                type="button"
-                onClick={handleDownloadCsv}
-                disabled={downloadingCsv}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 hover:border-zinc-700 text-xs font-medium text-zinc-300 hover:text-white transition-all shadow-sm cursor-pointer"
-                title="Last ned CSV med alle kunder som har godtatt nyhetsbrev ved booking"
-              >
-                <Users className="w-3.5 h-3.5 text-emerald-400" />
-                <span>
-                  <strong>{subscribersCount}</strong> opt-in abonnenter
-                </span>
-                <Download className="w-3 h-3 text-zinc-500 ml-1" />
-              </button>
+            {allBookingsCount !== null && (
+              <div className="flex items-center gap-1 bg-zinc-950 border border-zinc-800 rounded-xl p-1 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadCsv(true)}
+                  disabled={downloadingCsv}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-zinc-900 text-xs font-medium text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  title="Last ned CSV med alle kunder som har booket"
+                >
+                  <Users className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>
+                    <strong>{allBookingsCount}</strong> kunder i Resend ({subscribersCount} opt-in)
+                  </span>
+                  <Download className="w-3 h-3 text-zinc-500 ml-0.5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSyncToResend}
+                  disabled={isSyncingResend}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-950/40 hover:bg-purple-900/50 border border-purple-800/50 text-xs font-medium text-purple-300 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                  title="Synkroniser alle booking-kunder til Resend segment (General)"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-purple-400 ${isSyncingResend ? "animate-spin" : ""}`} />
+                  <span>{isSyncingResend ? "Synker..." : "Synk til Resend"}</span>
+                </button>
+              </div>
             )}
 
             <button

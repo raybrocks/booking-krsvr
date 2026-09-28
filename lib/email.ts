@@ -118,6 +118,11 @@ export async function sendBookingConfirmationEmail(
       return null;
     }
     
+    // Automatisk synkroniser kunden til Resend Contacts (Audience + Segment)
+    addContactToNewsletter(to, firstName, lastName).catch((err) => {
+      console.error("Auto-sync contact to Resend failed in sendBookingConfirmationEmail:", err);
+    });
+
     return data;
   } catch (error) {
     console.error("Failed to send booking confirmation email:", error);
@@ -640,27 +645,74 @@ export async function sendEmployeeInviteEmail(to: string, name: string) {
   }
 }
 
-export async function addContactToNewsletter(email: string, firstName: string, lastName: string) {
+export const DEFAULT_RESEND_SEGMENT_ID = "415f5f22-314b-4144-96da-88b71d84e379";
+
+/**
+ * Lagrer/synkroniserer en booking-kunde i Resend Contacts (Audience + Segment).
+ * Standard segment: 415f5f22-314b-4144-96da-88b71d84e379 (General)
+ */
+export async function addContactToNewsletter(
+  email: string, 
+  firstName?: string | null, 
+  lastName?: string | null,
+  segmentIdOverride?: string
+) {
+  if (!email || !email.includes('@')) {
+    return null;
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  if (
+    cleanEmail === 'ingen@epost.no' || 
+    cleanEmail.includes('system@sperret') || 
+    cleanEmail.endsWith('@test.local')
+  ) {
+    return null;
+  }
+
   if (!process.env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY is not set. Contact not added to newsletter.");
-    return;
+    console.warn("RESEND_API_KEY is not set. Contact not added to Resend.");
+    return null;
   }
   
-  const segmentId = process.env.RESEND_SEGMENT_ID || "cd27fc2d-8077-4580-9404-9190a982020a";
+  const segmentId = segmentIdOverride || process.env.RESEND_SEGMENT_ID || DEFAULT_RESEND_SEGMENT_ID;
   
   try {
-    const data = await resend.contacts.create({
-      email,
-      firstName,
-      lastName,
+    const res = await resend.contacts.create({
+      email: cleanEmail,
+      firstName: (firstName || '').trim(),
+      lastName: (lastName || '').trim(),
       unsubscribed: false,
       segments: [
         { id: segmentId }
       ]
-    } as any); 
-    console.log("Contact added to Resend segment successfully:", data);
-    return data;
+    });
+
+    if (res.error) {
+      console.warn("Resend create contact notice, attempting fallback segment add:", res.error);
+      // Dersom kontakten allerede finnes, knytter vi den direkte til segmentet
+      await resend.contacts.segments.add({
+        email: cleanEmail,
+        segmentId,
+      }).catch((e) => console.error("Fallback resend segments.add error:", e));
+
+      if (firstName || lastName) {
+        await resend.contacts.update({
+          email: cleanEmail,
+          firstName: (firstName || '').trim(),
+          lastName: (lastName || '').trim(),
+        }).catch(() => {});
+      }
+    } else {
+      console.log(`Contact ${cleanEmail} successfully saved to Resend segment ${segmentId}`);
+    }
+
+    return res;
   } catch (error) {
-    console.error("Failed to add contact to newsletter:", error);
+    console.error("Failed to add contact to Resend:", error);
+    return null;
   }
 }
+
+export const syncBookingContactToResend = addContactToNewsletter;
+

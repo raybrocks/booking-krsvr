@@ -105,6 +105,14 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    // Auto-sync kontakt til Resend (Audience + Segment)
+    if (booking.email && booking.email !== 'ingen@epost.no') {
+      const { addContactToNewsletter } = await import('@/lib/email');
+      addContactToNewsletter(booking.email, booking.firstName, booking.lastName).catch((err) =>
+        console.error("Auto-sync contact to Resend failed in booking creation:", err)
+      );
+    }
+
     return NextResponse.json({ id: booking.id }, { status: 201 });
   } catch (error: any) {
     console.error("Booking creation failed:", error);

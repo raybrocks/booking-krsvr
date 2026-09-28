@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendEmail, sendAdminNewBookingNotification } from '@/lib/email';
+import { sendEmail, sendAdminNewBookingNotification, addContactToNewsletter } from '@/lib/email';
 
 export async function POST(req: Request) {
   try {
@@ -25,6 +25,15 @@ export async function POST(req: Request) {
       data: { status: 'confirmed' },
       include: { experience: true }
     });
+
+    // Auto-sync customer contact to Resend (Audience + Segment)
+    if (updatedBooking.email) {
+      addContactToNewsletter(
+        updatedBooking.email,
+        updatedBooking.firstName,
+        updatedBooking.lastName
+      ).catch((err) => console.error("Resend sync error on confirm-zero:", err));
+    }
 
     // Increment discount usage
     if (booking.discountCode) {

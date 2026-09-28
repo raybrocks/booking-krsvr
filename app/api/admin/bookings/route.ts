@@ -183,10 +183,12 @@ export async function POST(req: NextRequest) {
        await sendBookingConfirmationEmail(booking.email, booking, customText);
     }
 
-    // 5. Add to Newsletter if requested
-    if (data.subscribeNewsletter && booking.email && booking.email !== 'ingen@epost.no') {
+    // 5. Alltid synkroniser kunde til Resend (Audience + Segment 415f5f22-314b-4144-96da-88b71d84e379)
+    if (booking.email && booking.email !== 'ingen@epost.no') {
        const { addContactToNewsletter } = await import('@/lib/email');
-       await addContactToNewsletter(booking.email, booking.firstName, booking.lastName);
+       await addContactToNewsletter(booking.email, booking.firstName, booking.lastName).catch((err) =>
+         console.error("Failed to sync contact to Resend in admin booking creation:", err)
+       );
     }
 
     return NextResponse.json({ success: true, booking });

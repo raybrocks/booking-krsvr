@@ -203,6 +203,16 @@ export async function POST(req: Request) {
                  console.error("Failed to increment discount code usage:", e);
                }
             }
+
+            // Auto-sync customer contact to Resend (Audience + Segment)
+            if (confirmedBookingSnap?.email) {
+              const { addContactToNewsletter } = await import('@/lib/email');
+              addContactToNewsletter(
+                confirmedBookingSnap.email,
+                confirmedBookingSnap.firstName,
+                confirmedBookingSnap.lastName
+              ).catch((e) => console.error("Failed to sync contact to Resend in Vipps callback:", e));
+            }
             
             if (confirmedBookingSnap && !confirmedBookingSnap.cancellationEmailSent) {
               const { sendEmail, sendAdminNewBookingNotification } = await import('@/lib/email');
