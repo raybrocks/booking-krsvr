@@ -141,8 +141,8 @@ Når Gemini svarer på ferie- og aktivitetstips, leser den ofte artikler med ove
 - *«Hva skjer i Kristiansand når det regner?»*
 - [ ] **Tiltak:** Søk opp hvem som har skrevet de mest leste artiklene på Google i dag (f.eks. lokale reisebloggere, KRSby, Visit Sørlandet). Send en hyggelig henvendelse og be om at KRS VR Arena legges til som et hett tips for innendørs action og escape room.
 
-### C. Enkel QR-kode ved utgangen for Google-anmeldelser
-- [ ] Generer en direkte Google Review-lenke fra Google Bedriftsprofil (ser typisk ut som `https://g.page/r/.../review`).
-- [ ] Plasser et lite skilt/bordrytter ved betalingsdisken eller sofakroken:
+### C. Enkel QR-kode ved utgangen for Google-anmeldelser (Fullført)
+- [x] Generer en direkte Google Review-lenke fra Google Bedriftsprofil (`https://search.google.com/local/writereview?placeid=ChIJOVTL6bcDOEYR8N3bbtLT474` eller `https://krsvr.no/feedback`).
+- [x] Plasser et lite skilt/bordrytter ved betalingsdisken eller sofakroken:
   > *«Hadde dere en bra opplevelse? Skann QR-koden og del gjerne med andre hva dere spilte (VR Escape Room, Spatial Ops eller teambuilding)!»*
   - Dette oppfordrer kundene til å bruke nøkkelord helt naturlig.
