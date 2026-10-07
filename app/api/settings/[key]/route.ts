@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cleanupGeneralSettings } from '@/lib/settings';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
@@ -11,8 +12,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
     if (!setting) {
       return NextResponse.json({ value: null });
     }
+
+    const value = key === 'general' ? cleanupGeneralSettings(setting.value) : setting.value;
     
-    return NextResponse.json(setting.value);
+    return NextResponse.json(value);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch setting' }, { status: 500 });
   }

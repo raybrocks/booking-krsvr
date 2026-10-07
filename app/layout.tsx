@@ -80,17 +80,80 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": ["EntertainmentBusiness", "LocalBusiness"],
     "name": "KRS VR Arena",
-    "image": "https://www.krsvr.no/icon.svg",
+    "description": "Opplevelsessenter i Kristiansand med trådløse VR Escape Rooms, Mixed Reality og actionfylte spill for vennegjengen, studenter, teambuilding, utdrikningslag og familiepakker.",
+    "image": "https://krsvr.no/krsvrarena_logo_sort.png",
     "url": "https://www.krsvr.no",
     "telephone": "+4740828302",
+    "priceRange": "NOK 375 - 460",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Industrigata 12",
       "addressLocality": "Kristiansand",
       "postalCode": "4632",
       "addressCountry": "NO"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 58.1567,
+      "longitude": 8.0211
+    },
+    "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic",
+    "areaServed": [
+      { "@type": "City", "name": "Kristiansand" },
+      { "@type": "AdministrativeArea", "name": "Agder" }
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "VR og Mixed Reality Opplevelser",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "VR Escape Room i Kristiansand",
+            "description": "Gåteløsing og samarbeid i virtuelle rom for 2–6 spillere."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "VR Shooter & Mixed Reality Arena",
+            "description": "Trådløs action og fri bevegelse i 140 kvm arena for vennegjenger og kollegaer."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Teambuilding & Firmaevent i Kristiansand",
+            "description": "Sosialt og engasjerende opplegg for bedrifter med gamemaster og partylounge."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Utdrikningslag i VR",
+            "description": "Morsomme konkurranser og action for utdrikningslag i Kristiansand."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "VR Familiepakker",
+            "description": "Tilpassede 90-minutters opplevelser for familier med barn (8–12 år) og ungdom (12+)."
+          }
+        }
+      ]
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "reviewCount": "22"
     },
     "sameAs": [
       "https://www.instagram.com/krs.vr.arena",

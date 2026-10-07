@@ -38,16 +38,38 @@ const faqs = [
   {
     question: "Tilbyr dere parkering?",
     answer: "Ja, vi ligger sentralt plassert på Lund i Kristiansand og tilbyr gratis gateparkering til våre gjester.",
+  },
+  {
+    question: "Holder dere åpent i skoleferier og på helligdager?",
+    answer: "Ja, vi har åpent gjennom ferier og helger hele året (inkludert jule- og nyttårsferien, vinterferien, påskeferien, sommerferien og inneklemte dager). Vi tilbyr et bredt utvalg av opplevelser – fra utfordrende VR Escape Rooms og intense skytespill for vennegjenger, studenter og bedrifter, til egne familiepakker. Sjekk bookingsiden for tilgjengelige tider.",
+  },
+  {
+    question: "Passer KRS VR Arena som innendørs aktivitet når det regner i Kristiansand?",
+    answer: "Absolutt! Vår 140 kvm store trådløse arena er en av Kristiansands mest populære innendørs aktiviteter. Her er dere i full aktivitet med dedikert gamemaster, uavhengig av vær og vind – perfekt for vennegjenger, studenter, kollegaer og familier.",
+  },
+  {
+    question: "Hva er Familiepakke Barn og Familiepakke Ungdom?",
+    answer: "For familier som ønsker en samlet opplevelse tilbyr vi to egne pakker: Familiepakke Barn (8–12 år) med trygge, engasjerende spill barna mestrer, og Familiepakke Ungdom (12+) med mer action, samarbeidsoppdrag og konkurranser for tenåringer og voksne. Begge inkluderer 90 minutters opplegg med gamemaster og partylounge.",
   }
 ];
 
 export const metadata: Metadata = {
   title: "FAQ - Ofte stilte spørsmål",
-  description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, inkludert grupper, utstyr, aldersgrense og booking.",
-  keywords: ["FAQ VR Kristiansand", "Ofte stilte spørsmål KRS VR Arena", "VR aldersgrense", "VR utstyr", "Spørsmål og svar VR"],
+  description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, inkludert grupper, utstyr, ferier, aldersgrense og booking.",
+  keywords: [
+    "FAQ VR Kristiansand", 
+    "Ofte stilte spørsmål KRS VR Arena", 
+    "VR aldersgrense", 
+    "VR utstyr", 
+    "Spørsmål og svar VR",
+    "Innendørs aktivitet Kristiansand",
+    "Ting å gjøre i Kristiansand",
+    "VR ferieaktivitet",
+    "Familiepakke VR"
+  ],
   openGraph: {
-    title: "FAQ - Ofte stilte spørsmål",
-    description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, inkludert grupper, utstyr, aldersgrense og booking.",
+    title: "FAQ - Ofte stilte spørsmål | KRS VR Arena",
+    description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, grupper, ferieåpning, aldersgrenser og booking.",
     url: "https://www.krsvr.no/faq",
     type: "website",
   }

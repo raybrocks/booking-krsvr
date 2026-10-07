@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cleanupGeneralSettings } from '@/lib/settings';
 
 export const dynamic = "force-dynamic";
 
@@ -7,7 +8,9 @@ export async function GET(req: NextRequest) {
   try {
     const settings = await prisma.setting.findMany();
     const result = settings.reduce((acc, setting) => {
-      acc[setting.key] = setting.value;
+      acc[setting.key] = setting.key === 'general' 
+        ? cleanupGeneralSettings(setting.value) 
+        : setting.value;
       return acc;
     }, {} as Record<string, any>);
     
