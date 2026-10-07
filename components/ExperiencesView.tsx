@@ -329,6 +329,23 @@ export function ExperiencesView({
     );
   }
 
+  const getHeadingTitle = () => {
+    switch (activePrimaryFilter) {
+      case "Escape Room":
+        return "VR Escape Room i Kristiansand";
+      case "Mixed Reality":
+        return "Mixed Reality i Kristiansand";
+      case "Zombie":
+        return "Zombie Shooter i Kristiansand";
+      case "Familie":
+        return "Familievennlige VR-opplevelser";
+      case "Teambuilding":
+        return "VR Teambuilding i Kristiansand";
+      default:
+        return "VR Opplevelser i Kristiansand";
+    }
+  };
+
   return (
     <div className="flex flex-col items-center w-full">
       <motion.div
@@ -337,7 +354,7 @@ export function ExperiencesView({
          className="mb-10 text-center px-4 w-full"
       >
         <h1 className="text-4xl md:text-5xl font-light tracking-tighter mb-4">
-          Våre VR Opplevelser
+          {getHeadingTitle()}
         </h1>
 
         {/* Simple Primary Filter Row */}

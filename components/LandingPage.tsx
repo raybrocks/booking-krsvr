@@ -278,7 +278,7 @@ export default function LandingPage() {
           
           <div className="mt-14 text-center">
             <Link href="/vr-opplevelser" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-base font-medium transition-all bg-[#9C39FF] text-white hover:bg-[#b05aff] hover:shadow-[0_0_20px_rgba(156,57,255,0.4)]">
-              Se alle våre VR-opplevelser <ArrowRight className="w-5 h-5" />
+              Se alle VR-opplevelser <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
         </div>

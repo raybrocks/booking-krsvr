@@ -15,18 +15,22 @@ export async function generateMetadata({
   const initialTypeSlug = resolvedParams.slug?.[0];
   const initialExpSlug = resolvedParams.slug?.[1];
 
-  let title = "VR Opplevelser | KRS VR Arena Kristiansand";
-  let description = "Utforsk våre fantastiske VR-opplevelser og Mixed Reality i Kristiansand, fra VR Escape Rooms til actionfylte skytespill og eventyr for hele familien.";
+  let title = "VR Opplevelser i Kristiansand | KRS VR Arena";
+  let description = "Utforsk VR Escape Room, Mixed Reality og skytespill hos KRS VR Arena i Kristiansand. Opplevelser tilrettelagt for vennegjenger, studenter, teambuilding og familie.";
 
   // Virtual filter alias: /vr-opplevelser/familie aktiverer Familie-filteret
   if (initialTypeSlug === "familie") {
+    const familieUrl = "https://www.krsvr.no/vr-opplevelser/familie";
     return {
       title: "Familievennlige VR-opplevelser i Kristiansand | KRS VR Arena",
-      description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Perfekt for familier med barn og ungdom, bursdag og innendørs aktiviteter.",
+      description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Tilpasset for familier med barn og ungdom, bursdag og sosiale aktiviteter.",
+      alternates: {
+        canonical: familieUrl,
+      },
       openGraph: {
         title: "Familievennlige VR-opplevelser i Kristiansand | KRS VR Arena",
-        description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Perfekt for familier med barn og ungdom, bursdag og innendørs aktiviteter.",
-        url: "https://www.krsvr.no/vr-opplevelser/familie",
+        description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Tilpasset for familier med barn og ungdom, bursdag og sosiale aktiviteter.",
+        url: familieUrl,
         type: "website",
       },
     };
@@ -62,8 +66,10 @@ export async function generateMetadata({
       } else {
         const matchedType = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug);
         if (matchedType) {
-          title = `${matchedType.type} i Kristiansand | VR Opplevelser`;
-          if (matchedType.type?.toLowerCase().includes("vipps-test") || matchedType.type?.toLowerCase().includes("vipps test")) {
+          const typeName = matchedType.type || "VR Opplevelser";
+          title = `${typeName} i Kristiansand | KRS VR Arena`;
+          description = `Opplev ${typeName.toLowerCase()} hos KRS VR Arena i Kristiansand. Populært for vennegjenger, teambuilding, studenter og grupper.`;
+          if (typeName.toLowerCase().includes("vipps-test") || typeName.toLowerCase().includes("vipps test")) {
             isVippsTest = true;
           }
         }
@@ -77,13 +83,18 @@ export async function generateMetadata({
     }
   }
 
+  const pageUrl = `https://www.krsvr.no/vr-opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`;
+
   return {
     title,
     description,
+    alternates: {
+      canonical: pageUrl,
+    },
     openGraph: {
       title,
       description,
-      url: `https://www.krsvr.no/vr-opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`,
+      url: pageUrl,
       type: "website",
     },
     ...(isVippsTest && { robots: { index: false, follow: false } }),
@@ -133,7 +144,7 @@ export default async function ExperiencesPage({
       "addressLocality": "Kristiansand",
       "addressCountry": "NO"
     },
-    "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic"
+    "hasMap": "https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8"
   };
 
   if (matchedExp) {
