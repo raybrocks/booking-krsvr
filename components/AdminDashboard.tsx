@@ -432,13 +432,33 @@ export default function AdminDashboard() {
     }
 
     // Filter by search query
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      result = result.filter(booking => 
-        booking.firstName?.toLowerCase().includes(lowerQuery) ||
-        booking.lastName?.toLowerCase().includes(lowerQuery) ||
-        booking.email?.toLowerCase().includes(lowerQuery)
-      );
+    if (searchQuery.trim()) {
+      const queryWords = searchQuery.toLowerCase().trim().split(/\s+/);
+      result = result.filter(booking => {
+        const experienceTitle = booking.experienceName || experiencesMap[booking.experienceId] || "";
+        const playersString = Array.isArray(booking.playerNames) ? booking.playerNames.join(" ") : "";
+        
+        const searchableText = [
+          booking.companyName,
+          booking.firstName,
+          booking.lastName,
+          `${booking.firstName} ${booking.lastName}`,
+          booking.companyName ? `${booking.companyName} ${booking.firstName} ${booking.lastName}` : "",
+          booking.email,
+          booking.phone,
+          booking.internalNotes,
+          booking.id,
+          booking.paymentRef,
+          booking.discountCode,
+          experienceTitle,
+          playersString,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return queryWords.every(word => searchableText.includes(word));
+      });
     }
 
     // Sort
@@ -448,8 +468,8 @@ export default function AdminDashboard() {
 
       // Handle specific sorting cases
       if (sortConfig.key === 'customer') {
-        aValue = `${a.firstName} ${a.lastName}`.toLowerCase();
-        bValue = `${b.firstName} ${b.lastName}`.toLowerCase();
+        aValue = (a.companyName ? `${a.companyName} ${a.firstName} ${a.lastName}` : `${a.firstName} ${a.lastName}`).toLowerCase();
+        bValue = (b.companyName ? `${b.companyName} ${b.firstName} ${b.lastName}` : `${b.firstName} ${b.lastName}`).toLowerCase();
       } else if (sortConfig.key === 'dateTime') {
         aValue = new Date(`${a.date}T${a.time}`).getTime();
         bValue = new Date(`${b.date}T${b.time}`).getTime();
@@ -468,7 +488,7 @@ export default function AdminDashboard() {
     });
 
     return result;
-  }, [bookings, sortConfig, statusFilter, dateFilter, searchQuery, activeTab, currentTime]);
+  }, [bookings, sortConfig, statusFilter, dateFilter, searchQuery, activeTab, currentTime, experiencesMap]);
 
   if (loading) {
     return (
@@ -1002,7 +1022,7 @@ export default function AdminDashboard() {
             <div className="flex-1 w-full min-w-0">
               <input
                 type="text"
-                placeholder="Søk navn eller e-post..."
+                placeholder="Søk navn, bedrift, e-post, tlf, notater..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"

@@ -132,7 +132,8 @@ export default function TransactionsManager() {
     t.bookingId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.paymentRef?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.lastName?.toLowerCase().includes(searchQuery.toLowerCase())
+    t.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    t.companyName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const renderReceipt = () => {

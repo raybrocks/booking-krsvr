@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
         booking: b || null,
         firstName: b?.firstName || 'Kunde',
         lastName: b?.lastName || '',
+        companyName: b?.companyName || '',
         email: b?.email || '',
         phone: b?.phone || '',
         experienceId: b?.experienceId || '',
