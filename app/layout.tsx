@@ -156,6 +156,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       "reviewCount": "22"
     },
     "sameAs": [
+      "https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html",
       "https://www.instagram.com/krs.vr.arena",
       "https://www.tiktok.com/@krs.vr.arena",
       "https://www.facebook.com/krs.vr.arena",

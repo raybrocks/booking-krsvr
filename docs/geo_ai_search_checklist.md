@@ -9,32 +9,16 @@ Denne sjekklisten er utarbeidet for å maksimere sannsynligheten for at **KRS VR
 Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uavhengige kilder med identisk **NAP** (*Name, Address, Phone*: KRS VR Arena, Industrigata 12, 4632 Kristiansand, 408 28 302).
 
 ### Høyeste prioritet (De AI søker i først)
-- [ ] **TripAdvisor (Svært høy effekt for Gemini, Perplexity og turister):**
-  - **Profilstatus og administrasjon:**
-    - Logg inn i [TripAdvisor Owners (Management Center)](https://www.tripadvisor.com/Owners) og verifiser at profilen er fullt publisert og aktiv.
-    - *Merk om synlighet:* TripAdvisor indekserer ofte ikke profilsider i eksterne søkemotorer (som Google) før profilen har fått sine første verifiserte anmeldelser.
-  - **Kategorier og egenskaper (Avgjørende for søketreff og AI-anbefalinger):**
-    - Hovedkategori: *Moro og spill (Fun & Games)*.
-    - Underkategori 1 (Kritisk): *Escape Rooms* – Turister og AI søker spesifikt etter escape rooms i Kristiansand.
-    - Underkategori 2: *Spillehaller og underholdningssentre (Game & Entertainment Centers)*.
-    - Egenskaper/Attributter: Huk av for *Godt for store grupper*, *Regnværsaktivitet*, *Teambuilding/voksne*.
-  - **NAP og lenkestruktur:**
-    - Navn: *KRS VR Arena*
-    - Adresse: *Industrigata 12, 4632 Kristiansand* (Lund)
-    - Nettside: `https://krsvr.no` (Sikrer toveis tillit mellom TripAdvisor og nettsiden)
-    - Telefon: `408 28 302` (+47 408 28 302)
-  - **Bilder (Last opp minst 10–15 høyoppløselige bilder):**
-    - Spillere i aksjon i arenaen (Meta Quest 3, god belysning).
-    - Grupper som samarbeider i VR Escape Room (viser at dette er en sosial aktivitet for voksne/kolleger).
-    - Fasade og inngangsparti i Industrigata 12 med skiltet synlig (for gjenkjenning av både gjester og AI datasyn).
-  - **Profiltekst (Tospråklig – Norsk og Engelsk for sommerturister):**
-    - *Norsk:* «KRS VR Arena er Kristiansands ledende arena for virtuell virkelighet og mixed reality, sentralt plassert i Industrigata 12 på Lund. Vi tilbyr VR Escape Rooms, taktisk Mixed Reality-skyting (Spatial Ops) og engasjerende gruppeopplevelser for bedrifter, utdrikningslag, vennegjenger og familier. Helinnendørs opplevelse som passer uansett vær.»
-    - *Engelsk:* «KRS VR Arena is Kristiansand's premier virtual reality and mixed reality center, located in Industrigata 12 (Lund), just minutes from the city center. We offer free-roam VR escape rooms, tactical mixed reality shooter experiences (Spatial Ops), and immersive adventures for corporate team building, bachelor parties, friend groups, and families. A perfect all-weather indoor activity in Kristiansand.»
-  - **Få inn de første 5–10 anmeldelsene (Løfter rangeringen umiddelbart):**
-    - Bruk gratisverktøyet *TripAdvisor Review Express* i Management Center for å sende invitasjon til tidligere fornøyde gjester.
-    - Legg inn direkte lenke til TripAdvisor i tilbakemeldingsskjemaet (`/feedback`) og via QR-kode i lokalet for gjester uten Google-konto og utenlandske turister.
-  - **Toveis autoritetskobling (TripAdvisor Widget):**
-    - Når de første anmeldelsene er publisert, legg inn en offisiell TripAdvisor-widget eller badge i bunnteksten på `krsvr.no` for å skape en gjensidig autoritetslenke som Google og AI fanger opp.
+- [x] **TripAdvisor (Fullført – Aktiv profil og implementert widget):**
+  - **Direkte oppførings-URL:** [Krs VR Arena på TripAdvisor](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)
+  - **Status:** Aktiv og verifisert i TripAdvisor for Business med 3 anmeldelser (5 av 5 stjerner).
+  - **Teknisk implementasjon på `krsvr.no`:**
+    - [x] Offisiell TripAdvisor Rating-widget (`TA_rated54`) og TripAdvisor-ikon implementert i bunnteksten ([Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx)).
+    - [x] TripAdvisor-lenke integrert i tilbakemeldingsmodulen ([FeedbackForm.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/FeedbackForm.tsx)) for gjester uten Google-konto og utenlandske turister.
+    - [x] TripAdvisor-profilen lagt inn i `sameAs`-strukturen i Schema.org JSON-LD ([layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx)) for sterk AI- og Google-kobling.
+  - **Videre optimalisering:**
+    - Bruk *TripAdvisor Review Express* i Management Center ved anledning for å fortsette å bygge anmeldelsesvolum mot 10+ anmeldelser.
+    - Sikre at tospråklig tekst (norsk/engelsk) og bilder av lokalet/voksne grupper er lastet opp i TripAdvisor for Business.
 - [ ] **Visit Sørlandet (visitsorlandet.com):**
   - Visit Sørlandet er det offisielle destinasjonsselskapet for Agder. Gemini og Visit Norway bruker denne som primærkilde for Kristiansand.
   - Ta kontakt med Visit Sørlandet (Usus AS) for å få registrert KRS VR Arena under «Aktiviteter og opplevelser i Kristiansand» og «Innendørsaktiviteter».

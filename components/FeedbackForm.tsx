@@ -7,6 +7,7 @@ import { Loader2, Check, ExternalLink, Sparkles, Copy, ArrowLeft } from 'lucide-
 
 const GOOGLE_REVIEW_URL = process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL || 'https://search.google.com/local/writereview?placeid=ChIJOVTL6bcDOEYR8N3bbtLT474';
 const GOOGLE_MAPS_URL = 'https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8';
+const TRIPADVISOR_URL = 'https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html';
 
 const ACTIVITY_TAGS = [
   { id: 'vr-escape-room', label: 'VR Escape Room', text: 'VR Escape Room' },
@@ -391,7 +392,16 @@ export default function FeedbackForm() {
             {/* TripAdvisor alternativ */}
             <div className="pt-2 text-center">
               <p className="text-xs text-zinc-500">
-                Har du ikke Google-konto? Du kan også finne oss på{' '}
+                Har du ikke Google-konto? Du kan også gi oss en anmeldelse på{' '}
+                <a
+                  href={TRIPADVISOR_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-400 hover:underline font-medium"
+                >
+                  Tripadvisor
+                </a>
+                {' '}eller{' '}
                 <a
                   href={GOOGLE_MAPS_URL}
                   target="_blank"

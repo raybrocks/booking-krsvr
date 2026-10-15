@@ -10,6 +10,12 @@ const TikTokIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
+const TripAdvisorIcon = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.006 4.295c-2.67 0-5.338.784-7.645 2.353H0l1.963 2.135a5.997 5.997 0 0 0 4.04 10.43 5.976 5.976 0 0 0 4.075-1.6L12 19.705l1.922-2.09a5.972 5.972 0 0 0 4.072 1.598 6 6 0 0 0 6-5.998 5.982 5.982 0 0 0-1.957-4.432L24 6.648h-4.35a13.573 13.573 0 0 0-7.644-2.353zM12 6.255c1.531 0 3.063.303 4.504.903C13.943 8.138 12 10.43 12 13.1c0-2.671-1.942-4.962-4.504-5.942A11.72 11.72 0 0 1 12 6.256zM6.002 9.157a4.059 4.059 0 1 1 0 8.118 4.059 4.059 0 0 1 0-8.118zm11.992.002a4.057 4.057 0 1 1 .003 8.115 4.057 4.057 0 0 1-.003-8.115zm-11.992 1.93a2.128 2.128 0 0 0 0 4.256 2.128 2.128 0 0 0 0-4.256zm11.992 0a2.128 2.128 0 0 0 0 4.256 2.128 2.128 0 0 0 0-4.256z"/>
+  </svg>
+);
+
 export default function Footer() {
   const [adminEmail, setAdminEmail] = useState("post@krsvr.no");
 
@@ -28,6 +34,15 @@ export default function Footer() {
       }
     };
     fetchSettings();
+
+    // Dynamically load TripAdvisor widget script if not present
+    if (!document.getElementById("ta-widget-script")) {
+      const script = document.createElement("script");
+      script.id = "ta-widget-script";
+      script.src = "https://www.jscache.com/wejs?wtype=rated&uniq=54&locationId=34257006&lang=no&display_version=2";
+      script.async = true;
+      document.body.appendChild(script);
+    }
   }, []);
 
   return (
@@ -38,21 +53,47 @@ export default function Footer() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="KRS VR ARENA" className="h-10 mb-6 object-contain" />
             <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-              Sørlandets Råeste VR Opplevelse. Vi tilbyr de nyeste og mest spennende virtual reality-opplevelsene.
+              Sørlandets arena for VR Escape Room, Mixed Reality og unike gruppeopplevelser.
             </p>
-            <div className="flex gap-4">
-              <a href="https://www.facebook.com/krs.vr.arena" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
+            <div className="flex flex-wrap gap-3">
+              <a href="https://www.facebook.com/krs.vr.arena" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="https://www.instagram.com/krs.vr.arena" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
+              <a href="https://www.instagram.com/krs.vr.arena" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="https://www.tiktok.com/@krs.vr.arena" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
+              <a href="https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html" target="_blank" rel="noopener noreferrer" title="Tripadvisor" aria-label="Tripadvisor" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#00aa6c] hover:border-[#00aa6c] transition-colors">
+                <TripAdvisorIcon size={20} />
+              </a>
+              <a href="https://www.tiktok.com/@krs.vr.arena" target="_blank" rel="noopener noreferrer" title="TikTok" aria-label="TikTok" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
                 <TikTokIcon size={20} />
               </a>
-              <a href="https://www.youtube.com/@KrsVRArena" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
+              <a href="https://www.youtube.com/@KrsVRArena" target="_blank" rel="noopener noreferrer" title="YouTube" aria-label="YouTube" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
                 <Youtube size={20} />
               </a>
+            </div>
+
+            {/* TripAdvisor Rating Widget */}
+            <div className="mt-6 pt-4 border-t border-zinc-900">
+              <div id="TA_rated54" className="TA_rated">
+                <ul id="fPRviuVgo" className="TA_links 7WP8d9z list-none p-0 m-0">
+                  <li id="TchUHJzEG" className="ojEVAq">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html"
+                      className="inline-block hover:opacity-90 transition-opacity"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="https://no.tripadvisor.com/img/cdsi/img2/badges/ollie-11424-2.gif"
+                        alt="TripAdvisor"
+                        className="h-9 w-auto"
+                      />
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
           
