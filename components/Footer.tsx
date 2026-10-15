@@ -71,12 +71,12 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 href="https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html"
                 className="inline-block transition-transform hover:scale-105"
-                title="Anbefalt på Tripadvisor"
+                title="Rated on Tripadvisor"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/tripadvisor_horizontal.svg"
-                  alt="Anbefalt på Tripadvisor"
+                  alt="Rated on Tripadvisor"
                   className="h-8 md:h-9 w-auto rounded-full shadow-sm"
                 />
               </a>

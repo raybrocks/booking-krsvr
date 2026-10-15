@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 38" width="220" height="38">
-  <rect width="220" height="38" rx="19" fill="#19EB5B"/>
-  <text x="23" y="23" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#000000" letter-spacing="0.6">ANBEFALT PÅ</text>
-  <g transform="translate(112, 10) scale(0.02523)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 36" width="196" height="36">
+  <rect width="196" height="36" rx="18" fill="#19EB5B"/>
+  <text x="22" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#000000" letter-spacing="0.6">RATED ON</text>
+  <g transform="translate(92, 9.5) scale(0.02382)">
     
 <g>
 	<path d="M3335.258,476.767c-10.404,0-18.854,8.45-18.854,18.854c0,10.404,8.449,18.854,18.854,18.854
