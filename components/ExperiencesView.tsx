@@ -33,11 +33,15 @@ import {
   Trophy,
   Sparkles,
   Moon,
-  Info
+  Info,
+  Globe,
+  Volume2,
+  MessageSquare
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { slugify } from "@/lib/utils";
+import { formatLanguageDisplay, getLanguageInfo } from "@/lib/languages";
 
 const getTypeSlug = (exp: any) => exp.experienceType?.slug || slugify(exp.type || "");
 
@@ -548,6 +552,17 @@ export function ExperiencesView({
                   <span>{selected.difficulty}</span>
                 </div>
               )}
+
+              {((selected.languagesVoice && selected.languagesVoice.length > 0) || (selected.languagesText && selected.languagesText.length > 0)) && (
+                <div className="flex items-center gap-2 text-sm md:text-base">
+                  <Globe className="w-5 h-5 text-white" />
+                  <span>
+                    {selected.languagesVoice && selected.languagesVoice.length > 0
+                      ? `Tale: ${selected.languagesVoice.join(', ')}`
+                      : `${selected.languagesText?.length || 0} språk`}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* CONTENT MERGED */}
@@ -555,7 +570,7 @@ export function ExperiencesView({
               {/* DESCRIPTION & PASSER FOR */}
               <div className="flex flex-col items-center w-full">
                 {(selected.familyFriendly || selected.teambuilding || selected.party) && (
-                  <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 mb-12 bg-zinc-900/40 p-4 md:px-8 rounded-2xl border border-white/5 w-full">
+                  <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 mb-8 bg-zinc-900/40 p-4 md:px-8 rounded-2xl border border-white/5 w-full">
                     <span className="text-sm font-bold text-white uppercase tracking-wider">Passer for:</span>
                     <div className="flex flex-wrap items-center gap-4">
                       {selected.familyFriendly && (
@@ -574,6 +589,70 @@ export function ExperiencesView({
                         <div className="flex items-center gap-2 cursor-help" title="Ypperlig for fest og moro!">
                           <PartyPopper className="w-4 h-4 text-[#9C39FF]" />
                           <span className="text-sm text-zinc-300 font-medium">Vennegjeng</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* SPRÅKSTØTTE (VOICE & TEXT) */}
+                {((selected.languagesVoice && selected.languagesVoice.length > 0) || (selected.languagesText && selected.languagesText.length > 0)) && (
+                  <div className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 md:p-6 mb-10">
+                    <div className="flex items-center gap-2 mb-4 text-white">
+                      <Globe className="w-5 h-5 text-[#9C39FF]" />
+                      <h4 className="text-base font-semibold tracking-wide">Tilgjengelige språk</h4>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* VOICE */}
+                      {selected.languagesVoice && selected.languagesVoice.length > 0 && (
+                        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5">
+                          <div className="flex items-center gap-2 mb-2 text-purple-400">
+                            <Volume2 className="w-4 h-4" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
+                              Tale / Voice
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selected.languagesVoice.map((lang: string) => {
+                              const info = getLanguageInfo(lang);
+                              return (
+                                <span
+                                  key={lang}
+                                  className="inline-flex items-center gap-1.5 bg-purple-950/40 border border-purple-800/50 text-white text-xs px-2.5 py-1 rounded-lg font-medium"
+                                >
+                                  <span>{info.flag}</span>
+                                  <span>{info.label}</span>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* TEXT */}
+                      {selected.languagesText && selected.languagesText.length > 0 && (
+                        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5">
+                          <div className="flex items-center gap-2 mb-2 text-blue-400">
+                            <MessageSquare className="w-4 h-4" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
+                              Tekst & Undertekster
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selected.languagesText.map((lang: string) => {
+                              const info = getLanguageInfo(lang);
+                              return (
+                                <span
+                                  key={lang}
+                                  className="inline-flex items-center gap-1.5 bg-blue-950/40 border border-blue-800/50 text-zinc-200 text-xs px-2.5 py-1 rounded-lg font-medium"
+                                >
+                                  <span>{info.flag}</span>
+                                  <span>{info.label}</span>
+                                </span>
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
                     </div>

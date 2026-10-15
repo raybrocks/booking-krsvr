@@ -20,6 +20,8 @@ export type Experience = {
   jumpScare?: boolean;
   duration?: string;
   tags?: string[];
+  languagesVoice?: string[];
+  languagesText?: string[];
 };
 
 export type Settings = {

@@ -3,6 +3,7 @@ import { ExperiencesView } from "@/components/ExperiencesView";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
+import { getLanguageInfo } from "@/lib/languages";
 
 export const dynamic = "force-dynamic";
 
@@ -148,6 +149,9 @@ export default async function ExperiencesPage({
   };
 
   if (matchedExp) {
+    const allLangs = Array.from(new Set([...(matchedExp.languagesVoice || []), ...(matchedExp.languagesText || [])]));
+    const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== 'und');
+
     jsonLd = {
       "@context": "https://schema.org",
       "@type": "Product",
@@ -155,6 +159,7 @@ export default async function ExperiencesPage({
       "description": `${matchedExp.shortDescription || ""} Spilles hos KRS VR Arena i Kristiansand.`,
       "brand": providerInfo,
       "category": matchedExp.type,
+      ...(isoLangs.length > 0 && { inLanguage: isoLangs }),
       "offers": {
         "@type": "AggregateOffer",
         "availability": "https://schema.org/InStock",
@@ -188,23 +193,28 @@ export default async function ExperiencesPage({
       "@type": "ItemList",
       "name": "VR Opplevelser hos KRS VR Arena",
       "description": "Se vårt store utvalg av VR-opplevelser, inkludert Escape Rooms, skytespill og eventyr i Kristiansand.",
-      "itemListElement": experiences.map((exp, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
-          "@type": "Product",
-          "name": exp.name,
-          "description": exp.shortDescription || "",
-          "url": `https://www.krsvr.no/vr-opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
-          "brand": providerInfo,
-          "offers": {
-            "@type": "AggregateOffer",
-            "availability": "https://schema.org/InStock",
-            "priceCurrency": "NOK",
-            "lowPrice": 375,
-            "highPrice": 460,
-            "offerCount": 1
-          },
+      "itemListElement": experiences.map((exp, index) => {
+        const allLangs = Array.from(new Set([...(exp.languagesVoice || []), ...(exp.languagesText || [])]));
+        const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== 'und');
+
+        return {
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "Product",
+            "name": exp.name,
+            "description": exp.shortDescription || "",
+            "url": `https://www.krsvr.no/vr-opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
+            "brand": providerInfo,
+            ...(isoLangs.length > 0 && { inLanguage: isoLangs }),
+            "offers": {
+              "@type": "AggregateOffer",
+              "availability": "https://schema.org/InStock",
+              "priceCurrency": "NOK",
+              "lowPrice": 375,
+              "highPrice": 460,
+              "offerCount": 1
+            },
           "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": 4.9,
@@ -224,8 +234,9 @@ export default async function ExperiencesPage({
             }
           ]
         }
-      }))
-    };
+      };
+    })
+  };
   }
 
   return (

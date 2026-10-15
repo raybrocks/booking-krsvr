@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy, Settings } from "lucide-react";
+import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy, Settings, Volume2, MessageSquare, Globe } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import TestimonialsManager from "./TestimonialsManager";
 import ExperienceTypesModal from "./ExperienceTypesModal";
+import { COMMON_LANGUAGES, getLanguageInfo } from "@/lib/languages";
 
 export default function ExperiencesManager() {
   const [experiences, setExperiences] = useState<any[]>([]);
@@ -75,9 +76,18 @@ export default function ExperiencesManager() {
     fetchExperienceTypes();
   }, []);
 
+  const [customVoiceLang, setCustomVoiceLang] = useState("");
+  const [customTextLang, setCustomTextLang] = useState("");
+
   const handleEdit = (exp: any) => {
     setEditingId(exp.id);
-    setEditForm({ ...exp });
+    setEditForm({
+      ...exp,
+      languagesVoice: Array.isArray(exp.languagesVoice) ? exp.languagesVoice : [],
+      languagesText: Array.isArray(exp.languagesText) ? exp.languagesText : []
+    });
+    setCustomVoiceLang("");
+    setCustomTextLang("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -105,9 +115,49 @@ export default function ExperiencesManager() {
       codeSolving: false,
       picture: "",
       videoUrl: "",
-      awards: []
+      awards: [],
+      languagesVoice: ["English"],
+      languagesText: ["English"]
     });
+    setCustomVoiceLang("");
+    setCustomTextLang("");
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const toggleLanguage = (type: 'voice' | 'text', langName: string) => {
+    if (!editForm) return;
+    const field = type === 'voice' ? 'languagesVoice' : 'languagesText';
+    const current: string[] = Array.isArray(editForm[field]) ? [...editForm[field]] : [];
+    const exists = current.some(l => l.toLowerCase() === langName.toLowerCase());
+    const updated = exists 
+      ? current.filter(l => l.toLowerCase() !== langName.toLowerCase())
+      : [...current, langName];
+    setEditForm({ ...editForm, [field]: updated });
+  };
+
+  const addCustomLanguage = (type: 'voice' | 'text') => {
+    const val = type === 'voice' ? customVoiceLang.trim() : customTextLang.trim();
+    if (!val) return;
+    const field = type === 'voice' ? 'languagesVoice' : 'languagesText';
+    const current: string[] = Array.isArray(editForm[field]) ? [...editForm[field]] : [];
+    if (!current.some(l => l.toLowerCase() === val.toLowerCase())) {
+      setEditForm({ ...editForm, [field]: [...current, val] });
+    }
+    if (type === 'voice') setCustomVoiceLang("");
+    else setCustomTextLang("");
+  };
+
+  const copyVoiceToText = () => {
+    const voice = Array.isArray(editForm.languagesVoice) ? editForm.languagesVoice : [];
+    const text = Array.isArray(editForm.languagesText) ? [...editForm.languagesText] : [];
+    const merged = Array.from(new Set([...text, ...voice]));
+    setEditForm({ ...editForm, languagesText: merged });
+    toast.success("Tale-språk kopiert til tekst-språk");
+  };
+
+  const clearLanguages = (type: 'voice' | 'text') => {
+    const field = type === 'voice' ? 'languagesVoice' : 'languagesText';
+    setEditForm({ ...editForm, [field]: [] });
   };
 
   const handleAwardUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -585,6 +635,235 @@ export default function ExperiencesManager() {
               </div>
             </div>
 
+            {/* SPRÅKSTØTTE (VOICE & TEXT) */}
+            <div>
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-[#9C39FF]" />
+                  <h4 className="text-lg font-medium text-white">Språkstøtte (Voice & Text)</h4>
+                </div>
+                <span className="text-xs text-zinc-400">
+                  Definer hvilke språk opplevelsen kan spilles med
+                </span>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* TALE / VOICE */}
+                <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Volume2 className="w-4 h-4 text-purple-400" />
+                        <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+                          Tale / Voice (Lydspor)
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-zinc-400">
+                          {editForm.languagesVoice?.length || 0} valgt
+                        </span>
+                        {(editForm.languagesVoice?.length || 0) > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => clearLanguages('voice')}
+                            className="text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors"
+                          >
+                            Tøm
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-zinc-400 mb-3">
+                      Språk der spillere hører stemmer og lydinstruksjoner på dette språket.
+                    </p>
+
+                    {/* Chips for available languages */}
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {COMMON_LANGUAGES.map((lang) => {
+                        const isSelected = (editForm.languagesVoice || []).some(
+                          (l: string) => l.toLowerCase() === lang.id.toLowerCase() || l.toLowerCase() === lang.labelNo.toLowerCase()
+                        );
+                        return (
+                          <button
+                            key={lang.id}
+                            type="button"
+                            onClick={() => toggleLanguage('voice', lang.id)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                              isSelected
+                                ? "bg-purple-600/30 border border-purple-500/60 text-white shadow-sm"
+                                : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
+                            }`}
+                          >
+                            <span>{lang.flag}</span>
+                            <span>{lang.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom languages added */}
+                    {(editForm.languagesVoice || []).filter(
+                      (l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase())
+                    ).length > 0 && (
+                      <div className="mb-3 pt-2 border-t border-zinc-800/60">
+                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Egendefinerte:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(editForm.languagesVoice || [])
+                            .filter((l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase()))
+                            .map((customL: string) => (
+                              <button
+                                key={customL}
+                                type="button"
+                                onClick={() => toggleLanguage('voice', customL)}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-purple-600/30 border border-purple-500/60 text-white"
+                              >
+                                <span>🌐 {customL}</span>
+                                <X className="w-3 h-3 ml-1 text-zinc-400 hover:text-white" />
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Add custom input */}
+                  <div className="flex gap-2 pt-3 border-t border-zinc-800/80">
+                    <input
+                      type="text"
+                      value={customVoiceLang}
+                      onChange={(e) => setCustomVoiceLang(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addCustomLanguage('voice');
+                        }
+                      }}
+                      placeholder="Annet tale-språk..."
+                      className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#9C39FF]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => addCustomLanguage('voice')}
+                      className="bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Legg til
+                    </button>
+                  </div>
+                </div>
+
+                {/* TEKST / TEXT */}
+                <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4 text-blue-400" />
+                        <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+                          Tekst / Undertekster & Menyer
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-zinc-400">
+                          {editForm.languagesText?.length || 0} valgt
+                        </span>
+                        <button
+                          type="button"
+                          onClick={copyVoiceToText}
+                          className="text-[11px] text-[#9C39FF] hover:text-[#b462ff] transition-colors"
+                          title="Kopier alle valgte tale-språk til tekst"
+                        >
+                          Kopier fra tale
+                        </button>
+                        {(editForm.languagesText?.length || 0) > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => clearLanguages('text')}
+                            className="text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors"
+                          >
+                            Tøm
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-zinc-400 mb-3">
+                      Språk der undertekster, menyer, gåtehint og grensesnitt er tilgjengelig.
+                    </p>
+
+                    {/* Chips for available languages */}
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {COMMON_LANGUAGES.map((lang) => {
+                        const isSelected = (editForm.languagesText || []).some(
+                          (l: string) => l.toLowerCase() === lang.id.toLowerCase() || l.toLowerCase() === lang.labelNo.toLowerCase()
+                        );
+                        return (
+                          <button
+                            key={lang.id}
+                            type="button"
+                            onClick={() => toggleLanguage('text', lang.id)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                              isSelected
+                                ? "bg-blue-600/30 border border-blue-500/60 text-white shadow-sm"
+                                : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
+                            }`}
+                          >
+                            <span>{lang.flag}</span>
+                            <span>{lang.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom languages added */}
+                    {(editForm.languagesText || []).filter(
+                      (l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase())
+                    ).length > 0 && (
+                      <div className="mb-3 pt-2 border-t border-zinc-800/60">
+                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Egendefinerte:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(editForm.languagesText || [])
+                            .filter((l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase()))
+                            .map((customL: string) => (
+                              <button
+                                key={customL}
+                                type="button"
+                                onClick={() => toggleLanguage('text', customL)}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-blue-600/30 border border-blue-500/60 text-white"
+                              >
+                                <span>🌐 {customL}</span>
+                                <X className="w-3 h-3 ml-1 text-zinc-400 hover:text-white" />
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Add custom input */}
+                  <div className="flex gap-2 pt-3 border-t border-zinc-800/80">
+                    <input
+                      type="text"
+                      value={customTextLang}
+                      onChange={(e) => setCustomTextLang(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addCustomLanguage('text');
+                        }
+                      }}
+                      placeholder="Annet tekst-språk..."
+                      className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#9C39FF]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => addCustomLanguage('text')}
+                      className="bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Legg til
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* MEDIA */}
             <div>
               <h4 className="text-lg font-medium mb-4 text-white border-b border-zinc-800 pb-2">Media & Ekstra</h4>
@@ -742,6 +1021,16 @@ export default function ExperiencesManager() {
                 )}
                 {exp.mystic && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Mystikk</span>
+                )}
+                {exp.languagesVoice && exp.languagesVoice.length > 0 && (
+                  <span className="bg-purple-950/40 text-purple-300 px-2 py-1 rounded border border-purple-800/50 flex items-center gap-1">
+                    🎙️ {exp.languagesVoice.join(', ')}
+                  </span>
+                )}
+                {exp.languagesText && exp.languagesText.length > 0 && (
+                  <span className="bg-blue-950/40 text-blue-300 px-2 py-1 rounded border border-blue-800/50 flex items-center gap-1">
+                    💬 Tekst: {exp.languagesText.length} språk
+                  </span>
                 )}
               </div>
               

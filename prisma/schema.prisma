@@ -38,6 +38,8 @@ model Experience {
   codeSolving     Boolean  @default(false)
   videoUrl        String?
   awards          Json?
+  languagesVoice  String[] @default([])
+  languagesText   String[] @default([])
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

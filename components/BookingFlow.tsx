@@ -316,9 +316,24 @@ export default function BookingFlow() {
                               {exp.jumpScare && (
                                 <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Jump Scare</span>
                               )}
-                              {exp.tags && exp.tags.map(tag => (
+                              {exp.tags && exp.tags.map((tag: string) => (
                                 <span key={tag} className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{tag}</span>
                               ))}
+                              {exp.languagesVoice && exp.languagesVoice.length > 0 && (
+                                <span className="bg-purple-950/40 text-purple-300 px-2 py-1 rounded border border-purple-800/40">
+                                  🎙️ Tale: {exp.languagesVoice.join(', ')}
+                                </span>
+                              )}
+                              {exp.languagesText && exp.languagesText.length > 0 && (
+                                <span 
+                                  className="bg-blue-950/40 text-blue-300 px-2 py-1 rounded border border-blue-800/40"
+                                  title={`Tekst: ${exp.languagesText.join(', ')}`}
+                                >
+                                  💬 Tekst: {exp.languagesText.length > 3 
+                                    ? `${exp.languagesText.slice(0, 3).join(', ')} +${exp.languagesText.length - 3}` 
+                                    : exp.languagesText.join(', ')}
+                                </span>
+                              )}
                             </div>
                             
                             <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end mt-auto">
