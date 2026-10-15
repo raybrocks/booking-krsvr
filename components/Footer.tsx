@@ -64,20 +64,20 @@ export default function Footer() {
               </a>
             </div>
 
-            {/* TripAdvisor Recommended Green Badge */}
-            <div className="mt-6 pt-4 border-t border-zinc-900">
+            {/* TripAdvisor Recommended Horizontal Pill */}
+            <div className="mt-5 pt-4 border-t border-zinc-900">
               <a
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html"
                 className="inline-block transition-transform hover:scale-105"
-                title="Anbefalt på Tripadvisor – KRS VR Arena"
+                title="Anbefalt på Tripadvisor"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/tripadvisor_recommended.svg"
+                  src="/tripadvisor_horizontal.svg"
                   alt="Anbefalt på Tripadvisor"
-                  className="h-11 w-auto rounded shadow-sm"
+                  className="h-8 md:h-9 w-auto rounded-full shadow-sm"
                 />
               </a>
             </div>
