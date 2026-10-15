@@ -9,16 +9,21 @@ Denne sjekklisten er utarbeidet for å maksimere sannsynligheten for at **KRS VR
 Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uavhengige kilder med identisk **NAP** (*Name, Address, Phone*: KRS VR Arena, Industrigata 12, 4632 Kristiansand, 408 28 302).
 
 ### Høyeste prioritet (De AI søker i først)
-- [x] **TripAdvisor (Fullført – Aktiv profil og implementert widget):**
+- [x] **TripAdvisor (Fullført – Aktiv profil, bilder, beskrivelser og widget):**
   - **Direkte oppførings-URL:** [Krs VR Arena på TripAdvisor](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)
-  - **Status:** Aktiv og verifisert i TripAdvisor for Business med 3 anmeldelser (5 av 5 stjerner).
-  - **Teknisk implementasjon på `krsvr.no`:**
-    - [x] Offisiell TripAdvisor Rating-widget (`TA_rated54`) og TripAdvisor-ikon implementert i bunnteksten ([Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx)).
-    - [x] TripAdvisor-lenke integrert i tilbakemeldingsmodulen ([FeedbackForm.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/FeedbackForm.tsx)) for gjester uten Google-konto og utenlandske turister.
-    - [x] TripAdvisor-profilen lagt inn i `sameAs`-strukturen i Schema.org JSON-LD ([layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx)) for sterk AI- og Google-kobling.
-  - **Videre optimalisering:**
-    - Bruk *TripAdvisor Review Express* i Management Center ved anledning for å fortsette å bygge anmeldelsesvolum mot 10+ anmeldelser.
-    - Sikre at tospråklig tekst (norsk/engelsk) og bilder av lokalet/voksne grupper er lastet opp i TripAdvisor for Business.
+  - **Målepunkt / Baseline (15. oktober 2026):**
+    - **Rangering:** **Nr. 7 av 23** i kategorien *«Fornøyelse og lek i Kristiansand»*
+    - **Vurdering:** 5,0 av 5,0 stjerner
+    - **Antall anmeldelser:** 3 anmeldelser (Elisabeth V m.fl.)
+    - **Bilder:** 5 profesjonelle bilder lastet opp (dekker familiepakker 8–12 år, ungdom 13+, vennegjeng, teambuilding og utdrikningslag)
+  - **Gjennomførte tiltak:**
+    - [x] Bilder og optimaliserte bildebeskrivelser lastet opp i profilen.
+    - [x] Profilbeskrivelser oppdatert.
+    - [x] Offisiell «Rated on Tripadvisor» grønn badge implementert i bunnteksten ([Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx)).
+    - [x] TripAdvisor-lenke integrert i tilbakemeldingsmodulen ([FeedbackForm.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/FeedbackForm.tsx)).
+    - [x] TripAdvisor-profilen lagt inn i `sameAs`-strukturen i Schema.org JSON-LD ([layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx)).
+  - **Neste mål (Effektmåling):**
+    - Klatre fra **Nr. 7** opp til **Topp 3** ved å samle inn 5–10 nye anmeldelser via oppfølgings-e-poster og `/feedback`.
 - [ ] **Visit Sørlandet (visitsorlandet.com):**
   - Visit Sørlandet er det offisielle destinasjonsselskapet for Agder. Gemini og Visit Norway bruker denne som primærkilde for Kristiansand.
   - Ta kontakt med Visit Sørlandet (Usus AS) for å få registrert KRS VR Arena under «Aktiviteter og opplevelser i Kristiansand» og «Innendørsaktiviteter».
