@@ -34,15 +34,6 @@ export default function Footer() {
       }
     };
     fetchSettings();
-
-    // Dynamically load TripAdvisor widget script if not present
-    if (!document.getElementById("ta-widget-script")) {
-      const script = document.createElement("script");
-      script.id = "ta-widget-script";
-      script.src = "https://www.jscache.com/wejs?wtype=rated&uniq=54&locationId=34257006&lang=no&display_version=2";
-      script.async = true;
-      document.body.appendChild(script);
-    }
   }, []);
 
   return (
@@ -73,27 +64,22 @@ export default function Footer() {
               </a>
             </div>
 
-            {/* TripAdvisor Rating Widget */}
+            {/* TripAdvisor Recommended Green Badge */}
             <div className="mt-6 pt-4 border-t border-zinc-900">
-              <div id="TA_rated54" className="TA_rated">
-                <ul id="fPRviuVgo" className="TA_links 7WP8d9z list-none p-0 m-0">
-                  <li id="TchUHJzEG" className="ojEVAq">
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html"
-                      className="inline-block hover:opacity-90 transition-opacity"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src="https://no.tripadvisor.com/img/cdsi/img2/badges/ollie-11424-2.gif"
-                        alt="TripAdvisor"
-                        className="h-9 w-auto"
-                      />
-                    </a>
-                  </li>
-                </ul>
-              </div>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html"
+                className="inline-block transition-transform hover:scale-105"
+                title="Anbefalt på Tripadvisor – KRS VR Arena"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/tripadvisor_recommended.svg"
+                  alt="Anbefalt på Tripadvisor"
+                  className="h-11 w-auto rounded shadow-sm"
+                />
+              </a>
             </div>
           </div>
           
