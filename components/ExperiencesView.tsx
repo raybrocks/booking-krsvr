@@ -570,7 +570,7 @@ export function ExperiencesView({
                 className="w-full overflow-x-auto hide-scrollbar"
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
               >
-                <div className="flex items-start justify-center gap-4 md:gap-8 px-4 py-4 w-max min-w-full snap-x snap-mandatory">
+                <div className="flex items-center justify-center gap-3 sm:gap-6 md:gap-8 px-4 py-4 w-max min-w-full snap-x snap-mandatory">
                 {filteredExperiences.map((exp) => {
                 const isSelected = selected ? exp.id === selected.id : false;
                 return (
@@ -578,7 +578,7 @@ export function ExperiencesView({
                     key={exp.id}
                     data-id={exp.id}
                     onClick={() => setSelectedId(exp.id)}
-                    className={`relative flex flex-col items-center justify-center flex-shrink-0 snap-center focus:outline-none group min-w-[120px] px-2 py-3 rounded-2xl border transition-all duration-300 ${
+                    className={`relative flex flex-col items-center justify-between flex-shrink-0 snap-center focus:outline-none group w-[115px] sm:w-[130px] md:w-[150px] px-2 py-3 rounded-2xl border transition-all duration-300 min-h-[120px] sm:min-h-[130px] md:min-h-[140px] ${
                       isSelected 
                         ? "border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)]" 
                         : "border-transparent hover:border-zinc-800 hover:bg-zinc-800/30"
@@ -590,7 +590,7 @@ export function ExperiencesView({
                       </span>
                     )}
                     <div 
-                      className={`mb-2 transition-colors duration-300 ${
+                      className={`mb-1.5 transition-colors duration-300 flex items-center justify-center h-10 w-10 ${
                         isSelected 
                           ? "text-[#9C39FF]" 
                           : "text-zinc-500 group-hover:text-zinc-300"
@@ -598,10 +598,18 @@ export function ExperiencesView({
                     >
                       {getIconForType(exp.type, exp.name)}
                     </div>
-                    <span className={`text-sm md:text-base font-medium mb-1 transition-colors ${isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}>
+                    <span 
+                      className={`w-full text-center text-xs sm:text-sm md:text-base font-medium mb-1.5 transition-colors line-clamp-2 [text-wrap:balance] h-9 sm:h-10 md:h-11 flex items-center justify-center leading-tight md:leading-snug px-1 ${
+                        isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
+                      }`}
+                    >
                       {exp.name}
                     </span>
-                    <span className={`text-[10px] md:text-[11px] uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-500 bg-zinc-900"}`}>
+                    <span 
+                      className={`text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-wider px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
+                        isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-500 bg-zinc-900"
+                      }`}
+                    >
                       {exp.type}
                     </span>
                   </button>
