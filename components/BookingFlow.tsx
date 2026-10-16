@@ -292,6 +292,11 @@ export default function BookingFlow() {
                         >
                           <div className="relative h-48 w-full">
                             <Image src={exp.picture} alt={exp.name} fill className="object-cover" />
+                            {exp.isNew && (
+                              <div className="absolute top-3 left-3 bg-[#19EB5B] px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider text-black shadow-md">
+                                Nyhet
+                              </div>
+                            )}
                             <div className="absolute top-3 right-3 bg-[#9C39FF] px-3 py-1 rounded-full text-xs font-medium text-white shadow-md">
                               {exp.type}
                             </div>

@@ -12,7 +12,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [
     '',
     '/vr-opplevelser',
-    '/vr-opplevelser/familie',
     '/arrangementer/private-fester',
     '/arrangementer/firmaevent',
     '/priser',

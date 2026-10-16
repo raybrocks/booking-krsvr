@@ -16,6 +16,12 @@ const SUITABLE_FOR_OPTIONS = [
   "Voksne"
 ];
 
+const FILTER_CATEGORY_OPTIONS = [
+  "Familie",
+  "Rask Action",
+  "Escape Room"
+];
+
 export default function ExperiencesManager() {
   const [experiences, setExperiences] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,12 +97,19 @@ export default function ExperiencesManager() {
     const existingImages = Array.isArray(exp.images) && exp.images.length > 0
       ? exp.images
       : exp.picture ? [exp.picture] : [];
+    const defaultCats = Array.isArray(exp.filterCategories) && exp.filterCategories.length > 0
+      ? exp.filterCategories
+      : [
+          ...(exp.type && FILTER_CATEGORY_OPTIONS.includes(exp.type) ? [exp.type] : []),
+          ...(exp.familyFriendly && exp.type !== "Familie" ? ["Familie"] : [])
+        ];
     setEditForm({
       ...exp,
       images: existingImages,
       picture: existingImages[0] || exp.picture || "",
       languages: Array.isArray(exp.languages) ? exp.languages : [],
-      suitableFor: Array.isArray(exp.suitableFor) ? exp.suitableFor : []
+      suitableFor: Array.isArray(exp.suitableFor) ? exp.suitableFor : [],
+      filterCategories: defaultCats
     });
     setCustomLang("");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -115,6 +128,7 @@ export default function ExperiencesManager() {
       maxPlayers: 6,
       arenaSize: "",
       isActive: true,
+      isNew: false,
       familyFriendly: false,
       teambuilding: false,
       party: false,
@@ -130,10 +144,25 @@ export default function ExperiencesManager() {
       videoUrl: "",
       awards: [],
       languages: ["English"],
-      suitableFor: []
+      suitableFor: [],
+      filterCategories: ["Escape Room"]
     });
     setCustomLang("");
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const toggleFilterCategory = (cat: string) => {
+    if (!editForm) return;
+    const current: string[] = Array.isArray(editForm.filterCategories) ? [...editForm.filterCategories] : [];
+    const exists = current.includes(cat);
+    const nextList = exists
+      ? current.filter((item) => item !== cat)
+      : FILTER_CATEGORY_OPTIONS.filter((opt) => current.includes(opt) || opt === cat);
+    setEditForm({
+      ...editForm,
+      filterCategories: nextList,
+      familyFriendly: nextList.includes("Familie")
+    });
   };
 
   const toggleSuitableFor = (option: string) => {
@@ -578,7 +607,25 @@ export default function ExperiencesManager() {
             {/* TAGS OG SYNLIGHET */}
             <div>
               <h4 className="text-lg font-medium mb-4 text-white border-b border-zinc-800 pb-2">Filtrering & Synlighet</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1 uppercase tracking-wider">Filter-kategorier</label>
+                  <p className="text-[11px] text-zinc-500 mb-3">Kan ligge i flere filtre samtidig</p>
+                  <div className="flex flex-col gap-2">
+                    {FILTER_CATEGORY_OPTIONS.map((cat) => (
+                      <label key={cat} className="flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={Array.isArray(editForm.filterCategories) && editForm.filterCategories.includes(cat)}
+                          onChange={() => toggleFilterCategory(cat)}
+                          className="w-4 h-4 accent-[#9C39FF]"
+                        />
+                        <span className="ml-2 text-sm text-zinc-300">{cat}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wider">Passer for</label>
                   <div className="flex flex-col gap-2">
@@ -599,6 +646,15 @@ export default function ExperiencesManager() {
                 <div>
                   <label className="block text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wider">Stemning</label>
                   <div className="flex flex-col gap-2">
+                    <label className="flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={editForm.cinematic || false}
+                        onChange={(e) => setEditForm({...editForm, cinematic: e.target.checked})}
+                        className="w-4 h-4 accent-[#9C39FF]"
+                      />
+                      <span className="ml-2 text-sm text-zinc-300">Cinematic</span>
+                    </label>
                     <label className="flex items-center cursor-pointer">
                       <input 
                         type="checkbox" 
@@ -653,32 +709,40 @@ export default function ExperiencesManager() {
                       />
                       <span className="ml-2 text-sm text-zinc-300">Kodeløsning</span>
                     </label>
-                    <label className="flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={editForm.cinematic || false}
-                        onChange={(e) => setEditForm({...editForm, cinematic: e.target.checked})}
-                        className="w-4 h-4 accent-[#9C39FF]"
-                      />
-                      <span className="ml-2 text-sm text-zinc-300">Cinematic</span>
-                    </label>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wider">Status</label>
-                  <label className="flex items-center cursor-pointer bg-zinc-900 border border-zinc-800 p-3 rounded-xl hover:border-zinc-700 transition-colors">
-                    <input 
-                      type="checkbox" 
-                      checked={editForm.isActive}
-                      onChange={(e) => setEditForm({...editForm, isActive: e.target.checked})}
-                      className="w-5 h-5 accent-[#9C39FF]"
-                    />
-                    <div className="ml-3 flex flex-col">
-                      <span className="text-sm font-medium text-white">Aktiv (Synlig)</span>
-                      <span className="text-xs text-zinc-500">Vis på forsiden</span>
-                    </div>
-                  </label>
+                  <div className="flex flex-col gap-3">
+                    <label className="flex items-center cursor-pointer bg-zinc-900 border border-zinc-800 p-3 rounded-xl hover:border-zinc-700 transition-colors">
+                      <input 
+                        type="checkbox" 
+                        checked={editForm.isActive}
+                        onChange={(e) => setEditForm({...editForm, isActive: e.target.checked})}
+                        className="w-5 h-5 accent-[#9C39FF]"
+                      />
+                      <div className="ml-3 flex flex-col">
+                        <span className="text-sm font-medium text-white">Aktiv (Synlig)</span>
+                        <span className="text-xs text-zinc-500">Vis på forsiden</span>
+                      </div>
+                    </label>
+                    <label className="flex items-center cursor-pointer bg-zinc-900 border border-zinc-800 p-3 rounded-xl hover:border-zinc-700 transition-colors">
+                      <input 
+                        type="checkbox" 
+                        checked={editForm.isNew || false}
+                        onChange={(e) => setEditForm({...editForm, isNew: e.target.checked})}
+                        className="w-5 h-5 accent-[#9C39FF]"
+                      />
+                      <div className="ml-3 flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-white">NYHET-badge</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider bg-[#19EB5B] text-black px-1.5 py-0.5 rounded">Nyhet</span>
+                        </div>
+                        <span className="text-xs text-zinc-500">Marker som nyhet på nettsiden</span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -939,6 +1003,11 @@ export default function ExperiencesManager() {
             {(exp.images?.[0] || exp.picture) ? (
               <div className="relative w-full h-40 bg-zinc-950 border-b border-zinc-800">
                 <Image src={exp.images?.[0] || exp.picture} alt={exp.name} fill className="object-cover" />
+                {exp.isNew && (
+                  <span className="absolute top-2 left-2 bg-[#19EB5B] text-black text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md shadow-md">
+                    Nyhet
+                  </span>
+                )}
                 {Array.isArray(exp.images) && exp.images.length > 1 && (
                   <span className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-md border border-white/10">
                     {exp.images.length} bilder
@@ -969,6 +1038,9 @@ export default function ExperiencesManager() {
                 {Array.isArray(exp.suitableFor) && exp.suitableFor.map((item: string) => (
                   <span key={item} className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{item}</span>
                 ))}
+                {exp.cinematic && (
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Cinematic</span>
+                )}
                 {exp.action && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Action</span>
                 )}
@@ -986,9 +1058,6 @@ export default function ExperiencesManager() {
                 )}
                 {exp.codeSolving && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Kodeløsning</span>
-                )}
-                {exp.cinematic && (
-                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Cinematic</span>
                 )}
                 {exp.languages && exp.languages.length > 0 && (
                   <span className="bg-purple-950/40 text-purple-300 px-2 py-1 rounded border border-purple-800/50 flex items-center gap-1" title={exp.languages.join(', ')}>

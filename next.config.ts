@@ -50,6 +50,46 @@ const nextConfig: NextConfig = {
         destination: '/vr-opplevelser/:path*',
         permanent: true,
       },
+      {
+        source: '/vr-opplevelser/mixed-reality',
+        destination: '/vr-opplevelser/rask-action',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/mixed-reality/:slug*',
+        destination: '/vr-opplevelser/rask-action/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/zombie',
+        destination: '/vr-opplevelser/rask-action',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/zombie/:slug*',
+        destination: '/vr-opplevelser/rask-action/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/archer',
+        destination: '/vr-opplevelser/familie',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/archer/:slug*',
+        destination: '/vr-opplevelser/familie/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/familiepakke',
+        destination: '/vr-opplevelser/familie',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/familiepakke/:slug*',
+        destination: '/vr-opplevelser/familie/:slug*',
+        permanent: true,
+      },
     ];
   },
   async headers() {

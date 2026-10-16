@@ -27,6 +27,7 @@ model Experience {
   arenaSize       String?
   pricing         Json?    
   isActive        Boolean  @default(true)
+  isNew           Boolean  @default(false)
   order           Int      @default(999)
   familyFriendly  Boolean  @default(false)
   teambuilding    Boolean  @default(false)
@@ -42,6 +43,7 @@ model Experience {
   awards          Json?
   languages       String[] @default([])
   suitableFor     String[] @default([])
+  filterCategories String[] @default([])
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

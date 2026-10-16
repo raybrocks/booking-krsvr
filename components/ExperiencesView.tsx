@@ -266,16 +266,15 @@ export function ExperiencesView({
   const [isLoading, setIsLoading] = useState(experiences.length === 0);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [activePrimaryFilter, setActivePrimaryFilter] = useState<string>(() => {
+    if (initialTypeSlug === "familie" || initialTypeSlug === "familiepakke" || initialTypeSlug === "archer") return "Familie";
+    if (initialTypeSlug === "rask-action" || initialTypeSlug === "fast-action" || initialTypeSlug === "mixed-reality" || initialTypeSlug === "zombie") return "Rask Action";
     if (initialTypeSlug === "escape-room" || initialTypeSlug === "escape-rooms") return "Escape Room";
-    if (initialTypeSlug === "mixed-reality") return "Mixed Reality";
-    if (initialTypeSlug === "zombie" || initialTypeSlug === "zombie-shooter") return "Zombie";
-    if (initialTypeSlug === "familie") return "Familie";
     return "Alle";
   });
   const [isExpanded, setIsExpanded] = useState(false);
   // Prevents selectedId useEffect from overriding a URL already set by a filter button click,
-  // and also skips the initial URL push when arriving via a virtual filter URL like /familie.
-  const skipNextUrlUpdate = useRef(initialTypeSlug === "familie");
+  // and also skips the initial URL push when arriving via a category filter URL without a specific experience slug.
+  const skipNextUrlUpdate = useRef(Boolean(initialTypeSlug && !initialExpSlug));
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const getEmbedUrl = (url: string) => {
@@ -386,20 +385,19 @@ export function ExperiencesView({
     
   }, [selectedId, experiences]);
 
-  const filteredExperiences = experiences.filter(exp => {
-    if (activePrimaryFilter === "Alle") return true;
-    if (activePrimaryFilter === "Familie") return exp.familyFriendly;
-    if (activePrimaryFilter === "Teambuilding") return exp.teambuilding;
-    
+  const matchesPrimaryFilter = (exp: any, filter: string) => {
+    if (filter === "Alle") return true;
+    if (Array.isArray(exp.filterCategories) && exp.filterCategories.length > 0) {
+      return exp.filterCategories.includes(filter);
+    }
     const tSlug = getTypeSlug(exp);
-    const nSlug = slugify(exp.name || "");
-    
-    if (activePrimaryFilter === "Escape Room") return tSlug.includes("escape");
-    if (activePrimaryFilter === "Mixed Reality") return tSlug.includes("mixed-reality");
-    if (activePrimaryFilter === "Zombie") return tSlug.includes("zombie") || nSlug.includes("zombie");
-    
+    if (filter === "Familie") return tSlug === "familie" || exp.familyFriendly;
+    if (filter === "Rask Action") return tSlug === "rask-action";
+    if (filter === "Escape Room") return tSlug === "escape-room" || tSlug.includes("escape");
     return true;
-  });
+  };
+
+  const filteredExperiences = experiences.filter(exp => matchesPrimaryFilter(exp, activePrimaryFilter));
 
   const selected = filteredExperiences.find(e => e.id === selectedId) || filteredExperiences[0] || experiences[0];
 
@@ -410,32 +408,18 @@ export function ExperiencesView({
   const handlePrimaryFilterClick = (filter: string) => {
     setActivePrimaryFilter(filter);
 
-    // Push filter-specific URL for Familie and Alle so the URL is shareable/crawlable.
-    // Set skip flag so the selectedId useEffect does not immediately override this URL.
+    skipNextUrlUpdate.current = true;
     if (filter === "Familie") {
-      skipNextUrlUpdate.current = true;
       window.history.pushState({}, '', '/vr-opplevelser/familie');
-    } else if (filter === "Alle") {
-      skipNextUrlUpdate.current = true;
+    } else if (filter === "Rask Action") {
+      window.history.pushState({}, '', '/vr-opplevelser/rask-action');
+    } else if (filter === "Escape Room") {
+      window.history.pushState({}, '', '/vr-opplevelser/escape-room');
+    } else {
       window.history.pushState({}, '', '/vr-opplevelser');
     }
-    // For type-based filters (Escape Room, Mixed Reality, Zombie, Teambuilding),
-    // the selectedId useEffect handles the URL via the specific experience URL.
     
-    const newFiltered = experiences.filter(exp => {
-      if (filter === "Alle") return true;
-      if (filter === "Familie") return exp.familyFriendly;
-      if (filter === "Teambuilding") return exp.teambuilding;
-      
-      const tSlug = getTypeSlug(exp);
-      const nSlug = slugify(exp.name || "");
-      
-      if (filter === "Escape Room") return tSlug.includes("escape");
-      if (filter === "Mixed Reality") return tSlug.includes("mixed-reality");
-      if (filter === "Zombie") return tSlug.includes("zombie") || nSlug.includes("zombie");
-      
-      return true;
-    });
+    const newFiltered = experiences.filter(exp => matchesPrimaryFilter(exp, filter));
 
     if (newFiltered.length > 0) {
       setSelectedId(newFiltered[0].id);
@@ -482,7 +466,7 @@ export function ExperiencesView({
     if (ltype.includes("escape") || lname.includes("escape")) return <Handshake className="w-10 h-10" />;
     if (ltype.includes("shooter") || lname.includes("shooter")) return <Crosshair className="w-10 h-10" />;
     if (ltype.includes("zomb") || lname.includes("zomb") || lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10" />;
-    if (ltype.includes("archer") || lname.includes("archer")) return <Mountain className="w-10 h-10" />;
+    if (ltype.includes("archer") || lname.includes("archer") || lname.includes("arrow")) return <Mountain className="w-10 h-10" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10" />;
     return <Gamepad2 className="w-10 h-10" />;
   };
@@ -506,16 +490,12 @@ export function ExperiencesView({
 
   const getHeadingTitle = () => {
     switch (activePrimaryFilter) {
-      case "Escape Room":
-        return "VR Escape Room i Kristiansand";
-      case "Mixed Reality":
-        return "Mixed Reality i Kristiansand";
-      case "Zombie":
-        return "Zombie Shooter i Kristiansand";
       case "Familie":
         return "Familievennlige VR-opplevelser";
-      case "Teambuilding":
-        return "VR Teambuilding i Kristiansand";
+      case "Rask Action":
+        return "Rask Action & Skytespill i VR";
+      case "Escape Room":
+        return "VR Escape Room i Kristiansand";
       default:
         return "VR Opplevelser i Kristiansand";
     }
@@ -526,22 +506,22 @@ export function ExperiencesView({
       <motion.div
          initial={{ opacity: 0, y: 20 }}
          animate={{ opacity: 1, y: 0 }}
-         className="mb-10 text-center px-4 w-full"
+         className="mb-6 md:mb-10 text-center px-3 md:px-4 w-full"
       >
-        <h1 className="text-4xl md:text-5xl font-light tracking-tighter mb-4">
+        <h1 className="text-3xl md:text-5xl font-light tracking-tighter mb-3 md:mb-4">
           {getHeadingTitle()}
         </h1>
 
         {/* Simple Primary Filter Row */}
-        <p className="text-zinc-400 text-base md:text-lg text-center font-light mb-10 max-w-2xl mx-auto px-4">
+        <p className="text-zinc-400 text-sm md:text-lg text-center font-light mb-5 md:mb-8 max-w-2xl mx-auto px-2">
           Alle opplevelser hos oss er laget for samarbeid, kommunikasjon og felles mestring.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-4xl mx-auto px-4 mb-4">
-          {["Alle", "Escape Room", "Mixed Reality", "Zombie", "Familie", "Teambuilding"].map(filter => (
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 w-full max-w-4xl mx-auto px-1 mb-2 overflow-x-auto hide-scrollbar">
+          {["Alle", "Familie", "Rask Action", "Escape Room"].map(filter => (
             <button
               key={filter}
               onClick={() => handlePrimaryFilterClick(filter)}
-              className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all border ${
+              className={`px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all border cursor-pointer ${
                 activePrimaryFilter === filter
                   ? "border-[#9C39FF] bg-[#9C39FF]/20 text-white shadow-[0_0_15px_rgba(156,57,255,0.2)]"
                   : "border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-white"
@@ -564,7 +544,7 @@ export function ExperiencesView({
       ) : (
         <>
           {/* HORIZONTAL CAROUSEL NAV */}
-          <div className="sticky top-[81px] md:top-[189px] lg:top-[199px] z-40 w-full bg-black py-4 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)] border-b border-white/5">
+          <div className="sticky top-[81px] md:top-[189px] lg:top-[199px] z-40 w-full bg-black py-2 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)] border-b border-white/5">
             <div className="relative w-full max-w-6xl mx-auto flex items-center">
               <button 
                 onClick={scrollLeft} 
@@ -578,7 +558,7 @@ export function ExperiencesView({
                 className="w-full overflow-x-auto hide-scrollbar"
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
               >
-                <div className="flex items-start justify-center gap-4 md:gap-8 px-4 w-max min-w-full snap-x snap-mandatory">
+                <div className="flex items-start justify-center gap-4 md:gap-8 px-4 py-4 w-max min-w-full snap-x snap-mandatory">
                 {filteredExperiences.map((exp) => {
                 const isSelected = selected ? exp.id === selected.id : false;
                 return (
@@ -586,12 +566,17 @@ export function ExperiencesView({
                     key={exp.id}
                     data-id={exp.id}
                     onClick={() => setSelectedId(exp.id)}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 snap-center focus:outline-none group min-w-[120px] px-2 py-3 rounded-2xl border transition-all duration-300 ${
+                    className={`relative flex flex-col items-center justify-center flex-shrink-0 snap-center focus:outline-none group min-w-[120px] px-2 py-3 rounded-2xl border transition-all duration-300 ${
                       isSelected 
                         ? "border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)]" 
                         : "border-transparent hover:border-zinc-800 hover:bg-zinc-800/30"
                     }`}
                   >
+                    {exp.isNew && (
+                      <span className="absolute -top-2 right-2 bg-[#19EB5B] text-black text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(25,235,91,0.45)]">
+                        Nyhet
+                      </span>
+                    )}
                     <div 
                       className={`mb-2 transition-colors duration-300 ${
                         isSelected 
@@ -655,16 +640,21 @@ export function ExperiencesView({
                 </h3>
               )}
               <div className="flex items-center gap-2 flex-wrap justify-center mt-2">
+                {selected.isNew && (
+                  <span className="text-xs md:text-sm uppercase tracking-wider px-3.5 py-1.5 rounded bg-[#19EB5B] text-black font-extrabold shadow-[0_0_15px_rgba(25,235,91,0.3)]">
+                    Nyhet
+                  </span>
+                )}
                 <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
                   {selected.type}
                 </span>
+                {selected.cinematic && <span title="Filmatisk opplevelse med sterk historie og atmosfære" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Cinematic</span>}
                 {selected.action && <span title="Høyt tempo og spenning!" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Action</span>}
                 {selected.jumpScare && <span title="Advarsel: Kan inneholde skremmende elementer" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Jump Scare</span>}
                 {selected.highscore && <span title="Jakt på poeng og sett nye rekorder!" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Highscore</span>}
                 {selected.fantasy && <span title="Opplev magiske og eventyrlige verdener" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Fantasy</span>}
                 {selected.mystic && <span title="Gåtefulle og spennende mysterier venter" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Mystikk</span>}
                 {selected.codeSolving && <span title="Krever kløkt og logisk tenkning for å løse kodene" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Kodeløsning</span>}
-                {selected.cinematic && <span title="Filmatisk opplevelse med sterk historie og atmosfære" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Cinematic</span>}
               </div>
             </div>
 

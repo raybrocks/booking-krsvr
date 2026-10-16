@@ -14,6 +14,7 @@ export type Experience = {
   maxPlayers: number;
   pricing: Record<string, number>;
   isActive: boolean;
+  isNew?: boolean;
   order?: number;
   familyFriendly?: boolean;
   teambuilding?: boolean;
