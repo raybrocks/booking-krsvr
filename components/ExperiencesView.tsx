@@ -165,7 +165,7 @@ function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVide
       </div>
 
       {/* INSTAGRAM-STYLE DOTS NAVBAR */}
-      {images.length > 0 && (
+      {hasMultiple && (
         <div className="mt-4 flex items-center justify-center gap-2" aria-label="Bildegalleri navigasjon">
           {images.map((_, idx) => {
             const isActive = idx === safeIndex;
