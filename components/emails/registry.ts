@@ -12,6 +12,7 @@ import { ContactInquiryNotificationEmail } from './ContactInquiryNotificationEma
 import { FeedbackNotificationEmail } from './FeedbackNotificationEmail';
 import { WeeklySummaryEmail } from './WeeklySummaryEmail';
 import { NewsletterBroadcastEmail } from './NewsletterBroadcastEmail';
+import { ReviewRequestEmail } from './ReviewRequestEmail';
 
 export interface EmailTemplateDefinition {
   id: string;
@@ -322,6 +323,23 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
       ctaButtonText: 'Bestill tid på nett',
       ctaButtonUrl: 'https://krsvr.no/booking',
       discountCode: 'VR15',
+      adminEmail: 'post@krsvr.no',
+    },
+  },
+  {
+    id: 'customer-review-request',
+    title: 'Forespørsel om omtale (TripAdvisor & Google)',
+    category: 'customer',
+    categoryLabel: 'Kundeoppfølging',
+    subject: 'Takk for besøket hos oss i KRS VR Arena',
+    trigger: 'Manuelt utløst fra backend (/admin under Upcoming) etter at kunden har besøkt arenaen.',
+    filePath: 'components/emails/ReviewRequestEmail.tsx',
+    Component: ReviewRequestEmail,
+    mockProps: {
+      firstName: 'Kari',
+      experienceTitle: 'Mission: Sigma (VR Escape Room)',
+      platform: 'both',
+      language: 'no',
       adminEmail: 'post@krsvr.no',
     },
   },

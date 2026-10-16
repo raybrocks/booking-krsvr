@@ -11,6 +11,7 @@ import { AdminBookingUpdateEmail } from '@/components/emails/AdminBookingUpdateE
 import { AdminBookingCancellationEmail } from '@/components/emails/AdminBookingCancellationEmail';
 import { AdminNameListReminderEmail } from '@/components/emails/AdminNameListReminderEmail';
 import { EmployeeInviteEmail } from '@/components/emails/EmployeeInviteEmail';
+import { ReviewRequestEmail } from '@/components/emails/ReviewRequestEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -715,4 +716,59 @@ export async function addContactToNewsletter(
 }
 
 export const syncBookingContactToResend = addContactToNewsletter;
+
+export async function sendReviewRequestEmail(
+  to: string,
+  bookingDetails: {
+    firstName: string;
+    lastName?: string;
+    experienceTitle?: string;
+    date?: string;
+  },
+  options: {
+    platform: 'tripadvisor' | 'google' | 'both';
+    language: 'no' | 'en';
+  }
+) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Email not sent.");
+    return null;
+  }
+
+  const adminEmail = await getAdminEmail();
+  const { firstName, experienceTitle, date } = bookingDetails;
+  const { platform, language } = options;
+
+  const isEn = language === 'en';
+  const emailSubject = isEn
+    ? 'Thank you for visiting KRS VR Arena'
+    : 'Takk for besøket hos oss i KRS VR Arena';
+
+  try {
+    const html = await render(
+      React.createElement(ReviewRequestEmail, {
+        firstName,
+        experienceTitle,
+        date,
+        platform,
+        language,
+        adminEmail,
+      })
+    );
+
+    const data = await resend.emails.send({
+      from: 'KRS VR Arena <post@krsvr.no>',
+      to: [to],
+      replyTo: adminEmail,
+      subject: emailSubject,
+      html: html,
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Error sending review request email:", error);
+    return null;
+  }
+}
+
 

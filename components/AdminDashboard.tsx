@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil, Star } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import SettingsManager from "./SettingsManager";
@@ -13,6 +13,7 @@ import ShiftManager from "./ShiftManager";
 import EmployeesManager from "./EmployeesManager";
 import InquiriesManager, { ContactInquiryItem } from "./InquiriesManager";
 import EditBookingModal from "./EditBookingModal";
+import ReviewRequestModal from "./ReviewRequestModal";
 
 const playDing = () => {
   try {
@@ -93,6 +94,7 @@ export default function AdminDashboard() {
   const [experiencesList, setExperiencesList] = useState<any[]>([]);
   const [pricingTiers, setPricingTiers] = useState<Record<string, number> | undefined>(undefined);
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
+  const [reviewModalBooking, setReviewModalBooking] = useState<any | null>(null);
   const [resendingEmailId, setResendingEmailId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const supabase = createClient();
@@ -867,6 +869,42 @@ export default function AdminDashboard() {
                         )}
                       </button>
 
+                      {/* Be om omtale (TripAdvisor / Google Reviews) */}
+                      {(() => {
+                        const now = new Date(currentTime);
+                        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                        const isEligible = booking.status !== 'cancelled' && 
+                          booking.bookingType !== 'system' && 
+                          !booking.email?.includes('system@sperret') &&
+                          booking.date <= todayStr;
+
+                        if (!isEligible) return null;
+
+                        const hasSent = !!booking.reviewEmailSentAt;
+                        const platformLabel = booking.reviewEmailType === 'tripadvisor' ? 'TripAdvisor' : booking.reviewEmailType === 'google' ? 'Google' : 'Begge';
+
+                        return (
+                          <button
+                            onClick={() => setReviewModalBooking(booking)}
+                            className={`text-xs px-2 py-1.5 rounded-lg border transition-all inline-flex items-center gap-1 font-medium ${
+                              hasSent
+                                ? "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                                : "bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30"
+                            }`}
+                            title={
+                              hasSent
+                                ? `Omtale sendt (${platformLabel}) ${booking.reviewEmailSentAt ? new Intl.DateTimeFormat("no-NO", { dateStyle: "short" }).format(new Date(booking.reviewEmailSentAt)) : ""}. Klikk for å se eller sende på nytt.`
+                                : "Send forespørsel om omtale (TripAdvisor / Google Reviews)"
+                            }
+                          >
+                            <Star className={`w-3.5 h-3.5 ${hasSent ? "fill-emerald-400 text-emerald-400" : "fill-amber-300/30 text-amber-300"}`} />
+                            <span className="hidden xl:inline">
+                              {hasSent ? `Sendt (${platformLabel})` : "Be om omtale"}
+                            </span>
+                          </button>
+                        );
+                      })()}
+
                       <select
                         value={booking.status}
                         onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
@@ -1123,6 +1161,18 @@ export default function AdminDashboard() {
         }}
         experiences={experiencesList}
         pricingTiers={pricingTiers}
+      />
+
+      {/* Review Request Modal */}
+      <ReviewRequestModal
+        booking={reviewModalBooking}
+        isOpen={!!reviewModalBooking}
+        onClose={() => setReviewModalBooking(null)}
+        onSent={(updated) => {
+          setBookings((prev) =>
+            prev.map((b) => (b.id === updated.id ? { ...b, ...updated } : b))
+          );
+        }}
       />
     </div>
   );

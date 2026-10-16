@@ -42,6 +42,8 @@ model Experience {
   videoUrl        String?
   awards          Json?
   languages       String[] @default([])
+  languagesVoice  String[] @default([])
+  languagesText   String[] @default([])
   suitableFor     String[] @default([])
   filterCategories String[] @default([])
 
@@ -80,6 +82,8 @@ model Booking {
   playerNames       String[] @default([])
   lastReminderDate  String?  // "YYYY-MM-DD" of last reminder sent to prevent duplicate same-day emails
   reminderCount     Int      @default(0)
+  reviewEmailSentAt DateTime?
+  reviewEmailType   String?
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
