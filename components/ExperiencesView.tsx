@@ -703,7 +703,7 @@ export function ExperiencesView({
                       <li>Gruppebilde og gratis vann</li>
                       <li>Mission debrief og scoreboard i lounge</li>
                       <li>Lån av party lounge i 30 min etter spill</li>
-                      <li>Mulighet for medbrakt mat/drikke</li>
+                      <li>Gratis kaffe og vann (servering kan forhåndsbestilles)</li>
                     </ul>
                   </div>
                 </div>

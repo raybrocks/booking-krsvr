@@ -80,5 +80,11 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 3. **Pakkepriser:**
    - Teambuilding (2–10 personer): Fra 375 kr eks. mva / pers (90 min).
    - Teambuilding (10–50 personer): Fra 450 kr eks. mva / pers (inntil 3 timer totaltid / hele lokalet for dere selv / 120 min aktivt turneringsformat).
+4. **Ingen medbrakt mat og drikke på teambuilding og utdrikningslag:**
+   - Det er ikke anledning til medbrakt mat og drikke på teambuilding og utdrikningslag.
+   - Drikke serveres via våre to forhåndsbestilte barkonsepter (Pakke 1: Øl/cider/mineralvann eller Pakke 2: Vin & bobler).
+   - Mat serveres ved at vi koordinerer levering av fersk, varm lokal pizza direkte til partyloungen.
+   - (Merk: Ved barnebursdager er det tillatt å ta med egen bursdagskake, godteri og snacks).
+
 
 

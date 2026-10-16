@@ -99,7 +99,7 @@ export default function PremiumPackageCard() {
               "Mulighet for langbord",
               "Garderobe og toaletter",
               "Musikk og skjermer i lokalet",
-              "Mulighet for medbrakt mat og drikke etter avtale",
+              "Mulighet for forhåndsbestilt bar og servering",
               "Eventansvarlig som bistår med koordinering",
               "Egen gamemaster gjennom arrangementet"
             ].map((item, i) => (

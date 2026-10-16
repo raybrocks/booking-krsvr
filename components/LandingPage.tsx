@@ -322,7 +322,7 @@ export default function LandingPage() {
                 "Gående opplevelse inni virtuelle verdener.",
                 "Passer for både nybegynnere og erfarne VR-spillere.",
                 "Alle spill er eksklusive og testet for høy underholdningsverdi",
-                "Tilgang til partylounge i 30 minutter etter spillet - mulighet til å nyte medbrakt mat og drikke",
+                "Tilgang til partylounge etter spillet med gratis kaffe og vann (forhåndsbestilt servering tilgjengelig)",
                 "Sentralt på Lund med gratis gateparkering."
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-4 bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800/50 hover:border-zinc-700 transition-colors">

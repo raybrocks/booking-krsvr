@@ -518,7 +518,7 @@ function KontaktForm() {
                           ))}
                         </div>
                         <p className="mt-3 text-xs text-zinc-500 leading-relaxed">
-                          KRS VR Arena kan koordinere levering av pizza/mat på forespørsel. Medbrakt mat og drikke avtales på forhånd.
+                          KRS VR Arena koordinerer levering av fersk lokal pizza direkte til loungen. Merk at det ikke er anledning til medbrakt mat og drikke på teambuilding og utdrikningslag.
                         </p>
                       </div>
 

@@ -52,6 +52,10 @@ export default function VrTeambuildingPage() {
       answer: "Ja, ved forhåndsbestilling klargjør vi baren i partyloungen. Dere kan velge mellom to forhåndsbestilte drikkepakker: 1) Øl, cider og mineralvann (Tuborg, Corona, Breezer) eller 2) Kvalitetsvin og bobler fra samme leverandør som Boen Gård. Vi kan også ordne fersk lokal pizza levert til loungen. Komplett prisliste sendes uforpliktende ved bookingforespørsel, og dere velger om alt samles på EHF-faktura eller om baren åpnes for deltakerbetaling.",
     },
     {
+      question: "Kan vi ta med medbrakt mat eller drikke?",
+      answer: "Nei, det er ikke anledning til medbrakt mat eller drikke til teambuilding og bedriftsarrangementer. Drikkeservering håndteres via våre forhåndsbestilte barkonsepter (kald øl/cider/mineralvann eller kvalitetsvin og bobler), og vi koordinerer gjerne levering av fersk lokal pizza direkte til loungen.",
+    },
+    {
       question: "Kan bedriften få samlet EHF-faktura?",
       answer: "Ja, vi tilbyr full EHF-fakturering for bedrifter og offentlige virksomheter. Vi kan inkludere både aktivitet, drikke og eventuell mat på samme faktura, merket med deres PO-nummer eller ressursnummer.",
     },
@@ -357,7 +361,7 @@ export default function VrTeambuildingPage() {
             </div>
 
             <p className="text-xs text-zinc-400 italic text-center">
-              * Bar og servering klargjøres ved forhåndsbooking slik at vi har alt ferdig innkjøpt og nedkjølt til dere kommer.
+              * Bar og servering klargjøres ved forhåndsbooking slik at vi har alt ferdig innkjøpt og nedkjølt til dere kommer. Det er ikke anledning til medbrakt mat eller drikke.
             </p>
           </div>
         </div>
@@ -379,7 +383,7 @@ export default function VrTeambuildingPage() {
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 text-[#19EB5B] flex-shrink-0 mt-0.5" />
-                <span><strong>Partylounge og servering:</strong> Gratis kaffe og vann. Mulighet for forhåndsbestilt bar og lokal pizzalevering.</span>
+                <span><strong>Partylounge og servering:</strong> Gratis kaffe og vann. Mulighet for forhåndsbestilt bar og lokal pizzalevering (ikke anledning til medbrakt mat/drikke).</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 text-[#19EB5B] flex-shrink-0 mt-0.5" />

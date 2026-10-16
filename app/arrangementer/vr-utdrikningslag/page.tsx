@@ -53,6 +53,10 @@ export default function VrUtdrikningslagPage() {
       answer: "Ja! Ved forhåndsbestilling kan dere velge mellom to drikkepakker til partyloungen: enten kald øl/cider/mineralvann eller håndplukkede viner og bobler. Komplett prisliste sendes uforpliktende ved forespørsel.",
     },
     {
+      question: "Kan vi ta med medbrakt mat eller drikke?",
+      answer: "Nei, det er ikke anledning til medbrakt mat eller drikke til utdrikningslag. Vi klargjør gjerne partyloungen med våre forhåndsbestilte drikkepakker (kald øl/cider/mineralvann eller kvalitetsvin og bobler) samt varm, lokal pizzalevering.",
+    },
+    {
       question: "Hvor tidlig må vi møte opp?",
       answer: "Møt presist for å ikke miste spilletid. Vi starter med en kort briefing og utstyrsgjennomgang til oppsatt tid, slik at dere får maksimal tid inne i den virtuelle arenaen.",
     },
@@ -222,7 +226,7 @@ export default function VrUtdrikningslagPage() {
                   <Check className="w-5 h-5 text-[#19EB5B]" /> <strong>Forhåndsbestilt bar:</strong> Velg mellom pakke med kald øl/cider eller vin & bobler for å skåle for bruden eller brudgommen! Prisliste på forespørsel.
                 </div>
                 <div className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-[#19EB5B]" /> Mulighet for medbrakt velkomstdrink / snacks etter avtale
+                  <Check className="w-5 h-5 text-[#19EB5B]" /> <strong>Lokal pizzalevering:</strong> Varm pizza levert til loungen (ikke anledning til medbrakt mat/drikke)
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-[#19EB5B]" /> Sentral beliggenhet i Kristiansand (Lund)

@@ -105,7 +105,7 @@ export default function PriserPage() {
                 "Gratis vann å drikke.",
                 "Mission debrief og scoreboard i lounge med gamemaster.",
                 "Tilgang til vår partylounge i 30 minutter etter spillet.",
-                "Mulighet til å nyte medbrakt mat, kake og drikke.",
+                "Mulighet for medbrakt kake ved barnebursdag (forhåndsbestilt servering ved arrangementer).",
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-zinc-900/20 border border-white/5 hover:border-white/10 hover:bg-zinc-900/40 transition-colors">
                   <CheckCircle2 className="w-6 h-6 text-[#9C39FF] flex-shrink-0" />
