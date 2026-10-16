@@ -80,10 +80,10 @@ export default function VrUtdrikningslagPage() {
         "category": "Bachelor and Bachelorette Parties",
         "offers": {
           "@type": "AggregateOffer",
-          "lowPrice": 375,
-          "highPrice": 460,
+          "lowPrice": 450,
+          "highPrice": 450,
           "priceCurrency": "NOK",
-          "offerCount": 3
+          "offerCount": 1
         },
         "aggregateRating": {
           "@type": "AggregateRating",
@@ -250,8 +250,8 @@ export default function VrUtdrikningslagPage() {
             Enkel kuvertpris som inkluderer full spilletid, instruktør, partylounge og gruppebilde.
           </p>
           <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-8 text-center max-w-md mx-auto">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">Fra 375 kr</div>
-            <div className="text-xs uppercase tracking-wider text-[#9C39FF] font-medium mb-6">per person &middot; 90 min totalopplevelse</div>
+            <div className="text-3xl md:text-4xl font-bold text-white mb-1">Fra 450 kr</div>
+            <div className="text-xs uppercase tracking-wider text-[#9C39FF] font-medium mb-6">per person &middot; Varighet: 1,5–3 timer</div>
             <Link
               href="/booking"
               className="w-full flex items-center justify-center h-12 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-sm font-semibold tracking-wide transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)]"
