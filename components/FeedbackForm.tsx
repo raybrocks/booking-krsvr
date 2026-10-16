@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { submitFeedback } from '@/app/feedback/actions';
 import { Loader2, Check, ExternalLink, Sparkles, Copy, ArrowLeft } from 'lucide-react';
 
-const GOOGLE_REVIEW_URL = process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL || 'https://search.google.com/local/writereview?placeid=ChIJOVTL6bcDOEYR8N3bbtLT474';
+const GOOGLE_REVIEW_URL = process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL || 'https://g.page/r/CfC9vWzS0yO-EBM/review';
 const GOOGLE_MAPS_URL = 'https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8';
-const TRIPADVISOR_URL = 'https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html';
+const TRIPADVISOR_URL = 'https://no.tripadvisor.com/UserReviewEdit-g190492-d34257006-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html';
 
 const ACTIVITY_TAGS = [
   { id: 'vr-escape-room', label: 'VR Escape Room', text: 'VR Escape Room' },
