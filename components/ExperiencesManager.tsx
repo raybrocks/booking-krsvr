@@ -124,6 +124,7 @@ export default function ExperiencesManager() {
       fantasy: false,
       mystic: false,
       codeSolving: false,
+      cinematic: false,
       picture: "",
       images: [],
       videoUrl: "",
@@ -652,6 +653,15 @@ export default function ExperiencesManager() {
                       />
                       <span className="ml-2 text-sm text-zinc-300">Kodeløsning</span>
                     </label>
+                    <label className="flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={editForm.cinematic || false}
+                        onChange={(e) => setEditForm({...editForm, cinematic: e.target.checked})}
+                        className="w-4 h-4 accent-[#9C39FF]"
+                      />
+                      <span className="ml-2 text-sm text-zinc-300">Cinematic</span>
+                    </label>
                   </div>
                 </div>
 
@@ -973,6 +983,12 @@ export default function ExperiencesManager() {
                 )}
                 {exp.mystic && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Mystikk</span>
+                )}
+                {exp.codeSolving && (
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Kodeløsning</span>
+                )}
+                {exp.cinematic && (
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Cinematic</span>
                 )}
                 {exp.languages && exp.languages.length > 0 && (
                   <span className="bg-purple-950/40 text-purple-300 px-2 py-1 rounded border border-purple-800/50 flex items-center gap-1" title={exp.languages.join(', ')}>

@@ -664,6 +664,7 @@ export function ExperiencesView({
                 {selected.fantasy && <span title="Opplev magiske og eventyrlige verdener" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Fantasy</span>}
                 {selected.mystic && <span title="Gåtefulle og spennende mysterier venter" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Mystikk</span>}
                 {selected.codeSolving && <span title="Krever kløkt og logisk tenkning for å løse kodene" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Kodeløsning</span>}
+                {selected.cinematic && <span title="Filmatisk opplevelse med sterk historie og atmosfære" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Cinematic</span>}
               </div>
             </div>
 
@@ -683,52 +684,74 @@ export function ExperiencesView({
               </div>
             )}
 
-            {/* STATS ROW */}
-            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto px-4">
-              <div className="flex items-center gap-2 text-sm md:text-base relative group cursor-help">
-                <Timer className="w-5 h-5 text-white" />
-                <span>{selected.duration || "90 min"}</span>
-                <Info className="w-4 h-4 text-zinc-400" />
-                
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 p-4 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none text-left">
-                  <h4 className="font-bold text-white mb-2 text-sm">90 minutter totalopplevelse</h4>
-                  <ul className="text-xs text-zinc-300 space-y-1 list-disc pl-4">
-                    <li>10-15 min forberedelse og intro</li>
-                    <li>Rundt 60 min in-game session</li>
-                    <li>Gruppebilde og gratis vann</li>
-                    <li>Mission debrief og scoreboard i lounge</li>
-                    <li>Lån av party lounge i 30 min etter spill</li>
-                    <li>Mulighet for medbrakt mat/drikke</li>
-                  </ul>
+            {/* STATS ROW (3 METADATA LINES) */}
+            <div className="flex flex-col items-center gap-5 md:gap-6 text-zinc-300 font-medium mb-10 pb-10 border-b border-white/10 w-full max-w-4xl mx-auto px-4">
+              {/* Line 1: Core stats */}
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:gap-x-10">
+                <div className="flex items-center gap-2 text-sm md:text-base relative group cursor-help whitespace-nowrap">
+                  <Timer className="w-5 h-5 text-white shrink-0" />
+                  <span>{selected.duration || "90 min"}</span>
+                  <Info className="w-4 h-4 text-zinc-400 shrink-0" />
+                  
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 p-4 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none text-left whitespace-normal">
+                    <h4 className="font-bold text-white mb-2 text-sm">90 minutter totalopplevelse</h4>
+                    <ul className="text-xs text-zinc-300 space-y-1 list-disc pl-4">
+                      <li>10-15 min forberedelse og intro</li>
+                      <li>Rundt 60 min in-game session</li>
+                      <li>Gruppebilde og gratis vann</li>
+                      <li>Mission debrief og scoreboard i lounge</li>
+                      <li>Lån av party lounge i 30 min etter spill</li>
+                      <li>Mulighet for medbrakt mat/drikke</li>
+                    </ul>
+                  </div>
                 </div>
+
+                <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
+                  <Users className="w-5 h-5 text-white shrink-0" />
+                  <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-8 personer"}</span>
+                </div>
+
+                {selected.arenaSize && (
+                  <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
+                    <Maximize className="w-5 h-5 text-white shrink-0" />
+                    <span>{selected.arenaSize}</span>
+                  </div>
+                )}
+
+                {selected.age && (
+                  <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
+                    <UserCheck className="w-5 h-5 text-white shrink-0" />
+                    <span>Fra {selected.age} år</span>
+                  </div>
+                )}
+
+                {selected.difficulty && (
+                  <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
+                    <Activity className="w-5 h-5 text-white shrink-0" />
+                    <span>{selected.difficulty}</span>
+                  </div>
+                )}
               </div>
 
-              <div className="flex items-center gap-2 text-sm md:text-base">
-                <Users className="w-5 h-5 text-white" />
-                <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-8 personer"}</span>
-              </div>
-
-              {selected.arenaSize && (
-                <div className="flex items-center gap-2 text-sm md:text-base">
-                  <Maximize className="w-5 h-5 text-white" />
-                  <span>{selected.arenaSize}</span>
+              {/* Line 2: Passer for */}
+              {Array.isArray(selected.suitableFor) && selected.suitableFor.length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5 text-sm md:text-base max-w-3xl">
+                  <div className="flex items-center gap-2 text-white whitespace-nowrap mr-0.5">
+                    <Users className="w-5 h-5 text-white shrink-0" />
+                    <span>Passer for:</span>
+                  </div>
+                  {selected.suitableFor.map((audience: string, idx: number) => (
+                    <React.Fragment key={audience}>
+                      <span className="text-zinc-200 whitespace-nowrap">{audience}</span>
+                      {idx < selected.suitableFor.length - 1 && (
+                        <span className="text-[#9C39FF] font-bold select-none" aria-hidden="true">•</span>
+                      )}
+                    </React.Fragment>
+                  ))}
                 </div>
               )}
 
-              {selected.age && (
-                <div className="flex items-center gap-2 text-sm md:text-base">
-                  <UserCheck className="w-5 h-5 text-white" />
-                  <span>Fra {selected.age} år</span>
-                </div>
-              )}
-
-              {selected.difficulty && (
-                <div className="flex items-center gap-2 text-sm md:text-base">
-                  <Activity className="w-5 h-5 text-white" />
-                  <span>{selected.difficulty}</span>
-                </div>
-              )}
-
+              {/* Line 3: Available languages */}
               {selected.languages && selected.languages.length > 0 && (
                 <LanguageFlagsRow key={`lang-${selected.id}`} languages={selected.languages} />
               )}
@@ -736,22 +759,8 @@ export function ExperiencesView({
 
             {/* CONTENT MERGED */}
             <div className="flex flex-col gap-12 w-full max-w-3xl mx-auto px-4 items-center">
-              {/* DESCRIPTION & PASSER FOR */}
+              {/* DESCRIPTION */}
               <div className="flex flex-col items-center w-full">
-                {Array.isArray(selected.suitableFor) && selected.suitableFor.length > 0 && (
-                  <div className="flex flex-wrap justify-center items-center gap-3 md:gap-5 mb-8 bg-zinc-900/40 p-4 md:px-8 rounded-2xl border border-white/5 w-full">
-                    <span className="text-sm font-bold text-white uppercase tracking-wider">Passer for:</span>
-                    <div className="flex flex-wrap justify-center items-center gap-2.5 md:gap-4">
-                      {selected.suitableFor.map((audience: string) => (
-                        <div key={audience} className="flex items-center gap-2 bg-zinc-950/60 border border-white/10 px-3 py-1.5 rounded-xl">
-                          <UserCheck className="w-4 h-4 text-[#9C39FF] shrink-0" />
-                          <span className="text-sm text-zinc-200 font-medium">{audience}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 <h3 className="text-2xl font-bold text-white mb-6 text-center">Om opplevelsen</h3>
                 <div className="prose prose-invert prose-lg max-w-none text-zinc-400 text-center">
                   {selected.shortDescription && selected.shortDescription.split('\n').map((paragraph: string, i: number) => (
