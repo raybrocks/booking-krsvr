@@ -12,6 +12,7 @@ import { AdminBookingCancellationEmail } from '@/components/emails/AdminBookingC
 import { AdminNameListReminderEmail } from '@/components/emails/AdminNameListReminderEmail';
 import { EmployeeInviteEmail } from '@/components/emails/EmployeeInviteEmail';
 import { ReviewRequestEmail } from '@/components/emails/ReviewRequestEmail';
+import { AdminReviewRequestReceiptEmail } from '@/components/emails/AdminReviewRequestReceiptEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -735,7 +736,7 @@ export async function sendReviewRequestEmail(
   }
 
   const adminEmail = await getAdminEmail();
-  const { firstName, date } = bookingDetails;
+  const { firstName, lastName, date } = bookingDetails;
   const { platform, language } = options;
 
   const isEn = language === 'en';
@@ -754,6 +755,7 @@ export async function sendReviewRequestEmail(
       })
     );
 
+    // 1. Send e-post til gjesten
     const data = await resend.emails.send({
       from: 'KRS VR Arena <post@krsvr.no>',
       to: [to],
@@ -761,6 +763,42 @@ export async function sendReviewRequestEmail(
       subject: emailSubject,
       html: html,
     });
+
+    // 2. Send alltid en kvittering til admin post@krsvr.no med kopi av mailen
+    try {
+      const sentAt = new Intl.DateTimeFormat('no-NO', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'Europe/Oslo',
+      }).format(new Date());
+
+      const fullName = [firstName, lastName].filter(Boolean).join(' ') || firstName || 'Gjest';
+
+      const adminReceiptHtml = await render(
+        React.createElement(AdminReviewRequestReceiptEmail, {
+          recipientName: fullName,
+          recipientEmail: to,
+          date,
+          platform,
+          language,
+          sentAt,
+          adminEmail,
+        })
+      );
+
+      // Sørg for at post@krsvr.no alltid mottar kvitteringen
+      const adminRecipients = Array.from(new Set(['post@krsvr.no', adminEmail]));
+
+      await resend.emails.send({
+        from: 'KRS VR Arena Admin <booking@donotreply.krsvr.no>',
+        to: adminRecipients,
+        replyTo: to,
+        subject: `Kvittering: Forespørsel om omtale sendt til ${fullName}`,
+        html: adminReceiptHtml,
+      });
+    } catch (receiptErr) {
+      console.error("Failed to send admin receipt for review request email:", receiptErr);
+    }
 
     return data;
   } catch (error) {

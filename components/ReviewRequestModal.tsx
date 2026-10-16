@@ -259,6 +259,10 @@ export default function ReviewRequestModal({
                   <span className="text-zinc-500 inline-block w-14">Avsender:</span>
                   <span className="text-zinc-400">KRS VR Arena &lt;post@krsvr.no&gt;</span>
                 </div>
+                <div className="text-zinc-400 flex items-center">
+                  <span className="text-zinc-500 inline-block w-14">Kvittering:</span>
+                  <span className="text-emerald-400/90 font-medium text-[11px]">Kopi sendes automatisk til post@krsvr.no</span>
+                </div>
               </div>
 
               {/* Simulert e-posttekst */}

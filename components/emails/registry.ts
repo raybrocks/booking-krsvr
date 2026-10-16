@@ -13,6 +13,7 @@ import { FeedbackNotificationEmail } from './FeedbackNotificationEmail';
 import { WeeklySummaryEmail } from './WeeklySummaryEmail';
 import { NewsletterBroadcastEmail } from './NewsletterBroadcastEmail';
 import { ReviewRequestEmail } from './ReviewRequestEmail';
+import { AdminReviewRequestReceiptEmail } from './AdminReviewRequestReceiptEmail';
 
 export interface EmailTemplateDefinition {
   id: string;
@@ -263,6 +264,25 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
       rating: 'happy',
       comments: 'Veldig god opplevelse. Instruktøren var dyktig og tok godt imot oss.',
       phone: '+47 987 65 432',
+      adminEmail: 'post@krsvr.no',
+    },
+  },
+  {
+    id: 'admin-review-request-receipt',
+    title: 'Kvittering: Omtaleforespørsel sendt til kunde',
+    category: 'internal',
+    categoryLabel: 'Interne varslinger',
+    subject: 'Kvittering: Forespørsel om omtale sendt til Kari Nordmann',
+    trigger: 'Sendes automatisk til post@krsvr.no hver gang en omtaleforespørsel sendes ut fra admin-panelet.',
+    filePath: 'components/emails/AdminReviewRequestReceiptEmail.tsx',
+    Component: AdminReviewRequestReceiptEmail,
+    mockProps: {
+      recipientName: 'Kari Nordmann',
+      recipientEmail: 'kari@example.com',
+      date: '12. september 2026 kl. 18:00',
+      platform: 'both',
+      language: 'no',
+      sentAt: '16.10.2026 kl. 19:50',
       adminEmail: 'post@krsvr.no',
     },
   },

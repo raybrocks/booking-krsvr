@@ -63,7 +63,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     return NextResponse.json({
       success: true,
-      message: `Forespørsel om omtale (${platformLabel}) sendt til ${booking.email}`,
+      message: `Forespørsel om omtale sendt til ${booking.email}. Kvittering og kopi er sendt til post@krsvr.no.`,
       booking: updatedBooking,
     });
   } catch (error) {
