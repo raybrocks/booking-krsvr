@@ -4,7 +4,6 @@ import { EmailLayout } from './EmailLayout';
 
 export interface ReviewRequestEmailProps {
   firstName: string;
-  experienceTitle?: string;
   date?: string;
   platform: 'tripadvisor' | 'google' | 'both';
   language?: 'no' | 'en';
@@ -16,7 +15,6 @@ const GOOGLE_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=C
 
 export const ReviewRequestEmail: React.FC<ReviewRequestEmailProps> = ({
   firstName,
-  experienceTitle,
   platform = 'both',
   language = 'no',
   adminEmail = 'post@krsvr.no',
@@ -37,14 +35,20 @@ export const ReviewRequestEmail: React.FC<ReviewRequestEmailProps> = ({
 
       <Text style={paragraphStyle}>
         {isEn
-          ? `We hope you and your group had a great time experiencing ${experienceTitle ? `"${experienceTitle}"` : 'our VR arena'} with us in Kristiansand.`
-          : `Vi håper du og gruppen din hadde en fin stund med ${experienceTitle ? `«${experienceTitle}»` : 'VR-opplevelsene'} hos oss på Lund i Kristiansand.`}
+          ? `We hope you had a great experience with us at Lund in Kristiansand.`
+          : `Vi håper dere hadde en fin opplevelse hos oss på Lund i Kristiansand.`}
       </Text>
 
       <Text style={paragraphStyle}>
         {isEn
-          ? `As a local arena, reviews from visitors like you mean the world to our team and help others discover what we offer. If you have a minute to spare, we would be deeply grateful if you could share a brief review of your visit.`
-          : `Som en lokal arena i Kristiansand betyr tilbakemeldinger fra gjestene våre utrolig mye for instruktørene våre og for andre som vurderer å besøke oss. Dersom du har et lite minutt til overs, ville vi satt stor pris på om du delte en kort omtale.`}
+          ? `As a local arena in Kristiansand, feedback from our visitors means the world to our team. If you have a minute to spare, we would truly appreciate it if you could share a brief review.`
+          : `Som en lokal arena i Kristiansand betyr tilbakemeldinger fra gjestene våre utrolig mye for teamet vårt. Dersom du har et lite minutt til overs, ville vi satt stor pris på om du delte en kort omtale.`}
+      </Text>
+
+      <Text style={paragraphStyle}>
+        {isEn
+          ? `The most valuable reviews often describe who you were, the occasion for your visit, and how you experienced it.`
+          : `De mest verdifulle tilbakemeldingene beskriver gjerne hvem dere var, i hvilken anledning dere besøkte oss, og hvordan opplevelsen var.`}
       </Text>
 
       {/* Button Section */}

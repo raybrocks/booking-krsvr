@@ -722,7 +722,6 @@ export async function sendReviewRequestEmail(
   bookingDetails: {
     firstName: string;
     lastName?: string;
-    experienceTitle?: string;
     date?: string;
   },
   options: {
@@ -736,7 +735,7 @@ export async function sendReviewRequestEmail(
   }
 
   const adminEmail = await getAdminEmail();
-  const { firstName, experienceTitle, date } = bookingDetails;
+  const { firstName, date } = bookingDetails;
   const { platform, language } = options;
 
   const isEn = language === 'en';
@@ -748,7 +747,6 @@ export async function sendReviewRequestEmail(
     const html = await render(
       React.createElement(ReviewRequestEmail, {
         firstName,
-        experienceTitle,
         date,
         platform,
         language,

@@ -32,7 +32,6 @@ export default function ReviewRequestModal({
 
   if (!isOpen || !booking) return null;
 
-  const experienceTitle = booking.experience?.name || "VR-opplevelse";
   const firstName = booking.firstName || "Kunde";
   const isEn = language === "en";
 
@@ -111,7 +110,7 @@ export default function ReviewRequestModal({
             <div className="flex items-center gap-4 text-zinc-300">
               <div>
                 <span className="text-zinc-500 block text-[10px] uppercase tracking-wider">Aktivitet</span>
-                <span className="font-medium text-white">{experienceTitle}</span>
+                <span className="font-medium text-white">{booking.experience?.name || "VR-opplevelse"}</span>
               </div>
               <div className="border-l border-zinc-800 pl-4">
                 <span className="text-zinc-500 block text-[10px] uppercase tracking-wider">Dato & Tid</span>
@@ -269,13 +268,18 @@ export default function ReviewRequestModal({
                 </div>
                 <p className="text-xs text-zinc-700 leading-relaxed">
                   {isEn
-                    ? `We hope you and your group had a great time experiencing "${experienceTitle}" with us in Kristiansand.`
-                    : `Vi håper du og gruppen din hadde en fin stund med «${experienceTitle}» hos oss på Lund i Kristiansand.`}
+                    ? `We hope you had a great experience with us at Lund in Kristiansand.`
+                    : `Vi håper dere hadde en fin opplevelse hos oss på Lund i Kristiansand.`}
                 </p>
                 <p className="text-xs text-zinc-700 leading-relaxed">
                   {isEn
-                    ? `As a local arena, reviews from visitors like you mean the world to our team. If you have a minute to spare, we would be deeply grateful if you could share a brief review.`
+                    ? `As a local arena in Kristiansand, feedback from our visitors means the world to our team. If you have a minute to spare, we would truly appreciate it if you could share a brief review.`
                     : `Som en lokal arena i Kristiansand betyr tilbakemeldinger fra gjestene våre utrolig mye for teamet vårt. Dersom du har et lite minutt til overs, ville vi satt stor pris på om du delte en kort omtale.`}
+                </p>
+                <p className="text-xs text-zinc-700 leading-relaxed">
+                  {isEn
+                    ? `The most valuable reviews often describe who you were, the occasion for your visit, and how you experienced it.`
+                    : `De mest verdifulle tilbakemeldingene beskriver gjerne hvem dere var, i hvilken anledning dere besøkte oss, og hvordan opplevelsen var.`}
                 </p>
 
                 {/* Knapper i preview */}

@@ -337,7 +337,6 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
     Component: ReviewRequestEmail,
     mockProps: {
       firstName: 'Kari',
-      experienceTitle: 'Mission: Sigma (VR Escape Room)',
       platform: 'both',
       language: 'no',
       adminEmail: 'post@krsvr.no',

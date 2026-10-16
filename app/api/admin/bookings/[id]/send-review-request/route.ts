@@ -33,14 +33,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // Body is optional, defaults to 'both' and 'no'
     }
 
-    const experienceTitle = booking.experience?.name || 'VR Opplevelse';
-
     const result = await sendReviewRequestEmail(
       booking.email,
       {
         firstName: booking.firstName,
         lastName: booking.lastName,
-        experienceTitle,
         date: booking.date,
       },
       {
