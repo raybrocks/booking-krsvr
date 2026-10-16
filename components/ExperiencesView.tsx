@@ -516,20 +516,32 @@ export function ExperiencesView({
         <p className="text-zinc-400 text-sm md:text-lg text-center font-light mb-5 md:mb-8 max-w-2xl mx-auto px-2">
           Alle opplevelser hos oss er laget for samarbeid, kommunikasjon og felles mestring.
         </p>
-        <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 w-full max-w-4xl mx-auto px-1 mb-2 overflow-x-auto hide-scrollbar">
-          {["Alle", "Familie", "Rask Action", "Escape Room"].map(filter => (
-            <button
-              key={filter}
-              onClick={() => handlePrimaryFilterClick(filter)}
-              className={`px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all border cursor-pointer ${
-                activePrimaryFilter === filter
-                  ? "border-[#9C39FF] bg-[#9C39FF]/20 text-white shadow-[0_0_15px_rgba(156,57,255,0.2)]"
-                  : "border-zinc-800 bg-transparent text-zinc-400 hover:border-zinc-600 hover:text-white"
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
+        <div className="flex items-center justify-center gap-3 sm:gap-5 w-full max-w-4xl mx-auto px-2 mb-2 overflow-x-auto hide-scrollbar">
+          {["Alle", "Familie", "Rask Action", "Escape Room"].map((filter, idx, arr) => {
+            const isActive = activePrimaryFilter === filter;
+            return (
+              <React.Fragment key={filter}>
+                <button
+                  onClick={() => handlePrimaryFilterClick(filter)}
+                  className={`relative py-1 text-xs sm:text-sm md:text-base tracking-wide whitespace-nowrap transition-colors cursor-pointer ${
+                    isActive
+                      ? "text-white font-semibold"
+                      : "text-zinc-500 hover:text-zinc-200 font-normal"
+                  }`}
+                >
+                  {filter}
+                  {isActive && (
+                    <span className="absolute left-0 right-0 -bottom-0.5 h-[2px] bg-[#9C39FF] rounded-full shadow-[0_0_8px_rgba(156,57,255,0.6)]" />
+                  )}
+                </button>
+                {idx < arr.length - 1 && (
+                  <span className="text-zinc-700 text-xs sm:text-sm select-none" aria-hidden="true">
+                    |
+                  </span>
+                )}
+              </React.Fragment>
+            );
+          })}
         </div>
       </motion.div>
 
