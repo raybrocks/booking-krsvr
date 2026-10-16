@@ -35,6 +35,7 @@ function KontaktForm() {
   const [altDate, setAltDate] = useState("");
   const [time, setTime] = useState("");
   const [food, setFood] = useState("");
+  const [bar, setBar] = useState("");
   const [consent, setConsent] = useState(false);
 
   // Form state
@@ -96,7 +97,8 @@ function KontaktForm() {
           date,
           altDate,
           time,
-          food
+          food,
+          bar
         }),
       });
       
@@ -517,6 +519,35 @@ function KontaktForm() {
                         </div>
                         <p className="mt-3 text-xs text-zinc-500 leading-relaxed">
                           KRS VR Arena kan koordinere levering av pizza/mat på forespørsel. Medbrakt mat og drikke avtales på forhånd.
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-zinc-300 mb-3">Ønsker dere forhåndsbestilt bar / drikkeservering?</label>
+                        <div className="grid sm:grid-cols-1 gap-3">
+                          {[
+                            "Pakke 1: Kald øl, cider og mineralvann (Tuborg, Corona Extra, Breezer)",
+                            "Pakke 2: Kvalitetsvin og bobler (samme leverandør som Boen Gård)",
+                            "Kombinasjon av begge pakker",
+                            "Nei, kun kaffe og vann",
+                            "Usikker – send oss komplett prisliste og forslag"
+                          ].map((opt) => (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => setBar(opt)}
+                              className={`p-3 rounded-lg border text-sm text-left transition-colors ${
+                                bar === opt
+                                  ? "bg-[#9C39FF]/10 border-[#9C39FF] text-white"
+                                  : "bg-black/40 border-white/10 text-zinc-400 hover:border-white/20 hover:text-white"
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="mt-3 text-xs text-zinc-500 leading-relaxed">
+                          Baren klargjøres ved forhåndsbestilling til arrangementet. Komplett prisliste mottar dere sammen med tilbudet. Bedriften kan få samlet EHF-faktura, eller vi kan åpne baren for deltakerbetaling.
                         </p>
                       </div>
 

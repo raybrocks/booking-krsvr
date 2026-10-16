@@ -40,6 +40,7 @@ export async function POST(req: Request) {
           altDate: data.altDate || null,
           time: data.time || null,
           food: data.food || null,
+          bar: data.bar || null,
           status: 'new',
         }
       });
@@ -83,6 +84,7 @@ export async function POST(req: Request) {
       }
       htmlContent += `<p><strong>Tidspunkt:</strong> ${data.time || 'Ikke spesifisert'}</p>`;
       htmlContent += `<p><strong>Matønsker:</strong> ${data.food || 'Ingen'}</p>`;
+      htmlContent += `<p><strong>Bar / drikkeservering:</strong> ${data.bar || 'Ingen / ikke spesifisert'}</p>`;
     }
     
     htmlContent += `<p><strong>Melding:</strong></p><p>${data.message.replace(/\n/g, '<br/>')}</p>`;

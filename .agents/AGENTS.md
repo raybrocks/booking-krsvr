@@ -14,8 +14,14 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    * Mixed Reality Shooter
    * Teambuilding Kristiansand
    * Utdrikningslag Kristiansand
+   * Bachelor Party Kristiansand
+   * Bachelorette Party Kristiansand
    * Bursdag Kristiansand
+   * Barnebursdag Kristiansand
    * Firmaevent Kristiansand
+   * Kickoff Kristiansand
+   * Julebord Kristiansand
+   * VR On-site Kristiansand
 2. **Bevar eksisterende SEO:** Ikke overskriv eksisterende god metadata og struktur (f.eks. JSON-LD, sitemap, robots, alt-tekster) uten god grunn. Utvid heller med nye relevante nøkkelord.
 3. **Semantikk:** Hold strukturert og semantisk HTML (H1, H2, H3) vedlike, og ha alltid beskrivende alt-tekster for bilder.
 4. **Visuelt design:** Ikke gjør store visuelle endringer i UI eller tekster for SEO-ens skyld. Endringer bør gjøres "under the hood" der det er mulig (metadata, aria-labels, json-ld).
@@ -56,5 +62,23 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    grant select, insert, update, delete on public.din_tabell to service_role;
    ```
 2. **Skille mellom GRANT og RLS:** `GRANT` gir Data API / PostgREST tillatelse til å nå tabellen. `RLS` (`alter table public.din_tabell enable row level security;` + policies) styrer hvilke rader som kan aksesseres. Begge deler må **alltid** settes opp sammen.
+
+# Bedriftsarrangementer, Teambuilding & Bar
+1. **Turneringsformat for store grupper (10–64 personer):**
+   - Store bedriftsgrupper kjøres i et dynamisk turneringsformat med opptil 10 aktive spillere samtidig i ~10-minutters runder.
+   - Hvert lag får fargerike armbånd med egne teamnavn (f.eks. avdelingsnavn fra firmaet eller Team Alfa, Beta, Charlie, Delta).
+   - De som har pause følger med på storskjerm (spectator), sjekker scorecards, tar en forfriskning og legger taktikk.
+   - Felles kåring av vinnerlaget på slutten.
+   - Alle opplever å delta på samme arrangement hele tiden &mdash; aldri isolert oppdelt i parallelle 4-timers økter.
+2. **Bar og Servering (Kun ved forhåndsbestilling):**
+   - Baren er ikke fast åpen drop-in, men klargjøres ved forhåndsbestilling til arrangementer.
+   - **Pakke 1 (Øl & Cider):** Kald Tuborg, Corona Extra, Bacardi Breezer og mineralvann. Veldig trygt og uformelt med tanke på utstyr.
+   - **Pakke 2 (Vin & Bobler):** Kvalitetsvin og musserende bobler fra samme anerkjente leverandør som Boen Gård (for hyggelige markeringer, nytes i loungen eller etter spill).
+   - **Prislister:** Sendes uforpliktende ved bookingforespørsel.
+   - **Pizza:** Lokal pizza kan leveres varmt direkte til partyloungen.
+   - **Oppgjør:** Firmaet dekker samlet på EHF-faktura, eller vi åpner baren for deltakerbetaling.
+3. **Pakkepriser:**
+   - Teambuilding (2–10 personer): Fra 375 kr eks. mva / pers (90 min).
+   - Teambuilding (10–50 personer): Fra 450 kr eks. mva / pers (inntil 3 timer totaltid / hele lokalet for dere selv / 120 min aktivt turneringsformat).
 
 

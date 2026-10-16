@@ -1,27 +1,38 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Users, PartyPopper } from "lucide-react";
-import { motion } from "motion/react";
+import Image from "next/image";
+import { ArrowRight, Cake, Flame, Users, Truck, Check } from "lucide-react";
 import { Metadata } from "next";
+import ArrangementSubNav from "@/components/ArrangementSubNav";
 
 export const metadata: Metadata = {
-  title: "Arrangementer, Teambuilding & Utdrikningslag Kristiansand",
-  description: "Planlegg teambuilding, utdrikningslag, firmaevent eller bursdag hos KRS VR Arena i Kristiansand. Full frihet i VR er den perfekte sosiale aktiviteten.",
-  keywords: ["Teambuilding Kristiansand", "Utdrikningslag Kristiansand", "Firmafest Kristiansand", "Julebord Kristiansand", "Bursdag Kristiansand", "Aktivitet Kristiansand", "Arrangement Kristiansand", "VR event"],
+  title: "Arrangementer i Kristiansand – Bursdag, Utdrikningslag & Teambuilding",
+  description: "Skreddersydde arrangementer med VR i Kristiansand. Opplev VR-bursdag, VR-utdrikningslag, teambuilding for bedrifter og VR on-site hos KRS VR Arena.",
+  keywords: [
+    "Arrangementer Kristiansand",
+    "VR Bursdag Kristiansand",
+    "Utdrikningslag Kristiansand",
+    "Bachelor party Kristiansand",
+    "Teambuilding Kristiansand",
+    "Firmaevent Kristiansand",
+    "Firmafest Kristiansand",
+    "VR On-site Kristiansand",
+    "Gruppeaktivitet Kristiansand",
+  ],
   openGraph: {
-    title: "Arrangementer & Teambuilding Kristiansand",
-    description: "Planlegg teambuilding, utdrikningslag, firmaevent eller bursdag med unike VR-opplevelser hos KRS VR Arena.",
+    title: "Arrangementer i Kristiansand | KRS VR Arena",
+    description: "Samle venner, kolleger eller familien til en engasjerende opplevelse i VR. Egen lounge og dedikert spillvert.",
     url: "https://www.krsvr.no/arrangementer",
     type: "website",
-  }
+  },
 };
 
 export default function ArrangementerPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "EventSeries",
-    "name": "Arrangementer, Teambuilding og Utdrikningslag hos KRS VR Arena",
-    "description": "Vi tilbyr skreddersydde pakker for teambuilding, utdrikningslag, firmaevent, julebord og bursdager i Kristiansand med eksklusiv VR-underholdning.",
+    "name": "Arrangementer hos KRS VR Arena",
+    "description": "Vi tilbyr skreddersydde pakker for VR-bursdag, VR-utdrikningslag, teambuilding og mobil VR on-site i Kristiansand og Agder.",
     "url": "https://www.krsvr.no/arrangementer",
     "provider": {
       "@type": "EntertainmentBusiness",
@@ -36,88 +47,144 @@ export default function ArrangementerPage() {
     }
   };
 
+  const tracks = [
+    {
+      title: "VR Bursdag",
+      subtitle: "Barn (8–12), ungdom & voksne",
+      description: "En aktiv bursdag der alle samarbeider og mestrer sammen. Egen partylounge med kakespising eller pizzalevering etter spillet.",
+      href: "/arrangementer/vr-bursdag",
+      image: "/images/vr-familiepakke-8-12-aar.jpg",
+      icon: Cake,
+      tag: "Partylounge inkludert",
+    },
+    {
+      title: "VR Utdrikningslag",
+      subtitle: "Bachelor & Bachelorette party",
+      description: "Det perfekte innslaget mellom lunsj og kvelden videre. Full action, lagkonkurranser, god stemning og partylounge for hele gjengen.",
+      href: "/arrangementer/vr-utdrikningslag",
+      image: "/images/vr-utdrikningslag-kristiansand.jpg",
+      icon: Flame,
+      tag: "Forloverens favoritt",
+    },
+    {
+      title: "VR Teambuilding",
+      subtitle: "Kickoff, firmafest & julebord",
+      description: "Styrk samholdet i teamet. Oppdrag som krever tydelig kommunikasjon og tillit. EHF-faktura og fleksibelt deltakerantall.",
+      href: "/arrangementer/vr-teambuilding",
+      image: "/images/vr-teambuilding-firmaevent-kristiansand.jpg",
+      icon: Users,
+      tag: "2–64 personer &middot; EHF",
+    },
+    {
+      title: "VR On-site",
+      subtitle: "Vi kommer til dine lokaler",
+      description: "Skal dere ha konferanse, kickoff eller festival i egne lokaler? Vi rigger opp mobil VR-arena med instruktører i hele Agder.",
+      href: "/arrangementer/vr-on-site",
+      image: "/arrangement-hero.jpg",
+      icon: Truck,
+      tag: "I hele Agder",
+    },
+  ];
+
   return (
-    <main className="min-h-screen pb-20 pt-16">
+    <main className="min-h-screen pb-24 pt-12 md:pt-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mb-10 text-center px-4">
-        <h1 className="text-4xl md:text-5xl font-light tracking-tighter">
-          Arrangementer hos KRS VR Arena
-        </h1>
-        <p className="mt-4 text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-          Planlegg bursdag, utdrikningslag, firmaevent, teambuilding eller julebord med unike VR-opplevelser i Kristiansand. Hos oss spiller dere på lag, løser oppdrag og skaper minner gruppa faktisk snakker om etterpå.
-        </p>
 
-        
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/arrangementer/private-fester" className="px-6 py-2.5 rounded-full text-sm font-medium transition-all bg-white text-black hover:bg-zinc-200">
-            Se private fester
-          </Link>
-          <Link href="/arrangementer/firmaevent" className="px-6 py-2.5 rounded-full text-sm font-medium transition-all bg-[#9C39FF]/10 text-white border border-[#9C39FF]/30 hover:bg-[#9C39FF]/20">
-            Se firmaevent
-          </Link>
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Undermeny for arrangementer */}
+        <ArrangementSubNav />
+
+        {/* HERO HEADER */}
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white">
+            Arrangementer hos KRS VR Arena
+          </h1>
+          <p className="mt-4 text-zinc-400 text-base md:text-lg leading-relaxed font-light">
+            Planlegg en feiring eller et bedriftsevent som skiller seg ut. Hos oss spiller dere på lag, løser gåter og kjemper side om side &mdash; med instruktør og egen partylounge.
+          </p>
         </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto px-4 mt-12 mb-16">
-        <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl group">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent z-10 pointer-events-none"></div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img 
-            src="/arrangement-hero.jpg" 
-            alt="Vennegjeng med VR-briller klare for spill" 
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-          />
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 mt-16">
-        {/* Pill Menu Navigation */}
-        <div className="flex justify-center mb-10 w-full">
-          <div className="inline-flex bg-zinc-900/80 p-1 rounded-full border border-white/5">
-            <Link href="/arrangementer/private-fester" className="px-6 py-2 rounded-full text-sm font-medium text-zinc-400 hover:text-white transition-colors">
-              Private fester
-            </Link>
-            <Link href="/arrangementer/firmaevent" className="px-6 py-2 rounded-full text-sm font-medium text-zinc-400 hover:text-white transition-colors">
-              Bedrifter
-            </Link>
+        {/* TRUST BADGE */}
+        <div className="flex justify-center mb-12">
+          <div className="inline-flex items-center text-xs sm:text-sm text-zinc-400 bg-zinc-900/60 px-6 py-2.5 rounded-full border border-white/5 text-center">
+            2–64 personer &middot; Egen partylounge &middot; Møt presist for å ikke miste spilletid.
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Kort 1 */}
-          <Link href="/arrangementer/private-fester" className="group block">
-            <div className="h-full bg-zinc-900/40 border border-white/10 rounded-2xl p-8 hover:bg-zinc-900/60 hover:border-white/20 transition-all flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-[#9C39FF]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <PartyPopper className="w-8 h-8 text-[#9C39FF]" />
-              </div>
-              <h2 className="text-2xl font-medium tracking-tight mb-4">Private fester</h2>
-              <p className="text-zinc-400 leading-relaxed mb-8 flex-grow">
-                Perfekt for bursdag og utdrikningslag. Samle gjengen til en sosial VR-opplevelse med samarbeid, konkurranse og høy energi.
-              </p>
-              <div className="inline-flex items-center text-sm font-medium text-white group-hover:text-[#9C39FF] transition-colors">
-                Se private fester <ArrowRight className="ml-2 w-4 h-4" />
-              </div>
-            </div>
-          </Link>
+        {/* 4 BILDE-KORT GRID */}
+        <div className="grid md:grid-cols-2 gap-8 mb-20">
+          {tracks.map((track) => {
+            const Icon = track.icon;
+            return (
+              <Link
+                key={track.href}
+                href={track.href}
+                className="group block bg-zinc-900/30 border border-white/10 rounded-3xl overflow-hidden hover:border-white/20 hover:bg-zinc-900/50 transition-all duration-300 shadow-xl flex flex-col"
+              >
+                <div className="relative aspect-[16/10] w-full overflow-hidden">
+                  <Image
+                    src={track.image}
+                    alt={track.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 600px"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3.5 py-1 rounded-full border border-white/10 text-xs font-medium text-zinc-200">
+                    <span dangerouslySetInnerHTML={{ __html: track.tag }} />
+                  </div>
+                </div>
 
-          {/* Kort 2 */}
-          <Link href="/arrangementer/firmaevent" className="group block">
-            <div className="h-full bg-zinc-900/40 border border-white/10 rounded-2xl p-8 hover:bg-zinc-900/60 hover:border-white/20 transition-all flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-[#9C39FF]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Users className="w-8 h-8 text-[#9C39FF]" />
-              </div>
-              <h2 className="text-2xl font-medium tracking-tight mb-4">Bedrifter</h2>
-              <p className="text-zinc-400 leading-relaxed mb-8 flex-grow">
-                Perfekt for teambuilding, kick off, firmafest og julebord. En aktiv og engasjerende opplevelse der kollegene må samarbeide for å lykkes.
-              </p>
-              <div className="inline-flex items-center text-sm font-medium text-white group-hover:text-[#9C39FF] transition-colors">
-                Se firmaevent <ArrowRight className="ml-2 w-4 h-4" />
-              </div>
-            </div>
-          </Link>
+                <div className="p-8 flex flex-col flex-grow">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-xl bg-[#9C39FF]/10 flex items-center justify-center text-[#9C39FF]">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-medium text-white tracking-tight group-hover:text-[#9C39FF] transition-colors">
+                        {track.title}
+                      </h2>
+                      <div className="text-xs text-zinc-400 font-light">{track.subtitle}</div>
+                    </div>
+                  </div>
+
+                  <p className="text-zinc-400 text-sm leading-relaxed mt-3 mb-6 flex-grow font-light">
+                    {track.description}
+                  </p>
+
+                  <div className="inline-flex items-center text-sm font-semibold text-white group-hover:text-[#9C39FF] transition-colors">
+                    Les mer og se opplegg <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* BUNN-BANNER / DIREKTE BOOKING */}
+        <div className="bg-gradient-to-r from-zinc-900/80 via-zinc-900/40 to-zinc-900/80 border border-white/10 rounded-3xl p-8 md:p-12 text-center max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-light text-white mb-3">
+            Klar for å planlegge arrangementet?
+          </h2>
+          <p className="text-zinc-400 text-sm md:text-base mb-8 max-w-xl mx-auto font-light">
+            Enten dere vil sikre et tidspunkt direkte i bookingsystemet, eller be om et skreddersydd bedriftsopplegg med servering, er vi klare til å ta imot dere.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/booking"
+              className="px-8 py-3 rounded-full text-sm font-semibold tracking-wide bg-[#9C39FF] hover:bg-[#8A30E0] text-white shadow-[0_0_20px_rgba(156,57,255,0.4)] transition-all hover:scale-105"
+            >
+              Book direkte online
+            </Link>
+            <Link
+              href="/kontakt"
+              className="px-8 py-3 rounded-full text-sm font-medium tracking-wide bg-white/5 hover:bg-white/10 text-zinc-200 border border-white/10 transition-colors"
+            >
+              Ta kontakt med oss
+            </Link>
+          </div>
         </div>
       </div>
     </main>

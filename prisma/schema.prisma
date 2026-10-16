@@ -212,6 +212,7 @@ model ContactInquiry {
   altDate       String?
   time          String?
   food          String?
+  bar           String?
 
   status        String    @default("new") // "new", "contacted", "booked", "rejected"
   internalNotes String?

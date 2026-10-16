@@ -3,18 +3,44 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
-import { motion } from "motion/react";
+import { Menu, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+
+const ARRANGEMENT_LINKS = [
+  { href: "/arrangementer", label: "Oversikt over arrangementer" },
+  { href: "/arrangementer/vr-bursdag", label: "VR Bursdag" },
+  { href: "/arrangementer/vr-utdrikningslag", label: "VR Utdrikningslag" },
+  { href: "/arrangementer/vr-teambuilding", label: "VR Teambuilding & Firma" },
+  { href: "/arrangementer/vr-on-site", label: "VR On-site (Vi kommer til deg)" },
+];
 
 export default function Header() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [mobileArrangementerOpen, setMobileArrangementerOpen] = useState(true);
+  const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
+  const [closeTimeout, setCloseTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (closeTimeout) {
+      clearTimeout(closeTimeout);
+      setCloseTimeout(null);
+    }
+    setDesktopDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setDesktopDropdownOpen(false);
+    }, 150);
+    setCloseTimeout(timeout);
+  };
 
   const navLinks = [
     { href: "/", label: "Hovedside" },
     { href: "/vr-opplevelser", label: "VR Opplevelser" },
-    { href: "/arrangementer", label: "Arrangementer" },
+    { href: "/arrangementer", label: "Arrangementer", hasDropdown: true },
     { href: "/priser", label: "Priser" },
     { href: "/faq", label: "FAQ" },
     { href: "/kontakt", label: "Kontakt" },
@@ -49,16 +75,19 @@ export default function Header() {
               <SheetTrigger render={<button className="text-zinc-200 hover:text-white p-2" />}>
                 <Menu size={28} />
               </SheetTrigger>
-              <SheetContent side="right" className="bg-[#0a0a0c]/95 border-zinc-800/50 backdrop-blur-xl text-zinc-100 flex flex-col pt-20">
+              <SheetContent side="right" className="bg-[#0a0a0c]/95 border-zinc-800/50 backdrop-blur-xl text-zinc-100 flex flex-col pt-16 overflow-y-auto">
                 <SheetTitle className="sr-only">Navigasjonsmeny</SheetTitle>
-                <nav className="flex flex-col items-center gap-8 flex-1 w-full mt-8">
+                <nav className="flex flex-col items-center gap-6 flex-1 w-full mt-4 pb-12">
                   {navLinks.map((link) => {
                     const isBooking = link.href === "/booking";
-                    const isActive = pathname === link.href;
+                    const isArrangementer = link.href === "/arrangementer";
+                    const isActive = isArrangementer 
+                      ? pathname === "/arrangementer" || pathname.startsWith("/arrangementer/")
+                      : pathname === link.href;
                     
                     if (isBooking) {
                       return (
-                        <div key={link.href} className="w-full flex justify-center mt-4">
+                        <div key={link.href} className="w-full flex justify-center mt-2">
                           <Link
                             href={link.href}
                             onClick={() => setIsOpen(false)}
@@ -66,6 +95,49 @@ export default function Header() {
                           >
                             {link.label}
                           </Link>
+                        </div>
+                      );
+                    }
+
+                    if (isArrangementer) {
+                      return (
+                        <div key={link.href} className="w-full flex flex-col items-center">
+                          <button
+                            onClick={() => setMobileArrangementerOpen(!mobileArrangementerOpen)}
+                            className={`flex items-center gap-2 text-2xl font-light tracking-wide transition-all ${
+                              isActive ? "text-white" : "text-zinc-500 hover:text-zinc-200"
+                            }`}
+                          >
+                            <span>{link.label}</span>
+                            <ChevronDown 
+                              size={20} 
+                              className={`transition-transform duration-200 text-zinc-400 ${
+                                mobileArrangementerOpen ? "rotate-180" : ""
+                              }`} 
+                            />
+                          </button>
+                          
+                          {mobileArrangementerOpen && (
+                            <div className="flex flex-col items-center gap-3.5 mt-3 pt-2 pb-1 border-y border-white/5 w-full bg-white/[0.02] rounded-2xl">
+                              {ARRANGEMENT_LINKS.map((sub) => {
+                                const isSubActive = pathname === sub.href;
+                                return (
+                                  <Link
+                                    key={sub.href}
+                                    href={sub.href}
+                                    onClick={() => setIsOpen(false)}
+                                    className={`text-sm tracking-wide transition-colors ${
+                                      isSubActive 
+                                        ? "text-[#9C39FF] font-semibold" 
+                                        : "text-zinc-400 hover:text-white"
+                                    }`}
+                                  >
+                                    {sub.label}
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       );
                     }
@@ -86,7 +158,7 @@ export default function Header() {
                            </span>
                         ) : link.label}
                       </Link>
-                    )
+                    );
                   })}
                 </nav>
               </SheetContent>
@@ -99,7 +171,10 @@ export default function Header() {
       <div className="hidden md:flex relative justify-center w-full mt-4 pointer-events-auto">
         <nav className="flex relative gap-1 md:gap-2">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isArrangementer = link.href === "/arrangementer";
+            const isActive = isArrangementer 
+              ? pathname === "/arrangementer" || pathname.startsWith("/arrangementer/")
+              : pathname === link.href;
             const isBooking = link.href === "/booking";
 
             if (isBooking) {
@@ -111,6 +186,70 @@ export default function Header() {
                 >
                   {link.label}
                 </Link>
+              );
+            }
+
+            if (isArrangementer) {
+              return (
+                <div 
+                  key={link.href}
+                  className="relative"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <Link
+                    href={link.href}
+                    className={`relative inline-flex items-center gap-1.5 px-6 py-2.5 outline-none rounded-full text-sm font-medium tracking-wide transition-colors ${
+                      isActive 
+                        ? "text-white" 
+                        : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-active-pill"
+                        className="absolute inset-0 bg-[#9C39FF] rounded-full shadow-[0_0_15px_rgba(156,57,255,0.4)]"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        style={{ zIndex: -1 }}
+                      />
+                    )}
+                    <span className="relative z-10">{link.label}</span>
+                    <ChevronDown size={14} className="relative z-10 opacity-70" />
+                  </Link>
+
+                  {/* Dropdown panel */}
+                  <AnimatePresence>
+                    {desktopDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                        transition={{ duration: 0.16 }}
+                        className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 min-w-[240px]"
+                      >
+                        <div className="bg-[#0c0c0e]/95 border border-zinc-800/80 backdrop-blur-2xl rounded-2xl p-2 shadow-2xl shadow-black/80 flex flex-col gap-1">
+                          {ARRANGEMENT_LINKS.map((sub) => {
+                            const isSubActive = pathname === sub.href;
+                            return (
+                              <Link
+                                key={sub.href}
+                                href={sub.href}
+                                onClick={() => setDesktopDropdownOpen(false)}
+                                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm tracking-wide transition-all ${
+                                  isSubActive
+                                    ? "bg-[#9C39FF]/15 text-white font-medium"
+                                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                                }`}
+                              >
+                                {sub.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               );
             }
             

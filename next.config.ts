@@ -90,6 +90,67 @@ const nextConfig: NextConfig = {
         destination: '/vr-opplevelser/familie/:slug*',
         permanent: true,
       },
+      // Arrangementer redirects
+      {
+        source: '/arrangementer/firmaevent',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/private-fester',
+        destination: '/arrangementer/vr-bursdag',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/bursdag',
+        destination: '/arrangementer/vr-bursdag',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/utdrikningslag',
+        destination: '/arrangementer/vr-utdrikningslag',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/bachelor-party',
+        destination: '/arrangementer/vr-utdrikningslag',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/bachelorette-party',
+        destination: '/arrangementer/vr-utdrikningslag',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/teambuilding',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/firmafest',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/julebord',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/kickoff',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/on-site',
+        destination: '/arrangementer/vr-on-site',
+        permanent: true,
+      },
+      {
+        source: '/arrangementer/vi-kommer-til-deg',
+        destination: '/arrangementer/vr-on-site',
+        permanent: true,
+      },
     ];
   },
   async headers() {

@@ -140,13 +140,13 @@ const PRESET_TEMPLATES: { id: string; label: string; description: string; data: 
         shortDescription: "Løs mysterier og koder sammen i fantastiske virtuelle verdener der kommunikasjon og samarbeid er nøkkelen til suksess.",
         picture: "https://krsvr.no/krsvrarena_logo_sort.png",
         buttonText: "Les om bedriftsarrangement",
-        buttonUrl: "https://krsvr.no/arrangementer/firmaevent",
+        buttonUrl: "https://krsvr.no/arrangementer/vr-teambuilding",
       },
       includeDiscount: false,
       discountCode: "",
       includeCta: true,
       ctaButtonText: "Les mer om firmaevent",
-      ctaButtonUrl: "https://krsvr.no/arrangementer/firmaevent",
+      ctaButtonUrl: "https://krsvr.no/arrangementer/vr-teambuilding",
     }
   },
   {
