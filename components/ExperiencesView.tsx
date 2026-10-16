@@ -34,46 +34,217 @@ import {
   Sparkles,
   Moon,
   Info,
-  Globe,
-  Volume2,
-  MessageSquare
+  Globe
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { slugify } from "@/lib/utils";
-import { formatLanguageDisplay, getLanguageInfo } from "@/lib/languages";
+import { getLanguageInfo } from "@/lib/languages";
 
 const getTypeSlug = (exp: any) => exp.experienceType?.slug || slugify(exp.type || "");
 
 function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVideo?: () => void }) {
+  const images: string[] = Array.isArray(experience.images) && experience.images.length > 0
+    ? experience.images
+    : experience.picture
+    ? [experience.picture]
+    : [];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const pointerStartX = useRef<number | null>(null);
+
+  const hasMultiple = images.length > 1;
+  const safeIndex = currentIndex >= images.length ? 0 : currentIndex;
+
+  const goPrev = () => {
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
+  };
+
+  const goNext = () => {
+    setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : prev));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!hasMultiple) return;
+    pointerStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!hasMultiple || pointerStartX.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - pointerStartX.current;
+    const threshold = 40;
+    if (deltaX < -threshold && safeIndex < images.length - 1) {
+      goNext();
+    } else if (deltaX > threshold && safeIndex > 0) {
+      goPrev();
+    }
+    pointerStartX.current = null;
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!hasMultiple) return;
+    pointerStartX.current = e.clientX;
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (!hasMultiple || pointerStartX.current === null) return;
+    const deltaX = e.clientX - pointerStartX.current;
+    const threshold = 50;
+    if (deltaX < -threshold && safeIndex < images.length - 1) {
+      goNext();
+    } else if (deltaX > threshold && safeIndex > 0) {
+      goPrev();
+    }
+    pointerStartX.current = null;
+  };
+
   return (
-    <div className="w-full flex flex-col items-center relative group">
-      <div className="w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl">
-        {experience.picture ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img 
-            src={experience.picture} 
-            alt={`Spill ${experience.name} - ${experience.type} hos KRS VR Arena i Kristiansand`} 
-            className="w-full h-full object-cover select-none pointer-events-none"
-          />
+    <div className="w-full flex flex-col items-center relative">
+      {/* IMAGE SLIDER */}
+      <div
+        className={`w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl select-none ${
+          hasMultiple ? "cursor-grab active:cursor-grabbing" : ""
+        }`}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      >
+        {images.length > 0 ? (
+          <div
+            className="flex w-full h-full transition-transform duration-300 ease-out"
+            style={{ transform: `translateX(-${safeIndex * 100}%)` }}
+          >
+            {images.map((imgUrl, idx) => (
+              <div key={`${imgUrl}-${idx}`} className="w-full h-full flex-shrink-0 relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imgUrl}
+                  alt={`Spill ${experience.name} (${idx + 1}/${images.length}) - ${experience.type} hos KRS VR Arena i Kristiansand`}
+                  className="w-full h-full object-cover select-none pointer-events-none"
+                  draggable={false}
+                />
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
             <Gamepad2 className="w-20 h-20 text-zinc-800" />
           </div>
         )}
 
-        {/* Overlay for Play Button */}
-        {experience.videoUrl && onPlayVideo && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <button 
-              onClick={onPlayVideo}
-              className="pointer-events-auto bg-black/20 backdrop-blur-md border border-white/20 hover:bg-black/40 hover:border-white/40 text-white w-12 h-12 md:w-16 md:h-16 rounded-full shadow-lg transform hover:scale-110 transition-all flex items-center justify-center group/play"
-              aria-label="Se Trailer"
-            >
-              <Play className="w-5 h-5 md:w-7 md:h-7 ml-1 text-white transition-colors" />
-            </button>
-          </div>
+        {/* Left Arrow */}
+        {hasMultiple && safeIndex > 0 && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              goPrev();
+            }}
+            aria-label="Forrige bilde"
+            className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-11 md:h-11 rounded-full bg-black/55 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all shadow-lg cursor-pointer"
+          >
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
         )}
+
+        {/* Right Arrow */}
+        {hasMultiple && safeIndex < images.length - 1 && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              goNext();
+            }}
+            aria-label="Neste bilde"
+            className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-11 md:h-11 rounded-full bg-black/55 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all shadow-lg cursor-pointer"
+          >
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+        )}
+      </div>
+
+      {/* INSTAGRAM-STYLE DOTS NAVBAR */}
+      {images.length > 0 && (
+        <div className="mt-4 flex items-center justify-center gap-2" aria-label="Bildegalleri navigasjon">
+          {images.map((_, idx) => {
+            const isActive = idx === safeIndex;
+            return (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setCurrentIndex(idx)}
+                aria-label={`Vis bilde ${idx + 1}`}
+                aria-current={isActive ? "true" : undefined}
+                className={`rounded-full transition-all duration-300 cursor-pointer ${
+                  isActive
+                    ? "w-2.5 h-2.5 bg-[#9C39FF] shadow-[0_0_8px_rgba(156,57,255,0.8)] scale-110"
+                    : "w-2 h-2 bg-zinc-600 hover:bg-zinc-400"
+                }`}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {/* STANDALONE VIDEO TRAILER BUTTON BELOW CAROUSEL */}
+      {experience.videoUrl && onPlayVideo && (
+        <button
+          type="button"
+          onClick={onPlayVideo}
+          className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-900/90 hover:bg-[#9C39FF]/20 border border-[#9C39FF]/50 hover:border-[#9C39FF] text-white text-xs font-semibold tracking-wider uppercase shadow-[0_0_15px_rgba(156,57,255,0.15)] hover:shadow-[0_0_20px_rgba(156,57,255,0.35)] transition-all cursor-pointer group/trailer"
+        >
+          <Play className="w-3.5 h-3.5 text-[#9C39FF] fill-[#9C39FF] group-hover/trailer:scale-110 transition-transform" />
+          <span>VIDEO TRAILER</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function LanguageFlagsRow({ languages }: { languages: string[] }) {
+  const [activeLang, setActiveLang] = useState<string | null>(null);
+
+  if (!languages || languages.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2 text-sm md:text-base">
+      <div className="flex items-center gap-2">
+        <Globe className="w-5 h-5 text-white shrink-0" />
+        <span>Available languages:</span>
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {languages.map((lang) => {
+          const info = getLanguageInfo(lang);
+          const isOpen = activeLang === lang;
+          return (
+            <button
+              key={lang}
+              type="button"
+              onClick={() => setActiveLang((prev) => (prev === lang ? null : lang))}
+              onMouseLeave={() => setActiveLang((prev) => (prev === lang ? null : prev))}
+              aria-label={info.label}
+              className="relative group/flag inline-flex items-center justify-center p-1 rounded-md hover:bg-white/10 active:scale-110 transition-all cursor-pointer focus:outline-none"
+            >
+              <span className="text-lg md:text-xl leading-none select-none" aria-hidden="true">
+                {info.flag}
+              </span>
+              <span className="sr-only">
+                {info.label} ({info.labelNo})
+              </span>
+              <span
+                className={`pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-700 text-white text-[11px] font-bold tracking-wider uppercase whitespace-nowrap shadow-xl transition-all z-50 ${
+                  isOpen
+                    ? "opacity-100 visible -translate-y-0.5"
+                    : "opacity-0 invisible group-hover/flag:opacity-100 group-hover/flag:visible group-hover/flag:-translate-y-0.5"
+                }`}
+              >
+                {info.label.toUpperCase()}
+                <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-700" />
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -459,16 +630,21 @@ export function ExperiencesView({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-6xl mx-auto flex flex-col items-center cursor-grab active:cursor-grabbing"
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragEnd={handleDragEnd}
+            className="w-full max-w-6xl mx-auto flex flex-col items-center"
           >
-            {/* HERO IMAGE */}
-            <div className="relative mb-12 w-full">
+            {/* HERO IMAGE CAROUSEL */}
+            <div className="relative mb-10 w-full">
               <MediaGallery experience={selected} onPlayVideo={() => setIsVideoOpen(true)} />
             </div>
+
+            {/* SWIPEABLE CONTENT AREA BELOW IMAGE */}
+            <motion.div
+              className="w-full flex flex-col items-center cursor-grab active:cursor-grabbing"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={handleDragEnd}
+            >
             <div className="flex flex-col items-center mb-8 gap-4 px-4">
               <h2 className="text-4xl md:text-6xl font-black text-white tracking-wide uppercase text-center">
                 {selected.name}
@@ -553,15 +729,8 @@ export function ExperiencesView({
                 </div>
               )}
 
-              {((selected.languagesVoice && selected.languagesVoice.length > 0) || (selected.languagesText && selected.languagesText.length > 0)) && (
-                <div className="flex items-center gap-2 text-sm md:text-base">
-                  <Globe className="w-5 h-5 text-white" />
-                  <span>
-                    {selected.languagesVoice && selected.languagesVoice.length > 0
-                      ? `Tale: ${selected.languagesVoice.join(', ')}`
-                      : `${selected.languagesText?.length || 0} språk`}
-                  </span>
-                </div>
+              {selected.languages && selected.languages.length > 0 && (
+                <LanguageFlagsRow key={`lang-${selected.id}`} languages={selected.languages} />
               )}
             </div>
 
@@ -569,92 +738,16 @@ export function ExperiencesView({
             <div className="flex flex-col gap-12 w-full max-w-3xl mx-auto px-4 items-center">
               {/* DESCRIPTION & PASSER FOR */}
               <div className="flex flex-col items-center w-full">
-                {(selected.familyFriendly || selected.teambuilding || selected.party) && (
-                  <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 mb-8 bg-zinc-900/40 p-4 md:px-8 rounded-2xl border border-white/5 w-full">
+                {Array.isArray(selected.suitableFor) && selected.suitableFor.length > 0 && (
+                  <div className="flex flex-wrap justify-center items-center gap-3 md:gap-5 mb-8 bg-zinc-900/40 p-4 md:px-8 rounded-2xl border border-white/5 w-full">
                     <span className="text-sm font-bold text-white uppercase tracking-wider">Passer for:</span>
-                    <div className="flex flex-wrap items-center gap-4">
-                      {selected.familyFriendly && (
-                        <div className="flex items-center gap-2 cursor-help" title="Passer perfekt for hele familien">
-                          <Baby className="w-4 h-4 text-[#9C39FF]" />
-                          <span className="text-sm text-zinc-300 font-medium">Familie</span>
+                    <div className="flex flex-wrap justify-center items-center gap-2.5 md:gap-4">
+                      {selected.suitableFor.map((audience: string) => (
+                        <div key={audience} className="flex items-center gap-2 bg-zinc-950/60 border border-white/10 px-3 py-1.5 rounded-xl">
+                          <UserCheck className="w-4 h-4 text-[#9C39FF] shrink-0" />
+                          <span className="text-sm text-zinc-200 font-medium">{audience}</span>
                         </div>
-                      )}
-                      {selected.teambuilding && (
-                        <div className="flex items-center gap-2 cursor-help" title="Krever samarbeid og kommunikasjon">
-                          <Layers className="w-4 h-4 text-[#9C39FF]" />
-                          <span className="text-sm text-zinc-300 font-medium">Teambuilding</span>
-                        </div>
-                      )}
-                      {selected.party && (
-                        <div className="flex items-center gap-2 cursor-help" title="Ypperlig for fest og moro!">
-                          <PartyPopper className="w-4 h-4 text-[#9C39FF]" />
-                          <span className="text-sm text-zinc-300 font-medium">Vennegjeng</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* SPRÅKSTØTTE (VOICE & TEXT) */}
-                {((selected.languagesVoice && selected.languagesVoice.length > 0) || (selected.languagesText && selected.languagesText.length > 0)) && (
-                  <div className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl p-5 md:p-6 mb-10">
-                    <div className="flex items-center gap-2 mb-4 text-white">
-                      <Globe className="w-5 h-5 text-[#9C39FF]" />
-                      <h4 className="text-base font-semibold tracking-wide">Tilgjengelige språk</h4>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {/* VOICE */}
-                      {selected.languagesVoice && selected.languagesVoice.length > 0 && (
-                        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5">
-                          <div className="flex items-center gap-2 mb-2 text-purple-400">
-                            <Volume2 className="w-4 h-4" />
-                            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
-                              Tale / Voice
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {selected.languagesVoice.map((lang: string) => {
-                              const info = getLanguageInfo(lang);
-                              return (
-                                <span
-                                  key={lang}
-                                  className="inline-flex items-center gap-1.5 bg-purple-950/40 border border-purple-800/50 text-white text-xs px-2.5 py-1 rounded-lg font-medium"
-                                >
-                                  <span>{info.flag}</span>
-                                  <span>{info.label}</span>
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* TEXT */}
-                      {selected.languagesText && selected.languagesText.length > 0 && (
-                        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5">
-                          <div className="flex items-center gap-2 mb-2 text-blue-400">
-                            <MessageSquare className="w-4 h-4" />
-                            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
-                              Tekst & Undertekster
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {selected.languagesText.map((lang: string) => {
-                              const info = getLanguageInfo(lang);
-                              return (
-                                <span
-                                  key={lang}
-                                  className="inline-flex items-center gap-1.5 bg-blue-950/40 border border-blue-800/50 text-zinc-200 text-xs px-2.5 py-1 rounded-lg font-medium"
-                                >
-                                  <span>{info.flag}</span>
-                                  <span>{info.label}</span>
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
+                      ))}
                     </div>
                   </div>
                 )}
@@ -694,6 +787,7 @@ export function ExperiencesView({
                 </Button>
               </Link>
             </div>
+            </motion.div>
           </motion.div>
           )}
         </>

@@ -1,12 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy, Settings, Volume2, MessageSquare, Globe } from "lucide-react";
+import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy, Settings, Globe, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import TestimonialsManager from "./TestimonialsManager";
 import ExperienceTypesModal from "./ExperienceTypesModal";
 import { COMMON_LANGUAGES, getLanguageInfo } from "@/lib/languages";
+
+const SUITABLE_FOR_OPTIONS = [
+  "Barn fra 8 år",
+  "Barn fra 8 år sammen med voksne",
+  "Ungdom",
+  "Ungdom sammen med voksne",
+  "Voksne"
+];
 
 export default function ExperiencesManager() {
   const [experiences, setExperiences] = useState<any[]>([]);
@@ -76,18 +84,21 @@ export default function ExperiencesManager() {
     fetchExperienceTypes();
   }, []);
 
-  const [customVoiceLang, setCustomVoiceLang] = useState("");
-  const [customTextLang, setCustomTextLang] = useState("");
+  const [customLang, setCustomLang] = useState("");
 
   const handleEdit = (exp: any) => {
     setEditingId(exp.id);
+    const existingImages = Array.isArray(exp.images) && exp.images.length > 0
+      ? exp.images
+      : exp.picture ? [exp.picture] : [];
     setEditForm({
       ...exp,
-      languagesVoice: Array.isArray(exp.languagesVoice) ? exp.languagesVoice : [],
-      languagesText: Array.isArray(exp.languagesText) ? exp.languagesText : []
+      images: existingImages,
+      picture: existingImages[0] || exp.picture || "",
+      languages: Array.isArray(exp.languages) ? exp.languages : [],
+      suitableFor: Array.isArray(exp.suitableFor) ? exp.suitableFor : []
     });
-    setCustomVoiceLang("");
-    setCustomTextLang("");
+    setCustomLang("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -114,50 +125,49 @@ export default function ExperiencesManager() {
       mystic: false,
       codeSolving: false,
       picture: "",
+      images: [],
       videoUrl: "",
       awards: [],
-      languagesVoice: ["English"],
-      languagesText: ["English"]
+      languages: ["English"],
+      suitableFor: []
     });
-    setCustomVoiceLang("");
-    setCustomTextLang("");
+    setCustomLang("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const toggleLanguage = (type: 'voice' | 'text', langName: string) => {
+  const toggleSuitableFor = (option: string) => {
     if (!editForm) return;
-    const field = type === 'voice' ? 'languagesVoice' : 'languagesText';
-    const current: string[] = Array.isArray(editForm[field]) ? [...editForm[field]] : [];
+    const current: string[] = Array.isArray(editForm.suitableFor) ? [...editForm.suitableFor] : [];
+    const exists = current.includes(option);
+    const nextList = exists
+      ? current.filter((item) => item !== option)
+      : SUITABLE_FOR_OPTIONS.filter((opt) => current.includes(opt) || opt === option);
+    const isFamilyFriendly = nextList.some((opt) => opt.startsWith("Barn") || opt.startsWith("Ungdom"));
+    setEditForm({ ...editForm, suitableFor: nextList, familyFriendly: isFamilyFriendly });
+  };
+
+  const toggleLanguage = (langName: string) => {
+    if (!editForm) return;
+    const current: string[] = Array.isArray(editForm.languages) ? [...editForm.languages] : [];
     const exists = current.some(l => l.toLowerCase() === langName.toLowerCase());
     const updated = exists 
       ? current.filter(l => l.toLowerCase() !== langName.toLowerCase())
       : [...current, langName];
-    setEditForm({ ...editForm, [field]: updated });
+    setEditForm({ ...editForm, languages: updated });
   };
 
-  const addCustomLanguage = (type: 'voice' | 'text') => {
-    const val = type === 'voice' ? customVoiceLang.trim() : customTextLang.trim();
+  const addCustomLanguage = () => {
+    const val = customLang.trim();
     if (!val) return;
-    const field = type === 'voice' ? 'languagesVoice' : 'languagesText';
-    const current: string[] = Array.isArray(editForm[field]) ? [...editForm[field]] : [];
+    const current: string[] = Array.isArray(editForm.languages) ? [...editForm.languages] : [];
     if (!current.some(l => l.toLowerCase() === val.toLowerCase())) {
-      setEditForm({ ...editForm, [field]: [...current, val] });
+      setEditForm({ ...editForm, languages: [...current, val] });
     }
-    if (type === 'voice') setCustomVoiceLang("");
-    else setCustomTextLang("");
+    setCustomLang("");
   };
 
-  const copyVoiceToText = () => {
-    const voice = Array.isArray(editForm.languagesVoice) ? editForm.languagesVoice : [];
-    const text = Array.isArray(editForm.languagesText) ? [...editForm.languagesText] : [];
-    const merged = Array.from(new Set([...text, ...voice]));
-    setEditForm({ ...editForm, languagesText: merged });
-    toast.success("Tale-språk kopiert til tekst-språk");
-  };
-
-  const clearLanguages = (type: 'voice' | 'text') => {
-    const field = type === 'voice' ? 'languagesVoice' : 'languagesText';
-    setEditForm({ ...editForm, [field]: [] });
+  const clearLanguages = () => {
+    setEditForm({ ...editForm, languages: [] });
   };
 
   const handleAwardUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,49 +209,93 @@ export default function ExperiencesManager() {
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setUploadingImage(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("pathPrefix", "experiences");
+      const uploadedUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("pathPrefix", "experiences");
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!res.ok) {
-        throw new Error(await res.text());
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+
+        const data = await res.json();
+        uploadedUrls.push(data.url);
       }
 
-      const data = await res.json();
-      setEditForm({ ...editForm, picture: data.url });
-      toast.success("Image uploaded successfully");
+      const currentImages = Array.isArray(editForm.images)
+        ? [...editForm.images]
+        : editForm.picture ? [editForm.picture] : [];
+      const updatedImages = [...currentImages, ...uploadedUrls];
+
+      setEditForm({
+        ...editForm,
+        images: updatedImages,
+        picture: updatedImages[0] || ""
+      });
+      toast.success(uploadedUrls.length > 1 ? `${uploadedUrls.length} bilder lastet opp` : "Bilde lastet opp");
     } catch (error: any) {
       console.error("Upload error:", error);
       toast.error(`Upload failed: ${error.message || 'Unknown error'}`);
     } finally {
       setUploadingImage(false);
+      e.target.value = "";
     }
+  };
+
+  const removeImage = (indexToRemove: number) => {
+    const currentImages = Array.isArray(editForm.images) ? [...editForm.images] : [];
+    const updatedImages = currentImages.filter((_: string, index: number) => index !== indexToRemove);
+    setEditForm({
+      ...editForm,
+      images: updatedImages,
+      picture: updatedImages[0] || ""
+    });
+  };
+
+  const moveImage = (index: number, direction: 'left' | 'right') => {
+    const currentImages = Array.isArray(editForm.images) ? [...editForm.images] : [];
+    const targetIndex = direction === 'left' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= currentImages.length) return;
+    const updatedImages = [...currentImages];
+    [updatedImages[index], updatedImages[targetIndex]] = [updatedImages[targetIndex], updatedImages[index]];
+    setEditForm({
+      ...editForm,
+      images: updatedImages,
+      picture: updatedImages[0] || ""
+    });
   };
 
   const handleSave = async () => {
     try {
+      const normalizedImages = Array.isArray(editForm.images) ? editForm.images : (editForm.picture ? [editForm.picture] : []);
+      const payload = {
+        ...editForm,
+        images: normalizedImages,
+        picture: normalizedImages[0] || ""
+      };
       if (editingId === "new") {
         const res = await fetch("/api/experiences", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(editForm)
+          body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error("Failed to create");
       } else {
         const res = await fetch(`/api/experiences/${editForm.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(editForm)
+          body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error("Failed to update");
       }
@@ -525,35 +579,19 @@ export default function ExperiencesManager() {
               <h4 className="text-lg font-medium mb-4 text-white border-b border-zinc-800 pb-2">Filtrering & Synlighet</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wider">Målgruppe</label>
+                  <label className="block text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wider">Passer for</label>
                   <div className="flex flex-col gap-2">
-                    <label className="flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={editForm.familyFriendly || false}
-                        onChange={(e) => setEditForm({...editForm, familyFriendly: e.target.checked})}
-                        className="w-4 h-4 accent-[#9C39FF]"
-                      />
-                      <span className="ml-2 text-sm text-zinc-300">Familie</span>
-                    </label>
-                    <label className="flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={editForm.teambuilding || false}
-                        onChange={(e) => setEditForm({...editForm, teambuilding: e.target.checked})}
-                        className="w-4 h-4 accent-[#9C39FF]"
-                      />
-                      <span className="ml-2 text-sm text-zinc-300">Teambuilding</span>
-                    </label>
-                    <label className="flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={editForm.party || false}
-                        onChange={(e) => setEditForm({...editForm, party: e.target.checked})}
-                        className="w-4 h-4 accent-[#9C39FF]"
-                      />
-                      <span className="ml-2 text-sm text-zinc-300">Vennegjeng / Feiring</span>
-                    </label>
+                    {SUITABLE_FOR_OPTIONS.map((option) => (
+                      <label key={option} className="flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={Array.isArray(editForm.suitableFor) && editForm.suitableFor.includes(option)}
+                          onChange={() => toggleSuitableFor(option)}
+                          className="w-4 h-4 accent-[#9C39FF]"
+                        />
+                        <span className="ml-2 text-sm text-zinc-300">{option}</span>
+                      </label>
+                    ))}
                   </div>
                 </div>
 
@@ -635,231 +673,98 @@ export default function ExperiencesManager() {
               </div>
             </div>
 
-            {/* SPRÅKSTØTTE (VOICE & TEXT) */}
+            {/* SPRÅK (LANGUAGES) */}
             <div>
               <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-4">
                 <div className="flex items-center gap-2">
                   <Globe className="w-5 h-5 text-[#9C39FF]" />
-                  <h4 className="text-lg font-medium text-white">Språkstøtte (Voice & Text)</h4>
+                  <h4 className="text-lg font-medium text-white">Språk (Languages)</h4>
                 </div>
-                <span className="text-xs text-zinc-400">
-                  Definer hvilke språk opplevelsen kan spilles med
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-zinc-400">
+                    {editForm.languages?.length || 0} valgt
+                  </span>
+                  {(editForm.languages?.length || 0) > 0 && (
+                    <button
+                      type="button"
+                      onClick={clearLanguages}
+                      className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                    >
+                      Tøm alle
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* TALE / VOICE */}
-                <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <Volume2 className="w-4 h-4 text-purple-400" />
-                        <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
-                          Tale / Voice (Lydspor)
-                        </label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-zinc-400">
-                          {editForm.languagesVoice?.length || 0} valgt
-                        </span>
-                        {(editForm.languagesVoice?.length || 0) > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => clearLanguages('voice')}
-                            className="text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors"
-                          >
-                            Tøm
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-xs text-zinc-400 mb-3">
-                      Språk der spillere hører stemmer og lydinstruksjoner på dette språket.
-                    </p>
-
-                    {/* Chips for available languages */}
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {COMMON_LANGUAGES.map((lang) => {
-                        const isSelected = (editForm.languagesVoice || []).some(
-                          (l: string) => l.toLowerCase() === lang.id.toLowerCase() || l.toLowerCase() === lang.labelNo.toLowerCase()
-                        );
-                        return (
-                          <button
-                            key={lang.id}
-                            type="button"
-                            onClick={() => toggleLanguage('voice', lang.id)}
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                              isSelected
-                                ? "bg-purple-600/30 border border-purple-500/60 text-white shadow-sm"
-                                : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
-                            }`}
-                          >
-                            <span>{lang.flag}</span>
-                            <span>{lang.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Custom languages added */}
-                    {(editForm.languagesVoice || []).filter(
-                      (l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase())
-                    ).length > 0 && (
-                      <div className="mb-3 pt-2 border-t border-zinc-800/60">
-                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Egendefinerte:</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {(editForm.languagesVoice || [])
-                            .filter((l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase()))
-                            .map((customL: string) => (
-                              <button
-                                key={customL}
-                                type="button"
-                                onClick={() => toggleLanguage('voice', customL)}
-                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-purple-600/30 border border-purple-500/60 text-white"
-                              >
-                                <span>🌐 {customL}</span>
-                                <X className="w-3 h-3 ml-1 text-zinc-400 hover:text-white" />
-                              </button>
-                            ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Add custom input */}
-                  <div className="flex gap-2 pt-3 border-t border-zinc-800/80">
-                    <input
-                      type="text"
-                      value={customVoiceLang}
-                      onChange={(e) => setCustomVoiceLang(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addCustomLanguage('voice');
-                        }
-                      }}
-                      placeholder="Annet tale-språk..."
-                      className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#9C39FF]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => addCustomLanguage('voice')}
-                      className="bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      Legg til
-                    </button>
-                  </div>
+              <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4">
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {COMMON_LANGUAGES.map((lang) => {
+                    const isSelected = (editForm.languages || []).some(
+                      (l: string) => l.toLowerCase() === lang.id.toLowerCase() || l.toLowerCase() === lang.labelNo.toLowerCase()
+                    );
+                    return (
+                      <button
+                        key={lang.id}
+                        type="button"
+                        onClick={() => toggleLanguage(lang.id)}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                          isSelected
+                            ? "bg-[#9C39FF]/25 border border-[#9C39FF] text-white shadow-sm"
+                            : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
+                        }`}
+                      >
+                        <span>{lang.flag}</span>
+                        <span>{lang.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* TEKST / TEXT */}
-                <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4 text-blue-400" />
-                        <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
-                          Tekst / Undertekster & Menyer
-                        </label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-zinc-400">
-                          {editForm.languagesText?.length || 0} valgt
-                        </span>
-                        <button
-                          type="button"
-                          onClick={copyVoiceToText}
-                          className="text-[11px] text-[#9C39FF] hover:text-[#b462ff] transition-colors"
-                          title="Kopier alle valgte tale-språk til tekst"
-                        >
-                          Kopier fra tale
-                        </button>
-                        {(editForm.languagesText?.length || 0) > 0 && (
+                {/* Custom languages added */}
+                {(editForm.languages || []).filter(
+                  (l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase())
+                ).length > 0 && (
+                  <div className="mb-3 pt-2 border-t border-zinc-800/60">
+                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Egendefinerte:</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(editForm.languages || [])
+                        .filter((l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase()))
+                        .map((customL: string) => (
                           <button
+                            key={customL}
                             type="button"
-                            onClick={() => clearLanguages('text')}
-                            className="text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors"
+                            onClick={() => toggleLanguage(customL)}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-[#9C39FF]/25 border border-[#9C39FF] text-white"
                           >
-                            Tøm
+                            <span>🌐 {customL}</span>
+                            <X className="w-3 h-3 ml-1 text-zinc-400 hover:text-white" />
                           </button>
-                        )}
-                      </div>
+                        ))}
                     </div>
-                    <p className="text-xs text-zinc-400 mb-3">
-                      Språk der undertekster, menyer, gåtehint og grensesnitt er tilgjengelig.
-                    </p>
-
-                    {/* Chips for available languages */}
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {COMMON_LANGUAGES.map((lang) => {
-                        const isSelected = (editForm.languagesText || []).some(
-                          (l: string) => l.toLowerCase() === lang.id.toLowerCase() || l.toLowerCase() === lang.labelNo.toLowerCase()
-                        );
-                        return (
-                          <button
-                            key={lang.id}
-                            type="button"
-                            onClick={() => toggleLanguage('text', lang.id)}
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                              isSelected
-                                ? "bg-blue-600/30 border border-blue-500/60 text-white shadow-sm"
-                                : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
-                            }`}
-                          >
-                            <span>{lang.flag}</span>
-                            <span>{lang.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Custom languages added */}
-                    {(editForm.languagesText || []).filter(
-                      (l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase())
-                    ).length > 0 && (
-                      <div className="mb-3 pt-2 border-t border-zinc-800/60">
-                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Egendefinerte:</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {(editForm.languagesText || [])
-                            .filter((l: string) => !COMMON_LANGUAGES.some(c => c.id.toLowerCase() === l.toLowerCase() || c.labelNo.toLowerCase() === l.toLowerCase()))
-                            .map((customL: string) => (
-                              <button
-                                key={customL}
-                                type="button"
-                                onClick={() => toggleLanguage('text', customL)}
-                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-blue-600/30 border border-blue-500/60 text-white"
-                              >
-                                <span>🌐 {customL}</span>
-                                <X className="w-3 h-3 ml-1 text-zinc-400 hover:text-white" />
-                              </button>
-                            ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
+                )}
 
-                  {/* Add custom input */}
-                  <div className="flex gap-2 pt-3 border-t border-zinc-800/80">
-                    <input
-                      type="text"
-                      value={customTextLang}
-                      onChange={(e) => setCustomTextLang(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addCustomLanguage('text');
-                        }
-                      }}
-                      placeholder="Annet tekst-språk..."
-                      className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#9C39FF]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => addCustomLanguage('text')}
-                      className="bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      Legg til
-                    </button>
-                  </div>
+                <div className="flex gap-2 pt-3 border-t border-zinc-800/80 max-w-sm">
+                  <input
+                    type="text"
+                    value={customLang}
+                    onChange={(e) => setCustomLang(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCustomLanguage();
+                      }
+                    }}
+                    placeholder="Annet språk..."
+                    className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#9C39FF]"
+                  />
+                  <button
+                    type="button"
+                    onClick={addCustomLanguage}
+                    className="bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    Legg til
+                  </button>
                 </div>
               </div>
             </div>
@@ -868,55 +773,103 @@ export default function ExperiencesManager() {
             <div>
               <h4 className="text-lg font-medium mb-4 text-white border-b border-zinc-800 pb-2">Media & Ekstra</h4>
               <div className="flex flex-col gap-6">
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-400 mb-2">Hovedbilde</label>
-                    <div className="flex items-start gap-4">
-                      {editForm.picture ? (
-                        <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-zinc-800">
-                          <Image src={editForm.picture} alt="Experience" fill className="object-cover" />
+                {/* BILDEGALLERI */}
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <label className="block text-xs font-medium text-zinc-400">
+                      Bildegalleri ({Array.isArray(editForm.images) ? editForm.images.length : 0} bilder) — Første bilde brukes som hovedbilde
+                    </label>
+                    <label className="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded-xl cursor-pointer transition-colors border border-zinc-700 text-xs font-medium">
+                      {uploadingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                      {uploadingImage ? "Laster opp..." : "Last opp bilde(r)"}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple
+                        className="hidden" 
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                      />
+                    </label>
+                  </div>
+
+                  {Array.isArray(editForm.images) && editForm.images.length > 0 ? (
+                    <div className="flex flex-wrap gap-3 mb-2">
+                      {editForm.images.map((imgUrl: string, index: number) => (
+                        <div 
+                          key={`${imgUrl}-${index}`} 
+                          className={`relative w-40 aspect-video rounded-xl overflow-hidden border transition-all group ${
+                            index === 0 
+                              ? "border-[#9C39FF] ring-1 ring-[#9C39FF]/50 shadow-[0_0_15px_rgba(156,57,255,0.2)]" 
+                              : "border-zinc-800"
+                          }`}
+                        >
+                          <Image src={imgUrl} alt={`Bilde ${index + 1}`} fill className="object-cover" />
+                          
+                          {/* Badge */}
+                          <span className={`absolute top-1.5 left-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md shadow ${
+                            index === 0 ? "bg-[#9C39FF] text-white" : "bg-black/70 text-zinc-300"
+                          }`}>
+                            {index === 0 ? "Hovedbilde" : `#${index + 1}`}
+                          </span>
+
+                          {/* Remove button */}
                           <button 
-                            onClick={() => setEditForm({...editForm, picture: ""})}
-                            className="absolute top-1 right-1 bg-black/60 p-1 rounded-full text-white hover:bg-black/80 transition-colors"
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-1.5 right-1.5 bg-black/70 hover:bg-red-600 p-1 rounded-full text-white transition-colors"
+                            title="Slett bilde"
                           >
                             <X className="w-3 h-3" />
                           </button>
-                        </div>
-                      ) : (
-                        <div className="w-24 h-24 rounded-xl border border-dashed border-zinc-700 bg-zinc-950 flex flex-col items-center justify-center text-zinc-500">
-                          <ImageIcon className="w-6 h-6 mb-1 opacity-50" />
-                          <span className="text-[10px]">Ingen bilde</span>
-                        </div>
-                      )}
-                      
-                      <div className="flex-1">
-                        <label className="flex items-center justify-center gap-2 w-full md:w-auto bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-xl cursor-pointer transition-colors border border-zinc-700 text-sm">
-                          {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                          {uploadingImage ? "Laster opp..." : "Last opp nytt"}
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={handleImageUpload}
-                            disabled={uploadingImage}
-                          />
-                        </label>
-                        <p className="text-[10px] text-zinc-500 mt-2">Anbefalt: 800x600px. Maks 2MB.</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-400 mb-1">Trailer / Video URL (YouTube/Vimeo)</label>
-                    <input 
-                      type="url" 
-                      value={editForm.videoUrl || ""}
-                      onChange={(e) => setEditForm({...editForm, videoUrl: e.target.value})}
-                      placeholder="https://www.youtube.com/watch?v=..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
-                    />
-                  </div>
+                          {/* Reorder controls */}
+                          {editForm.images.length > 1 && (
+                            <div className="absolute bottom-1.5 inset-x-1.5 flex justify-between items-center pointer-events-none">
+                              <button
+                                type="button"
+                                onClick={() => moveImage(index, 'left')}
+                                disabled={index === 0}
+                                className="pointer-events-auto bg-black/75 hover:bg-black text-white p-1 rounded-md disabled:opacity-20 transition-opacity"
+                                title="Flytt frem"
+                              >
+                                <ChevronLeft className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveImage(index, 'right')}
+                                disabled={index === editForm.images.length - 1}
+                                className="pointer-events-auto bg-black/75 hover:bg-black text-white p-1 rounded-md disabled:opacity-20 transition-opacity"
+                                title="Flytt bak"
+                              >
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="w-full py-8 rounded-xl border border-dashed border-zinc-800 bg-zinc-950/50 flex flex-col items-center justify-center text-zinc-500 mb-2">
+                      <ImageIcon className="w-7 h-7 mb-1.5 opacity-40" />
+                      <span className="text-xs">Ingen bilder lastet opp enda</span>
+                    </div>
+                  )}
+
+                  <p className="text-[11px] text-zinc-500">
+                    Anbefalt: 1920x1080px (16:9 bredformat, min. 1280x720). Maks 3MB per bilde. Bruk pilene på bildene for å endre rekkefølge.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Trailer / Video URL (YouTube/Vimeo)</label>
+                  <input 
+                    type="url" 
+                    value={editForm.videoUrl || ""}
+                    onChange={(e) => setEditForm({...editForm, videoUrl: e.target.value})}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                  />
                 </div>
 
                 <div>
@@ -973,9 +926,14 @@ export default function ExperiencesManager() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {experiences.map((exp, index) => (
           <div key={exp.id} className={`bg-zinc-900/50 border ${exp.isActive ? 'border-zinc-800' : 'border-red-900/50 opacity-70'} rounded-2xl overflow-hidden flex flex-col`}>
-            {exp.picture ? (
+            {(exp.images?.[0] || exp.picture) ? (
               <div className="relative w-full h-40 bg-zinc-950 border-b border-zinc-800">
-                <Image src={exp.picture} alt={exp.name} fill className="object-cover" />
+                <Image src={exp.images?.[0] || exp.picture} alt={exp.name} fill className="object-cover" />
+                {Array.isArray(exp.images) && exp.images.length > 1 && (
+                  <span className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-md border border-white/10">
+                    {exp.images.length} bilder
+                  </span>
+                )}
               </div>
             ) : (
               <div className="w-full h-40 bg-zinc-950 border-b border-zinc-800 flex items-center justify-center">
@@ -998,15 +956,9 @@ export default function ExperiencesManager() {
                 {exp.age && <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.age}</span>}
                 {exp.difficulty && <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>}
                 {exp.arenaSize && <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{exp.arenaSize}</span>}
-                {exp.familyFriendly && (
-                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Familie</span>
-                )}
-                {exp.teambuilding && (
-                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Teambuilding</span>
-                )}
-                {exp.party && (
-                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Vennegjeng / Feiring</span>
-                )}
+                {Array.isArray(exp.suitableFor) && exp.suitableFor.map((item: string) => (
+                  <span key={item} className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{item}</span>
+                ))}
                 {exp.action && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Action</span>
                 )}
@@ -1022,14 +974,9 @@ export default function ExperiencesManager() {
                 {exp.mystic && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Mystikk</span>
                 )}
-                {exp.languagesVoice && exp.languagesVoice.length > 0 && (
-                  <span className="bg-purple-950/40 text-purple-300 px-2 py-1 rounded border border-purple-800/50 flex items-center gap-1">
-                    🎙️ {exp.languagesVoice.join(', ')}
-                  </span>
-                )}
-                {exp.languagesText && exp.languagesText.length > 0 && (
-                  <span className="bg-blue-950/40 text-blue-300 px-2 py-1 rounded border border-blue-800/50 flex items-center gap-1">
-                    💬 Tekst: {exp.languagesText.length} språk
+                {exp.languages && exp.languages.length > 0 && (
+                  <span className="bg-purple-950/40 text-purple-300 px-2 py-1 rounded border border-purple-800/50 flex items-center gap-1" title={exp.languages.join(', ')}>
+                    🌐 {exp.languages.map((l: string) => getLanguageInfo(l).flag).join(' ')} ({exp.languages.length})
                   </span>
                 )}
               </div>

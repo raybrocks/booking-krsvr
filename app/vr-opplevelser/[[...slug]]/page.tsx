@@ -149,17 +149,26 @@ export default async function ExperiencesPage({
   };
 
   if (matchedExp) {
-    const allLangs = Array.from(new Set([...(matchedExp.languagesVoice || []), ...(matchedExp.languagesText || [])]));
+    const allLangs: string[] = Array.isArray(matchedExp.languages) ? matchedExp.languages : [];
     const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== 'und');
+    const langSummary = allLangs.length > 0 ? ` Available languages: ${allLangs.join(", ")}.` : "";
+    const suitableList: string[] = Array.isArray(matchedExp.suitableFor) ? matchedExp.suitableFor : [];
+    const suitableSummary = suitableList.length > 0 ? ` Passer for: ${suitableList.join(", ")}.` : "";
 
     jsonLd = {
       "@context": "https://schema.org",
       "@type": "Product",
       "name": `${matchedExp.name} - ${matchedExp.type} i Kristiansand`,
-      "description": `${matchedExp.shortDescription || ""} Spilles hos KRS VR Arena i Kristiansand.`,
+      "description": `${matchedExp.shortDescription || ""} Spilles hos KRS VR Arena i Kristiansand.${suitableSummary}${langSummary}`,
       "brand": providerInfo,
       "category": matchedExp.type,
-      ...(isoLangs.length > 0 && { inLanguage: isoLangs }),
+      ...(isoLangs.length > 0 && { inLanguage: isoLangs, availableLanguage: allLangs }),
+      ...(suitableList.length > 0 && {
+        audience: {
+          "@type": "PeopleAudience",
+          "audienceType": suitableList.join(", ")
+        }
+      }),
       "offers": {
         "@type": "AggregateOffer",
         "availability": "https://schema.org/InStock",
@@ -194,8 +203,11 @@ export default async function ExperiencesPage({
       "name": "VR Opplevelser hos KRS VR Arena",
       "description": "Se vårt store utvalg av VR-opplevelser, inkludert Escape Rooms, skytespill og eventyr i Kristiansand.",
       "itemListElement": experiences.map((exp, index) => {
-        const allLangs = Array.from(new Set([...(exp.languagesVoice || []), ...(exp.languagesText || [])]));
+        const allLangs: string[] = Array.isArray(exp.languages) ? exp.languages : [];
         const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== 'und');
+        const langSummary = allLangs.length > 0 ? ` Available languages: ${allLangs.join(", ")}.` : "";
+        const suitableList: string[] = Array.isArray(exp.suitableFor) ? exp.suitableFor : [];
+        const suitableSummary = suitableList.length > 0 ? ` Passer for: ${suitableList.join(", ")}.` : "";
 
         return {
           "@type": "ListItem",
@@ -203,10 +215,16 @@ export default async function ExperiencesPage({
           "item": {
             "@type": "Product",
             "name": exp.name,
-            "description": exp.shortDescription || "",
+            "description": `${exp.shortDescription || ""}${suitableSummary}${langSummary}`,
             "url": `https://www.krsvr.no/vr-opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
             "brand": providerInfo,
-            ...(isoLangs.length > 0 && { inLanguage: isoLangs }),
+            ...(isoLangs.length > 0 && { inLanguage: isoLangs, availableLanguage: allLangs }),
+            ...(suitableList.length > 0 && {
+              audience: {
+                "@type": "PeopleAudience",
+                "audienceType": suitableList.join(", ")
+              }
+            }),
             "offers": {
               "@type": "AggregateOffer",
               "availability": "https://schema.org/InStock",

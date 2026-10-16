@@ -17,6 +17,7 @@ model Experience {
   subName         String?
   shortDescription String
   picture         String?
+  images          String[] @default([])
   type            String?
   typeId          String?
   experienceType  ExperienceType? @relation(fields: [typeId], references: [id])
@@ -38,8 +39,8 @@ model Experience {
   codeSolving     Boolean  @default(false)
   videoUrl        String?
   awards          Json?
-  languagesVoice  String[] @default([])
-  languagesText   String[] @default([])
+  languages       String[] @default([])
+  suitableFor     String[] @default([])
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

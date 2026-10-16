@@ -7,6 +7,7 @@ export type Experience = {
   name: string;
   shortDescription: string;
   picture: string;
+  images?: string[];
   type: string;
   age: string;
   difficulty: string;
@@ -20,8 +21,8 @@ export type Experience = {
   jumpScare?: boolean;
   duration?: string;
   tags?: string[];
-  languagesVoice?: string[];
-  languagesText?: string[];
+  languages?: string[];
+  suitableFor?: string[];
 };
 
 export type Settings = {
