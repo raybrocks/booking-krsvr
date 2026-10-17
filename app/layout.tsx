@@ -96,8 +96,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": 58.149257,
-      "longitude": 8.016398
+      "latitude": 58.152302,
+      "longitude": 8.025888
     },
     "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic",
     "areaServed": [
@@ -156,6 +156,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       "reviewCount": "22"
     },
     "sameAs": [
+      "https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
+      "https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
       "https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html",
       "https://www.instagram.com/krs.vr.arena",
       "https://www.tiktok.com/@krs.vr.arena",

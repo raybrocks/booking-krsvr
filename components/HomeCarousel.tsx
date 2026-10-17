@@ -2,8 +2,9 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Handshake, Crosshair, Skull, Mountain, Ghost, Gamepad2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Handshake, Crosshair, Skull, Mountain, Ghost, Gamepad2, Users } from "lucide-react";
 import Tilt from "react-parallax-tilt";
+import { slugify } from "@/lib/utils";
 
 export default function HomeCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -49,10 +50,10 @@ export default function HomeCarousel() {
           if (scrollLeft + clientWidth >= scrollWidth - 10) {
             scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
           } else {
-            scrollRef.current.scrollBy({ left: 250, behavior: "smooth" });
+            scrollRef.current.scrollBy({ left: 280, behavior: "smooth" });
           }
         }
-      }, 3000);
+      }, 3500);
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -61,13 +62,13 @@ export default function HomeCarousel() {
 
   const scrollLeft = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -250, behavior: "smooth" });
+      scrollRef.current.scrollBy({ left: -280, behavior: "smooth" });
     }
   };
 
   const scrollRight = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 250, behavior: "smooth" });
+      scrollRef.current.scrollBy({ left: 280, behavior: "smooth" });
     }
   };
 
@@ -81,18 +82,6 @@ export default function HomeCarousel() {
     if (ltype.includes("archer") || lname.includes("archer")) return <Mountain className="w-10 h-10 md:w-12 md:h-12" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10 md:w-12 md:h-12" />;
     return <Gamepad2 className="w-10 h-10 md:w-12 md:h-12" />;
-  };
-
-  const slugify = (text: string) => {
-    if (!text) return "";
-    return text
-      .toString()
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w\-]+/g, '')
-      .replace(/\-\-+/g, '-')
-      .replace(/^-+/, '')
-      .replace(/-+$/, '');
   };
 
   if (isLoading) {
@@ -115,45 +104,95 @@ export default function HomeCarousel() {
     >
       <button 
         onClick={scrollLeft} 
-        className="absolute -left-4 md:-left-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors bg-black/80 rounded-full md:bg-transparent"
+        aria-label="Bla til venstre"
+        className="absolute -left-2 md:-left-12 z-20 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors bg-black/80 border border-white/10 rounded-full md:bg-transparent md:border-transparent"
       >
-        <ChevronLeft className="w-8 h-8 md:w-16 md:h-16" strokeWidth={1} />
+        <ChevronLeft className="w-7 h-7 md:w-14 md:h-14" strokeWidth={1.5} />
       </button>
 
       <div 
         ref={scrollRef}
-        className="w-full overflow-x-auto overflow-y-hidden hide-scrollbar py-8"
+        className="w-full overflow-x-auto overflow-y-hidden hide-scrollbar py-6"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        <div className="flex items-center justify-start md:justify-center gap-4 md:gap-8 px-8 md:px-4 w-max min-w-full snap-x snap-mandatory">
+        <div className="flex items-stretch justify-start gap-5 md:gap-6 px-6 md:px-4 w-max min-w-full snap-x snap-mandatory">
         {experiences.map((exp) => {
+          const typeSlug = exp.experienceType?.slug || slugify(exp.type || "");
+          const coverImage =
+            (Array.isArray(exp.images) && exp.images.length > 0 ? exp.images[0] : null) ||
+            exp.picture ||
+            null;
+          const maxPlayers = exp.maxPlayers || 6;
+
           return (
             <Tilt
               key={exp.id}
-              tiltMaxAngleX={15}
-              tiltMaxAngleY={15}
+              tiltMaxAngleX={8}
+              tiltMaxAngleY={8}
               glareEnable={true}
-              glareMaxOpacity={0.3}
+              glareMaxOpacity={0.2}
               glareColor="#ffffff"
               glarePosition="all"
               glareBorderRadius="24px"
-              scale={1.05}
+              scale={1.03}
               transitionSpeed={1500}
-              className="flex-shrink-0 snap-center min-w-[140px]"
+              className="flex-shrink-0 snap-center w-[230px] sm:w-[250px]"
             >
               <Link
-                href={`/vr-opplevelser/${slugify(exp.type)}/${slugify(exp.name)}`}
-                className="flex flex-col items-center justify-center group w-full h-full px-4 py-8 rounded-3xl border border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)] hover:bg-[#9C39FF]/20 hover:shadow-[0_0_25px_rgba(156,57,255,0.4)] transition-all duration-300"
+                href={`/vr-opplevelser/${typeSlug}/${slugify(exp.name)}`}
+                className="flex flex-col justify-between group w-full h-full rounded-3xl overflow-hidden border border-[#9C39FF]/40 bg-zinc-900/70 shadow-[0_0_20px_rgba(156,57,255,0.15)] hover:border-[#9C39FF] hover:shadow-[0_0_30px_rgba(156,57,255,0.35)] transition-all duration-300"
               >
-                <div className="mb-4 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] group-hover:scale-110 transition-transform duration-300">
-                  {getIconForType(exp.type, exp.name)}
+                {/* Cover Image or Icon Fallback */}
+                <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden">
+                  {coverImage ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={coverImage}
+                        alt={`${exp.name} – ${exp.type || "VR-opplevelse"} hos KRS VR Arena`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-[#9C39FF]/10 text-white group-hover:scale-110 transition-transform duration-300">
+                      {getIconForType(exp.type, exp.name)}
+                    </div>
+                  )}
+
+                  {/* Genre Pill Top-Left */}
+                  {exp.type && (
+                    <span className="absolute top-3 left-3 text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-semibold shadow-md">
+                      {exp.type}
+                    </span>
+                  )}
                 </div>
-                <span className="text-sm md:text-base font-bold mb-2 text-white text-center max-w-[120px] leading-tight">
-                  {exp.name}
-                </span>
-                <span className="text-[10px] md:text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-medium shadow-[0_0_10px_rgba(156,57,255,0.5)]">
-                  {exp.type}
-                </span>
+
+                {/* Card Body */}
+                <div className="p-4 flex flex-col flex-grow justify-between text-left">
+                  <div>
+                    <h3 className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-snug line-clamp-2">
+                      {exp.name}
+                    </h3>
+                    {exp.subName && (
+                      <p className="text-xs text-zinc-400 font-light mt-1 line-clamp-1">
+                        {exp.subName}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs text-zinc-400">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-[#9C39FF]" />
+                      2–{maxPlayers >= 10 ? "10" : maxPlayers} spillere
+                    </span>
+                    {exp.age && (
+                      <span className="text-zinc-500 font-medium">
+                        {String(exp.age).includes("år") ? exp.age : `${exp.age} år`}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </Link>
             </Tilt>
           );
@@ -163,10 +202,12 @@ export default function HomeCarousel() {
 
       <button 
         onClick={scrollRight} 
-        className="absolute -right-4 md:-right-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors bg-black/80 rounded-full md:bg-transparent"
+        aria-label="Bla til høyre"
+        className="absolute -right-2 md:-right-12 z-20 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors bg-black/80 border border-white/10 rounded-full md:bg-transparent md:border-transparent"
       >
-        <ChevronRight className="w-8 h-8 md:w-16 md:h-16" strokeWidth={1} />
+        <ChevronRight className="w-7 h-7 md:w-14 md:h-14" strokeWidth={1.5} />
       </button>
     </div>
   );
 }
+

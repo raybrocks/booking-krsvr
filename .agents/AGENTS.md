@@ -25,7 +25,14 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 2. **Bevar eksisterende SEO:** Ikke overskriv eksisterende god metadata og struktur (f.eks. JSON-LD, sitemap, robots, alt-tekster) uten god grunn. Utvid heller med nye relevante nøkkelord.
 3. **Semantikk:** Hold strukturert og semantisk HTML (H1, H2, H3) vedlike, og ha alltid beskrivende alt-tekster for bilder.
 4. **Visuelt design:** Ikke gjør store visuelle endringer i UI eller tekster for SEO-ens skyld. Endringer bør gjøres "under the hood" der det er mulig (metadata, aria-labels, json-ld).
-5. **Kontekstuell bruk:** Innarbeid ord naturlig. Ikke fyll siden med overdreven "keyword stuffing". Fokus er på lokal tilstedeværelse på Lund i Kristiansand (`Industrigata 12, 4632 Kristiansand`, GPS: `58.149257, 8.016398`) og å formidle opplevelsestypene tydelig til AI og søkemotorer.
+5. **Kontekstuell bruk:** Innarbeid ord naturlig. Ikke fyll siden med overdreven "keyword stuffing". Fokus er på lokal tilstedeværelse på Lund i Kristiansand (`Industrigata 12, 4632 Kristiansand`, GPS: `58.152302, 8.025888`) og å formidle opplevelsestypene tydelig til AI og søkemotorer.
+6. **SEO/GEO-scanning og historisk målelogg (`docs/geo_ai_search_checklist.md`):**
+   Når brukeren ber om en ny SEO/GEO-scanning, skal agenten sjekke og oppdatere tabellene i `docs/geo_ai_search_checklist.md` med en ny datokolonne for:
+   - Antall sider i `https://www.krsvr.no/sitemap.xml`
+   - Refererende domener (`"krsvr.no" -site:krsvr.no` og `"Krs VR Arena" -site:krsvr.no`) + Tranco Domain Rank (`https://tranco-list.eu/api/ranks/domain/<domene>`)
+   - Brønnøysund NACE-bransjekode (`https://data.brreg.no/enhetsregisteret/api/enheter/936318878`)
+   - Vurdering, antall anmeldelser og rangering på Google Maps og TripAdvisor
+   - De 6 faste nøytrale kommersielle AI-søkene i Seksjon 0.C.
 
 # Utvikling og Kjøring
 1. **Port:** Dev-serveren (`npm run dev`) skal *alltid* startes på port 3050.

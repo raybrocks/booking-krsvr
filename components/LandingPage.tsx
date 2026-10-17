@@ -1,22 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import HomeCarousel from "@/components/HomeCarousel";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
-import { useEffect } from "react";
 import { 
   ArrowRight, 
-  MapPin, 
   CheckCircle2, 
   Handshake, 
   Footprints, 
   Users, 
   Glasses, 
   CalendarHeart, 
-  Briefcase, 
   Smile, 
   Info, 
   Clock, 
@@ -24,7 +22,9 @@ import {
   UsersRound,
   UserCheck,
   Crown,
-  PartyPopper
+  PartyPopper,
+  Truck,
+  Star
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -45,8 +45,8 @@ export default function LandingPage() {
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": "58.149257",
-      "longitude": "8.016398"
+      "latitude": "58.152302",
+      "longitude": "8.025888"
     },
     "keywords": "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room, Zombie Shooter Kristiansand, Spatial Ops Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bursdag Kristiansand",
     "offers": {
@@ -55,8 +55,74 @@ export default function LandingPage() {
       "lowPrice": 375,
       "highPrice": 460,
       "priceCurrency": "NOK"
-    }
+    },
+    "sameAs": [
+      "https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
+      "https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
+      "https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html",
+      "https://www.instagram.com/krs.vr.arena",
+      "https://www.tiktok.com/@krs.vr.arena",
+      "https://www.facebook.com/krs.vr.arena",
+      "https://www.youtube.com/@KrsVRArena"
+    ]
   };
+
+  const groupCards = [
+    {
+      title: "Teambuilding & Bedrift",
+      badge: "2–64 personer · EHF & Servering",
+      description: "Styrk samholdet med utfordrende samarbeid for 2–10 spillere, eller dynamisk turneringsformat med storskjerm i loungen for opptil 64 kolleger. Mulighet for pizzalevering og forhåndsbestilt bar.",
+      href: "/arrangementer/vr-teambuilding",
+      image: "/images/vr-teambuilding-firmaevent-kristiansand.jpg",
+      alt: "Kolleger som feirer sammen etter VR teambuilding hos KRS VR Arena i Kristiansand",
+      icon: Handshake,
+    },
+    {
+      title: "Utdrikningslag",
+      badge: "Forloverens favoritt · 1,5–3 timer",
+      description: "En energisk og sosial start på feiringen der alle deltar på lik linje. Inkluderer egen partylounge med mulighet for varm pizzalevering og forhåndsbestilt drikke.",
+      href: "/arrangementer/vr-utdrikningslag",
+      image: "/images/vr-utdrikningslag-kristiansand.jpg",
+      alt: "Glad gjeng i utdrikningslag med VR-briller i arenaen på Lund i Kristiansand",
+      icon: Crown,
+    },
+    {
+      title: "Vennegjeng & Studenter",
+      badge: "2–10 spillere · 20 % studentrabatt søn–tor",
+      description: "Samle gjengen til 90 minutter med gåteløsing i VR Escape Room eller høy puls i Mixed Reality Shooter og Zombie Shooter – helt uten kabler.",
+      href: "/vr-opplevelser",
+      image: "/images/vr-vennegjeng.jpg",
+      alt: "Vennegjeng i full action med trådløse VR-briller på 140 kvm arena",
+      icon: Users,
+    },
+    {
+      title: "VR Bursdag",
+      badge: "Fra 375 kr/pers · Partylounge inkludert",
+      description: "En aktiv feiring med egen spillvert og 30 minutter i partyloungen etter spillet. Tilpassede opplegg for barnebursdag (8–12 år), ungdom og voksenbursdag (18+).",
+      href: "/arrangementer/vr-bursdag",
+      image: "/images/vr-familiepakke-ungdom-12pluss.jpg",
+      alt: "Ungdomsgjeng og bursdagsfeiring med VR-utstyr hos KRS VR Arena",
+      icon: CalendarHeart,
+    },
+    {
+      title: "Familier med barn & ungdom",
+      badge: "8–12 år & 12+ · Trygge eventyr",
+      description: "Utforsk nye verdener og løs spennende oppgaver sammen som en aktiv familie – helt uavhengig av tidligere VR-erfaring.",
+      href: "/vr-opplevelser/familie",
+      image: "/images/vr-familiepakke-8-12-aar.jpg",
+      alt: "Familie med barn og voksne som samarbeider i VR hos KRS VR Arena",
+      icon: Glasses,
+    },
+    {
+      title: "VR On-site – Vi kommer til dere",
+      badge: "I hele Agder · Konferanse & Kickoff",
+      description: "Skal dere ha firmafest, konferanse eller arrangement i egne lokaler? Vi rigger opp mobil VR-arena med egne instruktører der dere er.",
+      href: "/arrangementer/vr-on-site",
+      image: "/arrangement-hero.jpg",
+      alt: "Spillere foran KRS VR Arena sitt neonskilt klare for VR-opplevelse",
+      icon: Truck,
+    },
+  ];
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -94,7 +160,7 @@ export default function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {/* 1. Hero Section */}
-      <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden pt-20">
+      <section className="relative flex flex-col items-center justify-center text-center px-4 overflow-hidden pt-6 md:pt-12 pb-16">
         <motion.div 
           className="absolute inset-0 -z-10"
           style={{ x: bgX1, y: bgY1 }}
@@ -120,29 +186,118 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="max-w-4xl mx-auto space-y-6 md:space-y-8"
+          className="max-w-5xl mx-auto space-y-5 md:space-y-6"
         >
+          {/* Top Trust Pill */}
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-zinc-900/80 border border-white/10 text-xs sm:text-sm text-zinc-300">
+            <span className="inline-flex items-center gap-1 text-amber-400 font-medium">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              5,0 på Google & TripAdvisor
+            </span>
+            <span className="text-zinc-600">&middot;</span>
+            <span>90 min totalopplevelse</span>
+            <span className="text-zinc-600">&middot;</span>
+            <span>2–64 personer</span>
+            <span className="text-zinc-600 hidden sm:inline">&middot;</span>
+            <span className="hidden sm:inline text-zinc-300">Fra 375 kr/pers</span>
+          </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tighter text-white leading-[1.15]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-tighter text-white leading-[1.12] max-w-4xl mx-auto">
             <span className="font-bold">Mixed Reality, VR Escape Rooms og teambuilding i Kristiansand</span>
           </h1>
-          <p className="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto font-light leading-relaxed">
+          <p className="text-base sm:text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto font-light leading-relaxed">
             Løs oppdrag, konkurrer i actionfylte lagspill og opplev Mixed Reality — der arenaen blir en del av spillet. Perfekt for vennegjenger, bursdag og utdrikningslag — og en teambuilding-opplevelse kollegaene faktisk snakker om etterpå.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-            <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-14 px-8 text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 min-w-[240px]">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+            <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-13 md:h-14 px-8 text-base md:text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 min-w-[230px]">
               Book opplevelse <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button nativeButton={false} render={<Link href="/vr-opplevelser" />} size="lg" variant="outline" className="h-14 px-8 text-lg border-zinc-700 hover:bg-zinc-800 rounded-full text-white min-w-[240px]">
+            <Button nativeButton={false} render={<Link href="/vr-opplevelser" />} size="lg" variant="outline" className="h-13 md:h-14 px-8 text-base md:text-lg border-zinc-700 hover:bg-zinc-800 rounded-full text-white min-w-[230px]">
               Se opplevelser
             </Button>
           </div>
 
-          <p className="pt-8 text-sm md:text-base text-zinc-500 font-medium tracking-wider uppercase max-w-2xl mx-auto">
-            Kristiansands mest sosiale VR-opplevelse <br className="hidden sm:block" />
-            <span className="text-zinc-600">— der grupper går fysisk inn i spillet.</span>
-          </p>
+          {/* 3-Photo Showcase Row Above the Fold (Alternativ 1) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 md:gap-5 pt-4 md:pt-6 max-w-5xl mx-auto text-left">
+            <Link
+              href="/vr-opplevelser"
+              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 hover:border-[#9C39FF]/60 transition-all duration-300 shadow-xl"
+            >
+              <Image
+                src="/images/vr-vennegjeng.jpg"
+                alt="Vennegjeng som spiller trådløs Mixed Reality og VR Escape Room i Kristiansand"
+                fill
+                priority
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute bottom-3.5 left-4 right-4">
+                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-[#9C39FF] text-white font-medium mb-1.5 shadow">
+                  2–10 spillere samtidig
+                </span>
+                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-tight">
+                  Vennegjeng & Action
+                </div>
+                <div className="text-xs text-zinc-300 font-light mt-0.5">
+                  Trådløs Mixed Reality & Escape Room
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/arrangementer/vr-teambuilding"
+              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-[#9C39FF]/40 hover:border-[#9C39FF] transition-all duration-300 shadow-[0_0_25px_rgba(156,57,255,0.18)]"
+            >
+              <Image
+                src="/images/vr-teambuilding-firmaevent-kristiansand.jpg"
+                alt="Bedrift på VR teambuilding og firmaevent hos KRS VR Arena i Kristiansand"
+                fill
+                priority
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute bottom-3.5 left-4 right-4">
+                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-white font-medium mb-1.5">
+                  2–64 pers &middot; EHF & Bar
+                </span>
+                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-tight">
+                  Teambuilding & Bedrift
+                </div>
+                <div className="text-xs text-zinc-300 font-light mt-0.5">
+                  Samarbeid, turnering & servering
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/arrangementer/vr-utdrikningslag"
+              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 hover:border-[#9C39FF]/60 transition-all duration-300 shadow-xl"
+            >
+              <Image
+                src="/images/vr-utdrikningslag-kristiansand.jpg"
+                alt="Utdrikningslag og bursdagsfeiring i VR-arenaen i Kristiansand"
+                fill
+                priority
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute bottom-3.5 left-4 right-4">
+                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-white font-medium mb-1.5">
+                  Egen partylounge
+                </span>
+                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-tight">
+                  Utdrikningslag & Bursdag
+                </div>
+                <div className="text-xs text-zinc-300 font-light mt-0.5">
+                  Sosial feiring for hele gjengen
+                </div>
+              </div>
+            </Link>
+          </div>
         </motion.div>
 
         {/* 2. Tillitslinje (Trust Line) */}
@@ -150,7 +305,7 @@ export default function LandingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="mt-16 sm:mt-24 w-full max-w-6xl mx-auto flex flex-wrap justify-center gap-6 lg:gap-12 px-4"
+          className="mt-10 sm:mt-14 w-full max-w-6xl mx-auto flex flex-wrap justify-center gap-6 lg:gap-12 px-4"
         >
           <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
             <Smile className="w-6 h-6 text-[#9C39FF]/70" />
@@ -220,41 +375,55 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-light text-white mb-6 tracking-tight">Perfekt for grupper</h2>
             <p className="text-xl text-zinc-400 font-light max-w-2xl mx-auto">
-              Aktiviteten kan tilpasses, og alle får en trygg og god opplevelse – helt uavhengig av tidligere VR-erfaring.
+              Aktiviteten kan tilpasses både små og store grupper, og alle får en trygg og god opplevelse – helt uavhengig av tidligere VR-erfaring.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <Link href="/arrangementer/vr-teambuilding" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
-              <Handshake className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
-              <h4 className="text-2xl font-medium text-white">Teambuilding</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Styrk samholdet gjennom utfordrende samarbeid og oppdrag som engasjerer.</p>
-            </Link>
-            <Link href="/arrangementer/vr-bursdag" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
-              <Users className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
-              <h4 className="text-2xl font-medium text-white">Vennegrupper</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Samle gjengen til en annerledes, aktiv og sosial kveld sammen i arenaen.</p>
-            </Link>
-            <Link href="/arrangementer/vr-teambuilding" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
-              <Briefcase className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
-              <h4 className="text-2xl font-medium text-white">Firmaevent</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Bryt opp arbeidsdagen med en engasjerende og sosial teambuilding for hele avdelingen.</p>
-            </Link>
-            <Link href="/arrangementer/vr-utdrikningslag" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
-              <Crown className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
-              <h4 className="text-2xl font-medium text-white">Utdrikningslag</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">En energisk start på feiringen der alle i alle aldre kan delta på lik linje.</p>
-            </Link>
-            <Link href="/arrangementer/vr-bursdag" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
-              <CalendarHeart className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
-              <h4 className="text-2xl font-medium text-white">Bursdag</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">En feiring som skiller seg skikkelig ut fra det vanlige programmet.</p>
-            </Link>
-            <Link href="/vr-opplevelser/familie" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
-              <Glasses className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
-              <h4 className="text-2xl font-medium text-white">Familier med store barn</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Utforsk nye verdener og løs spennende gåter sammen som en aktiv familie.</p>
-            </Link>
+            {groupCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <Link
+                  key={card.title}
+                  href={card.href}
+                  className="rounded-3xl bg-zinc-900/40 border border-zinc-800/60 overflow-hidden flex flex-col hover:border-[#9C39FF]/50 hover:bg-zinc-900/70 transition-all duration-300 cursor-pointer group shadow-lg"
+                >
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-zinc-950">
+                    <Image
+                      src={card.image}
+                      alt={card.alt}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
+                    <div className="absolute top-3.5 left-3.5 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-xs font-medium text-zinc-200">
+                      {card.badge}
+                    </div>
+                  </div>
+
+                  <div className="p-7 flex flex-col flex-grow justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#9C39FF]/15 flex items-center justify-center text-[#9C39FF] group-hover:scale-110 transition-transform duration-300">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-xl font-medium text-white group-hover:text-[#9C39FF] transition-colors">
+                          {card.title}
+                        </h3>
+                      </div>
+                      <p className="text-zinc-400 text-sm font-light leading-relaxed">
+                        {card.description}
+                      </p>
+                    </div>
+
+                    <div className="inline-flex items-center text-sm font-medium text-white group-hover:text-[#9C39FF] transition-colors pt-1">
+                      Les mer <ArrowRight className="ml-1.5 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -299,10 +468,10 @@ export default function LandingPage() {
             
             <h3 className="text-3xl md:text-4xl font-light text-white mb-6">Ser dere etter en aktivitet som virkelig bygger relasjoner?</h3>
             <p className="text-xl text-zinc-300 font-light max-w-3xl mx-auto mb-10 leading-relaxed">
-              I våre opplevelser må deltakerne samarbeide, kommunisere, ta raske avgjørelser og løse oppgaver felles.
+              I våre opplevelser må deltakerne samarbeide, kommunisere og løse oppgaver i fellesskap. For større bedrifter (10–64 personer) kjører vi et sosialt turneringsformat med storskjerm i loungen, egne lag-armbånd, varm pizzalevering, forhåndsbestilt bar og EHF-faktura.
             </p>
             <Button nativeButton={false} render={<Link href="/arrangementer/vr-teambuilding" />} size="lg" className="h-14 px-8 text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-transform hover:scale-105">
-              Se arrangementer <ArrowRight className="ml-2 w-5 h-5" />
+              Se bedriftsopplegg og teambuilding <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
         </div>
@@ -317,13 +486,13 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto">
             <ul className="space-y-4">
               {[
-                "Sosiale team-aktiviteter som alle kan være med på.",
-                "Engasjerende, gøy og god veiledning fra egen spillvert.",
-                "Gående opplevelse inni virtuelle verdener.",
-                "Passer for både nybegynnere og erfarne VR-spillere.",
-                "Alle spill er eksklusive og testet for høy underholdningsverdi",
-                "Tilgang til partylounge etter spillet med gratis kaffe og vann (forhåndsbestilt servering tilgjengelig)",
-                "Sentralt på Lund med gratis gateparkering."
+                "Sosiale team-aktiviteter der opptil 10 personer spiller samtidig i 140 m² arena.",
+                "Dynamisk turneringsformat med storskjerm og lagkonkurranse for grupper fra 10 til 64 personer.",
+                "Engasjerende og trygg veiledning fra dedikert spillvert gjennom hele besøket.",
+                "Trådløs, gående opplevelse inni virtuelle verdener – passer både nybegynnere og erfarne.",
+                "Alle spill er nøye utvalgt og testet for høy samarbeids- og underholdningsverdi.",
+                "Tilgang til partylounge etter spillet, med mulighet for varm pizzalevering og forhåndsbestilt bar (øl/cider eller vin/bobler).",
+                "Sentralt på Lund i Kristiansand (Industrigata 12) med gratis gateparkering i nærområdet."
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-4 bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800/50 hover:border-zinc-700 transition-colors">
                   <CheckCircle2 className="w-6 h-6 text-[#9C39FF] flex-shrink-0 mt-0.5" />

@@ -5,7 +5,7 @@ For detaljerte forretningsregler, SEO-krav, e-postmaler, priser og tone-of-voice
 
 ## Prosjektkontekst
 - **Live URL:** `https://krsvr.no` (og `https://www.krsvr.no`)
-- **Lokasjon:** Industrigata 12, Lund, 4632 Kristiansand (`58.149257, 8.016398`)
+- **Lokasjon:** Industrigata 12, Lund, 4632 Kristiansand (`58.152302, 8.025888`)
 - **Hosting & CI/CD:** Vercel (automatisk bygg og deploy ved push til `main`-branchen på GitHub).
 - **GitHub-repo:** `https://github.com/raybrocks/booking-krsvr.git` (`main` branch).
 - **Teknologistakk:**

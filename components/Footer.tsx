@@ -64,8 +64,8 @@ export default function Footer() {
               </a>
             </div>
 
-            {/* TripAdvisor Recommended Horizontal Pill */}
-            <div className="mt-5 pt-4 border-t border-zinc-900">
+            {/* TripAdvisor & Visit Sørlandet */}
+            <div className="mt-5 pt-4 border-t border-zinc-900 flex flex-col items-start gap-2.5">
               <a
                 target="_blank"
                 rel="noopener noreferrer"
@@ -79,6 +79,20 @@ export default function Footer() {
                   alt="Rated on Tripadvisor"
                   className="h-8 md:h-9 w-auto rounded-full shadow-sm"
                 />
+              </a>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/"
+                className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
+                title="KRS VR Arena på Visit Sørlandet"
+              >
+                <span>
+                  Du finner oss også på{" "}
+                  <span className="underline decoration-zinc-700 underline-offset-4 hover:decoration-[#9C39FF]">
+                    Visit Sørlandet
+                  </span>
+                </span>
               </a>
             </div>
           </div>
