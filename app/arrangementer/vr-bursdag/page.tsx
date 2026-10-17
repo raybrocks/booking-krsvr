@@ -99,7 +99,7 @@ export default function VrBursdagPage() {
   };
 
   return (
-    <main className="min-h-screen pb-24 pt-12 md:pt-16">
+    <main className="min-h-screen pb-24 pt-4 md:pt-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -109,36 +109,18 @@ export default function VrBursdagPage() {
         {/* Undermeny for arrangementer */}
         <ArrangementSubNav />
 
-        {/* HERO SECTION */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <span className="text-xs md:text-sm font-semibold uppercase tracking-wider text-[#9C39FF] bg-[#9C39FF]/10 px-4 py-1.5 rounded-full inline-block mb-4">
+        {/* COMPACT HERO HEADER */}
+        <div className="text-center max-w-3xl mx-auto mb-4 md:mb-6">
+          <span className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-[#9C39FF] bg-[#9C39FF]/10 px-3.5 py-1 rounded-full inline-block mb-2">
             Feiringer for alle aldre
           </span>
-          <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tighter text-white leading-tight">
             VR Bursdag i Kristiansand
           </h1>
-          <p className="mt-4 text-zinc-400 text-base md:text-lg leading-relaxed font-light">
-            En aktiv og sosial bursdagsfeiring der alle er med på oppdraget. Hos KRS VR Arena spiller dere sammen på lag, løser gåter og kjemper side om side &mdash; med instruktør og egen partylounge.
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/booking"
-              className="px-8 py-3 rounded-full text-sm font-semibold tracking-wide bg-[#9C39FF] hover:bg-[#8A30E0] text-white shadow-[0_0_20px_rgba(156,57,255,0.4)] transition-all hover:scale-105"
-            >
-              Book bursdag direkte
-            </Link>
-            <Link
-              href="/kontakt?type=bursdag"
-              className="px-8 py-3 rounded-full text-sm font-medium tracking-wide bg-white/5 hover:bg-white/10 text-zinc-200 border border-white/10 transition-colors"
-            >
-              Send forespørsel
-            </Link>
-          </div>
         </div>
 
-        {/* HERO BILDE */}
-        <div className="relative w-full aspect-[4/3] md:aspect-[16/9] rounded-3xl overflow-hidden border border-white/10 shadow-2xl mb-4">
+        {/* HERO BILDE – SYNLIG VED FØRSTE ØYEKAST */}
+        <div className="relative w-full aspect-[4/3] md:aspect-[16/9] rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 shadow-2xl mb-3">
           <Image
             src="/images/vr-familiepakke-8-12-aar.jpg"
             alt="Barn og voksne med VR-headset klare for spill i arenaen"
@@ -148,12 +130,34 @@ export default function VrBursdagPage() {
             priority
           />
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm text-zinc-400 mb-16 px-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-zinc-400 mb-6 px-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#19EB5B]" />
             Møt presist for å ikke miste spilletid.
           </div>
           <div>Partylounge inkludert etter spillet</div>
+        </div>
+
+        {/* INTRO TEKST OG CTA UNDER BILDET */}
+        <div className="text-center max-w-3xl mx-auto mb-14 md:mb-16">
+          <p className="text-zinc-300 text-sm sm:text-base md:text-lg leading-relaxed font-light mb-6">
+            En aktiv og sosial bursdagsfeiring der alle er med på oppdraget. Hos KRS VR Arena spiller dere sammen på lag, løser gåter og kjemper side om side &mdash; med instruktør og egen partylounge.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <Link
+              href="/booking"
+              className="px-7 sm:px-8 py-3 rounded-full text-sm font-semibold tracking-wide bg-[#9C39FF] hover:bg-[#8A30E0] text-white shadow-[0_0_20px_rgba(156,57,255,0.4)] transition-all hover:scale-105"
+            >
+              Book bursdag direkte
+            </Link>
+            <Link
+              href="/kontakt?type=bursdag"
+              className="px-7 sm:px-8 py-3 rounded-full text-sm font-medium tracking-wide bg-white/5 hover:bg-white/10 text-zinc-200 border border-white/10 transition-colors"
+            >
+              Send forespørsel
+            </Link>
+          </div>
         </div>
 
         {/* 3 ALDERS-SPOR */}

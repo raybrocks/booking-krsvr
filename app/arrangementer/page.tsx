@@ -87,7 +87,7 @@ export default function ArrangementerPage() {
   ];
 
   return (
-    <main className="min-h-screen pb-24 pt-12 md:pt-16">
+    <main className="min-h-screen pb-24 pt-4 md:pt-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -97,19 +97,19 @@ export default function ArrangementerPage() {
         {/* Undermeny for arrangementer */}
         <ArrangementSubNav />
 
-        {/* HERO HEADER */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h1 className="text-4xl md:text-6xl font-light tracking-tighter text-white">
+        {/* COMPACT HERO HEADER */}
+        <div className="text-center max-w-3xl mx-auto mb-5 md:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tighter text-white leading-tight">
             Arrangementer hos KRS VR Arena
           </h1>
-          <p className="mt-4 text-zinc-400 text-base md:text-lg leading-relaxed font-light">
-            Planlegg en feiring eller et bedriftsevent som skiller seg ut. Hos oss spiller dere på lag, løser gåter og kjemper side om side &mdash; med instruktør og egen partylounge.
+          <p className="mt-2.5 text-zinc-400 text-sm sm:text-base md:text-lg leading-relaxed font-light">
+            Planlegg en feiring eller et bedriftsevent som skiller seg ut. Velg anledning nedenfor for å se opplegg og pakker.
           </p>
         </div>
 
         {/* TRUST BADGE */}
-        <div className="flex justify-center mb-12">
-          <div className="inline-flex items-center text-xs sm:text-sm text-zinc-400 bg-zinc-900/60 px-6 py-2.5 rounded-full border border-white/5 text-center">
+        <div className="flex justify-center mb-6 md:mb-10">
+          <div className="inline-flex items-center text-xs sm:text-sm text-zinc-400 bg-zinc-900/60 px-5 py-2 rounded-full border border-white/5 text-center">
             2–64 personer &middot; Egen partylounge &middot; Møt presist for å ikke miste spilletid.
           </div>
         </div>
