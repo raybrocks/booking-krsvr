@@ -1,54 +1,30 @@
-You are working on my live production project for KRS VR Arena.
+# Project Instructions – KRS VR Arena (`krsvr.no`)
 
-Project context:
-- The app is live at https://krsvr.no
-- The app is deployed on Vercel.
-- Vercel is connected directly to GitHub.
-- The connected GitHub repository is:
-  https://github.com/raybrocks/booking-krsvr.git
-- The production branch is main.
-- Whenever code is pushed to GitHub, Vercel automatically starts a new build/deployment.
-- This project was previously edited in Google AI Studio and synced to GitHub.
-- From now on, Antigravity replaces Google AI Studio as the place where code is edited.
-- The current local files in Antigravity (abbreviation AG) should match the current GitHub state.
+Du jobber på produksjonsprosjektet for **KRS VR Arena** i Kristiansand.
+For detaljerte forretningsregler, SEO-krav, e-postmaler, priser og tone-of-voice, se alltid [`.agents/AGENTS.md`](./.agents/AGENTS.md), som er prosjektets primære styringsdokument (Single Source of Truth).
 
-Important workflow:
-AG edits files locally
-→ I review/test locally
-→ AG commits changes
-→ AG pushes to GitHub
-→ Vercel builds automatically
-→ krsvr.no updates if the build succeeds
+## Prosjektkontekst
+- **Live URL:** `https://krsvr.no` (og `https://www.krsvr.no`)
+- **Lokasjon:** Industrigata 12, Lund, 4632 Kristiansand (`58.149257, 8.016398`)
+- **Hosting & CI/CD:** Vercel (automatisk bygg og deploy ved push til `main`-branchen på GitHub).
+- **GitHub-repo:** `https://github.com/raybrocks/booking-krsvr.git` (`main` branch).
+- **Teknologistakk:**
+  - Next.js 15 (App Router, TypeScript, Tailwind CSS)
+  - Database: PostgreSQL (Supabase) via Prisma ORM (`prisma/schema.prisma`)
+  - Betaling: Vipps MobilePay ePay API
+  - E-post: Resend + React Email (`components/emails/` og `components/emails/registry.ts`)
 
-Rules:
-- Do not create a new GitHub repository.
-- Do not create a new Vercel project.
-- Do not change DNS settings.
-- Do not disconnect or modify the existing Vercel/GitHub integration.
-- Do not use force push.
-- Do not commit .env files, secrets, API keys, node_modules, dist, build, .next, or other generated files.
-- Do not make large unrelated refactors unless I explicitly ask.
-- Before pushing, always show me what files changed and ask for approval.
-- If you need to run terminal commands, explain what they do before running them.
-- If the production build fails locally or on Vercel, help me debug based on the error output.
-
-Before making any changes, verify:
-1. This folder is the project root.
-2. package.json exists.
-3. The current Git branch.
-4. The Git remote origin.
-5. Whether the working tree has uncommitted changes.
-6. The correct local dev command from package.json.
-7. The correct production build command from package.json.
-
-Preferred development process:
-1. Understand the requested change.
-2. Inspect the relevant files.
-3. Explain the planned change briefly.
-4. Make the smallest safe change.
-5. Run the relevant local check/build command if available.
-6. Summarize changed files.
-7. Ask me before committing or pushing.
-
-For small visual/content fixes, we can work directly on main after local verification.
-For bigger changes, suggest a separate branch first.
+## Utvikling og Arbeidsflyt
+1. **Lokal utviklingsserver:**
+   - Skal **alltid** kjøres på port `3050` (`npm run dev`).
+2. **`lbp` (Lint -> Build -> Push):**
+   - Når brukeren skriver `lbp` (eller ber om «lint, build, push»), skal følgende kjøres automatisk i rekkefølge uten å be om ekstra bekreftelse:
+     1. `npm run lint` (rett eventuelle feil/advarsler)
+     2. `npm run build` (sikre at typer og produksjonsbygg går gjennom uten feil)
+     3. `git add`, `git commit` med beskrivende melding og `git push origin main`
+3. **Sikkerhetsregler:**
+   - Opprett aldri et nytt GitHub-repo eller Vercel-prosjekt.
+   - Ikke endre DNS-innstillinger eller koble fra Vercel/GitHub-integrasjonen.
+   - Bruk aldri `git push --force`.
+   - Commit aldri `.env`-filer, hemmeligheter, API-nøkler, `node_modules` eller `.next`.
+   - Ved nye databasetabeller i `public`-skjemaet må det alltid legges til eksplisitte `GRANT`-setninger sammen med `RLS` (se `.agents/AGENTS.md`).

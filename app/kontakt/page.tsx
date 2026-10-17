@@ -52,19 +52,46 @@ function KontaktForm() {
       setFormType("arrangement");
     }
 
-    if (typeParam === "privat") setGroupType("privat");
-    if (typeParam === "bedrift") setGroupType("bedrift");
-
-    if (eventParam) {
-      // Map basic values
-      if (eventParam === "bursdag") setEventType("Bursdag");
-      if (eventParam === "utdrikningslag") setEventType("Utdrikningslag");
-      if (eventParam === "teambuilding") setEventType("Teambuilding");
-      if (eventParam === "julebord") setEventType("Julebord");
+    if (typeParam === "privat") {
+      setGroupType("privat");
+    } else if (typeParam === "bedrift") {
+      setGroupType("bedrift");
+      setEventType("Teambuilding");
+    } else if (typeParam === "bursdag") {
+      setGroupType("privat");
+      setEventType("Bursdag");
+      setPackageType("Mindre gruppe: 2–10 personer / 90 minutter");
+    } else if (typeParam === "utdrikningslag") {
+      setGroupType("privat");
+      setEventType("Utdrikningslag");
+      setPackageType("Utdrikningslag: 1,5–3 timer");
+    } else if (typeParam === "onsite") {
+      setGroupType("bedrift");
+      setEventType("VR On-site (Vi kommer til dere)");
+      setPackageType("VR On-site: Vi kommer til deres lokasjon");
     }
 
-    if (pakkeParam === "dagsevent") {
-      setPackageType("Privat dagsevent: 10–64 personer / inntil 8 timer");
+    if (eventParam) {
+      if (eventParam === "bursdag") {
+        setGroupType("privat");
+        setEventType("Bursdag");
+      }
+      if (eventParam === "utdrikningslag") {
+        setGroupType("privat");
+        setEventType("Utdrikningslag");
+      }
+      if (eventParam === "teambuilding") {
+        setGroupType("bedrift");
+        setEventType("Teambuilding");
+      }
+      if (eventParam === "julebord") {
+        setGroupType("bedrift");
+        setEventType("Julebord");
+      }
+    }
+
+    if (pakkeParam === "dagsevent" || pakkeParam === "turnering") {
+      setPackageType("Større gruppe / Turnering: 10–64 personer / inntil 3 timer");
     }
   }, [searchParams]);
 
@@ -141,7 +168,7 @@ function KontaktForm() {
             Send forespørsel om arrangement
           </h1>
           <p className="text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            Fyll ut skjemaet nedenfor, så hjelper vi deg med å sette sammen en uforglemmelig opplevelse hos KRS VR Arena.
+            Fyll ut skjemaet nedenfor, så hjelper vi dere med å skreddersy et godt opplegg hos KRS VR Arena.
           </p>
         </div>
 
@@ -375,7 +402,7 @@ function KontaktForm() {
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                           <label className="block text-sm font-medium text-zinc-300 mb-3">Hva slags arrangement planlegger dere? *</label>
                           <div className="grid sm:grid-cols-2 gap-3">
-                            {groupType === "privat" && ["Bursdag", "Utdrikningslag", "Privat dagsevent", "Annet privat arrangement"].map((opt) => (
+                            {groupType === "privat" && ["Bursdag", "Utdrikningslag", "Vennegjeng / Familie", "Annet privat arrangement"].map((opt) => (
                               <button
                                 key={opt}
                                 type="button"
@@ -389,7 +416,7 @@ function KontaktForm() {
                                 {opt}
                               </button>
                             ))}
-                            {groupType === "bedrift" && ["Teambuilding", "Kick Off / Firmafest", "Julebord", "Privat dagsevent for bedrift", "Annet firmaevent"].map((opt) => (
+                            {groupType === "bedrift" && ["Teambuilding", "Kickoff / Firmafest", "Julebord", "VR On-site (Vi kommer til dere)", "Annet firmaevent"].map((opt) => (
                               <button
                                 key={opt}
                                 type="button"
@@ -412,10 +439,10 @@ function KontaktForm() {
                         <label className="block text-sm font-medium text-zinc-300 mb-3">Hvilket opplegg passer best?</label>
                         <div className="grid sm:grid-cols-2 gap-3">
                           {[
-                            "Liten gruppe: 2–8 personer / 90 minutter",
-                            "Medium gruppe: 9–16 personer / 2,5 timer",
-                            "Stor gruppe: 17–24 personer / 3,5 timer",
-                            "Privat dagsevent: 10–64 personer / inntil 8 timer",
+                            "Mindre gruppe: 2–10 personer / 90 minutter",
+                            "Større gruppe / Turnering: 10–64 personer / inntil 3 timer",
+                            "Utdrikningslag: 1,5–3 timer",
+                            "VR On-site: Vi kommer til deres lokasjon",
                             "Usikker – ønsker anbefaling"
                           ].map((opt) => (
                             <button
@@ -499,9 +526,10 @@ function KontaktForm() {
                         <label className="block text-sm font-medium text-zinc-300 mb-3">Ønsker dere hjelp med mat?</label>
                         <div className="grid sm:grid-cols-1 gap-3">
                           {[
-                            "Ja, vi ønsker at dere koordinerer pizza/mat",
-                            "Nei, vi ordner selv",
-                            "Usikker"
+                            "Ja, vi ønsker at dere koordinerer lokal pizzalevering til loungen",
+                            "Barnebursdag: Vi tar med egen bursdagskake / snacks",
+                            "Nei, vi trenger ikke matservering",
+                            "Usikker – ønsker forslag"
                           ].map((opt) => (
                             <button
                               key={opt}
@@ -518,7 +546,7 @@ function KontaktForm() {
                           ))}
                         </div>
                         <p className="mt-3 text-xs text-zinc-500 leading-relaxed">
-                          KRS VR Arena koordinerer levering av fersk lokal pizza direkte til loungen. Merk at det ikke er anledning til medbrakt mat og drikke på teambuilding og utdrikningslag.
+                          KRS VR Arena koordinerer levering av fersk, varm lokal pizza direkte til partyloungen. Merk at det ikke er anledning til medbrakt mat og drikke på teambuilding, firmaarrangementer, voksenbursdager (18+) og utdrikningslag (ved barnebursdag er egen kake og snacks tillatt).
                         </p>
                       </div>
 

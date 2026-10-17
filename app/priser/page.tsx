@@ -44,7 +44,7 @@ export default function PriserPage() {
           Priser <span className="text-sm font-medium text-zinc-500 uppercase tracking-widest ml-2 align-middle">Inkl. MVA</span>
         </h1>
         <p className="mt-4 text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-          Prisen justeres automatisk etter hvor mange dere er. Få en uforglemmelig opplevelse i våre store VR arenaer!
+          Prisen justeres automatisk etter hvor mange dere er. Samle venner, familie eller kollegaer i våre trådløse VR-arenaer på Lund.
         </p>
       </div>
 
@@ -64,7 +64,7 @@ export default function PriserPage() {
 
             <div className="space-y-4">
               {[
-                { pers: "8 pers+", price: "375 kr", popular: false },
+                { pers: "8 - 10 pers", price: "375 kr", popular: false },
                 { pers: "5 - 7 pers", price: "385 kr", popular: false },
                 { pers: "3 - 4 pers", price: "395 kr", popular: false },
                 { pers: "2 pers", price: "460 kr", popular: false },
@@ -105,7 +105,7 @@ export default function PriserPage() {
                 "Gratis vann å drikke.",
                 "Mission debrief og scoreboard i lounge med gamemaster.",
                 "Tilgang til vår partylounge i 30 minutter etter spillet.",
-                "Mulighet for medbrakt kake ved barnebursdag (forhåndsbestilt servering ved arrangementer).",
+                "Mulighet for medbrakt kake ved barnebursdag (forhåndsbestilt servering ved teambuilding, voksenbursdag og utdrikningslag).",
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-zinc-900/20 border border-white/5 hover:border-white/10 hover:bg-zinc-900/40 transition-colors">
                   <CheckCircle2 className="w-6 h-6 text-[#9C39FF] flex-shrink-0" />
@@ -116,7 +116,7 @@ export default function PriserPage() {
             
             <div className="mt-8 p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800 text-sm text-zinc-400 flex items-start gap-3">
               <Info className="w-5 h-5 text-zinc-500 flex-shrink-0 mt-0.5" />
-              <p>For grupper med flere enn 8 personer, deles gruppen opp slik at alle får spille med maksimal komfort og utstyr.</p>
+              <p>For grupper med flere enn 10 personer kjøres opplegget i et sosialt turneringsformat, slik at alle får spille sammen med maksimal komfort og utstyr.</p>
             </div>
           </div>
 

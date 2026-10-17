@@ -25,7 +25,7 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 2. **Bevar eksisterende SEO:** Ikke overskriv eksisterende god metadata og struktur (f.eks. JSON-LD, sitemap, robots, alt-tekster) uten god grunn. Utvid heller med nye relevante nøkkelord.
 3. **Semantikk:** Hold strukturert og semantisk HTML (H1, H2, H3) vedlike, og ha alltid beskrivende alt-tekster for bilder.
 4. **Visuelt design:** Ikke gjør store visuelle endringer i UI eller tekster for SEO-ens skyld. Endringer bør gjøres "under the hood" der det er mulig (metadata, aria-labels, json-ld).
-5. **Kontekstuell bruk:** Innarbeid ord naturlig. Ikke fyll siden med overdreven "keyword stuffing". Fokus er på lokal tilstedeværelse i Kristiansand og å formidle opplevelsestypene tydelig til AI og søkemotorer.
+5. **Kontekstuell bruk:** Innarbeid ord naturlig. Ikke fyll siden med overdreven "keyword stuffing". Fokus er på lokal tilstedeværelse på Lund i Kristiansand (`Industrigata 12, 4632 Kristiansand`, GPS: `58.149257, 8.016398`) og å formidle opplevelsestypene tydelig til AI og søkemotorer.
 
 # Utvikling og Kjøring
 1. **Port:** Dev-serveren (`npm run dev`) skal *alltid* startes på port 3050.
@@ -47,11 +47,19 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 3. **Logo-format (PNG fremfor SVG):** I alle e-postmaler og HTML-e-poster (Resend / React Email) skal det alltid benyttes PNG-format for logoer i stedet for SVG for å sikre stabil visning i e-postklienter:
    - Lys bakgrunn (standard): `https://krsvr.no/krsvrarena_logo_sort.png`
    - Mørk bakgrunn: `https://krsvr.no/krsvrarena_logo_hvit.png`
+4. **Omtale-forespørsel etter besøk (`ReviewRequestEmail.tsx` & `AdminReviewRequestReceiptEmail.tsx`):**
+   - Sendes manuelt fra `/admin` (under «Upcoming») på norsk eller engelsk.
+   - **Ikke nevn spesifikt booket spill:** E-posten skal aldri nevne hvilken spesifikk opplevelse kunden booket, ettersom gjester ofte får prøve flere opplevelser under oppholdet.
+   - **Automatisk admin-kopi:** Ved hver utsendelse skal det alltid gå en kvittering med full kopi av e-posten til `post@krsvr.no` (`AdminReviewRequestReceiptEmail.tsx`).
+   - **Direktelenker til anmeldelser:**
+     - Google Maps: `https://g.page/r/CfC9vWzS0yO-EBM/review`
+     - Tripadvisor: `https://no.tripadvisor.com/UserReviewEdit-g190492-d34257006-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html`
+
 # Tone of Voice og Språk
 1. **Rolig og profesjonell varm tone:** Tekster på nettsiden og i alle e-poster skal alltid skrives i en rolig, profesjonell, trygg og varm tone.
-2. **Unngå overentusiasme og klisjeer:** Ikke bruk overentusiastiske vendinger som «uforglemmelig VR-opplevelse», «fantastisk opplevelse», «rå opplevelse fra første sekund» eller livlige emojier i overskrifter (f.eks. 🎉, 🎮, 🎯, ✨).
+2. **Unngå overentusiasme og klisjeer:** Ikke bruk overentusiastiske vendinger som «uforglemmelig VR-opplevelse», «fantastisk opplevelse», «rå opplevelse fra første sekund» eller livlige emojier i overskrifter/brødtekst (f.eks. 🎉, 🎮, 🎯, ✨).
 3. **Trygge og imøtekommende formuleringer:** Bruk formuleringer som «Vi gleder oss til å ta imot dere».
-4. **Oppmøtetekst:** Bruk alltid «Møt presist for å ikke miste spilletid.» i stedet for referanser til 10-15 minutter før med klokke-emojier.
+4. **Oppmøtetekst:** Bruk alltid «Møt presist for å ikke miste spilletid.» i stedet for referanser til 10–15 minutter før med klokke-emojier.
 5. **Navneliste og justering i kvittering:** Formuler tydelig at kunden kan justere antall og navneliste helt frem til ankomst, men at sene endringer ved oppmøte kan skape forsinkelser og redusert spilletid.
 
 # Database og Supabase Data API (Krav fra 30. oktober)
@@ -63,13 +71,16 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    ```
 2. **Skille mellom GRANT og RLS:** `GRANT` gir Data API / PostgREST tillatelse til å nå tabellen. `RLS` (`alter table public.din_tabell enable row level security;` + policies) styrer hvilke rader som kan aksesseres. Begge deler må **alltid** settes opp sammen.
 
-# Bedriftsarrangementer, Teambuilding & Bar
-1. **Turneringsformat for store grupper (10–64 personer):**
-   - Store bedriftsgrupper kjøres i et dynamisk turneringsformat med opptil 10 aktive spillere samtidig i ~10-minutters runder.
-   - Hvert lag får fargerike armbånd med egne teamnavn (f.eks. avdelingsnavn fra firmaet eller Team Alfa, Beta, Charlie, Delta).
-   - De som har pause følger med på storskjerm (spectator), sjekker scorecards, tar en forfriskning og legger taktikk.
-   - Felles kåring av vinnerlaget på slutten.
-   - Alle opplever å delta på samme arrangement hele tiden &mdash; aldri isolert oppdelt i parallelle 4-timers økter.
+# Kapasitet, Bedriftsarrangementer, Teambuilding & Bar
+1. **Kapasitet og gruppestørrelser (10 samtidige spillere):**
+   - Opptil **10 personer** kan spille samtidig i arenaen.
+   - **Selvbetjent booking (`/booking`):** Gjelder grupper på **2–10 personer** (90 min totalopplevelse). Merk at enkeltspill i databasen har sin egen tekniske maksgrense (`maxPlayers`, f.eks. 6 for enkelte Escape Rooms, 8 for enkelte spill, og 10+ for Mixed Reality Shooter).
+   - **Turneringsformat for store grupper (10–64 personer):**
+     - Store grupper bestilles via kontaktskjema (`/kontakt`) og kjøres i et dynamisk turneringsformat med opptil 10 aktive spillere samtidig i ~10-minutters runder.
+     - Hvert lag får fargerike armbånd med egne teamnavn (f.eks. avdelingsnavn fra firmaet eller Team Alfa, Beta, Charlie, Delta).
+     - De som har pause følger med på storskjerm (spectator), sjekker scorecards, tar en forfriskning og legger taktikk.
+     - Felles kåring av vinnerlaget på slutten.
+     - Alle opplever å delta på samme arrangement hele tiden &mdash; aldri isolert oppdelt i parallelle 4-timers økter.
 2. **Bar og Servering (Kun ved forhåndsbestilling):**
    - Baren er ikke fast åpen drop-in, men klargjøres ved forhåndsbestilling til arrangementer.
    - **Pakke 1 (Øl & Cider):** Kald Tuborg, Corona Extra, Bacardi Breezer og mineralvann. Veldig trygt og uformelt med tanke på utstyr.
@@ -77,15 +88,14 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - **Prislister:** Sendes uforpliktende ved bookingforespørsel.
    - **Pizza:** Lokal pizza kan leveres varmt direkte til partyloungen.
    - **Oppgjør:** Firmaet dekker samlet på EHF-faktura, eller vi åpner baren for deltakerbetaling.
-3. **Pakkepriser:**
-   - Teambuilding (2–10 personer): Fra 375 kr eks. mva / pers (90 min).
-   - Teambuilding (10–50 personer): Fra 450 kr eks. mva / pers (inntil 3 timer totaltid / hele lokalet for dere selv / 120 min aktivt turneringsformat).
-   - Utdrikningslag: Fra 450 kr / pers (Varighet: 1,5–3 timer).
-4. **Ingen medbrakt mat og drikke på teambuilding og utdrikningslag:**
-   - Det er ikke anledning til medbrakt mat og drikke på teambuilding og utdrikningslag.
+3. **Pakkepriser og MVA-skille:**
+   - **Normal booking / Privat (2–10 personer, 90 min):** Oppgis **inkl. mva** på `/priser` (2 pers: 460 kr/pers, 3–4 pers: 395 kr/pers, 5–7 pers: 385 kr/pers, 8–10 pers: 375 kr/pers).
+   - **Teambuilding bedrift (2–10 personer):** Fra 375 kr **eks. mva** / pers (90 min).
+   - **Teambuilding bedrift (10–50 personer):** Fra 450 kr **eks. mva** / pers (inntil 3 timer totaltid / hele lokalet for dere selv / 120 min aktivt turneringsformat).
+   - **Utdrikningslag:** Fra 450 kr / pers (Varighet: 1,5–3 timer).
+   - **VR Bursdag:** Fra 375 kr / pers (90 min totalopplevelse).
+4. **Ingen medbrakt mat og drikke på teambuilding, voksenbursdag (18+) og utdrikningslag:**
+   - Det er **ikke** anledning til medbrakt mat og drikke på teambuilding, firmaarrangementer, voksenbursdager (18+) og utdrikningslag.
    - Drikke serveres via våre to forhåndsbestilte barkonsepter (Pakke 1: Øl/cider/mineralvann eller Pakke 2: Vin & bobler).
    - Mat serveres ved at vi koordinerer levering av fersk, varm lokal pizza direkte til partyloungen.
-   - (Merk: Ved barnebursdager er det tillatt å ta med egen bursdagskake, godteri og snacks).
-
-
-
+   - **Unntak for barnebursdag:** Ved barnebursdager er det tillatt å ta med egen bursdagskake, godteri, snacks og brus.

@@ -1,20 +1,31 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# KRS VR Arena (`krsvr.no`)
 
-# Run and deploy your AI Studio app
+Nettside, bookingsystem og administrasjonspanel for **KRS VR Arena** i Kristiansand (`Industrigata 12, 4632 Kristiansand`).
 
-This contains everything you need to run your app locally.
+## Teknologistakk
+- **Rammeverk:** Next.js 15 (App Router, TypeScript, React 19)
+- **Styling:** Tailwind CSS v4, Motion (`motion/react`), Lucide Icons
+- **Database & ORM:** PostgreSQL (Supabase) + Prisma ORM (`prisma/schema.prisma`)
+- **Betaling:** Vipps MobilePay ePay API
+- **E-post:** Resend + React Email (`components/emails/` og `components/emails/registry.ts`)
 
-View your app in AI Studio: https://ai.studio/apps/c6c336f2-ea4e-4612-a27a-96d62abbfc58
+## Kjøre prosjektet lokalt
 
-## Run Locally
+1. Installer avhengigheter:
+   ```bash
+   npm install
+   ```
+2. Konfigurer miljøvariabler i `.env` / `.env.local` (se `app/.env.example`).
+3. Start utviklingsserveren (kjører fast på port **3050**):
+   ```bash
+   npm run dev
+   ```
+   Åpne [http://localhost:3050](http://localhost:3050) i nettleseren.
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Viktige retningslinjer
+Se [`.agents/AGENTS.md`](./.agents/AGENTS.md) for:
+- SEO- og AI-søk (GEO) retningslinjer
+- Tone of Voice og språkbruk
+- E-postmaler og sentralt e-postregister (`components/emails/registry.ts`)
+- Pakkepriser, kapasitet (opptil 10 samtidige spillere), turneringsformat (10–64 pers) og bar-/serveringsregler
+- Database- og Supabase `GRANT` + `RLS`-krav

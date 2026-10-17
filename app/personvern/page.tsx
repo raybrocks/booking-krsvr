@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
         <div className="prose prose-invert prose-zinc max-w-none">
           <p className="text-lg text-zinc-300 mb-8 leading-relaxed">
             Denne personvernerklæringen forteller om hvordan KRS VR Arena samler inn og bruker personopplysninger.
-            Vårt hovedfokus er å gi deg en fantastisk opplevelse, og vi lagrer kun den informasjonen som er helt nødvendig for å kunne ekspedere din bestilling og gjennomføre ditt besøk hos oss.
+            Vårt hovedfokus er å gi deg en trygg og god opplevelse, og vi lagrer kun den informasjonen som er helt nødvendig for å kunne ekspedere din bestilling og gjennomføre ditt besøk hos oss.
           </p>
 
           <section className="mb-10">

@@ -96,8 +96,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": 58.1567,
-      "longitude": 8.0211
+      "latitude": 58.149257,
+      "longitude": 8.016398
     },
     "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic",
     "areaServed": [

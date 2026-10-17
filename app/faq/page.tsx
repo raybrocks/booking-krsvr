@@ -4,16 +4,16 @@ import { FaqClient } from "./FaqClient";
 
 const faqs = [
   {
-    question: "Er det plass til grupper større enn 8 personer?",
+    question: "Er det plass til grupper større enn 10 personer?",
     answer: "Ja, vi tar imot opptil 64 personer! Opptil 10 personer kan spille samtidig i vårt sosiale turneringsformat. Mens én gruppe spiller, følger resten med på storskjerm (spectator), sjekker scorecards og slapper av i partyloungen. Ved forhåndsbestilling tilbyr vi egne barkonsepter (øl/cider eller vin/bobler) og lokal pizzalevering.",
   },
   {
     question: "Kan vi ha med egen mat, kake eller drikke?",
-    answer: "Ved barnebursdager er dere hjertelig velkomne til å ta med egen bursdagskake, godteri og brus til partyloungen. For teambuilding, firmaarrangementer og utdrikningslag er det ikke anledning til medbrakt mat og drikke – her tilbyr vi i stedet forhåndsbestilte drikkepakker (kald øl/cider/mineralvann eller kvalitetsvin og bobler) og koordinerer levering av fersk, varm lokal pizza direkte til loungen.",
+    answer: "Ved barnebursdager er dere hjertelig velkomne til å ta med egen bursdagskake, godteri og brus til partyloungen. For teambuilding, firmaarrangementer, voksenbursdager (18+) og utdrikningslag er det ikke anledning til medbrakt mat og drikke – her tilbyr vi i stedet forhåndsbestilte drikkepakker (kald øl/cider/mineralvann eller kvalitetsvin og bobler) og koordinerer levering av fersk, varm lokal pizza direkte til loungen.",
   },
   {
     question: "Hva er inkludert i prisen?",
-    answer: "Prisen inkluderer en totalopplevelse på 90 minutter. Dette består av forberedelse og introduksjon, rundt 60 minutter aktiv in-game session i VR, gruppebilder etter endt spill, og gratis vann. I tillegg har dere tilgang til partyloungen etter spillet. Ved barnebursdager kan dere ta med egen kake, mens for bedrifter og utdrikningslag tilbyr vi forhåndsbestilt bar og pizzalevering (ikke anledning til medbrakt mat/drikke).",
+    answer: "Prisen inkluderer en totalopplevelse på 90 minutter. Dette består av forberedelse og introduksjon, rundt 60 minutter aktiv in-game session i VR, gruppebilder etter endt spill, og gratis vann. I tillegg har dere tilgang til partyloungen etter spillet. Ved barnebursdager kan dere ta med egen kake, mens for bedrifter, voksenbursdager (18+) og utdrikningslag tilbyr vi forhåndsbestilt bar og pizzalevering (ikke anledning til medbrakt mat/drikke).",
   },
   {
     question: "Må vi ha erfaring med VR fra før av?",

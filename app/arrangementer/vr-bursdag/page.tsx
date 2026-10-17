@@ -43,7 +43,7 @@ export default function VrBursdagPage() {
     },
     {
       question: "Kan vi ta med egen bursdagskake eller bestille mat?",
-      answer: "Ja, alle våre bursdagspakker inkluderer 30 minutter i partyloungen etter spillingen. Her kan dere fritt ta med egen kake, muffins og snacks, eller vi kan koordinere levering av varm pizza fra våre lokale partnere.",
+      answer: "Ja, alle våre bursdagspakker inkluderer 30 minutter i partyloungen etter spillingen. Ved barnebursdager kan dere fritt ta med egen kake, muffins og snacks. For voksenbursdager (18+) er det ikke anledning til medbrakt mat og drikke – her tilbyr vi forhåndsbestilt bar (øl/cider eller vin/bobler) og koordinerer levering av varm pizza fra våre lokale partnere.",
     },
     {
       question: "Er det spillverter til stede som passer på barna?",
@@ -51,7 +51,7 @@ export default function VrBursdagPage() {
     },
     {
       question: "Hvor mange barn kan feire bursdag sammen?",
-      answer: "Vi kan ta imot både små og store grupper opptil 64 personer. Mindre grupper spiller sammen kontinuerlig, mens større grupper rullerer i korte, spennende runder med heiing og pause i partyloungen.",
+      answer: "Vi kan ta imot både små og store grupper opptil 64 personer. Mindre grupper (opptil 10 personer) spiller sammen kontinuerlig, mens større grupper rullerer i korte, spennende runder med heiing og pause i partyloungen.",
     },
     {
       question: "Hva bør barna ha på seg?",
@@ -258,10 +258,10 @@ export default function VrBursdagPage() {
                     <Check className="w-4 h-4 text-[#19EB5B]" /> Escape Room og taktisk action
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#19EB5B]" /> Egen partylounge til fri disposisjon
+                    <Check className="w-4 h-4 text-[#19EB5B]" /> Egen partylounge til disposisjon
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#19EB5B]" /> Mulighet for medbrakt mat og drikke
+                    <Check className="w-4 h-4 text-[#19EB5B]" /> Forhåndsbestilt bar og pizzalevering
                   </li>
                 </ul>
               </div>
@@ -280,12 +280,12 @@ export default function VrBursdagPage() {
                 Feiring, kake og mat etter spillet
               </h2>
               <p className="text-zinc-400 text-sm md:text-base leading-relaxed mb-6 font-light">
-                Etter den aktive runden i spillarenaen har bursdagsfølget tilgang til vår egen partylounge i 30 minutter. Her kan dere samles rundt bordet, åpne gaver, spise kake og prate om opplevelsene.
+                Etter den aktive runden i spillarenaen har bursdagsfølget tilgang til vår egen partylounge i 30 minutter. Her kan dere samles rundt bordet, åpne gaver, spise og prate om opplevelsene.
               </p>
               <div className="space-y-3 text-sm text-zinc-300">
                 <div className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[#19EB5B] flex-shrink-0 mt-0.5" />
-                  <span><strong>Medbrakt kake og snacks:</strong> Dere kan fritt ta med egen bursdagskake, godteri og brus.</span>
+                  <span><strong>Medbrakt kake ved barnebursdag:</strong> Ved barnebursdager kan dere fritt ta med egen bursdagskake, godteri og brus (ved voksenbursdag 18+ tilbyr vi forhåndsbestilt bar og pizzalevering).</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[#19EB5B] flex-shrink-0 mt-0.5" />

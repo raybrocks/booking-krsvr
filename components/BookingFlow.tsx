@@ -113,10 +113,10 @@ export default function BookingFlow() {
               
               <div className="bg-[#9C39FF]/10 border border-[#9C39FF]/20 rounded-2xl p-4 md:p-5 text-sm text-zinc-300 space-y-3">
                 <p>
-                  <strong>For små grupper (2-8 personer):</strong> <br />Bruk bookingmodulen under.
+                  <strong>For små grupper (2-10 personer):</strong> <br />Bruk bookingmodulen under.
                 </p>
                 <p>
-                  <strong>For større grupper (8-64 personer):</strong> <br />Utforsk våre arrangementssider og reserver via kontaktskjema.
+                  <strong>For større grupper (10-64 personer):</strong> <br />Utforsk våre arrangementssider og reserver via kontaktskjema.
                 </p>
               </div>
               
@@ -209,7 +209,7 @@ export default function BookingFlow() {
                 </button>
                 <div className="text-6xl font-light w-24">{players}</div>
                 <button 
-                  onClick={() => setPlayers(Math.min(8, players + 1))}
+                  onClick={() => setPlayers(Math.min(10, players + 1))}
                   className="w-12 h-12 rounded-full border border-zinc-700 flex items-center justify-center hover:bg-zinc-800 transition-colors"
                 >
                   +

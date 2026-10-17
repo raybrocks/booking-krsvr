@@ -123,7 +123,7 @@ Når en bruker spør Gemini: *«Beste aktiviteter for utdrikningslag i Kristians
 
 #### Segment 4: Innendørsaktivitet på en regnværsdag
 > **Google Maps eksempel (Prioritet 1):**
-> *«Beste regnværsaktiviteten i Kristiansand! Da været sviktet booket vi en time her, og det reddet hele ettermiddagen. Helinnendørs, sentralt i Kvadraturen og utrolig gøy for både voksne og ungdom. Hit kommer vi tilbake neste gang det regner på Sørlandet!»*
+> *«Beste regnværsaktiviteten i Kristiansand! Da været sviktet booket vi en time her, og det reddet hele ettermiddagen. Helinnendørs, sentralt på Lund (Industrigata 12) og utrolig gøy for både voksne og ungdom. Hit kommer vi tilbake neste gang det regner på Sørlandet!»*
 
 > **TripAdvisor eksempel (Prioritet 2):**
 > *«Redningen på en gråværsdag i Kristiansand. VR Escape Room var super spennende og vi glemte helt tid og sted. Anbefales på det sterkeste til alle som ser etter innendørs aktiviteter i byen.»*
@@ -151,8 +151,13 @@ Når Gemini svarer på ferie- og aktivitetstips, leser den ofte artikler med ove
 - *«Hva skjer i Kristiansand når det regner?»*
 - [ ] **Tiltak:** Søk opp hvem som har skrevet de mest leste artiklene på Google i dag (f.eks. lokale reisebloggere, KRSby, Visit Sørlandet). Send en hyggelig henvendelse og be om at KRS VR Arena legges til som et hett tips for innendørs action og escape room.
 
-### C. Enkel QR-kode ved utgangen for Google-anmeldelser (Fullført)
-- [x] Generer en direkte Google Review-lenke fra Google Bedriftsprofil (`https://search.google.com/local/writereview?placeid=ChIJOVTL6bcDOEYR8N3bbtLT474` eller `https://krsvr.no/feedback`).
-- [x] Plasser et lite skilt/bordrytter ved betalingsdisken eller sofakroken:
-  > *«Hadde dere en bra opplevelse? Skann QR-koden og del gjerne med andre hva dere spilte (VR Escape Room, Spatial Ops eller teambuilding)!»*
-  - Dette oppfordrer kundene til å bruke nøkkelord helt naturlig.
+### C. Direkte anmeldelseslenker, QR-kode og oppfølgings-e-post (Fullført)
+- [x] **Direkte anmeldelseslenker i e-post og `/feedback`:**
+  - **Google Maps Review:** `https://g.page/r/CfC9vWzS0yO-EBM/review`
+  - **Tripadvisor Review:** `https://no.tripadvisor.com/UserReviewEdit-g190492-d34257006-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html`
+- [x] **Manuell utsendelse fra Admin (`/admin` -> Upcoming):**
+  - Egen «Be om omtale»-knapp på gjennomførte bookinger sender personlig e-post via Resend (på norsk eller engelsk) med direktelenker til Google og Tripadvisor, samt automatisk kvittering/kopi til `post@krsvr.no`.
+- [x] **QR-kode ved utgangen / i loungen:**
+  - Plasser et lite skilt/bordrytter ved betalingsdisken eller i partyloungen som peker til `https://krsvr.no/feedback` eller direkte til Google/Tripadvisor:
+  > *«Hadde dere en fin opplevelse? Skann QR-koden og del gjerne hvem dere var, i hvilken anledning dere besøkte oss, og hvordan opplevelsen var!»*
+  - Dette oppfordrer kundene til å beskrive kontekst og nøkkelord helt naturlig for AI-søk.

@@ -32,7 +32,7 @@ export default function PremiumPackageCard() {
                   className="space-y-4 overflow-hidden"
                 >
                   <p>
-                    Med Privat dagsevent får dere eksklusiv tilgang til hele lokalet i inntil 8 timer. Gruppen kan kose seg gjennom dagen med ubegrensede VR-opplevelser, hvor hvert spill inkluderer en 90 minutters totalopplevelse med rundt 60 minutter aktiv spilletid. Opptil 8 personer spiller VR samtidig, mens resten av gruppen kan mingle, spise, drikke og følge stemningen i lokalet.
+                    Med Privat dagsevent får dere eksklusiv tilgang til hele lokalet i inntil 8 timer. Gruppen kan kose seg gjennom dagen med ubegrensede VR-opplevelser, hvor hvert spill inkluderer en 90 minutters totalopplevelse med rundt 60 minutter aktiv spilletid. Opptil 10 personer spiller VR samtidig, mens resten av gruppen kan mingle, spise, drikke og følge stemningen i lokalet.
                   </p>
                   <p>
                     Dere får tilgang til partylounge, spiserom med tekjøkken hvor vi kan rigge langbord, garderobe og toaletter. Lokalet har musikk og skjermer, og passer godt for grupper som ønsker en sosial og fleksibel ramme rundt arrangementet.
@@ -91,7 +91,7 @@ export default function PremiumPackageCard() {
             {[
               "Privat leie av hele lokalet i inntil 8 timer",
               "Passer for 10–64 personer",
-              "Opptil 8 personer kan spille VR samtidig",
+              "Opptil 10 personer kan spille VR samtidig",
               "Ubegrensede VR-opplevelser i 8 timer for deres selskap",
               "Hver runde gir en 90 minutters totalopplevelse (ca 60 min aktiv in-game session)",
               "Tilgang til partylounge",

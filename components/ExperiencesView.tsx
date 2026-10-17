@@ -718,7 +718,7 @@ export function ExperiencesView({
 
                 <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
                   <Users className="w-5 h-5 text-white shrink-0" />
-                  <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-8 personer"}</span>
+                  <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-10 personer"}</span>
                 </div>
 
                 {selected.arenaSize && (

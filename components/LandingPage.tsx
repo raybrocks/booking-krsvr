@@ -220,7 +220,7 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-light text-white mb-6 tracking-tight">Perfekt for grupper</h2>
             <p className="text-xl text-zinc-400 font-light max-w-2xl mx-auto">
-              Aktiviteten kan tilpasses, og alle får en fantastisk opplevelse – helt uavhengig av tidligere VR-erfaring.
+              Aktiviteten kan tilpasses, og alle får en trygg og god opplevelse – helt uavhengig av tidligere VR-erfaring.
             </p>
           </div>
 
@@ -233,12 +233,12 @@ export default function LandingPage() {
             <Link href="/arrangementer/vr-bursdag" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
               <Users className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Vennegrupper</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Samle gjengen til en annerledes, aktiv og sosial kveld. En garantert kveld utenom det vanlige.</p>
+              <p className="text-zinc-400 font-light leading-relaxed">Samle gjengen til en annerledes, aktiv og sosial kveld sammen i arenaen.</p>
             </Link>
             <Link href="/arrangementer/vr-teambuilding" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
               <Briefcase className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
               <h4 className="text-2xl font-medium text-white">Firmaevent</h4>
-              <p className="text-zinc-400 font-light leading-relaxed">Bryt opp arbeidsdagen med en engasjerende teambuilding, garantert et høydepunkt i kalenderen.</p>
+              <p className="text-zinc-400 font-light leading-relaxed">Bryt opp arbeidsdagen med en engasjerende og sosial teambuilding for hele avdelingen.</p>
             </Link>
             <Link href="/arrangementer/vr-utdrikningslag" className="p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/50 flex flex-col gap-4 hover:bg-zinc-800/60 transition-colors cursor-pointer group">
               <Crown className="w-10 h-10 text-[#9C39FF] group-hover:scale-110 transition-transform duration-300" />
@@ -269,9 +269,9 @@ export default function LandingPage() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-light text-white mb-5 tracking-tight">Fantastiske verdener å utforske</h2>
+            <h2 className="text-4xl md:text-5xl font-light text-white mb-5 tracking-tight">Spennende verdener å utforske</h2>
             <p className="text-xl text-zinc-400 font-light max-w-2xl mx-auto">
-              Utvalget er stort, og opplevelsene varierer i sjangre fra spenningsfylte eventyr til heseblesende action. 
+              Utvalget er stort, og opplevelsene varierer i sjangre fra spenningsfylte eventyr til taktisk action. 
             </p>
           </div>
           <HomeCarousel />
@@ -318,7 +318,7 @@ export default function LandingPage() {
             <ul className="space-y-4">
               {[
                 "Sosiale team-aktiviteter som alle kan være med på.",
-                "Engasjerende, gøy og full innlevelse fra første stund.",
+                "Engasjerende, gøy og god veiledning fra egen spillvert.",
                 "Gående opplevelse inni virtuelle verdener.",
                 "Passer for både nybegynnere og erfarne VR-spillere.",
                 "Alle spill er eksklusive og testet for høy underholdningsverdi",
@@ -347,8 +347,8 @@ export default function LandingPage() {
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
               <Clock className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">Møt opp litt før</h4>
-                <p className="text-zinc-400 font-light leading-relaxed">Møt opp 10 minutter før starttiden deres. Slik sikrer vi at dere kommer i gang i tide, og ikke mister spilltid.</p>
+                <h4 className="text-xl font-medium text-white mb-2">Møt presist</h4>
+                <p className="text-zinc-400 font-light leading-relaxed">Møt presist for å ikke miste spilletid. Vi starter med registrering og gjennomgang til oppsatt tid.</p>
               </div>
             </div>
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
@@ -368,15 +368,15 @@ export default function LandingPage() {
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
               <Users className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">Grupper større enn 8 personer</h4>
-                <p className="text-zinc-400 font-light leading-relaxed">Bruk kontaktskjema. 8 personer kan spille om gangen. Vi deler større grupper opp i hver sin runde og utstyr desinfiseres mellom brukere.</p>
+                <h4 className="text-xl font-medium text-white mb-2">Grupper større enn 10 personer</h4>
+                <p className="text-zinc-400 font-light leading-relaxed">Bruk kontaktskjema. Opptil 10 personer kan spille samtidig. For større grupper kjører vi et sosialt turneringsformat med rullerende runder, slik at alle deltar på samme arrangement.</p>
               </div>
             </div>
           </div>
           
           <div className="mt-12 text-center">
              <p className="text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
-               ✨ Ved forespørsel får barn til og med 14 år 10%, og studenter 20 %, rabatt alle dager, bortsett fra fredag og lørdag (i grupper på 3+ pers). Om du booker på nett refunderer vi rabatten ved forespørsel.
+               Ved forespørsel får barn til og med 14 år 10 %, og studenter 20 %, rabatt alle dager, bortsett fra fredag og lørdag (i grupper på 3+ pers). Om du booker på nett refunderer vi rabatten ved forespørsel.
              </p>
           </div>
         </div>
@@ -387,14 +387,14 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#9C39FF]/10 to-transparent -z-10"></div>
         <h2 className="text-5xl md:text-6xl font-light text-white mb-6 tracking-tight">Klar for å prøve VR sammen?</h2>
         <p className="text-xl text-zinc-400 font-light mb-12 max-w-2xl mx-auto">
-          Reserver din tid i dag, og gled deg til en opplevelse gruppa sent vil glemme.
+          Reserver tid på nett, eller send oss en forespørsel for større grupper. Vi gleder oss til å ta imot dere.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-16 px-10 text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 min-w-[320px]">
             Book opplevelse
           </Button>
           <Button nativeButton={false} render={<Link href="/kontakt" />} size="lg" variant="outline" className="h-16 px-10 text-xl border-zinc-700 hover:bg-zinc-800 rounded-full text-white min-w-[320px]">
-            Send gruppeforespørsel (8+)
+            Send gruppeforespørsel (10+)
           </Button>
         </div>
       </section>
