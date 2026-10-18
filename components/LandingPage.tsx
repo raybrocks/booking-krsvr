@@ -478,15 +478,16 @@ export default function LandingPage() {
              <TestimonialsCarousel />
           </div>
 
-          <div className="max-w-5xl mx-auto bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 rounded-3xl p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
+          <div className="max-w-5xl mx-auto bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 rounded-3xl p-6 sm:p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#9C39FF]/10 rounded-full blur-3xl -z-10 absolute-center translate-x-1/3 -translate-y-1/2"></div>
             
-            <h3 className="text-3xl md:text-4xl font-light text-white mb-6">Ser dere etter en aktivitet som virkelig bygger relasjoner?</h3>
-            <p className="text-xl text-zinc-300 font-light max-w-3xl mx-auto mb-10 leading-relaxed">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-5 sm:mb-6">Ser dere etter en aktivitet som virkelig bygger relasjoner?</h3>
+            <p className="text-base sm:text-xl text-zinc-300 font-light max-w-3xl mx-auto mb-8 sm:mb-10 leading-relaxed">
               I våre opplevelser må deltakerne samarbeide, kommunisere og løse oppgaver i fellesskap. For større bedrifter (10–64 personer) kjører vi et sosialt turneringsformat med storskjerm i loungen, egne lag-armbånd, varm pizzalevering, forhåndsbestilt bar og EHF-faktura.
             </p>
-            <Button nativeButton={false} render={<Link href="/arrangementer/vr-teambuilding" />} size="lg" className="h-14 px-8 text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-transform hover:scale-105">
-              Se bedriftsopplegg og teambuilding <ArrowRight className="ml-2 w-5 h-5" />
+            <Button nativeButton={false} render={<Link href="/arrangementer/vr-teambuilding" />} size="lg" className="w-full sm:w-auto max-w-full whitespace-normal h-auto min-h-12 sm:h-14 py-3 px-5 sm:px-8 text-sm sm:text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-transform hover:scale-105">
+              <span>Se bedriftsopplegg og teambuilding</span>
+              <ArrowRight className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
             </Button>
           </div>
         </div>
@@ -573,11 +574,11 @@ export default function LandingPage() {
         <p className="text-xl text-zinc-400 font-light mb-12 max-w-2xl mx-auto">
           Reserver tid på nett, eller send oss en forespørsel for større grupper. Vi gleder oss til å ta imot dere.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-16 px-10 text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 min-w-[320px]">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md sm:max-w-none mx-auto">
+          <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 sm:min-w-[300px]">
             Book opplevelse
           </Button>
-          <Button nativeButton={false} render={<Link href="/kontakt" />} size="lg" variant="outline" className="h-16 px-10 text-xl border-zinc-700 hover:bg-zinc-800 rounded-full text-white min-w-[320px]">
+          <Button nativeButton={false} render={<Link href="/kontakt" />} size="lg" variant="outline" className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-10 text-lg sm:text-xl border-zinc-700 hover:bg-zinc-800 rounded-full text-white sm:min-w-[300px]">
             Send gruppeforespørsel (10+)
           </Button>
         </div>
