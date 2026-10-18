@@ -101,6 +101,7 @@ export default function LandingPage() {
       description: "En aktiv feiring med egen spillvert og 30 minutter i partyloungen etter spillet. Tilpassede opplegg for barnebursdag (8–12 år), ungdom og voksenbursdag (18+).",
       href: "/arrangementer/vr-bursdag",
       image: "/images/vr-familiepakke-ungdom-12pluss.jpg",
+      imagePosition: "object-[center_18%]",
       alt: "Ungdomsgjeng og bursdagsfeiring med VR-utstyr hos KRS VR Arena",
       icon: CalendarHeart,
     },
@@ -110,6 +111,7 @@ export default function LandingPage() {
       description: "Utforsk nye verdener og løs spennende oppgaver sammen som en aktiv familie – helt uavhengig av tidligere VR-erfaring.",
       href: "/vr-opplevelser/familie",
       image: "/images/vr-familiepakke-8-12-aar.jpg",
+      imagePosition: "object-center",
       alt: "Familie med barn og voksne som samarbeider i VR hos KRS VR Arena",
       icon: Glasses,
     },
@@ -119,6 +121,7 @@ export default function LandingPage() {
       description: "Skal dere ha firmafest, konferanse eller arrangement i egne lokaler? Vi rigger opp mobil VR-arena med egne instruktører der dere er.",
       href: "/arrangementer/vr-on-site",
       image: "/arrangement-hero.jpg",
+      imagePosition: "object-[center_15%]",
       alt: "Spillere foran KRS VR Arena sitt neonskilt klare for VR-opplevelse",
       icon: Truck,
     },
@@ -322,17 +325,19 @@ export default function LandingPage() {
           transition={{ delay: 0.5, duration: 0.7 }}
           className="mt-8 sm:mt-10"
         >
-          <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-full bg-zinc-900/80 border border-white/10 text-xs sm:text-sm text-zinc-300">
+          <div className="inline-flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-1 sm:gap-2 px-5 py-2.5 sm:px-4 sm:py-2 rounded-2xl sm:rounded-full bg-zinc-900/80 border border-white/10 text-xs sm:text-sm text-zinc-300">
             <span className="inline-flex items-center gap-1.5 text-[#19EB5B] font-medium">
               <Star className="w-3.5 h-3.5 fill-[#19EB5B] text-[#19EB5B]" />
               5,0 på Google Maps & TripAdvisor
             </span>
-            <span className="text-zinc-600">&middot;</span>
-            <span>90 min totalopplevelse</span>
-            <span className="text-zinc-600">&middot;</span>
-            <span>2–64 personer</span>
-            <span className="text-zinc-600 hidden sm:inline">&middot;</span>
-            <span className="hidden sm:inline text-zinc-300">Fra 375 kr/pers</span>
+            <span className="hidden sm:inline text-zinc-600">&middot;</span>
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-zinc-300">
+              <span>90 min totalopplevelse</span>
+              <span className="text-zinc-600">&middot;</span>
+              <span>2–64 personer</span>
+              <span className="text-zinc-600">&middot;</span>
+              <span>Fra 375 kr/pers</span>
+            </div>
           </div>
         </motion.div>
       </section>
@@ -401,7 +406,7 @@ export default function LandingPage() {
                       alt={card.alt}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      className={`object-cover ${"imagePosition" in card && card.imagePosition ? card.imagePosition : "object-center"} group-hover:scale-105 transition-transform duration-700`}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
                     <div className="absolute top-3.5 left-3.5 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-xs font-medium text-zinc-200">
@@ -440,8 +445,8 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#9C39FF]/15 via-transparent to-transparent opacity-80 pointer-events-none" />
         
         {/* Subtle blur overlay at edges for smoother scrolling effect */}
-        <div className="absolute inset-y-0 left-0 w-8 md:w-24 bg-gradient-to-r from-zinc-950/80 to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-8 md:w-24 bg-gradient-to-l from-zinc-950/80 to-transparent z-10 pointer-events-none" />
+        <div className="hidden md:block absolute inset-y-0 left-0 w-28 bg-gradient-to-r from-zinc-950 via-zinc-950/70 to-transparent z-10 pointer-events-none" />
+        <div className="hidden md:block absolute inset-y-0 right-0 w-28 bg-gradient-to-l from-zinc-950 via-zinc-950/70 to-transparent z-10 pointer-events-none" />
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center mb-12">
@@ -466,6 +471,9 @@ export default function LandingPage() {
           <div className="mb-20">
              <div className="max-w-4xl mx-auto text-center mb-12">
                <h2 className="text-4xl md:text-5xl font-light text-white mb-5 tracking-tight">Teambuilding som engasjerer</h2>
+               <p className="text-xl text-zinc-400 font-light max-w-2xl mx-auto">
+                 Fra mindre avdelinger til sosiale bedriftsturneringer for opptil 64 deltakere.
+               </p>
              </div>
              <TestimonialsCarousel />
           </div>

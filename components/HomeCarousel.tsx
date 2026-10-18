@@ -96,117 +96,138 @@ export default function HomeCarousel() {
 
   return (
     <div 
-      className="relative w-full max-w-6xl mx-auto flex items-center mt-6"
+      className="relative w-full max-w-6xl mx-auto flex flex-col items-center mt-6"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
     >
-      <button 
-        onClick={scrollLeft} 
-        aria-label="Bla til venstre"
-        className="absolute -left-2 md:-left-12 z-20 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors bg-black/80 border border-white/10 rounded-full md:bg-transparent md:border-transparent"
-      >
-        <ChevronLeft className="w-7 h-7 md:w-14 md:h-14" strokeWidth={1.5} />
-      </button>
+      <div className="relative w-full flex items-center">
+        <button 
+          onClick={scrollLeft} 
+          aria-label="Bla til venstre"
+          className="hidden md:flex absolute -left-12 z-20 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors cursor-pointer"
+        >
+          <ChevronLeft className="w-14 h-14" strokeWidth={1.5} />
+        </button>
 
-      <div 
-        ref={scrollRef}
-        className="w-full overflow-x-auto overflow-y-hidden hide-scrollbar py-6"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        <div className="flex items-stretch justify-start gap-5 md:gap-6 px-6 md:px-4 w-max min-w-full snap-x snap-mandatory">
-        {experiences.map((exp) => {
-          const typeSlug = exp.experienceType?.slug || slugify(exp.type || "");
-          const coverImage =
-            (Array.isArray(exp.images) && exp.images.length > 0 ? exp.images[0] : null) ||
-            exp.picture ||
-            null;
-          const maxPlayers = exp.maxPlayers || 6;
+        <div 
+          ref={scrollRef}
+          className="w-full overflow-x-auto overflow-y-hidden hide-scrollbar py-6 snap-x snap-mandatory scroll-smooth"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          <div className="flex items-stretch justify-start gap-5 md:gap-6 px-6 md:px-4 w-max min-w-full">
+          {experiences.map((exp) => {
+            const typeSlug = exp.experienceType?.slug || slugify(exp.type || "");
+            const coverImage =
+              (Array.isArray(exp.images) && exp.images.length > 0 ? exp.images[0] : null) ||
+              exp.picture ||
+              null;
+            const maxPlayers = exp.maxPlayers || 6;
 
-          return (
-            <Tilt
-              key={exp.id}
-              tiltMaxAngleX={8}
-              tiltMaxAngleY={8}
-              glareEnable={true}
-              glareMaxOpacity={0.2}
-              glareColor="#ffffff"
-              glarePosition="all"
-              glareBorderRadius="24px"
-              scale={1.03}
-              transitionSpeed={1500}
-              className="flex-shrink-0 snap-center w-[230px] sm:w-[250px]"
-            >
-              <Link
-                href={`/vr-opplevelser/${typeSlug}/${slugify(exp.name)}`}
-                className="flex flex-col justify-between group w-full h-full rounded-3xl overflow-hidden border border-[#9C39FF]/40 bg-zinc-900/70 shadow-[0_0_20px_rgba(156,57,255,0.15)] hover:border-[#9C39FF] hover:shadow-[0_0_30px_rgba(156,57,255,0.35)] transition-all duration-300"
+            return (
+              <Tilt
+                key={exp.id}
+                tiltMaxAngleX={8}
+                tiltMaxAngleY={8}
+                glareEnable={true}
+                glareMaxOpacity={0.2}
+                glareColor="#ffffff"
+                glarePosition="all"
+                glareBorderRadius="24px"
+                scale={1.03}
+                transitionSpeed={1500}
+                className="flex-shrink-0 snap-center w-[250px] sm:w-[260px]"
               >
-                {/* Cover Image or Icon Fallback */}
-                <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden">
-                  {coverImage ? (
-                    <>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={coverImage}
-                        alt={`${exp.name} – ${exp.type || "VR-opplevelse"} hos KRS VR Arena`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
-                    </>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-[#9C39FF]/10 text-white group-hover:scale-110 transition-transform duration-300">
-                      {getIconForType(exp.type, exp.name)}
-                    </div>
-                  )}
-
-                  {/* Genre Pill Top-Left */}
-                  {exp.type && (
-                    <span className="absolute top-3 left-3 text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-semibold shadow-md">
-                      {exp.type}
-                    </span>
-                  )}
-                </div>
-
-                {/* Card Body */}
-                <div className="p-4 flex flex-col flex-grow justify-between text-left">
-                  <div>
-                    <h3 className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-snug line-clamp-2">
-                      {exp.name}
-                    </h3>
-                    {exp.subName && (
-                      <p className="text-xs text-zinc-400 font-light mt-1 line-clamp-1">
-                        {exp.subName}
-                      </p>
+                <Link
+                  href={`/vr-opplevelser/${typeSlug}/${slugify(exp.name)}`}
+                  className="flex flex-col justify-between group w-full h-full rounded-3xl overflow-hidden border border-[#9C39FF]/40 bg-zinc-900/70 shadow-[0_0_20px_rgba(156,57,255,0.15)] hover:border-[#9C39FF] hover:shadow-[0_0_30px_rgba(156,57,255,0.35)] transition-all duration-300"
+                >
+                  {/* Cover Image or Icon Fallback */}
+                  <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden">
+                    {coverImage ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={coverImage}
+                          alt={`${exp.name} – ${exp.type || "VR-opplevelse"} hos KRS VR Arena`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-[#9C39FF]/10 text-white group-hover:scale-110 transition-transform duration-300">
+                        {getIconForType(exp.type, exp.name)}
+                      </div>
                     )}
-                  </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs text-zinc-400">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-[#9C39FF]" />
-                      2–{maxPlayers >= 10 ? "10" : maxPlayers} spillere
-                    </span>
-                    {exp.age && (
-                      <span className="text-zinc-500 font-medium">
-                        {String(exp.age).includes("år") ? exp.age : `${exp.age} år`}
+                    {/* Genre Pill Top-Left */}
+                    {exp.type && (
+                      <span className="absolute top-3 left-3 text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-semibold shadow-md">
+                        {exp.type}
                       </span>
                     )}
                   </div>
-                </div>
-              </Link>
-            </Tilt>
-          );
-        })}
+
+                  {/* Card Body */}
+                  <div className="p-4 flex flex-col flex-grow justify-between text-left">
+                    <div>
+                      <h3 className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-snug line-clamp-2">
+                        {exp.name}
+                      </h3>
+                      {exp.subName && (
+                        <p className="text-xs text-zinc-400 font-light mt-1 line-clamp-1">
+                          {exp.subName}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs text-zinc-400">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-[#9C39FF]" />
+                        2–{maxPlayers >= 10 ? "10" : maxPlayers} spillere
+                      </span>
+                      {exp.age && (
+                        <span className="text-zinc-500 font-medium">
+                          {String(exp.age).includes("år") ? exp.age : `${exp.age} år`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              </Tilt>
+            );
+          })}
+          </div>
         </div>
+
+        <button 
+          onClick={scrollRight} 
+          aria-label="Bla til høyre"
+          className="hidden md:flex absolute -right-12 z-20 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors cursor-pointer"
+        >
+          <ChevronRight className="w-14 h-14" strokeWidth={1.5} />
+        </button>
       </div>
 
-      <button 
-        onClick={scrollRight} 
-        aria-label="Bla til høyre"
-        className="absolute -right-2 md:-right-12 z-20 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors bg-black/80 border border-white/10 rounded-full md:bg-transparent md:border-transparent"
-      >
-        <ChevronRight className="w-7 h-7 md:w-14 md:h-14" strokeWidth={1.5} />
-      </button>
+      {/* Mobile navigation controls below cards so they never overlap text */}
+      <div className="flex md:hidden items-center justify-center gap-4 mt-1">
+        <button
+          onClick={scrollLeft}
+          aria-label="Bla til venstre"
+          className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-300 active:scale-95 transition-all"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <span className="text-xs text-zinc-500">Sveip for å utforske</span>
+        <button
+          onClick={scrollRight}
+          aria-label="Bla til høyre"
+          className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-300 active:scale-95 transition-all"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
     </div>
   );
 }

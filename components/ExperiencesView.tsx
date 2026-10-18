@@ -516,22 +516,22 @@ export function ExperiencesView({
         <p className="text-zinc-400 text-sm md:text-lg text-center font-light mb-5 md:mb-8 max-w-2xl mx-auto px-2">
           Alle opplevelser hos oss er laget for samarbeid, kommunikasjon og felles mestring.
         </p>
-        <div className="flex items-center justify-center gap-3 sm:gap-5 w-full max-w-4xl mx-auto px-2 mb-2 overflow-x-auto hide-scrollbar">
+        <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-4xl mx-auto px-2 mb-2 overflow-x-auto hide-scrollbar">
           {["Alle", "Familie", "Rask Action", "Escape Room"].map((filter, idx, arr) => {
             const isActive = activePrimaryFilter === filter;
             return (
               <React.Fragment key={filter}>
                 <button
                   onClick={() => handlePrimaryFilterClick(filter)}
-                  className={`relative py-1 text-xs sm:text-sm md:text-base tracking-wide whitespace-nowrap transition-colors cursor-pointer ${
+                  className={`relative min-h-[40px] px-2.5 py-2 text-xs sm:text-sm md:text-base tracking-wide whitespace-nowrap transition-colors cursor-pointer inline-flex items-center ${
                     isActive
                       ? "text-white font-semibold"
-                      : "text-zinc-500 hover:text-zinc-200 font-normal"
+                      : "text-zinc-400 hover:text-zinc-200 font-normal"
                   }`}
                 >
                   {filter}
                   {isActive && (
-                    <span className="absolute left-0 right-0 -bottom-0.5 h-[2px] bg-[#9C39FF] rounded-full shadow-[0_0_8px_rgba(156,57,255,0.6)]" />
+                    <span className="absolute left-2 right-2 bottom-1 h-[2px] bg-[#9C39FF] rounded-full shadow-[0_0_8px_rgba(156,57,255,0.6)]" />
                   )}
                 </button>
                 {idx < arr.length - 1 && (
@@ -567,10 +567,10 @@ export function ExperiencesView({
 
               <div 
                 ref={scrollRef}
-                className="w-full overflow-x-auto hide-scrollbar"
+                className="w-full overflow-x-auto hide-scrollbar snap-x snap-mandatory"
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
               >
-                <div className="flex items-center justify-center gap-3 sm:gap-6 md:gap-8 px-4 py-4 w-max min-w-full snap-x snap-mandatory">
+                <div className="flex items-center justify-center gap-3 sm:gap-6 md:gap-8 px-4 py-4 w-max min-w-full">
                 {filteredExperiences.map((exp) => {
                 const isSelected = selected ? exp.id === selected.id : false;
                 return (
