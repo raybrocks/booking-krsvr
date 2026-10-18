@@ -188,25 +188,11 @@ export default function LandingPage() {
           transition={{ duration: 0.7 }}
           className="max-w-5xl mx-auto space-y-5 md:space-y-6"
         >
-          {/* Top Trust Pill */}
-          <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-zinc-900/80 border border-white/10 text-xs sm:text-sm text-zinc-300">
-            <span className="inline-flex items-center gap-1 text-amber-400 font-medium">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              5,0 på Google & TripAdvisor
-            </span>
-            <span className="text-zinc-600">&middot;</span>
-            <span>90 min totalopplevelse</span>
-            <span className="text-zinc-600">&middot;</span>
-            <span>2–64 personer</span>
-            <span className="text-zinc-600 hidden sm:inline">&middot;</span>
-            <span className="hidden sm:inline text-zinc-300">Fra 375 kr/pers</span>
-          </div>
-
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-tighter text-white leading-[1.12] max-w-4xl mx-auto">
             <span className="font-bold">Mixed Reality, VR Escape Rooms og teambuilding i Kristiansand</span>
           </h1>
           <p className="text-base sm:text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto font-light leading-relaxed">
-            Løs oppdrag, konkurrer i actionfylte lagspill og opplev Mixed Reality — der arenaen blir en del av spillet. Perfekt for vennegjenger, bursdag og utdrikningslag — og en teambuilding-opplevelse kollegaene faktisk snakker om etterpå.
+            Løs oppdrag, konkurrer i actionfylte lagspill og opplev Mixed Reality — der arenaen blir en del av spillet. Perfekt for familier, vennegjenger, bursdag og utdrikningslag — og en teambuilding-opplevelse kollegaene faktisk snakker om etterpå.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
@@ -225,8 +211,8 @@ export default function LandingPage() {
               className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 hover:border-[#9C39FF]/60 transition-all duration-300 shadow-xl"
             >
               <Image
-                src="/images/vr-vennegjeng.jpg"
-                alt="Vennegjeng som spiller trådløs Mixed Reality og VR Escape Room i Kristiansand"
+                src="/images/vr-familiepakke-8-12-aar.jpg"
+                alt="Familie og vennegjeng som spiller VR og utforsker spennende verdener hos KRS VR Arena i Kristiansand"
                 fill
                 priority
                 sizes="(max-width: 640px) 100vw, 33vw"
@@ -238,10 +224,10 @@ export default function LandingPage() {
                   2–10 spillere samtidig
                 </span>
                 <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-tight">
-                  Vennegjeng & Action
+                  Familie eller vennegjeng
                 </div>
                 <div className="text-xs text-zinc-300 font-light mt-0.5">
-                  Trådløs Mixed Reality & Escape Room
+                  Spennende verdener, rask action eller Escape Rooms
                 </div>
               </div>
             </Link>
@@ -326,6 +312,27 @@ export default function LandingPage() {
           <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
             <PartyPopper className="w-6 h-6 text-[#9C39FF]/70" />
             <span className="text-sm font-medium text-center leading-tight">Tilgang til vår partylounge i 30 min etter spillet</span>
+          </div>
+        </motion.div>
+
+        {/* Trust Pill below feature icons */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.7 }}
+          className="mt-8 sm:mt-10"
+        >
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-full bg-zinc-900/80 border border-white/10 text-xs sm:text-sm text-zinc-300">
+            <span className="inline-flex items-center gap-1.5 text-[#19EB5B] font-medium">
+              <Star className="w-3.5 h-3.5 fill-[#19EB5B] text-[#19EB5B]" />
+              5,0 på Google Maps & TripAdvisor
+            </span>
+            <span className="text-zinc-600">&middot;</span>
+            <span>90 min totalopplevelse</span>
+            <span className="text-zinc-600">&middot;</span>
+            <span>2–64 personer</span>
+            <span className="text-zinc-600 hidden sm:inline">&middot;</span>
+            <span className="hidden sm:inline text-zinc-300">Fra 375 kr/pers</span>
           </div>
         </motion.div>
       </section>
