@@ -12,30 +12,31 @@ Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for
 
 ### A. Overordnet Utvikling over Tid (KPI-er)
 
-| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | Endring | Mål (Q4 2026) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | **24 sider** | 🟢 **+5** | 25+ sider |
-| **Refererende domener (Backlinks / Omtaler)** | 4 domener | **9 domener** | 🟢 **+5** | 15+ domener |
-| **Bekreftede `sameAs`-autoritetslenker i Schema** | 5 lenker | **7 lenker** | 🟢 **+2** | 10+ lenker |
-| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | **5,0 ★ (22 stk)** | ➖ 0 | 5,0 ★ (40+ stk) |
-| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | **5,0 ★ (3 stk)** | ➖ 0 | 5,0 ★ (10+ stk) |
-| **TripAdvisor – Rangering i Kristiansand** *(Fornøyelse og lek)* | Nr. 7 av 23 | **Nr. 7 av 23** | ➖ 0 | **Topp 3** |
-| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | **2 av 6 (33 %)** | ➖ 0 | **5 av 6 (83 %)** |
-| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
-| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
+| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | Endring | Mål (Q4 2026) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | **24 sider** | 🟢 **+5** | 25+ sider |
+| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | **10 domener** | 🟢 **+6** | 15+ domener |
+| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | **8 lenker** | 🟢 **+3** | 10+ lenker |
+| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | **5,0 ★ (22 stk)** | ➖ 0 | 5,0 ★ (40+ stk) |
+| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | **5,0 ★ (3 stk)** | ➖ 0 | 5,0 ★ (10+ stk) |
+| **TripAdvisor – Rangering i Kristiansand** *(Fornøyelse og lek)* | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** | ➖ 0 | **Topp 3** |
+| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | **2 av 6 (33 %)** | ➖ 0 | **5 av 6 (83 %)** |
+| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
+| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
 
 ---
 
-### B. Backlinks & Refererende Domener – Autoritetskartlegging (Sist scannet: `17.10.2026`)
+### B. Backlinks & Refererende Domener – Autoritetskartlegging (Sist oppdatert: `19.10.2026`)
 
 Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, rangert etter **Global Tranco Rank** (objektivt mål på domeneautoritet/trafikk basert på CrUX, Cloudflare Radar og Majestic) og **Estimert DR (Domain Rating 0–100)**:
 
-| Eksternt Domene | Global Tranco Rank *(lavere = sterkere)* | Est. DR (0–100) | Lenkestatus til `krsvr.no` | Siteres av Gemini AI? | Kategori / Merknad per `17.10.2026` |
+| Eksternt Domene | Global Tranco Rank *(lavere = sterkere)* | Est. DR (0–100) | Lenkestatus til `krsvr.no` | Siteres av Gemini AI? | Kategori / Merknad per `19.10.2026` |
 | :--- | :---: | :---: | :--- | :---: | :--- |
 | **[tripadvisor.com](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)** | **#573** i verden | ~93 | ✅ Aktiv profil + lenke | ✅ Ja | *Fornøyelse og lek i Kristiansand* (Nr. 7 av 23, 5,0★). |
 | **[visitnorway.com / .se](https://www.visitnorway.no/)** | **#30 488** i verden | ~82 | ✅ Syndikert via Tellus | ✅ **Ja (Ofte!)** | Automatisk syndikert fra Visit Sørlandet. Siteres direkte av Gemini. |
 | **[1881.no](https://www.1881.no/data-programvare-og-utvikling/data-programvare-og-utvikling-agder/data-programvare-og-utvikling-kristiansand-s/krs-vr-arena-as_107699902S0/)** | **#46 211** i verden | ~74 | ⚠️ Kun NAP (Mangler URL/tlf) | Nei | Står under *Data - programvare og -utvikling*. **Må legge inn tlf + URL.** |
 | **[1850.no](https://www.1850.no/bedrifter/it/dataprogrammering/agder/kristiansand/krs-vr-arena-as-936605192)** | **#372 404** i verden | ~45 | ✅ Schema `sameAs: www.krsvr.no` | Ja (NAP) | Har riktig tlf og URL, men står under *IT / Dataprogrammering*. |
+| **[krs.no (KRS – Avisen Kristiansand)](https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800)** | **#565 057** i verden | ~62 | ✅ **Redaksjonell reportasje + Schema `subjectOf`** | 🔄 Indekseres | Nyhetsreportasje 19.10.2026 (*«Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet»*). Koblet via `subjectOf` og footer. |
 | **[visitsorlandet.com](https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/)** | **#595 256** i verden | ~58 | ✅ **Direkte Backlink (NO + EN)** | ✅ **Ja (Hovedkilde)** | Offisiell destinasjonsportal for Agder. Har rå `**` i brødtekst som bør fjernes. |
 | **[eventguiden.no](https://eventguiden.no/)** | **#4 446 189** i verden | ~32 | ✅ Aktiv profil + lenke | ✅ **Ja (#1 kilde!)** | Svært viktig kilde for Gemini ved søk etter gruppeaktiviteter i Kristiansand. |
 | **[lokalebedrifter.no](https://lokalebedrifter.no/bedrift/936318878/krs-vr-arena-as)** | Utenfor Topp 5M | ~20 | ✅ JSON-LD `url: krsvr.no` | Ja (NAP) | Har riktig tlf og URL, men kategorisert som *Softwareutvikling* (`62.100`). |
@@ -90,6 +91,15 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
     - [ ] Fjern rå `**`-stjerner (Markdown-fettekst) i brødteksten inne i Tellus/Visit Sørlandet-portalen, ettersom Simpleview viser `**Populære 90-minutters opplevelser:**` som synlige stjerner.
 - [x] **Visit Norway (visitnorway.no / visitnorway.com – Fullført via Tellus-syndikering):**
   - Automatisk syndikert fra Visit Sørlandet/Tellus DMS (bl.a. synlig i Visit Norways familie- og aktivitetslister for Kristiansand).
+- [x] **Presseomtale i KRS – Avisen Kristiansand (`krs.no` – Fullført 19. oktober 2026):**
+  - **Artikkel-URL:** [Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet](https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800)
+  - **Tittel / Overskrift:** *«Deler lokale med dansestudio: Nå fyller de storsalen med virtuell moro»* (av journalist Jasmine Marie Agas Ramos, publisert 19.10.2026 under teambuilding med 17 deltakere).
+  - **Gjennomførte tiltak på `krsvr.no`:**
+    - [x] Lagt inn strukturert `NewsArticle` under `subjectOf` (samt i `sameAs`) i Schema.org JSON-LD i [layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx) og [LandingPage.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/LandingPage.tsx) slik at Google Knowledge Graph og AI-crawlere kobler den låste Pluss-artikkelen direkte til entiteten **KRS VR Arena**.
+    - [x] Lagt inn synlig referanselenke («Omtalt i KRS – Avisen Kristiansand») i [Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx).
+  - **Oppfølgingstiltak (Eksternt):**
+    - [ ] Sende en hyggelig takk til `jasmine.ramos@krs.no` og høre om `krsvr.no` kan legges inn som klikkbar lenke i saken (dersom den kun står som ren tekst).
+    - [ ] Legge ut et «Innlegg» på Google Bedriftsprofil (Google Maps) som nevner teambuildingen for 17 deltakere og lenker til `krs.no`-reportasjen.
 
 ### Event- og selskapsportaler (For høyt betalende bedrifter og utdrikningslag)
 - [ ] **Utdrikningslag.no:**

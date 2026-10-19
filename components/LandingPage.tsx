@@ -56,10 +56,29 @@ export default function LandingPage() {
       "highPrice": 460,
       "priceCurrency": "NOK"
     },
+    "subjectOf": [
+      {
+        "@type": "NewsArticle",
+        "headline": "Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet (Deler lokale med dansestudio: Nå fyller de storsalen med virtuell moro)",
+        "description": "På Lund har byens nyeste virtuelle lekeplass åpnet dørene for både store og små.",
+        "url": "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
+        "datePublished": "2026-10-19T21:49:30+02:00",
+        "author": {
+          "@type": "Person",
+          "name": "Jasmine Marie Agas Ramos"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "KRS - Avisen Kristiansand",
+          "url": "https://www.krs.no"
+        }
+      }
+    ],
     "sameAs": [
       "https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
       "https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
       "https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html",
+      "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
       "https://www.instagram.com/krs.vr.arena",
       "https://www.tiktok.com/@krs.vr.arena",
       "https://www.facebook.com/krs.vr.arena",
@@ -70,7 +89,7 @@ export default function LandingPage() {
   const groupCards = [
     {
       title: "Teambuilding & Bedrift",
-      badge: "2–64 personer · EHF & Servering",
+      badge: "375 kr + mva/pers · 2–64 personer",
       description: "Styrk samholdet med utfordrende samarbeid for 2–10 spillere, eller dynamisk turneringsformat med storskjerm i loungen for opptil 64 kolleger. Mulighet for pizzalevering og forhåndsbestilt bar.",
       href: "/arrangementer/vr-teambuilding",
       image: "/images/vr-teambuilding-firmaevent-kristiansand.jpg",

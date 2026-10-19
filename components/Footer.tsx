@@ -64,13 +64,13 @@ export default function Footer() {
               </a>
             </div>
 
-            {/* TripAdvisor & Visit Sørlandet */}
-            <div className="mt-5 pt-4 border-t border-zinc-900 flex flex-col items-start gap-2.5">
+            {/* TripAdvisor, Visit Sørlandet & Presseomtale */}
+            <div className="mt-5 pt-4 border-t border-zinc-900 flex flex-col items-start gap-2">
               <a
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html"
-                className="inline-block transition-transform hover:scale-105"
+                className="inline-block transition-transform hover:scale-105 mb-0.5"
                 title="Rated on Tripadvisor"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -91,6 +91,20 @@ export default function Footer() {
                   Du finner oss også på{" "}
                   <span className="underline decoration-zinc-700 underline-offset-4 hover:decoration-[#9C39FF]">
                     Visit Sørlandet
+                  </span>
+                </span>
+              </a>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800"
+                className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
+                title="Les reportasjen om KRS VR Arena i KRS – Avisen Kristiansand"
+              >
+                <span>
+                  Omtalt i{" "}
+                  <span className="underline decoration-zinc-700 underline-offset-4 hover:decoration-[#9C39FF]">
+                    KRS – Avisen Kristiansand
                   </span>
                 </span>
               </a>

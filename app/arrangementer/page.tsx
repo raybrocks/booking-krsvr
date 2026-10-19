@@ -73,7 +73,7 @@ export default function ArrangementerPage() {
       href: "/arrangementer/vr-teambuilding",
       image: "/images/vr-teambuilding-firmaevent-kristiansand.jpg",
       icon: Users,
-      tag: "2–64 personer &middot; EHF",
+      tag: "375 kr + mva/pers &middot; 2–64 pers",
     },
     {
       title: "VR On-site",

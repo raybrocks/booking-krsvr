@@ -84,9 +84,9 @@ export default function VrTeambuildingPage() {
         "offers": {
           "@type": "AggregateOffer",
           "lowPrice": 375,
-          "highPrice": 460,
+          "highPrice": 375,
           "priceCurrency": "NOK",
-          "offerCount": 3
+          "offerCount": 2
         },
         "aggregateRating": {
           "@type": "AggregateRating",
@@ -401,7 +401,7 @@ export default function VrTeambuildingPage() {
         <div className="text-center max-w-4xl mx-auto mb-16">
           <h2 className="text-3xl font-light text-white mb-4">Pakker for bedrifter</h2>
           <p className="text-zinc-400 text-sm leading-relaxed mb-10 max-w-2xl mx-auto font-light">
-            Vi tilpasser opplegget etter gruppestørrelse. For grupper opptil 10 personer holder det med 90 minutter, mens grupper over 10 personer krever mer tid til turneringsrullering og har lokalet for seg selv i inntil 3 timer &mdash; derfor øker varigheten og kuvertprisen naturlig for større arrangementer.
+            Vi tilpasser opplegget etter gruppestørrelse med en fast pris på 375 kr + mva per person. For grupper opptil 10 personer holder det med 90 minutter, mens grupper over 10 personer kjøres i turneringsformat og har hele lokalet for seg selv i inntil 3 timer.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 text-left mb-10">
@@ -410,7 +410,7 @@ export default function VrTeambuildingPage() {
               <div>
                 <div className="text-xs uppercase tracking-wider text-[#9C39FF] font-semibold mb-2">Mindre grupper</div>
                 <h3 className="text-2xl font-medium text-white mb-2">Teambuilding 2–10 personer</h3>
-                <div className="text-3xl font-bold text-white mb-1">Fra 375 kr <span className="text-xs font-normal text-zinc-400">eks. mva / pers</span></div>
+                <div className="text-3xl font-bold text-white mb-1">375 kr <span className="text-xs font-normal text-zinc-400">+ mva / pers</span></div>
                 <div className="text-xs text-zinc-400 mb-6">90 minutter totalopplevelse (ca. 60 min spill + briefing)</div>
                 <ul className="text-xs sm:text-sm text-zinc-300 space-y-2.5 mb-8">
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#19EB5B]" /> Dedikert game master (spillvert) for gruppen</li>
@@ -433,7 +433,7 @@ export default function VrTeambuildingPage() {
               <div>
                 <div className="text-xs uppercase tracking-wider text-[#9C39FF] font-semibold mb-2">Større grupper</div>
                 <h3 className="text-2xl font-medium text-white mb-2">Teambuilding 10–50 personer</h3>
-                <div className="text-3xl font-bold text-white mb-1">Fra 450 kr <span className="text-xs font-normal text-zinc-400">eks. mva / pers</span></div>
+                <div className="text-3xl font-bold text-white mb-1">375 kr <span className="text-xs font-normal text-zinc-400">+ mva / pers</span></div>
                 <div className="text-xs text-zinc-400 mb-6">Inntil 3 timer totaltid &middot; 120 min aktivt turneringsformat</div>
                 <ul className="text-xs sm:text-sm text-zinc-300 space-y-2.5 mb-8">
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#19EB5B]" /> <strong>Hele lokalet for dere selv</strong> (inntil 3 timer)</li>

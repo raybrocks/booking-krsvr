@@ -97,8 +97,8 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - **Oppgjør:** Firmaet dekker samlet på EHF-faktura, eller vi åpner baren for deltakerbetaling.
 3. **Pakkepriser og MVA-skille:**
    - **Normal booking / Privat (2–10 personer, 90 min):** Oppgis **inkl. mva** på `/priser` (2 pers: 460 kr/pers, 3–4 pers: 395 kr/pers, 5–7 pers: 385 kr/pers, 8–10 pers: 375 kr/pers).
-   - **Teambuilding bedrift (2–10 personer):** Fra 375 kr **eks. mva** / pers (90 min).
-   - **Teambuilding bedrift (10–50 personer):** Fra 450 kr **eks. mva** / pers (inntil 3 timer totaltid / hele lokalet for dere selv / 120 min aktivt turneringsformat).
+   - **Teambuilding bedrift (2–10 personer):** 375 kr **+ mva** / pers (90 min).
+   - **Teambuilding bedrift (10–50 personer):** 375 kr **+ mva** / pers (inntil 3 timer totaltid / hele lokalet for dere selv / 120 min aktivt turneringsformat).
    - **Utdrikningslag:** Fra 450 kr / pers (Varighet: 1,5–3 timer).
    - **VR Bursdag:** Fra 375 kr / pers (90 min totalopplevelse).
 4. **Ingen medbrakt mat og drikke på teambuilding, voksenbursdag (18+) og utdrikningslag:**
