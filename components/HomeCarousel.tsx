@@ -113,10 +113,10 @@ export default function HomeCarousel() {
 
         <div 
           ref={scrollRef}
-          className="w-full overflow-x-auto overflow-y-hidden hide-scrollbar py-6 snap-x snap-mandatory scroll-smooth"
+          className="w-full overflow-x-auto overflow-y-hidden hide-scrollbar py-14 -my-6 snap-x snap-mandatory scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <div className="flex items-stretch justify-start gap-5 md:gap-6 px-6 md:px-4 w-max min-w-full">
+          <div className="flex items-stretch justify-start gap-5 md:gap-6 px-8 md:px-6 w-max min-w-full">
           {experiences.map((exp) => {
             const typeSlug = exp.experienceType?.slug || slugify(exp.type || "");
             const coverImage =
