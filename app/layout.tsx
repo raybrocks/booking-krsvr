@@ -160,6 +160,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         "@type": "NewsArticle",
         "headline": "Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet (Deler lokale med dansestudio: Nå fyller de storsalen med virtuell moro)",
         "description": "På Lund har byens nyeste virtuelle lekeplass åpnet dørene for både store og små.",
+        "abstract": "Reportasje i KRS – Avisen Kristiansand om KRS VR Arena på Lund i Kristiansand, drevet av daglig leder Jan Lewi Skeie og game master Marius Fjermedal. Konseptet er det første av sitt slag på Sørlandet og spesialiserer seg på sosiale VR-opplevelser, virtuelle Escape Rooms og actionspill der man beveger seg fritt på over 140 kvadratmeter med kapasitet fra 2 til 64 spillere. Artikkelen følger blant annet 17 ansatte fra Verkstedet Spiseri på teambuilding fordelt på tre rullerende lag med visning på storskjerm, og omtaler tilbudet for bedrifter (som Ingeniørvesenet), familier, studenter, turister, utdrikningslag og barnebursdager.",
+        "keywords": "VR-briller, Lund, Kristiansand, KRS VR Arena, Teambuilding, Virtuelle Escape Rooms, Utdrikningslag, Barnebursdag, Næringsliv",
         "url": "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
         "datePublished": "2026-10-19T21:49:30+02:00",
         "author": {
