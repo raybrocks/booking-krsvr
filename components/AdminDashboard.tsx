@@ -278,6 +278,27 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleMarkTerminalPaid = async (bookingId: string) => {
+    if (!confirm("Bekreft at kunden har betalt i kortterminalen i arenaen.")) return;
+    const loadingToastId = toast.loading("Registrerer betaling...");
+    try {
+      const res = await fetch(`/api/admin/bookings/${bookingId}/mark-paid`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Kunne ikke markere som betalt');
+      toast.success(data.message || 'Booking markert som fullt betalt i arenaen!', { id: loadingToastId });
+      setBookings(prev => prev.map(b => {
+        if (b.id === bookingId) {
+          return { ...b, amountPaid: b.totalPrice, vippsStatus: 'TERMINAL_BETALT' };
+        }
+        return b;
+      }));
+    } catch (err: any) {
+      toast.error(err.message || 'Feil ved registrering av betaling', { id: loadingToastId });
+    }
+  };
+
   const updateBookingStatus = async (id: string, newStatus: string) => {
     try {
       await fetch(`/api/admin/bookings/${id}`, {
@@ -716,12 +737,34 @@ export default function AdminDashboard() {
                           const isFullyPaid = (booking.paymentType === 'full' || amountPaid >= totalPrice) && totalPrice > 0;
                           const isFree = totalPrice === 0;
 
+                          const isTerminal = booking.paymentType === 'terminal';
+
                           if (isRefunded) {
                             return (
                               <div className="flex flex-col gap-1">
                                 <span className="text-blue-400 font-medium text-xs">refundert</span>
                                 <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-sm w-fit">
                                   REFUNDERT (VIPPS)
+                                </span>
+                              </div>
+                            );
+                          }
+                          if (isTerminal) {
+                            if (amountPaid >= totalPrice && totalPrice > 0) {
+                              return (
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-emerald-400 font-medium text-xs">betalt (terminal)</span>
+                                  <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm w-fit">
+                                    FULLT OPPGJORT (TERMINAL)
+                                  </span>
+                                </div>
+                              );
+                            }
+                            return (
+                              <div className="flex flex-col gap-1">
+                                <span className="text-purple-400 font-medium text-xs">betales i arena</span>
+                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm w-fit">
+                                  BETALES I ARENA: {remaining} NOK
                                 </span>
                               </div>
                             );
@@ -796,7 +839,12 @@ export default function AdminDashboard() {
                           <div className="text-zinc-200 font-medium">
                             Totalt: {booking.totalPrice || 0} NOK
                           </div>
-                          {booking.amountPaid > 0 ? (
+                          {booking.paymentType === 'terminal' ? (
+                            <div className="text-zinc-400 text-[11px]">
+                              Betaling: <span className="text-purple-300 font-medium">Kortterminal i arena</span>
+                              {booking.amountPaid > 0 && <span className="text-zinc-200"> ({booking.amountPaid} NOK innbetalt)</span>}
+                            </div>
+                          ) : booking.amountPaid > 0 ? (
                             <div className="text-zinc-400 text-[11px]">
                               Innbetalt (Vipps): <span className="text-zinc-200 font-medium">{booking.amountPaid} NOK</span>
                             </div>
@@ -833,6 +881,19 @@ export default function AdminDashboard() {
                               Refunder (Vipps)
                             </button>
                           )}
+                        </div>
+                      )}
+
+                      {/* Handlingsknapp for Kortterminal i arena */}
+                      {booking.paymentType === 'terminal' && ((booking.totalPrice || 0) > (booking.amountPaid || 0)) && booking.status !== 'cancelled' && (
+                        <div className="mt-1">
+                          <button 
+                            onClick={() => handleMarkTerminalPaid(booking.id)} 
+                            className="text-[11px] bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium" 
+                            title="Registrer at kunden har betalt i kortterminalen"
+                          >
+                            ✓ Registrer betalt i terminal
+                          </button>
                         </div>
                       )}
                     </div>

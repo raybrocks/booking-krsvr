@@ -39,6 +39,14 @@ export async function GET(req: NextRequest) {
       if (receipt) {
         vippsStatus = receipt.status;
         vippsAmount = Math.round(receipt.amount * 100);
+      } else if (b.paymentType === 'terminal') {
+        if (b.amountPaid >= b.totalPrice && b.totalPrice > 0) {
+          vippsStatus = 'TERMINAL_BETALT';
+          vippsAmount = Math.round((b.amountPaid || 0) * 100);
+        } else {
+          vippsStatus = 'TERMINAL_VENTER';
+          vippsAmount = 0;
+        }
       } else if (['reservation', 'full', 'vipps'].includes(b.paymentType)) {
         if (b.amountPaid > 0 || b.status === 'confirmed') {
           vippsStatus = 'CAPTURED';

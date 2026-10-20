@@ -13,6 +13,7 @@ export interface AdminNewBookingEmailProps {
   players: number;
   totalPrice: number;
   amountPaid: number;
+  paymentType?: string;
   bookingType?: string;
   companyName?: string;
   internalNotes?: string;
@@ -30,17 +31,22 @@ export const AdminNewBookingEmail: React.FC<AdminNewBookingEmailProps> = ({
   players,
   totalPrice,
   amountPaid,
+  paymentType,
   bookingType,
   companyName,
   internalNotes,
   adminEmail = 'post@krsvr.no',
 }) => {
+  const isTerminal = paymentType === 'terminal' || (amountPaid === 0 && totalPrice > 0);
+
   return (
     <EmailLayout previewText={`Ny booking: ${firstName} ${lastName} - ${date} kl ${time}`} adminEmail={adminEmail}>
       <Heading style={headingStyle}>Ny booking registrert</Heading>
 
       <Text style={paragraphStyle}>
-        En ny booking har blitt registrert og betalt i systemet.
+        {isTerminal
+          ? 'En ny booking er registrert. Kunden har valgt å betale ved oppmøte i arenaen (kortterminal).'
+          : 'En ny booking har blitt registrert og forhåndsbetalt i systemet.'}
       </Text>
 
       <Section style={detailsTableStyle}>
@@ -51,6 +57,14 @@ export const AdminNewBookingEmail: React.FC<AdminNewBookingEmailProps> = ({
         <Text style={detailRowStyle}><strong>Opplevelse:</strong> {experienceTitle}</Text>
         <Text style={detailRowStyle}><strong>Tidspunkt:</strong> {date} kl {time}</Text>
         <Text style={detailRowStyle}><strong>Antall deltakere:</strong> {players} pers</Text>
+        <Text style={detailRowStyle}>
+          <strong>Betalingsmåte:</strong>{' '}
+          {isTerminal ? (
+            <span style={{ color: '#b45309', fontWeight: 'bold' }}>Betales i arenaen (Kortterminal &ndash; gjenstår NOK {totalPrice})</span>
+          ) : (
+            <span style={{ color: '#047857', fontWeight: 'bold' }}>Betalt med Vipps</span>
+          )}
+        </Text>
         <Text style={detailRowStyle}><strong>Totalpris / Betalt:</strong> NOK {totalPrice} / NOK {amountPaid}</Text>
         {internalNotes && (
           <Text style={detailRowStyle}><strong>Notat:</strong> <em>{internalNotes}</em></Text>

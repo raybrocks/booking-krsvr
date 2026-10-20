@@ -215,7 +215,10 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
   };
 
   const handleCancel = async () => {
-    if (!confirm("Er du sikker på at du vil kansellere bookingen? Merk: Reservasjonsgebyret refunderes ikke automatisk.")) return;
+    const confirmMsg = (booking?.amountPaid || 0) > 0
+      ? "Er du sikker på at du vil kansellere bookingen? Eventuell refusjon behandles i henhold til våre avbestillingsregler (senest 48 timer før aktiviteten)."
+      : "Er du sikker på at du vil kansellere bookingen?";
+    if (!confirm(confirmMsg)) return;
     
     setIsCancelling(true);
     try {

@@ -596,25 +596,45 @@ export default function BookingFlow() {
 
               <div className="space-y-4">
                 <Label className="text-zinc-300">Betalingsalternativ</Label>
-                <RadioGroup value={paymentType} onValueChange={(v: "full" | "reservation") => setPaymentType(v)}>
-                  <div className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'full' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} onClick={() => setPaymentType('full')}>
-                    <div className="flex items-center space-x-3">
-                      <RadioGroupItem value="full" id="full" className="border-zinc-500 text-[#9C39FF]" />
-                      <Label htmlFor="full" className="cursor-pointer">Betal hele beløpet</Label>
-                    </div>
-                    <span className="font-medium">{totalPrice} NOK</span>
-                  </div>
-                  
-                  <div className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'reservation' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} onClick={() => setPaymentType('reservation')}>
-                    <div className="flex items-center space-x-3">
-                      <RadioGroupItem value="reservation" id="reservation" className="border-zinc-500 text-[#9C39FF]" />
+                <RadioGroup value={paymentType} onValueChange={(v: "vipps" | "terminal") => setPaymentType(v)}>
+                  <div 
+                    className={`flex items-start justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'vipps' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} 
+                    onClick={() => setPaymentType('vipps')}
+                  >
+                    <div className="flex items-start space-x-3">
+                      <RadioGroupItem value="vipps" id="vipps" className="mt-1 border-zinc-500 text-[#9C39FF]" />
                       <div className="space-y-1">
-                        <Label htmlFor="reservation" className="cursor-pointer font-medium">Reservasjonsavgift</Label>
-                        <p className="text-xs text-zinc-400">Tilsvarer 1 person</p>
-                        <p className="text-xs text-zinc-400">Betal restbeløpet i arenaen</p>
+                        <Label htmlFor="vipps" className="cursor-pointer font-medium text-white">
+                          Betal fullt oppgjør nå (Vipps)
+                        </Label>
+                        <p className="text-xs text-zinc-400">Rask og trygg betaling med Vipps på nett</p>
                       </div>
                     </div>
-                    <span className="font-medium">{pricePerPerson} NOK</span>
+                    <span className="font-medium text-white whitespace-nowrap">{totalPrice} NOK</span>
+                  </div>
+                  
+                  <div 
+                    className={`flex items-start justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'terminal' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} 
+                    onClick={() => setPaymentType('terminal')}
+                  >
+                    <div className="flex items-start space-x-3">
+                      <RadioGroupItem value="terminal" id="terminal" className="mt-1 border-zinc-500 text-[#9C39FF]" />
+                      <div className="space-y-1">
+                        <Label htmlFor="terminal" className="cursor-pointer font-medium text-white">
+                          Betal ved oppmøte i arenaen (Kortterminal)
+                        </Label>
+                        <p className="text-xs text-zinc-400">
+                          Betal med bankkort, Visa, Mastercard eller Apple Pay ved ankomst
+                        </p>
+                        <p className="text-[11px] text-zinc-500">
+                          Passer for alle &ndash; også turister og internasjonale gjester uten Vipps
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-medium text-white block">0 NOK</span>
+                      <span className="text-[11px] text-zinc-500 whitespace-nowrap">{totalPrice} NOK i arenaen</span>
+                    </div>
                   </div>
                 </RadioGroup>
               </div>
@@ -661,8 +681,10 @@ export default function BookingFlow() {
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     Behandler...
                   </>
+                ) : paymentType === 'terminal' ? (
+                  `Bekreft booking (Betal i arenaen)`
                 ) : (
-                  `Betal ${amountToPay} NOK`
+                  `Betal ${amountToPay} NOK med Vipps`
                 )}
               </Button>
             )}

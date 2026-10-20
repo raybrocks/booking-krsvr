@@ -595,8 +595,29 @@ export default function EditBookingModal({
                   </span>
                 </div>
                 <span className="text-[10px] text-zinc-500 mt-1 block">
-                  {remainingPrice > 0 ? "Betales ved oppmøte" : "Fullt betalt"}
+                  {remainingPrice > 0 ? (booking.paymentType === 'terminal' ? "Betales i kortterminal ved ankomst" : "Betales ved oppmøte") : "Fullt betalt"}
                 </span>
+
+                {booking.paymentType === 'terminal' && remainingPrice > 0 && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!confirm("Bekreft at kunden har betalt i kortterminalen.")) return;
+                      try {
+                        const res = await fetch(`/api/admin/bookings/${booking.id}/mark-paid`, { method: 'POST' });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || 'Feil ved registrering');
+                        setAmountPaid(totalPrice);
+                        toast.success("Markert som betalt i terminal!");
+                      } catch (e: any) {
+                        toast.error(e.message);
+                      }
+                    }}
+                    className="mt-2 w-full py-1.5 px-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-medium transition-colors text-center cursor-pointer"
+                  >
+                    ✓ Registrer betalt i terminal ({remainingPrice} NOK)
+                  </button>
+                )}
               </div>
             </div>
           </div>

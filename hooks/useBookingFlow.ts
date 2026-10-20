@@ -60,7 +60,7 @@ export function useBookingFlow() {
   const [acceptedNewsletter, setAcceptedNewsletter] = useState(false);
   
   // Payment
-  const [paymentType, setPaymentType] = useState<"full" | "reservation">("full");
+  const [paymentType, setPaymentType] = useState<"vipps" | "terminal">("vipps");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   
@@ -198,7 +198,7 @@ export function useBookingFlow() {
     if (discountAmount > rawTotalPrice) discountAmount = rawTotalPrice;
   }
   const totalPrice = rawTotalPrice - discountAmount;
-  const amountToPay = isVippsTest ? 2 : (paymentType === "full" ? totalPrice : Math.min(pricePerPerson, totalPrice));
+  const amountToPay = isVippsTest ? 2 : (paymentType === "vipps" ? totalPrice : 0);
 
   const handleApplyDiscount = async () => {
     if (!discountCodeInput.trim()) return;

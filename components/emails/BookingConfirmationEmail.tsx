@@ -11,6 +11,7 @@ export interface BookingConfirmationEmailProps {
   players: number;
   totalPrice: number;
   amountPaid: number;
+  paymentType?: string;
   manageUrl: string;
   customText?: string;
   adminEmail?: string;
@@ -26,6 +27,7 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
   players,
   totalPrice,
   amountPaid,
+  paymentType,
   manageUrl,
   customText,
   adminEmail = 'post@krsvr.no',
@@ -80,12 +82,17 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
         <Text style={detailRowStyle}><strong>Antall personer:</strong> {players} pers</Text>
       </Section>
 
-      {/* Betalingskvittering */}
-      <Text style={subheadingStyle}>Betalingskvittering</Text>
+      {/* Betalingsinformasjon */}
+      <Text style={subheadingStyle}>Betalingsinformasjon</Text>
       <Section style={detailsTableStyle}>
+        <Text style={detailRowStyle}>
+          <strong>Betalingsmåte:</strong> {paymentType === 'terminal' || (amountPaid === 0 && totalPrice > 0) ? 'Betales i arenaen (kortterminal)' : 'Vipps'}
+        </Text>
         <Text style={detailRowStyle}><strong>Totalpris:</strong> NOK {totalPrice}</Text>
-        <Text style={detailRowStyle}><strong>Betalt beløp:</strong> NOK {amountPaid}</Text>
-        <Text style={detailRowStyle}><strong>Gjenstående beløp:</strong> NOK {remainingAmount} {remainingAmount > 0 ? '(betales ved oppmøte/faktura)' : ''}</Text>
+        <Text style={detailRowStyle}><strong>Betalt på nett:</strong> NOK {amountPaid}</Text>
+        <Text style={detailRowStyle}>
+          <strong>Gjenstående beløp:</strong> NOK {remainingAmount} {remainingAmount > 0 ? (paymentType === 'terminal' || amountPaid === 0 ? '(betales i kortterminal ved ankomst)' : '(betales ved oppmøte/faktura)') : ''}
+        </Text>
       </Section>
 
       {/* Praktisk Info */}

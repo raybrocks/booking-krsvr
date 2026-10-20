@@ -41,7 +41,11 @@ export const AdminBookingCancellationEmail: React.FC<AdminBookingCancellationEma
       </Section>
 
       <Text style={{ fontSize: '12.5px', color: '#6b7280', margin: '0 0 16px 0' }}>
-        <em>Merk: Eventuelt reservasjonsgebyr er ikke refundert automatisk. Behandle eventuell refusjon i admin-panelet ved behov.</em>
+        <em>
+          {amountPaid && amountPaid > 0 
+            ? 'Merk: Beløpet er innbetalt via Vipps og er ikke refundert automatisk. Behandle eventuell refusjon i admin-panelet i tråd med avbestillingsreglene.'
+            : 'Merk: Kunden hadde valgt oppmøtebetaling (kortterminal) eller 0 kr. Ingen innbetaling ble foretatt, så ingen refusjon kreves.'}
+        </em>
       </Text>
 
       <Button href="https://krsvr.no/admin" style={primaryButtonStyle}>

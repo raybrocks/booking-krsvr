@@ -64,8 +64,8 @@ export default function EmailPreviewPage() {
       <h2 style="font-size: 18px; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Betalingskvittering</h2>
       <ul style="list-style: none; padding: 0;">
         <li style="margin-bottom: 10px;"><strong>Totalpris:</strong> NOK ${totalPrice}</li>
-        <li style="margin-bottom: 10px;"><strong>Betalt beløp (Reservasjonsgebyr/Fullt):</strong> NOK ${amountPaid}</li>
-        <li style="margin-bottom: 10px;"><strong>Gjenstående beløp:</strong> NOK ${totalPrice - amountPaid} (betales ved oppmøte)</li>
+        <li style="margin-bottom: 10px;"><strong>Innbetalt beløp:</strong> NOK ${amountPaid}</li>
+        <li style="margin-bottom: 10px;"><strong>Gjenstående beløp:</strong> NOK ${totalPrice - amountPaid} (betales ved oppmøte/kortterminal)</li>
       </ul>
 
       <div style="margin-top: 40px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
@@ -152,7 +152,7 @@ export default function EmailPreviewPage() {
       <h1 style="color: #ff4444;">Booking Kansellert av Kunde</h1>
       <p>Kunden <strong>${firstName} ${lastName}</strong> (${email}) har kansellert bookingen sin via selvkansellerings-portalen.</p>
       <p>Dette gjaldt bookingen for <strong>${date} kl ${time}</strong>.</p>
-      <p>Eventuelt reservasjonsgebyr er <strong>ikke</strong> refundert automatisk. Logg inn i admin-panelet for å behandle eventuell refusjon via Vipps-knappen.</p>
+      <p>Eventuelt innbetalt beløp er <strong>ikke</strong> refundert automatisk. Logg inn i admin-panelet for å behandle eventuell refusjon via Vipps-knappen.</p>
     </div>
     `,
     weekly: `

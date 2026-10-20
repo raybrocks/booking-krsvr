@@ -147,7 +147,7 @@ export default function TransactionsManager() {
 
     const betalingsform = (selectedTx.paymentType === 'vipps' || selectedTx.paymentType === 'reservation' || selectedTx.paymentType === 'full') 
       ? 'Vipps' 
-      : (selectedTx.paymentType === 'manual' || selectedTx.paymentType === 'system' ? 'Manuell / Oppmøte' : (selectedTx.paymentType || 'Vipps'));
+      : (selectedTx.paymentType === 'terminal' ? 'Kortterminal (Oppmøte)' : (selectedTx.paymentType === 'manual' || selectedTx.paymentType === 'system' ? 'Manuell / Oppmøte' : (selectedTx.paymentType || 'Vipps')));
 
     return (
       <div className="bg-white text-black font-mono text-sm max-w-sm mx-auto shadow-md p-8 print:shadow-none print:p-0 print:max-w-none">
