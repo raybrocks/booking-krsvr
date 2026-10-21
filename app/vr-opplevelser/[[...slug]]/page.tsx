@@ -17,7 +17,7 @@ export async function generateMetadata({
   const initialExpSlug = resolvedParams.slug?.[1];
 
   let title = "VR Opplevelser i Kristiansand | KRS VR Arena";
-  let description = "Utforsk VR Escape Room, Mixed Reality og skytespill hos KRS VR Arena i Kristiansand. Opplevelser tilrettelagt for vennegjenger, studenter, teambuilding og familie.";
+  let description = "Utforsk VR Escape Rooms, Action Strategi og sosiale opplevelser hos KRS VR Arena i Kristiansand. Opplevelser tilrettelagt for vennegjenger, studenter, teambuilding og familie.";
 
   // Virtual filter alias: /vr-opplevelser/familie aktiverer Familie-filteret
   if (initialTypeSlug === "familie") {

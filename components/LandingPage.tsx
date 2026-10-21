@@ -32,7 +32,7 @@ export default function LandingPage() {
     "@context": "https://schema.org",
     "@type": "EntertainmentBusiness",
     "name": "KRS VR Arena",
-    "description": "KRS VR Arena er en lokal opplevelsesbedrift i Kristiansand som tilbyr VR Escape Rooms, Mixed Reality-opplevelser, VR Arcade, Zombie Shooter og Spatial Ops. Løs oppdrag og koder, eller konkurrer i actionfylte lagspill. Vi tilbyr Norges mest immersive VR og Mixed Reality-teknologi (roam free) der arenaen blir en del av spillet. Våre opplevelser er perfekt for venner, bursdag, utdrikningslag, firmaevent og teambuilding.",
+    "description": "KRS VR Arena er Kristiansands mest sosiale opplevelsesarena på Lund. Vi tilbyr engasjerende VR Escape Rooms, Action Strategi (Tactical Arena) og felles opplevelser med full bevegelsesfrihet på 143 kvm. Perfekt for teambuilding, firmaevent, utdrikningslag, bursdag samt vennegjenger og familier.",
     "url": "https://www.krsvr.no", 
     "telephone": "+4740828302",
     "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic",
@@ -48,7 +48,7 @@ export default function LandingPage() {
       "latitude": "58.152302",
       "longitude": "8.025888"
     },
-    "keywords": "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room, Zombie Shooter Kristiansand, Spatial Ops Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bursdag Kristiansand",
+    "keywords": "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room, Tactical Arena Kristiansand, Action Strategi Kristiansand, Zombie Shooter Kristiansand, Spatial Ops Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bursdag Kristiansand",
     "offers": {
       "@type": "AggregateOffer",
       "offerCount": 10,
@@ -212,12 +212,27 @@ export default function LandingPage() {
           transition={{ duration: 0.7 }}
           className="max-w-5xl mx-auto space-y-5 md:space-y-6"
         >
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-tighter text-white leading-[1.12] max-w-4xl mx-auto">
-            <span className="font-bold">Mixed Reality, VR Escape Rooms og teambuilding i Kristiansand</span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tighter text-white leading-[1.12] max-w-4xl mx-auto">
+            Kristiansands mest sosiale VR-opplevelser
           </h1>
           <p className="text-base sm:text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto font-light leading-relaxed">
-            Løs oppdrag, konkurrer i actionfylte lagspill og opplev Mixed Reality — der arenaen blir en del av spillet. Perfekt for familier, vennegjenger, bursdag og utdrikningslag — og en teambuilding-opplevelse kollegaene faktisk snakker om etterpå.
+            Opplev latter, kommunikasjon og samarbeid som begeistrer på tvers av alder og teknisk erfaring – fra gåteløsing i VR Escape Rooms til fysisk Action Strategi på 143 kvm.
           </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base text-zinc-300 font-light pt-1">
+            <span className="flex items-center gap-2">
+              <span className="text-[#9C39FF] font-bold text-base leading-none">•</span>
+              Teambuilding & firmaevent
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="text-[#9C39FF] font-bold text-base leading-none">•</span>
+              Utdrikningslag & bursdag
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="text-[#9C39FF] font-bold text-base leading-none">•</span>
+              Venne- og familieopplevelser
+            </span>
+          </div>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <Button nativeButton={false} render={<Link href="/booking" />} size="lg" className="h-13 md:h-14 px-8 text-base md:text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 min-w-[230px]">
@@ -251,7 +266,7 @@ export default function LandingPage() {
                   Familie eller vennegjeng
                 </div>
                 <div className="text-xs text-zinc-300 font-light mt-0.5">
-                  Spennende verdener, rask action eller Escape Rooms
+                  Spennende verdener, Action Strategi eller Escape Rooms
                 </div>
               </div>
             </Link>
@@ -523,7 +538,7 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto">
             <ul className="space-y-4">
               {[
-                "Sosiale team-aktiviteter der opptil 10 personer spiller samtidig i 140 m² arena.",
+                "Sosiale team-aktiviteter der opptil 10 personer spiller samtidig i 143 m² arena.",
                 "Dynamisk turneringsformat med storskjerm og lagkonkurranse for grupper fra 10 til 64 personer.",
                 "Engasjerende og trygg veiledning fra dedikert spillvert gjennom hele besøket.",
                 "Trådløs, gående opplevelse inni virtuelle verdener – passer både nybegynnere og erfarne.",

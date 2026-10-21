@@ -19,20 +19,23 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.krsvr.no'),
   title: {
-    default: 'KRS VR Arena | VR Escape Room, Arcade & Teambuilding i Kristiansand',
+    default: 'KRS VR Arena | Kristiansands mest sosiale VR-opplevelser',
     template: '%s | KRS VR Arena'
   },
-  description: 'Opplev eksklusive VR Escape Rooms, skytespill og eventyr i Kristiansand med full bevegelsesfrihet. Den perfekte aktiviteten for teambuilding, utdrikningslag, bursdager og vennegjengen.',
+  description: 'Kristiansands mest sosiale VR-opplevelser med full bevegelsesfrihet på 143 kvm arena. VR Escape Rooms, Action Strategi og felles opplevelser for teambuilding, utdrikningslag, bursdager og vennegjengen.',
   keywords: [
     'VR Kristiansand',
     'Mixed Reality Kristiansand',
     'Tactical Arena Kristiansand',
+    'Tactical Arena',
+    'Action Strategi',
     'Mixed Reality Shooter',
     'Escape Room Kristiansand',
     'VR Escape Room Kristiansand',
     'Zombie Shooter Kristiansand',
     'Spatial Ops Kristiansand',
     'Arcade Kristiansand',
+    'VR Arcade Kristiansand',
     'Teambuilding Kristiansand',
     'Utdrikningslag Kristiansand',
     'Bursdag Kristiansand',
@@ -48,8 +51,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: 'KRS VR Arena | VR Escape Room & Arcade i Kristiansand',
-    description: 'Opplev eksklusive VR Escape Rooms, Mixed Reality, og actionfylte skytespill i Kristiansand. Full bevegelsesfrihet (roam free) på store spillområder for utdrikningslag, teambuilding, bursdag og vennegjenger.',
+    title: 'KRS VR Arena | Kristiansands mest sosiale VR-opplevelser',
+    description: 'Opplev latter, samarbeid og felles opplevelser hos KRS VR Arena på Lund i Kristiansand. Full bevegelsesfrihet på 143 kvm arena for utdrikningslag, teambuilding, bursdag, venner og familie.',
     url: 'https://www.krsvr.no',
     siteName: 'KRS VR Arena',
     locale: 'nb_NO',
@@ -84,7 +87,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     "@context": "https://schema.org",
     "@type": ["EntertainmentBusiness", "LocalBusiness"],
     "name": "KRS VR Arena",
-    "description": "Opplevelsessenter i Kristiansand med trådløse VR Escape Rooms, Mixed Reality og actionfylte spill for vennegjengen, studenter, teambuilding, utdrikningslag og familiepakker.",
+    "description": "Opplevelsessenter i Kristiansand med trådløse VR Escape Rooms, Action Strategi og felles opplevelser for vennegjengen, studenter, teambuilding, utdrikningslag og familiepakker.",
     "image": "https://krsvr.no/krsvrarena_logo_sort.png",
     "url": "https://www.krsvr.no",
     "telephone": "+4740828302",
@@ -108,7 +111,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     ],
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
-      "name": "VR og Mixed Reality Opplevelser",
+      "name": "VR og sosiale opplevelser",
       "itemListElement": [
         {
           "@type": "Offer",
@@ -122,8 +125,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           "@type": "Offer",
           "itemOffered": {
             "@type": "Service",
-            "name": "VR Shooter & Mixed Reality Arena",
-            "description": "Trådløs action og fri bevegelse i 140 kvm arena for vennegjenger og kollegaer."
+            "name": "Tactical Arena & Action Strategi",
+            "description": "Trådløs action, lagtaktikk og fri bevegelse i 143 kvm arena for vennegjenger og kollegaer."
           }
         },
         {
