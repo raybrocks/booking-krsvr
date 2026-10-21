@@ -19,11 +19,11 @@ export default function ClientLogoTicker({
   initialClients,
   title = "Sørlandsbedrifter som har hatt teambuilding på Krs VR Arena"
 }: ClientLogoTickerProps) {
-  const [clients, setClients] = useState<LogoClientItem[]>(initialClients || []);
-  const [loading, setLoading] = useState(!initialClients);
+  const [clients, setClients] = useState<LogoClientItem[]>(initialClients && initialClients.length > 0 ? initialClients : []);
+  const [loading, setLoading] = useState(!initialClients || initialClients.length === 0);
 
   useEffect(() => {
-    if (!initialClients) {
+    if (!initialClients || initialClients.length === 0) {
       async function fetchClients() {
         try {
           const res = await fetch("/api/testimonials?logo_slider=true");
@@ -63,8 +63,7 @@ export default function ClientLogoTicker({
           alt={`${client.companyName} – Bedriftskunde hos KRS VR Arena i Kristiansand`}
           width={180}
           height={60}
-          className="max-h-8 sm:max-h-10 md:max-h-11 w-auto object-contain opacity-75 hover:opacity-100 transition-all duration-300 group-hover:scale-105"
-          style={{ filter: "brightness(0) invert(1)" }}
+          className="h-8 sm:h-9 md:h-10 w-auto max-w-[150px] sm:max-w-[180px] md:max-w-[220px] object-contain transition-all duration-300 group-hover:scale-105"
           unoptimized
         />
       </div>
