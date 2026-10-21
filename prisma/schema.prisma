@@ -39,6 +39,7 @@ model Experience {
   fantasy         Boolean  @default(false)
   codeSolving     Boolean  @default(false)
   cinematic       Boolean  @default(false)
+  mixedReality    Boolean  @default(false)
   videoUrl        String?
   awards          Json?
   languages       String[] @default([])

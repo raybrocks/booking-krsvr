@@ -669,6 +669,7 @@ export function ExperiencesView({
                 <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
                   {selected.type}
                 </span>
+                {selected.mixedReality && <span title="Fysisk bevegelse der det virkelige rommet blandes med den virtuelle verdenen" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Mixed Reality</span>}
                 {selected.cinematic && <span title="Filmatisk opplevelse med sterk historie og atmosfære" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Cinematic</span>}
                 {selected.action && <span title="Høyt tempo og spenning!" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Action</span>}
                 {selected.jumpScare && <span title="Advarsel: Kan inneholde skremmende elementer" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Jump Scare</span>}

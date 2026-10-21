@@ -139,6 +139,7 @@ export default function ExperiencesManager() {
       mystic: false,
       codeSolving: false,
       cinematic: false,
+      mixedReality: false,
       picture: "",
       images: [],
       videoUrl: "",
@@ -649,6 +650,15 @@ export default function ExperiencesManager() {
                     <label className="flex items-center cursor-pointer">
                       <input 
                         type="checkbox" 
+                        checked={editForm.mixedReality || false}
+                        onChange={(e) => setEditForm({...editForm, mixedReality: e.target.checked})}
+                        className="w-4 h-4 accent-[#9C39FF]"
+                      />
+                      <span className="ml-2 text-sm text-zinc-300">Mixed Reality</span>
+                    </label>
+                    <label className="flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
                         checked={editForm.cinematic || false}
                         onChange={(e) => setEditForm({...editForm, cinematic: e.target.checked})}
                         className="w-4 h-4 accent-[#9C39FF]"
@@ -1038,6 +1048,9 @@ export default function ExperiencesManager() {
                 {Array.isArray(exp.suitableFor) && exp.suitableFor.map((item: string) => (
                   <span key={item} className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">{item}</span>
                 ))}
+                {exp.mixedReality && (
+                   <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Mixed Reality</span>
+                )}
                 {exp.cinematic && (
                    <span className="bg-zinc-950 px-2 py-1 rounded border border-zinc-800">Cinematic</span>
                 )}
