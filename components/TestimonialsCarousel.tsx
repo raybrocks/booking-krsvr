@@ -65,13 +65,14 @@ export default function TestimonialsCarousel() {
               </div>
               <div className="p-6 flex flex-col flex-grow items-center text-center -mt-16 md:-mt-24 relative z-10">
                 {testi.logoImage ? (
-                  <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden bg-white border-4 border-zinc-900 shadow-xl mb-4">
+                  <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden bg-zinc-950 border-4 border-zinc-800 shadow-2xl flex items-center justify-center p-4 md:p-6 mb-4 group-hover:border-zinc-700 transition-colors">
                     <Image 
                       src={testi.logoImage} 
                       alt={`${testi.companyName} – Bedriftskunde hos KRS VR Arena i Kristiansand`} 
                       width={192} 
                       height={192} 
-                      className="object-contain w-full h-full p-2 md:p-4" 
+                      className="object-contain w-full h-full" 
+                      unoptimized
                     />
                   </div>
                 ) : (
