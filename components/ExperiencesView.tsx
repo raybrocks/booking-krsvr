@@ -497,9 +497,9 @@ export function ExperiencesView({
       case "Rask Action":
         return "Action & Strategi i VR";
       case "Escape Room":
-        return "VR Escape Room i Kristiansand";
+        return "VR Escape Room";
       default:
-        return "VR Opplevelser i Kristiansand";
+        return "VR-opplevelser i Kristiansand";
     }
   };
 
@@ -516,7 +516,7 @@ export function ExperiencesView({
 
         {/* Simple Primary Filter Row */}
         <p className="text-zinc-400 text-sm md:text-lg text-center font-light mb-5 md:mb-8 max-w-2xl mx-auto px-2">
-          Alle opplevelser hos oss er laget for samarbeid, kommunikasjon og felles mestring.
+          Samle familie, venner eller kolleger til unike opplevelser hos KRS VR Arena i Kristiansand. Laget for samarbeid, kommunikasjon og felles mestring.
         </p>
         <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-4xl mx-auto px-2 mb-2 overflow-x-auto hide-scrollbar">
           {["Alle", "Familie", "Action Strategi", "Escape Room"].map((filter, idx, arr) => {
