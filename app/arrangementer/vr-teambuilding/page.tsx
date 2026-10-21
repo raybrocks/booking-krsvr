@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowRight, Check, Users, Briefcase, Award, Building2, Coffee, Shield, Zap, Trophy, Beer, Wine } from "lucide-react";
 import { Metadata } from "next";
 import ArrangementSubNav from "@/components/ArrangementSubNav";
+import ArrangementTrustBar from "@/components/ArrangementTrustBar";
 import { ArrangementFaq } from "@/components/ArrangementFaq";
 import ClientLogoTicker from "@/components/ClientLogoTicker";
 
@@ -142,9 +143,16 @@ export default function VrTeambuildingPage() {
           <span className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-[#9C39FF] bg-[#9C39FF]/10 px-3.5 py-1 rounded-full inline-block mb-2">
             Bedrift &middot; Teambuilding &middot; Julebord &middot; Kickoff
           </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tighter text-white leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tighter text-white leading-tight mb-4">
             VR Teambuilding og firmaevent i Kristiansand
           </h1>
+          <ArrangementTrustBar
+            items={[
+              "2–64 personer",
+              "EHF-faktura",
+              "Fra 375 kr/pers (+ mva)"
+            ]}
+          />
         </div>
 
         {/* HERO BILDE – SYNLIG VED FØRSTE ØYEKAST */}

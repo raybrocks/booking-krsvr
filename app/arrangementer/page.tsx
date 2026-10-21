@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowRight, Cake, Flame, Users, Truck, Check } from "lucide-react";
 import { Metadata } from "next";
 import ArrangementSubNav from "@/components/ArrangementSubNav";
+import ArrangementTrustBar from "@/components/ArrangementTrustBar";
 
 export const metadata: Metadata = {
   title: "Arrangementer i Kristiansand – Bursdag, Utdrikningslag & Teambuilding",
@@ -107,11 +108,15 @@ export default function ArrangementerPage() {
           </p>
         </div>
 
-        {/* TRUST BADGE */}
-        <div className="flex justify-center mb-6 md:mb-10">
-          <div className="inline-flex items-center text-xs sm:text-sm text-zinc-400 bg-zinc-900/60 px-5 py-2 rounded-full border border-white/5 text-center">
-            2–64 personer &middot; Egen partylounge &middot; Møt presist for å ikke miste spilletid.
-          </div>
+        {/* TRUST BAR */}
+        <div className="mb-8 md:mb-10">
+          <ArrangementTrustBar
+            items={[
+              "90 min totalopplevelse",
+              "2–64 personer",
+              "Fra 375 kr/pers"
+            ]}
+          />
         </div>
 
         {/* 4 BILDE-KORT GRID */}

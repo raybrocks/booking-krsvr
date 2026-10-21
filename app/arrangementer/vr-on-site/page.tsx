@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowRight, Check, MapPin, Truck, Zap, Monitor, Sparkles, HelpCircle } from "lucide-react";
 import { Metadata } from "next";
 import ArrangementSubNav from "@/components/ArrangementSubNav";
+import ArrangementTrustBar from "@/components/ArrangementTrustBar";
 import { ArrangementFaq } from "@/components/ArrangementFaq";
 
 export const metadata: Metadata = {
@@ -113,9 +114,16 @@ export default function VrOnSitePage() {
           <span className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-[#9C39FF] bg-[#9C39FF]/10 px-3.5 py-1 rounded-full inline-block mb-2">
             Mobil VR-arena &middot; Vi kommer til deg
           </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tighter text-white leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tighter text-white leading-tight mb-4">
             VR On-site i Kristiansand og Agder
           </h1>
+          <ArrangementTrustBar
+            items={[
+              "Vi rigger opp hos dere",
+              "Hele Agder",
+              "EHF-faktura"
+            ]}
+          />
         </div>
 
         {/* HERO BILDE – SYNLIG VED FØRSTE ØYEKAST */}

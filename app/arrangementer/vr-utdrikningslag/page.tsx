@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowRight, Check, Flame, Trophy, GlassWater, Camera, ShieldCheck } from "lucide-react";
 import { Metadata } from "next";
 import ArrangementSubNav from "@/components/ArrangementSubNav";
+import ArrangementTrustBar from "@/components/ArrangementTrustBar";
 import { ArrangementFaq } from "@/components/ArrangementFaq";
 
 export const metadata: Metadata = {
@@ -121,9 +122,16 @@ export default function VrUtdrikningslagPage() {
           <span className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-[#9C39FF] bg-[#9C39FF]/10 px-3.5 py-1 rounded-full inline-block mb-2">
             Bachelor & Bachelorette Party &middot; Kristiansand
           </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tighter text-white leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tighter text-white leading-tight mb-4">
             VR Utdrikningslag i Kristiansand
           </h1>
+          <ArrangementTrustBar
+            items={[
+              "Partylounge inkludert",
+              "Mulighet for åpen bar",
+              "Fra 450 kr/pers"
+            ]}
+          />
         </div>
 
         {/* HERO BILDE – SYNLIG VED FØRSTE ØYEKAST */}
