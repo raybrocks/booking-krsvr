@@ -6,7 +6,6 @@ import { Metadata } from "next";
 import ArrangementSubNav from "@/components/ArrangementSubNav";
 import { ArrangementFaq } from "@/components/ArrangementFaq";
 import ClientLogoTicker from "@/components/ClientLogoTicker";
-import { prisma } from "@/lib/prisma";
 
 export const revalidate = 60;
 
@@ -41,16 +40,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function VrTeambuildingPage() {
-  const logoClients = await prisma.testimonial.findMany({
-    where: {
-      isActive: true,
-      showInLogoSlider: true,
-      logoImage: { not: null },
-    },
-    orderBy: { order: "asc" },
-  });
-
+export default function VrTeambuildingPage() {
   const faqs = [
     {
       question: "Passer VR-teambuilding for alle aldre – hva med eldre kolleger (50–65+ år)?",
@@ -202,7 +192,7 @@ export default async function VrTeambuildingPage() {
         </div>
 
         {/* KLASSISK HORISONTAL KUNDE-LOGO STRIPE (EARLY TRUST) */}
-        <ClientLogoTicker clients={logoClients} />
+        <ClientLogoTicker />
 
         {/* 4 ANLEDNINGER I ÉN */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">

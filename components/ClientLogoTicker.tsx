@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 export interface LogoClientItem {
@@ -9,18 +11,40 @@ export interface LogoClientItem {
 }
 
 interface ClientLogoTickerProps {
-  clients: LogoClientItem[];
+  initialClients?: LogoClientItem[];
   title?: string;
 }
 
 export default function ClientLogoTicker({
-  clients,
+  initialClients,
   title = "Sørlandsbedrifter som har hatt teambuilding på Krs VR Arena"
 }: ClientLogoTickerProps) {
+  const [clients, setClients] = useState<LogoClientItem[]>(initialClients || []);
+  const [loading, setLoading] = useState(!initialClients);
+
+  useEffect(() => {
+    if (!initialClients) {
+      async function fetchClients() {
+        try {
+          const res = await fetch("/api/testimonials?logo_slider=true");
+          if (res.ok) {
+            const data = await res.json();
+            setClients(data);
+          }
+        } catch (e) {
+          console.error("Failed to load client logos:", e);
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchClients();
+    }
+  }, [initialClients]);
+
   // Only display clients that actually have a logo image
   const validClients = clients.filter((c) => !!c.logoImage);
 
-  if (validClients.length === 0) {
+  if (loading || validClients.length === 0) {
     return null;
   }
 

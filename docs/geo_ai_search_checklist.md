@@ -12,17 +12,17 @@ Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for
 
 ### A. Overordnet Utvikling over Tid (KPI-er)
 
-| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | Endring | Mål (Q4 2026) |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | **24 sider** | 🟢 **+5** | 25+ sider |
-| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | **10 domener** | 🟢 **+6** | 15+ domener |
-| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | **8 lenker** | 🟢 **+3** | 10+ lenker |
-| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | **5,0 ★ (22 stk)** | ➖ 0 | 5,0 ★ (40+ stk) |
-| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | **5,0 ★ (3 stk)** | ➖ 0 | 5,0 ★ (10+ stk) |
-| **TripAdvisor – Rangering i Kristiansand** *(Fornøyelse og lek)* | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** | ➖ 0 | **Topp 3** |
-| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | **2 av 6 (33 %)** | ➖ 0 | **5 av 6 (83 %)** |
-| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
-| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
+| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT-suksess) | Endring | Mål (Q4 2026) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | **24 sider** | 🟢 **+5** | 25+ sider |
+| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | **10 domener** | 🟢 **+6** | 15+ domener |
+| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | **8 lenker** | 🟢 **+3** | 10+ lenker |
+| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | **5,0 ★ (22 stk)** | ➖ 0 | 5,0 ★ (40+ stk) |
+| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | **5,0 ★ (6 stk)** | 🟢 **+3 (Dobling!)** | 5,0 ★ (10+ stk) |
+| **TripAdvisor – Rangering i Kristiansand** *(Fornøyelse og lek)* | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** | ➖ 0 | **Topp 3** |
+| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | 2 av 6 (33 %) | **Bekreftet konvertering i ChatGPT!** | 🟢 **Aktiv** | **5 av 6 (83 %)** |
+| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
+| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
 
 ---
 
@@ -32,7 +32,7 @@ Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, ra
 
 | Eksternt Domene | Global Tranco Rank *(lavere = sterkere)* | Est. DR (0–100) | Lenkestatus til `krsvr.no` | Siteres av Gemini AI? | Kategori / Merknad per `19.10.2026` |
 | :--- | :---: | :---: | :--- | :---: | :--- |
-| **[tripadvisor.com](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)** | **#573** i verden | ~93 | ✅ Aktiv profil + lenke | ✅ Ja | *Fornøyelse og lek i Kristiansand* (Nr. 7 av 23, 5,0★). |
+| **[tripadvisor.com](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)** | **#573** i verden | ~93 | ✅ Aktiv profil + lenke | ✅ Ja | *Fornøyelse og lek i Kristiansand* (5,0★, 6 anmeldelser). |
 | **[visitnorway.com / .se](https://www.visitnorway.no/)** | **#30 488** i verden | ~82 | ✅ Syndikert via Tellus | ✅ **Ja (Ofte!)** | Automatisk syndikert fra Visit Sørlandet. Siteres direkte av Gemini. |
 | **[1881.no](https://www.1881.no/data-programvare-og-utvikling/data-programvare-og-utvikling-agder/data-programvare-og-utvikling-kristiansand-s/krs-vr-arena-as_107699902S0/)** | **#46 211** i verden | ~74 | ⚠️ Kun NAP (Mangler URL/tlf) | Nei | Står under *Data - programvare og -utvikling*. **Må legge inn tlf + URL.** |
 | **[1850.no](https://www.1850.no/bedrifter/it/dataprogrammering/agder/kristiansand/krs-vr-arena-as-936605192)** | **#372 404** i verden | ~45 | ✅ Schema `sameAs: www.krsvr.no` | Ja (NAP) | Har riktig tlf og URL, men står under *IT / Dataprogrammering*. |
@@ -67,11 +67,17 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
 ### Høyeste prioritet (De AI søker i først)
 - [x] **TripAdvisor (Fullført – Aktiv profil, bilder, beskrivelser og widget):**
   - **Direkte oppførings-URL:** [Krs VR Arena på TripAdvisor](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)
-  - **Målepunkt / Baseline (15. oktober 2026):**
-    - **Rangering:** **Nr. 7 av 23** i kategorien *«Fornøyelse og lek i Kristiansand»*
-    - **Vurdering:** 5,0 av 5,0 stjerner
-    - **Antall anmeldelser:** 3 anmeldelser (Elisabeth V m.fl.)
-    - **Bilder:** 5 profesjonelle bilder lastet opp (dekker familiepakker 8–12 år, ungdom 13+, vennegjeng, teambuilding og utdrikningslag)
+  - **Målepunkt (Status per 21. oktober 2026):**
+    - **Vurdering:** **5,0 av 5,0 stjerner** (100 % toppkarakter!)
+    - **Antall anmeldelser:** **6 anmeldelser** (dobling fra baseline på 3 stk!)
+    - **Full strategisk målgruppedekning på TripAdvisor:**
+      1. **ChatGPT & Venner (19. okt 2026 – thoraamli):** *«Helt fantastisk opplevelse! Anbefales på det sterkeste!»* – Nevner eksplisitt: *«Jeg hadde faktisk ikke hørt om KRS VR Arena før jeg spurte ChatGPT om forslag til aktiviteter i Kristiansand. Det dukket opp som et tips...»* + *«Prison Break»*.
+      2. **Barnefamilier (18. okt 2026 – F8809GQveronikal):** *«Gå inn i en magisk verden sammen med barna»* – Supergøy barneaktivitet i høstferien/oktober!
+      3. **Spill og Service (17. okt 2026 – 363kristofferk):** *«Bra service og gøye spill»* – Godt opplegg og oppfølging.
+      4. **Teambuilding (24. sep 2026 – G6162DGelisabethv):** *«Skikkelig bra teambuilding»* – Utrolig gøy og super teambuilding for kolleger.
+      5. **Utdrikningslag / Stag Party (29. aug 2026 – Snocracker):** *«Stag party event»* – Fremhever VR Counter-Strike / Tactical Arena.
+      6. **Venner og Familie (22. aug 2026 – Scenic40468429041):** *«Gøy opplevelse»* – Veldig gøy oppsett for venner og familie.
+    - **Rangering:** Nr. 7 av 23 (klatrer raskt mot Topp 3 med 6 stk 5-stjerners anmeldelser).
   - **Gjennomførte tiltak:**
     - [x] Bilder og optimaliserte bildebeskrivelser lastet opp i profilen.
     - [x] Profilbeskrivelser oppdatert.
