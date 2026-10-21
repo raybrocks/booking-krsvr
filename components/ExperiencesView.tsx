@@ -267,7 +267,7 @@ export function ExperiencesView({
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [activePrimaryFilter, setActivePrimaryFilter] = useState<string>(() => {
     if (initialTypeSlug === "familie" || initialTypeSlug === "familiepakke" || initialTypeSlug === "archer") return "Familie";
-    if (initialTypeSlug === "rask-action" || initialTypeSlug === "fast-action" || initialTypeSlug === "mixed-reality" || initialTypeSlug === "zombie") return "Rask Action";
+    if (initialTypeSlug === "action" || initialTypeSlug === "rask-action" || initialTypeSlug === "fast-action" || initialTypeSlug === "mixed-reality" || initialTypeSlug === "zombie") return "Action";
     if (initialTypeSlug === "escape-room" || initialTypeSlug === "escape-rooms") return "Escape Room";
     return "Alle";
   });
@@ -392,7 +392,7 @@ export function ExperiencesView({
     }
     const tSlug = getTypeSlug(exp);
     if (filter === "Familie") return tSlug === "familie" || exp.familyFriendly;
-    if (filter === "Rask Action") return tSlug === "rask-action";
+    if (filter === "Action" || filter === "Rask Action") return tSlug === "action" || tSlug === "rask-action";
     if (filter === "Escape Room") return tSlug === "escape-room" || tSlug.includes("escape");
     return true;
   };
@@ -411,8 +411,8 @@ export function ExperiencesView({
     skipNextUrlUpdate.current = true;
     if (filter === "Familie") {
       window.history.pushState({}, '', '/vr-opplevelser/familie');
-    } else if (filter === "Rask Action") {
-      window.history.pushState({}, '', '/vr-opplevelser/rask-action');
+    } else if (filter === "Action" || filter === "Rask Action") {
+      window.history.pushState({}, '', '/vr-opplevelser/action');
     } else if (filter === "Escape Room") {
       window.history.pushState({}, '', '/vr-opplevelser/escape-room');
     } else {
@@ -464,7 +464,7 @@ export function ExperiencesView({
     const ltype = type ? type.toLowerCase() : "";
     
     if (ltype.includes("escape") || lname.includes("escape")) return <Handshake className="w-10 h-10" />;
-    if (ltype.includes("shooter") || lname.includes("shooter")) return <Crosshair className="w-10 h-10" />;
+    if (ltype.includes("shooter") || lname.includes("shooter") || lname.includes("tactical")) return <Crosshair className="w-10 h-10" />;
     if (ltype.includes("zomb") || lname.includes("zomb") || lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10" />;
     if (ltype.includes("archer") || lname.includes("archer") || lname.includes("arrow")) return <Mountain className="w-10 h-10" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10" />;
@@ -492,8 +492,9 @@ export function ExperiencesView({
     switch (activePrimaryFilter) {
       case "Familie":
         return "Familievennlige VR-opplevelser";
+      case "Action":
       case "Rask Action":
-        return "Rask Action & Skytespill i VR";
+        return "Action & Skytespill i VR";
       case "Escape Room":
         return "VR Escape Room i Kristiansand";
       default:
@@ -517,7 +518,7 @@ export function ExperiencesView({
           Alle opplevelser hos oss er laget for samarbeid, kommunikasjon og felles mestring.
         </p>
         <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-4xl mx-auto px-2 mb-2 overflow-x-auto hide-scrollbar">
-          {["Alle", "Familie", "Rask Action", "Escape Room"].map((filter, idx, arr) => {
+          {["Alle", "Familie", "Action", "Escape Room"].map((filter, idx, arr) => {
             const isActive = activePrimaryFilter === filter;
             return (
               <React.Fragment key={filter}>

@@ -222,7 +222,7 @@ export default function VrBursdagPage() {
                 </div>
                 <h3 className="text-xl font-medium text-white mb-2">Ungdomsbursdag</h3>
                 <p className="text-zinc-400 text-sm leading-relaxed mb-4 flex-grow">
-                  Rask action, lagkonkurranser og nervepirrende Escape Rooms. En aktivitet tenåringene genuint digger.
+                  Actionfylte skytespill, lagkonkurranser og nervepirrende Escape Rooms. En aktivitet tenåringene genuint digger.
                 </p>
                 <ul className="text-xs text-zinc-300 space-y-2 mb-6">
                   <li className="flex items-center gap-2">

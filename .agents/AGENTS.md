@@ -11,6 +11,8 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    * Arcade Kristiansand
    * Zombie Shooter Kristiansand
    * Spatial Ops Kristiansand
+   * Tactical Arena Kristiansand
+   * Tactical Arena
    * Mixed Reality Shooter
    * Teambuilding Kristiansand
    * Utdrikningslag Kristiansand
@@ -81,7 +83,7 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 # Kapasitet, Bedriftsarrangementer, Teambuilding & Bar
 1. **Kapasitet og gruppestørrelser (10 samtidige spillere):**
    - Opptil **10 personer** kan spille samtidig i arenaen.
-   - **Selvbetjent booking (`/booking`):** Gjelder grupper på **2–10 personer** (90 min totalopplevelse). Merk at enkeltspill i databasen har sin egen tekniske maksgrense (`maxPlayers`, f.eks. 6 for enkelte Escape Rooms, 8 for enkelte spill, og 10+ for Mixed Reality Shooter).
+   - **Selvbetjent booking (`/booking`):** Gjelder grupper på **2–10 personer** (90 min totalopplevelse). Merk at enkeltspill i databasen har sin egen tekniske maksgrense (`maxPlayers`, f.eks. 6 for enkelte Escape Rooms, 8 for enkelte spill, og 10+ for Tactical Arena / Mixed Reality Shooter).
    - **Turneringsformat for store grupper (10–64 personer):**
      - Store grupper bestilles via kontaktskjema (`/kontakt`) og kjøres i et dynamisk turneringsformat med opptil 10 aktive spillere samtidig i ~10-minutters runder.
      - Hvert lag får fargerike armbånd med egne teamnavn (f.eks. avdelingsnavn fra firmaet eller Team Alfa, Beta, Charlie, Delta).

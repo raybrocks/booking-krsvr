@@ -110,7 +110,7 @@ export default function LandingPage() {
     {
       title: "Vennegjeng & Studenter",
       badge: "2–10 spillere · 20 % studentrabatt søn–tor",
-      description: "Samle gjengen til 90 minutter med gåteløsing i VR Escape Room eller høy puls i Mixed Reality Shooter og Zombie Shooter – helt uten kabler.",
+      description: "Samle gjengen til 90 minutter med gåteløsing i VR Escape Room eller høy puls i Tactical Arena og Zombie Shooter – helt uten kabler.",
       href: "/vr-opplevelser",
       image: "/images/vr-vennegjeng.jpg",
       alt: "Vennegjeng i full action med trådløse VR-briller på 140 kvm arena",

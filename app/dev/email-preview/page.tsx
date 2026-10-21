@@ -13,7 +13,7 @@ export default function EmailPreviewPage() {
   const players = 6;
   const totalPrice = 2400;
   const amountPaid = 2400;
-  const experienceTitle = "Mixed Reality Shooter (90 min)";
+  const experienceTitle = "Tactical Arena (90 min)";
   const adminEmail = "post@krsvr.no";
   const manageUrl = "#";
   const customText = "Velkommen til en fantastisk opplevelse hos oss!";

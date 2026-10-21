@@ -58,7 +58,11 @@ export async function generateMetadata({
       if (initialExpSlug) {
         const matchedExp = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
         if (matchedExp) {
-          title = `${matchedExp.name} | ${matchedExp.type} i Kristiansand`;
+          if (matchedExp.name === "Tactical Arena") {
+            title = "Tactical Arena – Mixed Reality & Action i Kristiansand";
+          } else {
+            title = `${matchedExp.name} | ${matchedExp.type} i Kristiansand`;
+          }
           description = matchedExp.shortDescription ? `${matchedExp.shortDescription} Opplev ${matchedExp.name} hos KRS VR Arena i Kristiansand.` : description;
           if (matchedExp.type?.toLowerCase().includes("vipps-test") || matchedExp.type?.toLowerCase().includes("vipps test")) {
             isVippsTest = true;
@@ -68,8 +72,13 @@ export async function generateMetadata({
         const matchedType = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug);
         if (matchedType) {
           const typeName = matchedType.type || "VR Opplevelser";
-          title = `${typeName} i Kristiansand | KRS VR Arena`;
-          description = `Opplev ${typeName.toLowerCase()} hos KRS VR Arena i Kristiansand. Populært for vennegjenger, teambuilding, studenter og grupper.`;
+          if (matchedType.type?.toLowerCase() === "action") {
+            title = "Action & Skytespill i VR i Kristiansand";
+            description = "Opplev action- og skytespill i VR og Mixed Reality hos KRS VR Arena i Kristiansand. Taktisk lagspill og høy puls for vennegjenger, bursdag og teambuilding.";
+          } else {
+            title = `${typeName} i Kristiansand`;
+            description = `Opplev ${typeName.toLowerCase()} hos KRS VR Arena i Kristiansand. Populært for vennegjenger, teambuilding, studenter og grupper.`;
+          }
           if (typeName.toLowerCase().includes("vipps-test") || typeName.toLowerCase().includes("vipps test")) {
             isVippsTest = true;
           }

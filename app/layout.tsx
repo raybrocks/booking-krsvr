@@ -26,6 +26,8 @@ export const metadata: Metadata = {
   keywords: [
     'VR Kristiansand',
     'Mixed Reality Kristiansand',
+    'Tactical Arena Kristiansand',
+    'Mixed Reality Shooter',
     'Escape Room Kristiansand',
     'VR Escape Room Kristiansand',
     'Zombie Shooter Kristiansand',

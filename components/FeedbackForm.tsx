@@ -11,7 +11,7 @@ const TRIPADVISOR_URL = 'https://no.tripadvisor.com/UserReviewEdit-g190492-d3425
 
 const ACTIVITY_TAGS = [
   { id: 'vr-escape-room', label: 'VR Escape Room', text: 'VR Escape Room' },
-  { id: 'spatial-ops', label: 'Spatial Ops (Mixed Reality)', text: 'Spatial Ops (Mixed Reality Shooter)' },
+  { id: 'spatial-ops', label: 'Tactical Arena (Spatial Ops)', text: 'Tactical Arena (Spatial Ops)' },
   { id: 'vr-arcade', label: 'VR Arkade & Spill', text: 'VR Arkade' },
 ];
 
