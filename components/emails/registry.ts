@@ -336,11 +336,11 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
       ],
       featuredExperience: {
         name: 'Tactical Arena (Spatial Ops)',
-        type: 'Action',
+        type: 'Action Strategi',
         shortDescription: 'Løp fritt rundt i arenaen og kjemp mot venner eller roboter i Norges råeste Mixed Reality-opplevelse.',
         picture: 'https://krsvr.no/experiences/spatial-ops.jpg',
         buttonText: 'Se opplevelse og bestill',
-        buttonUrl: 'https://krsvr.no/vr-opplevelser/action/tactical-arena',
+        buttonUrl: 'https://krsvr.no/vr-opplevelser/action-strategi/tactical-arena',
       },
       ctaButtonText: 'Bestill tid på nett',
       ctaButtonUrl: 'https://krsvr.no/booking',

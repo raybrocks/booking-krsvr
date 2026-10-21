@@ -59,7 +59,7 @@ export async function generateMetadata({
         const matchedExp = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
         if (matchedExp) {
           if (matchedExp.name === "Tactical Arena") {
-            title = "Tactical Arena – Mixed Reality & Action i Kristiansand";
+            title = "Tactical Arena – Mixed Reality & Action Strategi i Kristiansand";
           } else {
             title = `${matchedExp.name} | ${matchedExp.type} i Kristiansand`;
           }
@@ -72,9 +72,9 @@ export async function generateMetadata({
         const matchedType = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug);
         if (matchedType) {
           const typeName = matchedType.type || "VR Opplevelser";
-          if (matchedType.type?.toLowerCase() === "action") {
-            title = "Action & Skytespill i VR i Kristiansand";
-            description = "Opplev action- og skytespill i VR og Mixed Reality hos KRS VR Arena i Kristiansand. Taktisk lagspill og høy puls for vennegjenger, bursdag og teambuilding.";
+          if (matchedType.type?.toLowerCase().includes("action")) {
+            title = "Action & Strategi i VR i Kristiansand";
+            description = "Opplev actionfylte skytespill og taktiske strategispill i VR og Mixed Reality hos KRS VR Arena i Kristiansand. Taktisk lagspill og høy puls for vennegjenger, bursdag og teambuilding.";
           } else {
             title = `${typeName} i Kristiansand`;
             description = `Opplev ${typeName.toLowerCase()} hos KRS VR Arena i Kristiansand. Populært for vennegjenger, teambuilding, studenter og grupper.`;

@@ -76,7 +76,7 @@ const PRESET_TEMPLATES: { id: string; label: string; description: string; data: 
       includeExperience: true,
       featuredExperience: {
         name: "Tactical Arena (Spatial Ops)",
-        type: "Action",
+        type: "Action Strategi",
         shortDescription: "Løp fritt rundt i arenaen med trådløse headset der det fysiske rommet smelter sammen med spillet. Perfekt for vennegjenger og kollegaer!",
         picture: "https://krsvr.no/krsvrarena_logo_sort.png",
         buttonText: "Les mer og bestill",

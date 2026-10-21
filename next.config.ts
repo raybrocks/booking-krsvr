@@ -53,58 +53,78 @@ const nextConfig: NextConfig = {
       // Specific experience redirects (Tactical Arena)
       {
         source: '/vr-opplevelser/rask-action/mixed-reality-shooter',
-        destination: '/vr-opplevelser/action/tactical-arena',
+        destination: '/vr-opplevelser/action-strategi/tactical-arena',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/action/mixed-reality-shooter',
-        destination: '/vr-opplevelser/action/tactical-arena',
+        destination: '/vr-opplevelser/action-strategi/tactical-arena',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/action/tactical-arena',
+        destination: '/vr-opplevelser/action-strategi/tactical-arena',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/rask-action/tactical-arena',
+        destination: '/vr-opplevelser/action-strategi/tactical-arena',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/mixed-reality/mixed-reality-shooter',
-        destination: '/vr-opplevelser/action/tactical-arena',
+        destination: '/vr-opplevelser/action-strategi/tactical-arena',
         permanent: true,
       },
-      // Category redirects (Action / legacy aliases)
+      // Category redirects (Action Strategi / legacy aliases)
+      {
+        source: '/vr-opplevelser/action',
+        destination: '/vr-opplevelser/action-strategi',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/action/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
+        permanent: true,
+      },
       {
         source: '/vr-opplevelser/rask-action',
-        destination: '/vr-opplevelser/action',
+        destination: '/vr-opplevelser/action-strategi',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/rask-action/:slug*',
-        destination: '/vr-opplevelser/action/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/mixed-reality',
-        destination: '/vr-opplevelser/action',
+        destination: '/vr-opplevelser/action-strategi',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/mixed-reality/:slug*',
-        destination: '/vr-opplevelser/action/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/zombie',
-        destination: '/vr-opplevelser/action',
+        destination: '/vr-opplevelser/action-strategi',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/zombie/:slug*',
-        destination: '/vr-opplevelser/action/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/fast-action',
-        destination: '/vr-opplevelser/action',
+        destination: '/vr-opplevelser/action-strategi',
         permanent: true,
       },
       {
         source: '/vr-opplevelser/fast-action/:slug*',
-        destination: '/vr-opplevelser/action/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
         permanent: true,
       },
       {

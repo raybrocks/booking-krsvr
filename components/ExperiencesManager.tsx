@@ -18,7 +18,7 @@ const SUITABLE_FOR_OPTIONS = [
 
 const FILTER_CATEGORY_OPTIONS = [
   "Familie",
-  "Action",
+  "Action Strategi",
   "Escape Room"
 ];
 
