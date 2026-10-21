@@ -6,3 +6,8 @@ coverage/
 .env*
 !.env.example
 .antigravity/
+
+# Google Search Console Service Account
+*service-account*.json
+gsc-*.json
+google-credentials.json
