@@ -134,13 +134,16 @@ model Setting {
 }
 
 model Testimonial {
-  id                String   @id @default(cuid())
-  companyName       String   @default("")
-  mainImage         String?
-  logoImage         String?
-  isActive          Boolean  @default(true)
-  order             Int      @default(999)
-  createdAt         DateTime @default(now())
+  id                 String   @id @default(cuid())
+  companyName        String   @default("")
+  mainImage          String?
+  logoImage          String?
+  websiteUrl         String?
+  showInLogoSlider   Boolean  @default(true)
+  showInTestimonials Boolean  @default(true)
+  isActive           Boolean  @default(true)
+  order              Int      @default(999)
+  createdAt          DateTime @default(now())
 }
 
 model DiscountCode {

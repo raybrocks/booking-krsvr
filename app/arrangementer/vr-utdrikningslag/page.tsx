@@ -148,7 +148,7 @@ export default function VrUtdrikningslagPage() {
         {/* INTRO TEKST OG CTA UNDER BILDET */}
         <div className="text-center max-w-3xl mx-auto mb-14 md:mb-16">
           <p className="text-zinc-300 text-sm sm:text-base md:text-lg leading-relaxed font-light mb-6">
-            Det ideelle stoppestedet mellom lunsj og kvelden videre. Hos KRS VR Arena får hovedpersonen og hele vennegjengen en felles opplevelse fylt med action, lagkonkurranser og god stemning.
+            Det ideelle stoppestedet mellom lunsj og kvelden videre. Hos KRS VR Arena får hovedpersonen og hele vennegjengen en felles opplevelse som <strong className="font-semibold text-white">begeistrer</strong> &mdash; fylt med action, lagkonkurranser og god stemning.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">

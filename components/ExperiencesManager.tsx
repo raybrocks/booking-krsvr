@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Loader2, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Upload, ArrowUp, ArrowDown, Copy, Settings, Globe, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
-import TestimonialsManager from "./TestimonialsManager";
 import ExperienceTypesModal from "./ExperienceTypesModal";
 import { COMMON_LANGUAGES, getLanguageInfo } from "@/lib/languages";
 
@@ -1121,7 +1120,6 @@ export default function ExperiencesManager() {
           </div>
         ))}
       </div>
-      <TestimonialsManager />
 
       {showTypesModal && (
         <ExperienceTypesModal 

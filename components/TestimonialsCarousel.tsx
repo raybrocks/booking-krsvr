@@ -19,7 +19,7 @@ export default function TestimonialsCarousel() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch('/api/testimonials?active_only=true');
+        const res = await fetch('/api/testimonials?testimonials=true');
         if (res.ok) {
            const data = await res.json();
            data.sort((a: any, b: any) => {
@@ -52,7 +52,12 @@ export default function TestimonialsCarousel() {
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden h-full flex flex-col group hover:border-zinc-700 transition-colors">
               <div className="relative w-full aspect-[16/10] md:aspect-[16/9] bg-zinc-950 overflow-hidden">
                 {testi.mainImage ? (
-                  <Image src={testi.mainImage} alt={testi.companyName} fill className="object-cover object-[center_18%] group-hover:scale-105 transition-transform duration-700" />
+                  <Image 
+                    src={testi.mainImage} 
+                    alt={`${testi.companyName} på teambuilding hos KRS VR Arena i Kristiansand`} 
+                    fill 
+                    className="object-cover object-[center_18%] group-hover:scale-105 transition-transform duration-700" 
+                  />
                 ) : (
                   <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">Ingen bilde</div>
                 )}
@@ -61,7 +66,13 @@ export default function TestimonialsCarousel() {
               <div className="p-6 flex flex-col flex-grow items-center text-center -mt-16 md:-mt-24 relative z-10">
                 {testi.logoImage ? (
                   <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden bg-white border-4 border-zinc-900 shadow-xl mb-4">
-                    <Image src={testi.logoImage} alt="Logo" width={192} height={192} className="object-contain w-full h-full p-2 md:p-4" />
+                    <Image 
+                      src={testi.logoImage} 
+                      alt={`${testi.companyName} – Bedriftskunde hos KRS VR Arena i Kristiansand`} 
+                      width={192} 
+                      height={192} 
+                      className="object-contain w-full h-full p-2 md:p-4" 
+                    />
                   </div>
                 ) : (
                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-full bg-zinc-800 border-4 border-zinc-900 mb-4" />

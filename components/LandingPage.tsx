@@ -32,7 +32,7 @@ export default function LandingPage() {
     "@context": "https://schema.org",
     "@type": "EntertainmentBusiness",
     "name": "KRS VR Arena",
-    "description": "KRS VR Arena er Kristiansands mest sosiale opplevelsesarena på Lund. Vi tilbyr engasjerende VR Escape Rooms, Action Strategi (Tactical Arena) og felles opplevelser med full bevegelsesfrihet på 143 kvm. Perfekt for teambuilding, firmaevent, utdrikningslag, bursdag samt vennegjenger og familier.",
+    "description": "KRS VR Arena er Kristiansands mest sosiale opplevelsesarena på Lund. Vi tilbyr engasjerende VR Escape Rooms, Action Strategi (Tactical Arena) og felles opplevelser i vår 300 kvm arkade med to spillsaler og lounge. Perfekt for teambuilding, firmaevent, utdrikningslag, bursdag samt vennegjenger og familier.",
     "url": "https://www.krsvr.no", 
     "telephone": "+4740828302",
     "hasMap": "https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic",
@@ -216,13 +216,13 @@ export default function LandingPage() {
             Kristiansands mest sosiale VR-opplevelser
           </h1>
           <p className="text-base sm:text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto font-light leading-relaxed">
-            Opplev latter, kommunikasjon og samarbeid som begeistrer på tvers av alder og teknisk erfaring – fra gåteløsing i VR Escape Rooms til fysisk Action Strategi på 143 kvm.
+            Latter, kommunikasjon og samarbeid som <strong className="font-semibold text-white">begeistrer</strong> på tvers av alder og teknisk erfaring – fra gåteløsing i VR Escape Rooms til fysisk Action Strategi i vår 300 kvm arkade.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base text-zinc-300 font-light pt-1">
             <span className="flex items-center gap-2">
               <span className="text-[#9C39FF] font-bold text-base leading-none">•</span>
-              Teambuilding & firmaevent
+              Venne- og familieopplevelser
             </span>
             <span className="flex items-center gap-2">
               <span className="text-[#9C39FF] font-bold text-base leading-none">•</span>
@@ -230,7 +230,7 @@ export default function LandingPage() {
             </span>
             <span className="flex items-center gap-2">
               <span className="text-[#9C39FF] font-bold text-base leading-none">•</span>
-              Venne- og familieopplevelser
+              Teambuilding & firmaevent
             </span>
           </div>
           
@@ -506,9 +506,9 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="mb-20">
              <div className="max-w-4xl mx-auto text-center mb-12">
-               <h2 className="text-4xl md:text-5xl font-light text-white mb-5 tracking-tight">Teambuilding som engasjerer</h2>
+               <h2 className="text-4xl md:text-5xl font-light text-white mb-5 tracking-tight">Teambuilding som begeistrer</h2>
                <p className="text-xl text-zinc-400 font-light max-w-2xl mx-auto">
-                 Fra mindre avdelinger til sosiale bedriftsturneringer for opptil 64 deltakere.
+                 Opplevelser de ansatte faktisk snakker om etterpå. Fra mindre avdelinger til sosiale bedriftsturneringer for opptil 64 deltakere.
                </p>
              </div>
              <TestimonialsCarousel />

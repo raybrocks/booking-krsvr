@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: 'KRS VR Arena | Kristiansands mest sosiale VR-opplevelser',
     template: '%s | KRS VR Arena'
   },
-  description: 'Kristiansands mest sosiale VR-opplevelser med full bevegelsesfrihet på 143 kvm arena. VR Escape Rooms, Action Strategi og felles opplevelser for teambuilding, utdrikningslag, bursdager og vennegjengen.',
+  description: 'Kristiansands mest sosiale VR-opplevelser i vår 300 kvm arkade. VR Escape Rooms, Action Strategi og felles opplevelser for teambuilding, utdrikningslag, bursdager og vennegjengen.',
   keywords: [
     'VR Kristiansand',
     'Mixed Reality Kristiansand',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'KRS VR Arena | Kristiansands mest sosiale VR-opplevelser',
-    description: 'Opplev latter, samarbeid og felles opplevelser hos KRS VR Arena på Lund i Kristiansand. Full bevegelsesfrihet på 143 kvm arena for utdrikningslag, teambuilding, bursdag, venner og familie.',
+    description: 'Opplev latter, samarbeid og felles opplevelser i vår 300 kvm arkade på Lund i Kristiansand. To spillsaler og lounge for utdrikningslag, teambuilding, bursdag, venner og familie.',
     url: 'https://www.krsvr.no',
     siteName: 'KRS VR Arena',
     locale: 'nb_NO',

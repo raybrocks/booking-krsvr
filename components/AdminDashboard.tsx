@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil, Star } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil, Star, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import SettingsManager from "./SettingsManager";
@@ -12,6 +12,7 @@ import ManualBookingManager, { ManualBookingInitialData } from "./ManualBookingM
 import ShiftManager from "./ShiftManager";
 import EmployeesManager from "./EmployeesManager";
 import InquiriesManager, { ContactInquiryItem } from "./InquiriesManager";
+import ClientsManager from "./ClientsManager";
 import EditBookingModal from "./EditBookingModal";
 import ReviewRequestModal from "./ReviewRequestModal";
 
@@ -76,7 +77,7 @@ const formatDateShort = (dateStr: string) => {
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "inquiries" | "experiences" | "transactions" | "settings" | "manual" | "shifts" | "employees">("upcoming");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "inquiries" | "experiences" | "clients" | "transactions" | "settings" | "manual" | "shifts" | "employees">("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isFirstLoad = useRef(true);
   const notifiedBookingIds = useRef<Set<string>>(new Set());
@@ -1042,6 +1043,7 @@ export default function AdminDashboard() {
             </button>
             <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
             <button onClick={() => setActiveTab("experiences")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-4 h-4" /> Spill</button>
+            <button onClick={() => setActiveTab("clients")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'clients' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Building2 className="w-4 h-4" /> Kunder</button>
             <button onClick={() => setActiveTab("transactions")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
             <button onClick={() => setActiveTab("shifts")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
             <button onClick={() => setActiveTab("employees")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
@@ -1088,6 +1090,7 @@ export default function AdminDashboard() {
               </button>
               <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
               <button onClick={() => { setActiveTab("experiences"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-4 h-4" /> Spill</button>
+              <button onClick={() => { setActiveTab("clients"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'clients' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Building2 className="w-4 h-4" /> Kunder</button>
               <button onClick={() => { setActiveTab("transactions"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
               <button onClick={() => { setActiveTab("shifts"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
               <button onClick={() => { setActiveTab("employees"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
@@ -1108,6 +1111,7 @@ export default function AdminDashboard() {
         inquiries: <h2 className="text-xl font-semibold text-white mb-6">Forespørsler & Arrangementer</h2>,
         manual: <h2 className="text-xl font-semibold text-white mb-6">Manuell booking</h2>,
         experiences: <h2 className="text-xl font-semibold text-white mb-6">Spill & Opplevelser</h2>,
+        clients: <h2 className="text-xl font-semibold text-white mb-6">Bedriftskunder, Logoer & Omtaler</h2>,
         transactions: <h2 className="text-xl font-semibold text-white mb-6">Regnskap</h2>,
         shifts: <h2 className="text-xl font-semibold text-white mb-6">Vakter & Timeføring</h2>,
         employees: <h2 className="text-xl font-semibold text-white mb-6">Ansatte</h2>,
@@ -1196,6 +1200,7 @@ export default function AdminDashboard() {
         />
       )}
       {activeTab === "experiences" && <ExperiencesManager />}
+      {activeTab === "clients" && <ClientsManager />}
       {activeTab === "transactions" && <TransactionsManager />}
       {activeTab === "settings" && <SettingsManager />}
       {activeTab === "manual" && (

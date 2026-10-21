@@ -7,9 +7,24 @@ export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const activeOnly = searchParams.get('active_only') === 'true';
+    const logoSliderOnly = searchParams.get('logo_slider') === 'true';
+    const testimonialsOnly = searchParams.get('testimonials') === 'true';
+
+    const where: any = {};
+    if (activeOnly || logoSliderOnly || testimonialsOnly) {
+      where.isActive = true;
+    }
+    if (logoSliderOnly) {
+      where.showInLogoSlider = true;
+      where.logoImage = { not: null };
+    }
+    if (testimonialsOnly) {
+      where.showInTestimonials = true;
+      where.mainImage = { not: null };
+    }
 
     const testimonials = await prisma.testimonial.findMany({
-      where: activeOnly ? { isActive: true } : undefined,
+      where: Object.keys(where).length > 0 ? where : undefined,
       orderBy: { order: 'asc' }
     });
     return NextResponse.json(testimonials);

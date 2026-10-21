@@ -5,10 +5,14 @@ import { ArrowRight, Check, Users, Briefcase, Award, Building2, Coffee, Shield, 
 import { Metadata } from "next";
 import ArrangementSubNav from "@/components/ArrangementSubNav";
 import { ArrangementFaq } from "@/components/ArrangementFaq";
+import ClientLogoTicker from "@/components/ClientLogoTicker";
+import { prisma } from "@/lib/prisma";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "VR-teambuilding & Firmaevent i Kristiansand – Kickoff, Julebord & Fest",
-  description: "Styrk samholdet med VR-teambuilding i Kristiansand. Perfekt for kickoff, firmafest, julebord og avdelingsdager for 2–64 personer hos KRS VR Arena.",
+  description: "Teambuilding i Kristiansand som begeistrer på tvers av alder og teknisk erfaring. Perfekt for kickoff, firmafest og avdelingsdager for 2–64 personer hos KRS VR Arena.",
   keywords: [
     "Teambuilding Kristiansand",
     "Firmaevent Kristiansand",
@@ -37,11 +41,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function VrTeambuildingPage() {
+export default async function VrTeambuildingPage() {
+  const logoClients = await prisma.testimonial.findMany({
+    where: {
+      isActive: true,
+      showInLogoSlider: true,
+      logoImage: { not: null },
+    },
+    orderBy: { order: "asc" },
+  });
+
   const faqs = [
     {
-      question: "Passer VR-teambuilding for kolleger uten spill- eller teknologierfaring?",
-      answer: "Ja, absolutt. Konseptet er utformet spesielt for at alle skal oppleve mestring uansett bakgrunn. Våre erfarne spillverter veileder gruppen gjennom hele opplevelsen og velger oppdrag med fokus på samarbeid, kommunikasjon og bevegelse fremfor komplekse spillkontroller. De som aldri har prøvd VR før, blir ofte de mest engasjerte.",
+      question: "Passer VR-teambuilding for alle aldre – hva med eldre kolleger (50–65+ år)?",
+      answer: "Ja, absolutt. Teambuilding hos oss er skapt for å samle hele avdelingen på tvers av generasjoner og fysiske forutsetninger. Vår erfaring er at voksne kolleger på 50–60+ år har det vel så gøy som de yngste i bedriften. Oppdragene handler om samarbeid, sunn kommunikasjon, observasjon og latter – ikke om raske reflekser eller gaming-kunnskaper. Våre spillverter er til stede hele tiden og sørger for at alle føler seg trygge, inkluderte og opplever umiddelbar mestring.",
+    },
+    {
+      question: "Hva kreves av teknisk forkunnskap eller spill-erfaring for å delta?",
+      answer: "Ingen forkunnskaper er nødvendig. Konseptet er utformet spesielt for at alle skal oppleve mestring uansett bakgrunn. Våre erfarne spillverter gir en trygg introduksjon og veileder gruppen gjennom hele opplevelsen med fokus på naturlige bevegelser og felles problemløsing fremfor komplekse spillkontroller. De som aldri har prøvd VR før, blir ofte de aller mest engasjerte.",
     },
     {
       question: "Hvor mange deltakere kan være med på et bedriftsarrangement?",
@@ -160,9 +177,12 @@ export default function VrTeambuildingPage() {
         </div>
 
         {/* INTRO TEKST OG CTA UNDER BILDET */}
-        <div className="text-center max-w-3xl mx-auto mb-14 md:mb-16">
-          <p className="text-zinc-300 text-sm sm:text-base md:text-lg leading-relaxed font-light mb-6">
-            Gi kollegene en opplevelse som bygger ekte relasjoner utenfor møterommet. Hos oss må deltakerne kommunisere, fordele roller og samarbeide under tidspress &mdash; med høy energi og mye latter.
+        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
+          <p className="text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed font-light mb-3">
+            Gi kollegene en felles opplevelse med latter, kommunikasjon og samarbeid som <strong className="font-semibold text-white">begeistrer</strong> på tvers av alder og teknisk erfaring.
+          </p>
+          <p className="text-zinc-400 text-sm sm:text-base leading-relaxed font-light mb-6">
+            Ingen forkunnskaper eller gaming-erfaring kreves &mdash; våre dedikerte spillverter veileder gruppen trygt gjennom hele opplegget, og erfaringen vår er at kolleger i alle aldre engasjerer seg like sterkt fra første minutt.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
@@ -180,6 +200,9 @@ export default function VrTeambuildingPage() {
             </Link>
           </div>
         </div>
+
+        {/* KLASSISK HORISONTAL KUNDE-LOGO STRIPE (EARLY TRUST) */}
+        <ClientLogoTicker clients={logoClients} />
 
         {/* 4 ANLEDNINGER I ÉN */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
