@@ -1,6 +1,7 @@
 import React from "react";
 import { ExperiencesView } from "@/components/ExperiencesView";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { getLanguageInfo } from "@/lib/languages";
@@ -57,31 +58,39 @@ export async function generateMetadata({
 
       if (initialExpSlug) {
         const matchedExp = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
-        if (matchedExp) {
-          if (matchedExp.name === "Tactical Arena") {
-            title = "Tactical Arena – Mixed Reality & Action Strategi i Kristiansand";
-          } else {
-            title = `${matchedExp.name} | ${matchedExp.type} i Kristiansand`;
-          }
-          description = matchedExp.shortDescription ? `${matchedExp.shortDescription} Opplev ${matchedExp.name} hos KRS VR Arena i Kristiansand.` : description;
-          if (matchedExp.type?.toLowerCase().includes("vipps-test") || matchedExp.type?.toLowerCase().includes("vipps test")) {
-            isVippsTest = true;
-          }
+        if (!matchedExp) {
+          return {
+            title: "Siden ble ikke funnet | KRS VR Arena",
+            robots: { index: false, follow: false },
+          };
+        }
+        if (matchedExp.name === "Tactical Arena") {
+          title = "Tactical Arena – Mixed Reality & Action Strategi i Kristiansand";
+        } else {
+          title = `${matchedExp.name} | ${matchedExp.type} i Kristiansand`;
+        }
+        description = matchedExp.shortDescription ? `${matchedExp.shortDescription} Opplev ${matchedExp.name} hos KRS VR Arena i Kristiansand.` : description;
+        if (matchedExp.type?.toLowerCase().includes("vipps-test") || matchedExp.type?.toLowerCase().includes("vipps test")) {
+          isVippsTest = true;
         }
       } else {
         const matchedType = exps.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug);
-        if (matchedType) {
-          const typeName = matchedType.type || "VR Opplevelser";
-          if (matchedType.type?.toLowerCase().includes("action")) {
-            title = "Action & Strategi i VR i Kristiansand";
-            description = "Opplev actionfylte skytespill og taktiske strategispill i VR og Mixed Reality hos KRS VR Arena i Kristiansand. Taktisk lagspill og høy puls for vennegjenger, bursdag og teambuilding.";
-          } else {
-            title = `${typeName} i Kristiansand`;
-            description = `Opplev ${typeName.toLowerCase()} hos KRS VR Arena i Kristiansand. Populært for vennegjenger, teambuilding, studenter og grupper.`;
-          }
-          if (typeName.toLowerCase().includes("vipps-test") || typeName.toLowerCase().includes("vipps test")) {
-            isVippsTest = true;
-          }
+        if (!matchedType) {
+          return {
+            title: "Siden ble ikke funnet | KRS VR Arena",
+            robots: { index: false, follow: false },
+          };
+        }
+        const typeName = matchedType.type || "VR Opplevelser";
+        if (matchedType.type?.toLowerCase().includes("action")) {
+          title = "Action & Strategi i VR i Kristiansand";
+          description = "Opplev actionfylte skytespill og taktiske strategispill i VR og Mixed Reality hos KRS VR Arena i Kristiansand. Taktisk lagspill og høy puls for vennegjenger, bursdag og teambuilding.";
+        } else {
+          title = `${typeName} i Kristiansand`;
+          description = `Opplev ${typeName.toLowerCase()} hos KRS VR Arena i Kristiansand. Populært for vennegjenger, teambuilding, studenter og grupper.`;
+        }
+        if (typeName.toLowerCase().includes("vipps-test") || typeName.toLowerCase().includes("vipps test")) {
+          isVippsTest = true;
         }
       }
       
@@ -139,6 +148,14 @@ export default async function ExperiencesPage({
   let matchedExp = null;
   if (initialTypeSlug && initialExpSlug) {
     matchedExp = experiences.find(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug && slugify(e.name || "") === initialExpSlug);
+    if (!matchedExp) {
+      notFound();
+    }
+  } else if (initialTypeSlug && initialTypeSlug !== "familie") {
+    const matchedType = experiences.some(e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug);
+    if (!matchedType) {
+      notFound();
+    }
   }
 
   let jsonLd: any = null;

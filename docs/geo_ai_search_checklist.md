@@ -12,14 +12,15 @@ Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for
 
 ### A. Overordnet Utvikling over Tid (KPI-er)
 
-| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT-suksess) | Endring | Mål (Q4 2026) |
+| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT & Profil-scan) | Endring | Mål (Q4 2026) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | **24 sider** | 🟢 **+5** | 25+ sider |
 | **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | **10 domener** | 🟢 **+6** | 15+ domener |
 | **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | **8 lenker** | 🟢 **+3** | 10+ lenker |
-| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | **5,0 ★ (22 stk)** | ➖ 0 | 5,0 ★ (40+ stk) |
+| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | **5,0 ★ (24 stk)** | 🟢 **+2** | 5,0 ★ (40+ stk) |
+| **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | **8 aktiviteter** | 🟢 **+1 (Zombie Shooter)** | 8+ aktiviteter |
 | **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | **5,0 ★ (6 stk)** | 🟢 **+3 (Dobling!)** | 5,0 ★ (10+ stk) |
-| **TripAdvisor – Rangering i Kristiansand** *(Fornøyelse og lek)* | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** | ➖ 0 | **Topp 3** |
+| **TripAdvisor – Rangering i Kristiansand** *(Fornøyelse og lek)* | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** *(#17 i åpen liste)* | ➖ 0 | **Topp 3** |
 | **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | 2 av 6 (33 %) | **Bekreftet konvertering i ChatGPT!** | 🟢 **Aktiv** | **5 av 6 (83 %)** |
 | **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
 | **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
@@ -70,6 +71,10 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
   - **Målepunkt (Status per 21. oktober 2026):**
     - **Vurdering:** **5,0 av 5,0 stjerner** (100 % toppkarakter!)
     - **Antall anmeldelser:** **6 anmeldelser** (dobling fra baseline på 3 stk!)
+    - **Eksternt nettsøk (Google):** **100 % sluppet ut og indeksert.** TripAdvisor-siden for KRS VR Arena rangerer som **#1 organisk søkeresultat** på Google Search direkte under `krsvr.no` sine sitelinks ved merkevaresøk. Google krever ingen minimumsgrense på anmeldelser for å indeksere profilen.
+    - **Rangering og synlighet internt på TripAdvisor:**
+      - **Profilrangering:** **Nr. 7 av 23** aktivitetsleverandører i *Fornøyelse og lek i Kristiansand*.
+      - **Åpen kategoriliste («Morsomme aktiviteter og spill i Kristiansand»):** **Nr. 17 av 23** sortert etter «Reisendes favoritter». Har med kun 6 anmeldelser allerede passert *Lucky Bowl (#21)*, *Qula (#22)*, *Gitaristene (#20)* og *Mal På Keramikk (#19)*. Med 2–4 nye 5-stjerners anmeldelser vil arenaen klatre inn blant Topp 10.
     - **Full strategisk målgruppedekning på TripAdvisor:**
       1. **ChatGPT & Venner (19. okt 2026 – thoraamli):** *«Helt fantastisk opplevelse! Anbefales på det sterkeste!»* – Nevner eksplisitt: *«Jeg hadde faktisk ikke hørt om KRS VR Arena før jeg spurte ChatGPT om forslag til aktiviteter i Kristiansand. Det dukket opp som et tips...»* + *«Prison Break»*.
       2. **Barnefamilier (18. okt 2026 – F8809GQveronikal):** *«Gå inn i en magisk verden sammen med barna»* – Supergøy barneaktivitet i høstferien/oktober!
@@ -77,7 +82,6 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
       4. **Teambuilding (24. sep 2026 – G6162DGelisabethv):** *«Skikkelig bra teambuilding»* – Utrolig gøy og super teambuilding for kolleger.
       5. **Utdrikningslag / Stag Party (29. aug 2026 – Snocracker):** *«Stag party event»* – Fremhever VR Counter-Strike / Tactical Arena.
       6. **Venner og Familie (22. aug 2026 – Scenic40468429041):** *«Gøy opplevelse»* – Veldig gøy oppsett for venner og familie.
-    - **Rangering:** Nr. 7 av 23 (klatrer raskt mot Topp 3 med 6 stk 5-stjerners anmeldelser).
   - **Gjennomførte tiltak:**
     - [x] Bilder og optimaliserte bildebeskrivelser lastet opp i profilen.
     - [x] Profilbeskrivelser oppdatert.
@@ -85,7 +89,7 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
     - [x] TripAdvisor-lenke integrert i tilbakemeldingsmodulen ([FeedbackForm.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/FeedbackForm.tsx)).
     - [x] TripAdvisor-profilen lagt inn i `sameAs`-strukturen i Schema.org JSON-LD ([layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx)).
   - **Neste mål (Effektmåling):**
-    - Klatre fra **Nr. 7** opp til **Topp 3** ved å samle inn 5–10 nye anmeldelser via oppfølgings-e-poster og `/feedback`.
+    - Klatre fra **Nr. 7 / #17** inn på **Topp 10** og deretter **Topp 3** ved å samle inn 5–10 nye anmeldelser via oppfølgings-e-poster og `/feedback`.
 - [x] **Visit Sørlandet (visitsorlandet.com – Fullført, live oppføring og backlink til `krsvr.no`):**
   - **Direkte oppførings-URL (NO):** [KRS VR Arena på Visit Sørlandet](https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/)
   - **Direkte oppførings-URL (EN):** [KRS VR Arena on Visit Southern Norway](https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/)
@@ -167,6 +171,21 @@ Gemini leser direkte fra «Spørsmål og svar»-seksjonen på Google Maps. Du ka
 
 ### C. Månedlige Google-oppdateringer (Innlegg)
 - [ ] Legg ut et kort innlegg i Google Maps hver 2.–3. uke (f.eks. sesongåpning for julebord, regnværstips, studentkveld). Innleggene indekseres av Gemini i sanntid.
+
+### D. Opplevelsesaktiviteter og Produkter i Google Bedriftsprofil (Fullført 21. oktober 2026)
+- [x] **8 aktiviteter konfigurert med opplevelsesfokusert tekst, riktige priser og direkte landingsside-lenker:**
+  1. **Zombie Shooter i Kristiansand** *(Ny opprettelse 21.10.2026)*: 375 kr (Voksen), varighet 1 t 30 min, bilde lastet opp fra databasens CDN (`zombie_shooter.png`), direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/action`.
+  2. **Tactical Arena i Kristiansand** *(Omdøpt fra VR Shooter & Mixed Reality)*: 375 kr, opplevelsesfokusert tekst med mixed reality nevnt i bisetning, direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/action`.
+  3. **VR Escape Room i Kristiansand**: 375 kr, fokus på samarbeid og mysterieopplevelse, direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/escape-room`.
+  4. **Utdrikningslag i VR i Kristiansand**: Oppdatert pris til 450 kr, fokus på latter, felles energi og opplevelse, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-utdrikningslag`.
+  5. **Teambuilding & Firmaevent i VR i Kristiansand**: 375 kr, fokus på samhold, turneringsformat, felles mestring på tvers av alder og forhåndsbestilt bar/pizza, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-teambuilding`.
+  6. **Bursdag i VR Arena i Kristiansand**: 375 kr, fokus på bursdagsfeiring i partyloungen og actionfylt moro, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-bursdag`.
+  7. **VR Familiepakke Ungdom 12+ i Kristiansand**: 375 kr, beholdt opprinnelig tekst og URL `https://www.krsvr.no/booking`.
+  8. **VR Familiepakke Barn 8-12 år i Kristiansand**: 375 kr, beholdt opprinnelig tekst og URL `https://www.krsvr.no/booking`.
+- **Hvorfor dette styrker SEO og AI-søk:**
+  - Google viser disse produktene direkte i Knowledge Panel / Google Maps med bilde, pris og en klikkbar «Bestill»-knapp.
+  - De nye dedikerte landingssidene (`/arrangementer/vr-teambuilding`, `/arrangementer/vr-utdrikningslag` osv.) får direkte klikk og sterk relevans i Googles lokale indeks.
+  - Beskrivelsene fremhever opplevelsen og fellesskapet fremfor maskinvare, i tråd med merkevareprofilen.
 
 ---
 

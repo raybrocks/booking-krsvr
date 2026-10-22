@@ -76,6 +76,62 @@ const nextConfig: NextConfig = {
         destination: '/vr-opplevelser/action-strategi/tactical-arena',
         permanent: true,
       },
+      {
+        source: '/vr-opplevelser/shooter/mixed-reality-shooter',
+        destination: '/vr-opplevelser/action-strategi/tactical-arena',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/shooter/tactical-arena',
+        destination: '/vr-opplevelser/action-strategi/tactical-arena',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/shooter/zombie-shooter-18',
+        destination: '/vr-opplevelser/action-strategi/zombie-shooter-18',
+        permanent: true,
+      },
+      // Category redirects (Action Strategi / legacy aliases)
+      {
+        source: '/vr-opplevelser/shooter',
+        destination: '/vr-opplevelser/action-strategi',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/shooter/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/skytespill',
+        destination: '/vr-opplevelser/action-strategi',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/skytespill/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/lasertag',
+        destination: '/vr-opplevelser/action-strategi',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/lasertag/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/laser-tag',
+        destination: '/vr-opplevelser/action-strategi',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/laser-tag/:slug*',
+        destination: '/vr-opplevelser/action-strategi/:slug*',
+        permanent: true,
+      },
       // Category redirects (Action Strategi / legacy aliases)
       {
         source: '/vr-opplevelser/action',
