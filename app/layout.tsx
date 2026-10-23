@@ -109,6 +109,22 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       { "@type": "City", "name": "Kristiansand" },
       { "@type": "AdministrativeArea", "name": "Agder" }
     ],
+    "potentialAction": {
+      "@type": "ReserveAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://www.krsvr.no/booking",
+        "inLanguage": "nb-NO",
+        "actionPlatform": [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform"
+        ]
+      },
+      "result": {
+        "@type": "Reservation",
+        "name": "VR Opplevelse Booking"
+      }
+    },
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "VR og sosiale opplevelser",

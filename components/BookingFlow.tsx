@@ -373,6 +373,7 @@ export default function BookingFlow() {
                     <Label htmlFor="firstName" className="text-zinc-300">Fornavn</Label>
                     <Input 
                       id="firstName" 
+                      autoComplete="given-name"
                       value={firstName} 
                       onChange={(e) => setFirstName(e.target.value)} 
                       className="bg-zinc-900 border-zinc-800 focus-visible:ring-zinc-700"
@@ -382,6 +383,7 @@ export default function BookingFlow() {
                     <Label htmlFor="lastName" className="text-zinc-300">Etternavn</Label>
                     <Input 
                       id="lastName" 
+                      autoComplete="family-name"
                       value={lastName} 
                       onChange={(e) => setLastName(e.target.value)} 
                       className="bg-zinc-900 border-zinc-800 focus-visible:ring-zinc-700"
@@ -394,6 +396,7 @@ export default function BookingFlow() {
                   <Input 
                     id="email" 
                     type="email" 
+                    autoComplete="email"
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
                     className="bg-zinc-900 border-zinc-800 focus-visible:ring-zinc-700"
@@ -405,6 +408,7 @@ export default function BookingFlow() {
                   <Input 
                     id="phone" 
                     type="tel" 
+                    autoComplete="tel"
                     placeholder="+47 "
                     value={phone} 
                     onChange={(e) => setPhone(e.target.value)} 

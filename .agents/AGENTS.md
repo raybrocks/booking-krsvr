@@ -35,6 +35,8 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - Brønnøysund NACE-bransjekode (`https://data.brreg.no/enhetsregisteret/api/enheter/936318878`)
    - Vurdering, antall anmeldelser og rangering på Google Maps og TripAdvisor
    - De 6 faste nøytrale kommersielle AI-søkene i Seksjon 0.C.
+7. **Vedlikehold av `llms.txt` og `llms-full.txt` (AI-agenter og LLM-standard):**
+   Hver gang det gjøres endringer i priser, kapasiteter, åpningstider, bar-/matkonsepter, regler for medbrakt eller nye opplevelser, **SKAL** både `public/llms.txt` og `public/llms-full.txt` oppdateres tilsvarende, slik at AI-agenter og språkmodeller alltid har oppdatert, presis og fullstendig forretningslogikk.
 
 # Utvikling og Kjøring
 1. **Port:** Dev-serveren (`npm run dev`) skal *alltid* startes på port 3050.

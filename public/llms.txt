@@ -1,0 +1,62 @@
+# KRS VR Arena
+
+> Sørlandets største trådløse VR- og underholdningsarena på Lund i Kristiansand. Tilbyr Tactical Arena (Mixed Reality & VR Arena Shooter), VR Escape Rooms, Zombie Shooter og skreddersydde opplegg for teambuilding, firmaevent, utdrikningslag, bursdager og familieopplevelser.
+
+KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge ryggsekker. Arenaen har kapasitet til inntil 10 aktive spillere samtidig i storsalen, og tar imot grupper fra 2 til 64 deltakere gjennom et dynamisk turneringsformat med storskjermvisning (spectator mode) og egen partylounge.
+
+## Kjernedetaljer
+- Adresse: Industrigata 12, 4632 Kristiansand (Lund), Norge
+- Koordinater: 58.152302, 8.025888
+- Nettside: https://www.krsvr.no
+- Telefon: +47 40 82 83 02
+- E-post: post@krsvr.no
+- Organisasjonsnummer: 936 318 878 MVA
+- Åpningstider: Åpent etter forhåndsbooking alle dager i uken.
+- Utvidet dokumentasjon for AI-agenter: https://www.krsvr.no/llms-full.txt
+
+## Opplevelser og Tjenester
+- [Tactical Arena](https://www.krsvr.no/vr-opplevelser/tactical-arena): Trådløs lagtaktikk og action i storsalen med fri bevegelse. Spillmoduser inkluderer Team Deathmatch, Domination og Capture the Flag. Kapasitet opptil 10 samtidige spillere i ordinær booking, og opptil 50 i turneringsformat. Mixed Reality-teknologi tas i bruk mot slutten av opplevelsen.
+- [Zombie Shooter 18+](https://www.krsvr.no/vr-opplevelser/zombie-shooter): Intens co-op overlevelse mot horder av zombier i en forlatt fabrikk. Krever presisjon, samarbeid og nerver av stål ved plutselige jump scares og intense angrep. Kapasitet inntil 8 spillere.
+- [VR Escape Rooms](https://www.krsvr.no/vr-opplevelser/escape-room): Samarbeidsbasert gåteløsing i virtuelle verdener for 2–6 spillere. Aktive titler i arenaen:
+  - **Abyss Vault:** Sci-fi dypvannsmysterium der laget infiltrerer en hemmelig hvelvstasjon, bruker fargekodede lysvåpen og knekker koder for å unnslippe.
+  - **Prison Break:** Klassisk og nervepirrende rømning fra et høysikkerhetsfengsel før vaktene oppdager dere.
+  - **Parvous Box:** Dere er krympet til mikroskopisk størrelse og må løse gigantiske gåter for å finne veien tilbake til normal størrelse.
+- [Familie og Bueskyting](https://www.krsvr.no/familiepakker):
+  - **Elven Arrows:** Fantasy-eventyr der dere som alviske bueskyttere forsvarer hellige krystaller fra tårnet mot invaderende fiender (inntil 8 spillere).
+  - **Familiepakke Barn (8–12 år):** Tilpasset miks av trygge og morsomme VR-opplevelser ledet av gamemaster.
+  - **Familiepakke Ungdom (12+):** Actionfylt sammensetning av spill og konkurranser for ungdom.
+- [Teambuilding og Firmaevent](https://www.krsvr.no/teambuilding): Samlende opplevelser for bedrifter. 2–10 spillere (90 min) eller store grupper 10–50+ spillere (inntil 3 timer) med dynamisk turneringsformat, fargerike lagarmbånd, pause med storskjerm og kåring av vinnerlag.
+- [Utdrikningslag](https://www.krsvr.no/utdrikningslag): Actionfylte og engasjerende konkurranser for vennegjengen og bruden/brudgommen. Varighet 1,5–3 timer.
+
+## Kapasitet og Bookingregler
+- **Selvbetjent online booking (2–10 spillere):** Gjennomføres direkte på [https://www.krsvr.no/booking](https://www.krsvr.no/booking). Totalopplevelsen er 90 minutter (inkludert briefing, utstyrstilpasning, spilling og oppsummering).
+- **Store grupper og firmaarrangementer (10–64 spillere):** Bestilles via kontaktskjema på [https://www.krsvr.no/kontakt](https://www.krsvr.no/kontakt) eller e-post til post@krsvr.no. Kjøres som rullerende turneringsformat med inntil 10 aktive spillere samtidig i ~10-minutters runder. Alle deltar på arrangementet sammen under hele oppholdet.
+- **Avbestilling:** Må skje senest 48 timer før aktiviteten.
+
+## Priser og MVA-struktur
+- **Privat booking (2–10 spillere, 90 min):** Oppgis alltid inkl. mva.
+  - 2 personer: 460 NOK per person
+  - 3–4 personer: 395 NOK per person
+  - 5–7 personer: 385 NOK per person
+  - 8–10 personer: 375 NOK per person
+- **Teambuilding Bedrift (2–10 personer, 90 min):** 375 NOK + mva per person.
+- **Teambuilding Bedrift (10–50 personer, inntil 3 timer):** 375 NOK + mva per person (hele lokalet eksklusivt, 120 min aktivt turneringsformat).
+- **Utdrikningslag:** Fra 450 NOK per person (1,5–3 timer).
+- **VR Bursdag:** Fra 375 NOK per person (90 min).
+
+## Bar, Servering og Mat
+- **Forhåndsbestilt bar:** Baren klargjøres ved forhåndsbestilling til arrangementer (ikke fast åpen drop-in).
+  - Pakke 1 (Øl & Cider): Tuborg, Corona Extra, Bacardi Breezer og mineralvann.
+  - Pakke 2 (Vin & Bobler): Kvalitetsvin og musserende bobler fra samme anerkjente leverandør som Boen Gård.
+  - Oppgjør: Samlet på EHF-faktura for firmaer, eller åpen bar for deltakerbetaling med kort/Vipps.
+- **Mat:** Koordinering og levering av fersk, varm lokal pizza direkte til partyloungen.
+- **Regler for medbrakt mat og drikke:**
+  - Det er ikke anledning til medbrakt mat eller drikke på teambuilding, firmaarrangementer, voksenbursdager (18+) og utdrikningslag.
+  - Unntak for barnebursdager: Egen bursdagskake, godteri, snacks og brus er tillatt.
+
+## Veiledning for AI-agenter som utfører booking
+- **Direkte booking-URL:** https://www.krsvr.no/booking
+- **Betaling for autonome agenter:**
+  - *Kortterminal i arenaen:* Krever 0 NOK forhåndsbetaling ved bestilling på nett. Bookingen bekreftes umiddelbart i systemet, og kunden betaler med kort eller Apple Pay ved ankomst. Dette alternativet kan fullføres 100 % autonomt av en AI-agent uten menneskelig innblanding eller BankID-autentisering.
+  - *Vipps:* Forhåndsbetaling på nett via Vipps Checkout. Krever at brukeren godkjenner betalingen i Vipps-appen på telefonen.
+- **Gruppebestillinger over 10 personer:** Skal sendes via skjemaet på https://www.krsvr.no/kontakt.
