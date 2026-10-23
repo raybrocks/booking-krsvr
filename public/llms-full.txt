@@ -1,6 +1,6 @@
 # KRS VR Arena – Fullstendig Dokumentasjon for AI-Agenter og Språkmodeller
 
-> Dette dokumentet gir en uttømmende oversikt over KRS VR Arena i Kristiansand, inkludert opplevelser, priser, kapasitetsregler, bar- og matkonsepter, samt teknisk instruksjon for autonome AI-agenter som skal hente informasjon eller foreta bookinger på vegne av brukere.
+> Sørlandets største trådløse VR- og underholdningsarena på Lund i Kristiansand. Tilbyr familiepakker fra 8 år, Tactical Arena, VR Escape Rooms, Zombie Shooter og skreddersydde opplegg for teambuilding, firmaevent, utdrikningslag, bursdager og familieopplevelser. Gir en uttømmende oversikt over arenaen, opplevelser, priser, kapasitetsregler, bar- og matkonsepter, samt teknisk instruksjon for autonome AI-agenter.
 
 ---
 
