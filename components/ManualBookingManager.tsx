@@ -11,6 +11,7 @@ export interface ManualBookingInitialData {
   phone?: string;
   companyName?: string;
   bookingType?: string;
+  experienceId?: string;
   date?: string;
   time?: string;
   duration?: number;
@@ -19,6 +20,15 @@ export interface ManualBookingInitialData {
   totalPrice?: number;
   inquiryId?: string;
 }
+
+export const MANUAL_ARRANGEMENTS = [
+  { id: "bursdag", name: "Bursdag" },
+  { id: "teambuilding", name: "Teambuilding" },
+  { id: "utdrikningslag", name: "Utdrikningslag" },
+  { id: "vr-on-site", name: "VR On-Site" },
+  { id: "arrangement", name: "Arrangement" },
+  { id: "julebord", name: "Julebord" },
+];
 
 interface ManualBookingManagerProps {
   initialData?: ManualBookingInitialData | null;
@@ -62,6 +72,7 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
       if (initialData.phone !== undefined) setPhone(initialData.phone);
       if (initialData.companyName !== undefined) setCompanyName(initialData.companyName);
       if (initialData.bookingType !== undefined) setBookingType(initialData.bookingType);
+      if (initialData.experienceId !== undefined) setExperienceId(initialData.experienceId);
       if (initialData.date !== undefined) setDate(initialData.date);
       if (initialData.time !== undefined) setTime(initialData.time);
       if (initialData.duration !== undefined) setDuration(initialData.duration);
@@ -85,7 +96,11 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
           const sett = await settingsRes.json();
           setExperiences(exps);
           setSettings(sett.general || sett);
-          if (exps.length > 0) setExperienceId(exps[0].id);
+          if (initialData?.experienceId) {
+            setExperienceId(initialData.experienceId);
+          } else if (exps.length > 0) {
+            setExperienceId(exps[0].id);
+          }
         }
       } catch (error) {
         console.error("Failed to load generic options", error);
@@ -94,7 +109,7 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
       }
     }
     loadData();
-  }, []);
+  }, [initialData?.experienceId]);
 
   // Update available times when date changes
   useEffect(() => {
@@ -307,14 +322,25 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
             <div>
               <label className="text-sm text-zinc-400 mb-1 block">Opplevelse</label>
               <select
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF] cursor-pointer"
                 value={experienceId}
                 onChange={(e) => setExperienceId(e.target.value)}
                 required
               >
-                {experiences.map(ex => (
-                  <option key={ex.id} value={ex.id}>{ex.title || ex.name}</option>
-                ))}
+                <optgroup label="Arrangementer & Pakker (Manuell)">
+                  {MANUAL_ARRANGEMENTS.map((arr) => (
+                    <option key={arr.id} value={arr.id} className="bg-zinc-900 font-medium">
+                      {arr.name}
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Spill & Aktiviteter">
+                  {experiences.filter(ex => !MANUAL_ARRANGEMENTS.some(arr => arr.id === ex.id)).map(ex => (
+                    <option key={ex.id} value={ex.id} className="bg-zinc-900">
+                      {ex.title || ex.name}
+                    </option>
+                  ))}
+                </optgroup>
               </select>
             </div>
             

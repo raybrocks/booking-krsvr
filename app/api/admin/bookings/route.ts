@@ -79,6 +79,31 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
 
+    // Ensure arrangement experience exists if one of the manual arrangements is selected
+    const manualArrangements: Record<string, string> = {
+      teambuilding: "Teambuilding",
+      bursdag: "Bursdag",
+      utdrikningslag: "Utdrikningslag",
+      julebord: "Julebord",
+      "vr-on-site": "VR On-Site",
+      arrangement: "Arrangement",
+    };
+
+    if (data.experienceId && manualArrangements[data.experienceId]) {
+      await prisma.experience.upsert({
+        where: { id: data.experienceId },
+        update: { name: manualArrangements[data.experienceId] },
+        create: {
+          id: data.experienceId,
+          name: manualArrangements[data.experienceId],
+          shortDescription: `${manualArrangements[data.experienceId]} i regi av KRS VR Arena`,
+          type: "Arrangement",
+          isActive: false,
+          maxPlayers: 64,
+        }
+      });
+    }
+
     // Check if main timeslot is booked
     const existing = await prisma.booking.findUnique({
       where: {

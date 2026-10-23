@@ -405,11 +405,21 @@ export default function EditBookingModal({
                   onChange={(e) => setExperienceId(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#9C39FF] cursor-pointer"
                 >
-                  {experiences.map((exp) => (
-                    <option key={exp.id} value={exp.id} className="bg-zinc-900">
-                      {exp.title || exp.name || exp.id} {exp.maxPlayers ? `(Maks ${exp.maxPlayers} pers)` : ""}
-                    </option>
-                  ))}
+                  <optgroup label="Arrangementer & Pakker (Manuell)">
+                    <option value="teambuilding" className="bg-zinc-900 font-medium">Teambuilding</option>
+                    <option value="bursdag" className="bg-zinc-900 font-medium">Bursdag</option>
+                    <option value="utdrikningslag" className="bg-zinc-900 font-medium">Utdrikningslag</option>
+                    <option value="julebord" className="bg-zinc-900 font-medium">Julebord</option>
+                    <option value="vr-on-site" className="bg-zinc-900 font-medium">VR On-Site</option>
+                    <option value="arrangement" className="bg-zinc-900 font-medium">Arrangement</option>
+                  </optgroup>
+                  <optgroup label="Spill & Aktiviteter">
+                    {experiences.filter(exp => !["teambuilding", "bursdag", "utdrikningslag", "julebord", "vr-on-site", "arrangement"].includes(exp.id)).map((exp) => (
+                      <option key={exp.id} value={exp.id} className="bg-zinc-900">
+                        {exp.title || exp.name || exp.id} {exp.maxPlayers ? `(Maks ${exp.maxPlayers} pers)` : ""}
+                      </option>
+                    ))}
+                  </optgroup>
                 </select>
               </div>
 

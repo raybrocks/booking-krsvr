@@ -1007,7 +1007,7 @@ export default function ExperiencesManager() {
       )}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {experiences.map((exp, index) => (
+        {experiences.filter(exp => exp.type !== 'Arrangement').map((exp, index) => (
           <div key={exp.id} className={`bg-zinc-900/50 border ${exp.isActive ? 'border-zinc-800' : 'border-red-900/50 opacity-70'} rounded-2xl overflow-hidden flex flex-col`}>
             {(exp.images?.[0] || exp.picture) ? (
               <div className="relative w-full h-40 bg-zinc-950 border-b border-zinc-800">

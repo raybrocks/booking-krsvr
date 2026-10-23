@@ -133,6 +133,21 @@ export default function AdminDashboard() {
       if (match) playersCount = parseInt(match[0], 10) || 1;
     }
 
+    // Match inquiry.eventType or packageType to arrangement
+    let matchedExpId = "arrangement";
+    const eventLower = ((inquiry.eventType || "") + " " + (inquiry.packageType || "") + " " + (inquiry.message || "")).toLowerCase();
+    if (eventLower.includes("teambuilding")) matchedExpId = "teambuilding";
+    else if (eventLower.includes("bursdag")) matchedExpId = "bursdag";
+    else if (eventLower.includes("utdrikningslag")) matchedExpId = "utdrikningslag";
+    else if (eventLower.includes("julebord")) matchedExpId = "julebord";
+    else if (eventLower.includes("on-site") || eventLower.includes("onsite")) matchedExpId = "vr-on-site";
+    else if (eventLower.includes("arrangement") || eventLower.includes("firma")) matchedExpId = "arrangement";
+
+    let duration = 90;
+    if (inquiry.packageType?.includes("2,5") || inquiry.packageType?.includes("150")) duration = 150;
+    else if (inquiry.packageType?.includes("2 timer") || inquiry.packageType?.includes("120")) duration = 120;
+    else if (inquiry.packageType?.includes("3 timer") || inquiry.packageType?.includes("180")) duration = 180;
+
     const notesParts = [];
     if (inquiry.eventType) notesParts.push(`Type arrangement: ${inquiry.eventType}`);
     if (inquiry.packageType) notesParts.push(`Pakke: ${inquiry.packageType}`);
@@ -147,8 +162,10 @@ export default function AdminDashboard() {
       phone: inquiry.phone || "",
       companyName: inquiry.companyName || "",
       bookingType: (inquiry.groupType === "bedrift" || inquiry.companyName) ? "corporate" : "private",
+      experienceId: matchedExpId,
       date: inquiry.date || "",
       time: inquiry.time || "",
+      duration,
       players: playersCount,
       internalNotes,
       inquiryId: inquiry.id,
