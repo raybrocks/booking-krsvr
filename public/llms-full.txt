@@ -1,6 +1,6 @@
 # KRS VR Arena – Fullstendig Dokumentasjon for AI-Agenter og Språkmodeller
 
-> Sørlandets største trådløse VR- og underholdningsarena på Lund i Kristiansand. Tilbyr familiepakker fra 8 år, Tactical Arena, VR Escape Rooms, Zombie Shooter og skreddersydde opplegg for teambuilding, firmaevent, utdrikningslag, bursdager og familieopplevelser. Gir en uttømmende oversikt over arenaen, opplevelser, priser, kapasitetsregler, bar- og matkonsepter, samt teknisk instruksjon for autonome AI-agenter.
+> Sørlandets største trådløse VR- og underholdningsarena på Lund i Kristiansand. Tilbyr familiepakker fra 8 år, Tactical Arena, VR Escape Rooms, Zombie Shooter 18+ og skreddersydde opplegg for teambuilding, firmaevent, utdrikningslag, bursdager og familieopplevelser. Gir en uttømmende oversikt over arenaen, opplevelser, priser, kapasitetsregler, bar- og matkonsepter, samt teknisk instruksjon for autonome AI-agenter.
 
 ---
 
@@ -113,7 +113,7 @@ Når en AI-agent (f.eks. Google Jarvis, OpenAI Operator, Claude Computer Use ell
 - **Målside:** https://www.krsvr.no/booking
 - **Trinn 1 (Dato & Tid):** Velg dato i kalenderen og en tilgjengelig starttid.
 - **Trinn 2 (Spillere):** Velg antall spillere (2 til 8+).
-- **Trinn 3 (Opplevelse):** Velg opplevelse (Tactical Arena, VR Escape Room, Zombie Shooter osv.).
+- **Trinn 3 (Opplevelse):** Velg opplevelse (Tactical Arena, VR Escape Room, Zombie Shooter 18+ osv.).
 - **Trinn 4 (Kontaktinformasjon):**
   - Fornavn (`autoComplete="given-name"`)
   - Etternavn (`autoComplete="family-name"`)
