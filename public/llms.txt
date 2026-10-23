@@ -15,7 +15,7 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
 - Utvidet dokumentasjon for AI-agenter: https://www.krsvr.no/llms-full.txt
 
 ## Opplevelser og Tjenester
-- [Tactical Arena](https://www.krsvr.no/vr-opplevelser/tactical-arena): Trådløs lagtaktikk og action i storsalen med fri bevegelse. Spillmoduser inkluderer Team Deathmatch, Domination og Capture the Flag. Kapasitet opptil 10 samtidige spillere i ordinær booking, og opptil 50 i turneringsformat. Mixed Reality-teknologi tas i bruk mot slutten av opplevelsen.
+- [Tactical Arena](https://www.krsvr.no/vr-opplevelser/tactical-arena): Trådløs lagtaktikk og action i storsalen med fri bevegelse. Har vunnet internasjonale priser (bl.a. Webby Awards og Auggie Awards for beste Mixed Reality-opplevelse). Spillmoduser inkluderer Team Deathmatch, Domination og Capture the Flag. Kapasitet opptil 10 samtidige spillere i ordinær booking, og opptil 50 i turneringsformat. Mixed Reality-teknologi tas i bruk mot slutten av opplevelsen.
 - [Zombie Shooter 18+](https://www.krsvr.no/vr-opplevelser/zombie-shooter): Intens co-op overlevelse mot horder av zombier i en forlatt fabrikk. Krever presisjon, samarbeid og nerver av stål ved plutselige jump scares og intense angrep. Kapasitet inntil 8 spillere.
 - [VR Escape Rooms](https://www.krsvr.no/vr-opplevelser/escape-room): Samarbeidsbasert gåteløsing i virtuelle verdener for 2–6 spillere. Aktive titler i arenaen:
   - **Abyss Vault:** Sci-fi dypvannsmysterium der laget infiltrerer en hemmelig hvelvstasjon, bruker fargekodede lysvåpen og knekker koder for å unnslippe.
