@@ -20,7 +20,9 @@ import {
   Sparkles,
   RefreshCw,
   Tag,
-  ExternalLink
+  ExternalLink,
+  RotateCcw,
+  Archive
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -66,6 +68,11 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
   // Note editing modal or inline
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
+
+  // Date editing
+  const [editingDateId, setEditingDateId] = useState<string | null>(null);
+  const [dateDraft, setDateDraft] = useState("");
+  const [timeDraft, setTimeDraft] = useState("");
 
   const fetchInquiries = React.useCallback(async (isManual = false) => {
     if (isManual) setRefreshing(true);
@@ -126,6 +133,26 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
       }
     } catch (err) {
       toast.error("Feil ved lagring av notat");
+    }
+  };
+
+  const handleSaveDate = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/inquiries/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: dateDraft || null, time: timeDraft || null }),
+      });
+      if (res.ok) {
+        setInquiries(prev => prev.map(item => item.id === id ? { ...item, date: dateDraft || null, time: timeDraft || null } : item));
+        setEditingDateId(null);
+        toast.success("Ønsket dato oppdatert");
+        if (onInquiriesUpdated) onInquiriesUpdated();
+      } else {
+        toast.error("Kunne ikke oppdatere dato");
+      }
+    } catch (err) {
+      toast.error("Feil ved lagring av dato");
     }
   };
 
@@ -193,7 +220,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
   };
 
   const isClosedInquiry = (item: ContactInquiryItem) => {
-    return item.status === "booked" || !!item.bookingId || item.status === "rejected" || isDatePassed(item.date);
+    return item.status === "booked" || !!item.bookingId || item.status === "rejected";
   };
 
   // Filter items
@@ -313,16 +340,71 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
               </span>
             </div>
             <div>
-              <span className="text-zinc-500 block mb-0.5">Ønsket dato:</span>
-              <span className="font-medium text-zinc-200 font-mono flex items-center gap-1">
-                <Calendar className="w-3 h-3 text-zinc-500" />
-                {formatDateShort(item.date) || "Ikke oppgitt"}
-                {item.time && ` kl. ${item.time}`}
-              </span>
-              {item.altDate && (
-                <span className="text-[10px] text-zinc-400 block font-mono mt-0.5">
-                  Alt: {formatDateShort(item.altDate)}
-                </span>
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="text-zinc-500">Ønsket dato:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingDateId(item.id);
+                    setDateDraft(item.date || "");
+                    setTimeDraft(item.time || "");
+                  }}
+                  className="text-[10px] text-zinc-500 hover:text-[#9C39FF] underline decoration-dotted transition-colors"
+                >
+                  Endre
+                </button>
+              </div>
+
+              {editingDateId === item.id ? (
+                <div className="mt-1 space-y-1.5 bg-zinc-900 p-2 rounded-lg border border-zinc-700">
+                  <input
+                    type="date"
+                    value={dateDraft}
+                    onChange={(e) => setDateDraft(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-1.5 py-1 text-xs text-zinc-200"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Tid (f.eks. 16:00)"
+                    value={timeDraft}
+                    onChange={(e) => setTimeDraft(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-1.5 py-1 text-xs text-zinc-200 placeholder:text-zinc-600"
+                  />
+                  <div className="flex items-center gap-1.5 pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => handleSaveDate(item.id)}
+                      className="px-2 py-0.5 bg-[#9C39FF] text-white text-[11px] font-medium rounded hover:bg-[#8A2BE2] transition-colors"
+                    >
+                      Lagre
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingDateId(null)}
+                      className="px-2 py-0.5 bg-zinc-800 text-zinc-400 text-[11px] rounded hover:text-white transition-colors"
+                    >
+                      Avbryt
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <span className="font-medium text-zinc-200 font-mono flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-zinc-500" />
+                    {formatDateShort(item.date) || "Ikke oppgitt"}
+                    {item.time && ` kl. ${item.time}`}
+                  </span>
+                  {item.altDate && (
+                    <span className="text-[10px] text-zinc-400 block font-mono mt-0.5">
+                      Alt: {formatDateShort(item.altDate)}
+                    </span>
+                  )}
+                  {isDatePassed(item.date) && item.status !== "booked" && item.status !== "rejected" && (
+                    <span className="text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded font-medium mt-1 inline-block">
+                      Tidligere foreslått dato
+                    </span>
+                  )}
+                </>
               )}
             </div>
             <div>
@@ -395,9 +477,10 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
 
         {/* Bottom Actions Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-zinc-800/60">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {onCreateBooking && item.status !== "booked" && (
               <button
+                type="button"
                 onClick={() => onCreateBooking(item)}
                 className="px-4 py-2 bg-[#9C39FF] hover:bg-[#8A2BE2] text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md shadow-[#9C39FF]/20"
                 title="Åpne manuell booking forhåndsutfylt med denne kundens data"
@@ -412,6 +495,32 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Booking er opprettet {item.bookingId ? `(#${item.bookingId.substring(0, 8)})` : ""}
               </span>
+            )}
+
+            {/* UN-ARCHIVE / GJENÅPNE KNAPP FOR LUKKEDE / AVVISTE / ARKIVERTE */}
+            {(item.status === "rejected" || item.status === "booked") && (
+              <button
+                type="button"
+                onClick={() => handleUpdateStatus(item.id, "contacted")}
+                className="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm"
+                title="Gjenåpne henvendelsen og flytt den tilbake til aktive henvendelser"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Gjenåpne henvendelse
+              </button>
+            )}
+
+            {/* LUKK / ARKIVER KNAPP FOR AKTIVE HENVENDELSER */}
+            {item.status !== "rejected" && item.status !== "booked" && (
+              <button
+                type="button"
+                onClick={() => handleUpdateStatus(item.id, "rejected")}
+                className="px-3 py-2 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700/60 text-xs font-medium rounded-xl flex items-center gap-1.5 transition-colors"
+                title="Lukk eller arkiver henvendelsen (sett som avslått/avsluttet)"
+              >
+                <Archive className="w-3.5 h-3.5" />
+                Lukk / Arkiver
+              </button>
             )}
           </div>
 
