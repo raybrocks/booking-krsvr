@@ -37,7 +37,7 @@ async function main() {
       type: 'Action',
       filterCategories: ['Action'],
       shortDescription:
-        'Dette er ikke VR der du står stille. I Tactical Arena (Spatial Ops) beveger dere dere fysisk rundt i arenaen, dukker bak cover og spiller direkte mot hverandre i taktiske lagkamper. Perfekt for bedrifter, avdelinger og teambuilding der samspill, kommunikasjon og taktikk avgjør — samt vennegjenger og utdrikningslag. Velg mellom klassiske lagspill som Team Deathmatch, Domination og Capture the Flag. Spillet har vunnet en rekke prestisjetunge internasjonale priser for beste Mixed Reality-opplevelse (Webby Awards, Auggie Awards m.fl.).',
+        'Dette er ikke VR der du står stille. I Tactical Arena beveger dere dere fysisk rundt i arenaen, dukker bak cover og spiller direkte mot hverandre i taktiske lagkamper. Perfekt for bedrifter, avdelinger og teambuilding der samspill, kommunikasjon og taktikk avgjør — samt vennegjenger og utdrikningslag. Velg mellom klassiske lagspill som Team Deathmatch, Domination og Capture the Flag. Spillet har vunnet en rekke prestisjetunge internasjonale priser for beste Mixed Reality-opplevelse (Webby Awards, Auggie Awards m.fl.).',
     },
   });
   console.log('Updated Tactical Arena:', {

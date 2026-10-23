@@ -11,7 +11,7 @@ const TRIPADVISOR_URL = 'https://no.tripadvisor.com/UserReviewEdit-g190492-d3425
 
 const ACTIVITY_TAGS = [
   { id: 'vr-escape-room', label: 'VR Escape Room', text: 'VR Escape Room' },
-  { id: 'spatial-ops', label: 'Tactical Arena (Spatial Ops)', text: 'Tactical Arena (Spatial Ops)' },
+  { id: 'tactical-arena', label: 'Tactical Arena', text: 'Tactical Arena' },
   { id: 'vr-arcade', label: 'VR Arkade & Spill', text: 'VR Arkade' },
 ];
 
@@ -340,7 +340,7 @@ export default function FeedbackForm() {
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#9C39FF] text-sm"
-                placeholder="F.eks.: Vi var en vennegjeng som spilte Spatial Ops og VR Escape Room. Kjempegøy opplegg og topp veiledning i Kristiansand..."
+                placeholder="F.eks.: Vi var en vennegjeng som spilte Tactical Arena og VR Escape Room. Kjempegøy opplegg og topp veiledning i Kristiansand..."
               />
             </div>
 

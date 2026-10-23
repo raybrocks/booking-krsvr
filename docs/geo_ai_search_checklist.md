@@ -163,7 +163,7 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
 ### B. Google Q&A (Spørsmål og svar) – Skjult gullgruve for AI
 Gemini leser direkte fra «Spørsmål og svar»-seksjonen på Google Maps. Du kan selv logge inn og stille de vanligste spørsmålene fra en privat konto, og deretter svare offisielt som eier:
 - [ ] **Spørsmål 1:** *«Passer KRS VR Arena for teambuilding og firmaarrangement i Kristiansand?»*
-  - **Offisielt svar:** *«Ja, vi tar imot bedrifter, avdelinger og teambuilding-grupper i alle størrelser. Vi tilbyr både VR Escape Room og Mixed Reality Shooter (Spatial Ops), med konkurranseelementer og opplegg tilpasset kolleger.»*
+  - **Offisielt svar:** *«Ja, vi tar imot bedrifter, avdelinger og teambuilding-grupper i alle størrelser. Vi tilbyr både VR Escape Room og Tactical Arena (action strategi), med konkurranseelementer og opplegg tilpasset kolleger.»*
 - [ ] **Spørsmål 2:** *«Er dette en god innendørsaktivitet på en regnværsdag i Kristiansand?»*
   - **Offisielt svar:** *«Absolutt! KRS VR Arena er en helinnendørs opplevelsesarena i Kristiansand (Industrigata 12, Lund). Perfekt aktivitet uansett vær for vennegjenger, studenter, kolleger og familier.»*
 - [ ] **Spørsmål 3:** *«Hva gjør man ved utdrikningslag hos dere?»*
@@ -210,7 +210,7 @@ Når en bruker spør Gemini: *«Beste aktiviteter for utdrikningslag i Kristians
 
 #### Segment 1: Bedrift & Teambuilding (Høyeste inntjening)
 > **Google Maps eksempel (Prioritet 1):**
-> *«Vi hadde teambuilding for 16 kolleger hos KRS VR Arena i Kristiansand, og det var midt i blinken for hele gjengen. Mixed Reality Shooter (Spatial Ops) fikk frem konkurranseinstinktet, og VR Escape Room krevde skikkelig samarbeid. Svært profesjonell vert som guidet oss gjennom alt. Anbefales varmt til alle bedrifter som ser etter en aktivitet i Kristiansand sentrum!»*
+> *«Vi hadde teambuilding for 16 kolleger hos KRS VR Arena i Kristiansand, og det var midt i blinken for hele gjengen. Tactical Arena fikk frem konkurranseinstinktet, og VR Escape Room krevde skikkelig samarbeid. Svært profesjonell vert som guidet oss gjennom alt. Anbefales varmt til alle bedrifter som ser etter en aktivitet i Kristiansand sentrum!»*
 
 > **TripAdvisor eksempel (Prioritet 2):**
 > *«Super bedriftsaktivitet i Kristiansand! Vi la firmaavslutningen hit før middag i byen. Lett å finne i Industrigata på Lund, topp moderne utstyr og fantastisk moro for både nybegynnere og de som har prøvd VR før. Kommer garantert tilbake for neste teambuilding.»*
@@ -219,7 +219,7 @@ Når en bruker spør Gemini: *«Beste aktiviteter for utdrikningslag i Kristians
 
 #### Segment 2: Utdrikningslag (Voksne 25–40 år)
 > **Google Maps eksempel (Prioritet 1):**
-> *«La oppstarten på utdrikningslaget til KRS VR Arena for en gjeng på 10 personer. Perfekt actionfylt start på dagen! Spatial Ops var hysterisk morsomt, og brudgommen fikk virkelig kjørt seg. Topp service og god veiledning. En av de beste tingene man kan gjøre i Kristiansand med en kompisgjeng!»*
+> *«La oppstarten på utdrikningslaget til KRS VR Arena for en gjeng på 10 personer. Perfekt actionfylt start på dagen! Tactical Arena var hysterisk morsomt, og brudgommen fikk virkelig kjørt seg. Topp service og god veiledning. En av de beste tingene man kan gjøre i Kristiansand med en kompisgjeng!»*
 
 > **TripAdvisor eksempel (Prioritet 2):**
 > *«Utdrikningslag med full klaff! Vi testet både VR Escape Room og skytingen. Veldig sosialt og engasjerende opplegg hvor alle var med hele tiden. Anbefales på det sterkeste for vennegjenger som planlegger utdrikningslag på Sørlandet.»*
@@ -231,7 +231,7 @@ Når en bruker spør Gemini: *«Beste aktiviteter for utdrikningslag i Kristians
 > *«Vi var en studentgjeng på 6 venner som testet VR Escape Room en fredagskveld. Utrolig kul innendørsaktivitet i Kristiansand! Gåtene var utfordrende og grafikken var super. Veldig hyggelig betjening som hjalp oss i gang. Mye morsommere enn vanlig kino eller bowling!»*
 
 > **TripAdvisor eksempel (Prioritet 2):**
-> *«Fantastisk opplevelse for vennegjengen i Kristiansand. Vi spilte Spatial Ops i arenaen – pulsen var på topp fra start til slutt. Perfekt opplegg for studenter som vil finne på noe gøy sammen i sentrum.»*
+> *«Fantastisk opplevelse for vennegjengen i Kristiansand. Vi spilte Tactical Arena i arenaen – pulsen var på topp fra start til slutt. Perfekt opplegg for studenter som vil finne på noe gøy sammen i sentrum.»*
 
 ---
 

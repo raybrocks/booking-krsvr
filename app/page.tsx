@@ -13,7 +13,6 @@ export const metadata: Metadata = {
     'Tactical Arena Kristiansand',
     'Action Strategi',
     'Zombie Shooter Kristiansand',
-    'Spatial Ops Kristiansand',
     'Teambuilding Kristiansand',
     'Utdrikningslag Kristiansand',
     'Bursdag Kristiansand',

@@ -179,7 +179,7 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
       date: '14. september 2026',
       time: '19:00',
       players: 8,
-      experienceTitle: 'Spatial Ops Kristiansand (90 min)',
+      experienceTitle: 'Tactical Arena (90 min)',
       adminEmail: 'post@krsvr.no',
     },
   },
@@ -335,7 +335,7 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
         'Bruk koden under ved bestilling for 15% rabatt på din neste spilløkt.'
       ],
       featuredExperience: {
-        name: 'Tactical Arena (Spatial Ops)',
+        name: 'Tactical Arena',
         type: 'Action Strategi',
         shortDescription: 'Løp fritt rundt i arenaen og kjemp mot venner eller roboter i Norges råeste Mixed Reality-opplevelse.',
         picture: 'https://krsvr.no/experiences/spatial-ops.jpg',

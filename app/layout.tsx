@@ -33,7 +33,6 @@ export const metadata: Metadata = {
     'Escape Room Kristiansand',
     'VR Escape Room Kristiansand',
     'Zombie Shooter Kristiansand',
-    'Spatial Ops Kristiansand',
     'Arcade Kristiansand',
     'VR Arcade Kristiansand',
     'Teambuilding Kristiansand',

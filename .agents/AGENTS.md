@@ -10,7 +10,6 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    * VR Arcade Kristiansand
    * Arcade Kristiansand
    * Zombie Shooter Kristiansand
-   * Spatial Ops Kristiansand
    * Tactical Arena Kristiansand
    * Tactical Arena
    * Mixed Reality Shooter

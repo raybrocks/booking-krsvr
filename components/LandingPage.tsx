@@ -48,7 +48,7 @@ export default function LandingPage() {
       "latitude": "58.152302",
       "longitude": "8.025888"
     },
-    "keywords": "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room, Tactical Arena Kristiansand, Action Strategi Kristiansand, Zombie Shooter Kristiansand, Spatial Ops Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bursdag Kristiansand",
+    "keywords": "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room, Tactical Arena Kristiansand, Action Strategi Kristiansand, Zombie Shooter Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bursdag Kristiansand",
     "offers": {
       "@type": "AggregateOffer",
       "offerCount": 10,
