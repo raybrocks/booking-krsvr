@@ -45,7 +45,7 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - **1. Lint:** Kjør `npm run lint` for å verifisere kodekvalitet. Eventuelle feil eller advarsler skal feilsøkes og rettes automatisk.
    - **2. Build:** Kjør `npm run build` for å sikre at prosjektet bygger og typer uten feil. Eventuelle byggfeil skal rettes opp.
    - **3. Push:** Når alt passerer med null feil, legg til endringer (`git add`), opprett en presis commit-melding og kjør `git push origin main`.
-   - **4. GSC Notify:** Kjør `npm run gsc:submit` for automatisk å sende inn oppdatert sitemap og be om re-indeksering hos Google Search Console.
+   - **VIKTIG OM GSC / INDEKSERING:** Kjør **IKKE** `npm run gsc:submit` automatisk ved push! Overdreven innsending av sitemap og re-indeksering kan føre til at Google nedprioriterer eller kvotestenger domenet. GSC-innsending skal **KUN** kjøres når brukeren eksplisitt ber om det (f.eks. «send til gsc» eller «meld inn til google»).
 
 # E-postmaler og Forhåndsvisning
 1. **React Email:** Alle nye e-postmaler skal bygges som modulære React Email-komponenter under `components/emails/` og benytte `EmailLayout.tsx`.
