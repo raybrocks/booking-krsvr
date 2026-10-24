@@ -42,11 +42,11 @@
   - **Parvous Box (2–6 spillere):** Et eksperiment går galt, og dere er krympet til mikroskopisk størrelse. Teamet må samarbeide for å løse enorme gåter og finne veien tilbake til normal størrelse før tiden renner ut.
 - **URL:** https://www.krsvr.no/vr-opplevelser/escape-room
 
-### 2.4 Familie og Bueskyting
-- **Elven Arrows (2–8 spillere):** Riket er under angrep, og de hellige krystallene må forsvares. Som alviske bueskyttere må dere samarbeide fra tårnet, skyte ned fiender og beskytte krystallene. Et fantasy-eventyr fylt med action, magi og lagspill.
-- **Familiepakke Barn 8–12 år (2–8 spillere):** En trygg og morsom 90-minutters VR-opplevelse der gamemasteren setter sammen en variert miks av familievennlige spill tilpasset barnas nivå.
-- **Familiepakke Ungdom 12+ (2–8 spillere):** Variert og actionfylt 90-minutters opplevelse for familier med ungdom. En miks av VR-spill, konkurranser og samarbeidsoppdrag.
-- **URL:** https://www.krsvr.no/familiepakker
+### 2.4 Familieopplevelser og Bueskyting
+- **Familiepakke Barn 8–12 år (2–8 spillere):** En trygg, morsom og mestringsorientert 90-minutters VR-opplevelse for barnefamilier. Dedikert gamemaster veileder barna hele veien og setter sammen en variert miks av barnevennlige spill og enkle samarbeidsoppgaver uten skumle elementer eller jump scares.
+- **Familiepakke Ungdom 12+ (2–8 spillere):** Variert og actionfylt 90-minutters opplevelse skreddersydd for familier med tenåringer og voksne. Høyere tempo, utfordrende samarbeidsoppdrag, taktisk lagspill og engasjerende konkurranser der ungdom og foreldre utfordres på like vilkår.
+- **Elven Arrows (2–8 spillere):** Samarbeidsbasert fantasy-bueskyting. Riket er under angrep, og de hellige krystallene må forsvares. Som alviske bueskyttere må dere samarbeide fra tårnet, skyte ned fiender og beskytte krystallene. Et fantasy-eventyr fylt med action, magi og lagspill.
+- **URL:** https://www.krsvr.no/vr-opplevelser/familie
 
 ### 2.5 Teambuilding og Firmaarrangement
 - **Beskrivelse:** Sosiale og engasjerende bedriftsopplegg ledet av dedikert game master. Lokalet har egen partylounge med storskjermvisning, sofaer og forhåndsbestilt bar.
@@ -64,15 +64,15 @@
 - **URL:** https://www.krsvr.no/utdrikningslag
 
 ### 2.7 Familiepakker og Barnebursdager
-- **Beskrivelse:** Familievennlige opplevelser tilpasset barn fra 8 år og oppover samt ungdom. Vanskelighetsgrad og utstyr tilpasses gruppen.
-- **URL:** https://www.krsvr.no/familiepakker
+- **Beskrivelse:** Familievennlige opplevelser tilpasset barn fra 8 år og oppover samt ungdom og bursdagsselskap. Vanskelighetsgrad, spillvalg og utstyr tilpasses gruppen med full veiledning fra gamemaster.
+- **URL:** https://www.krsvr.no/vr-opplevelser/familie
 
 ---
 
 ## 3. Prisstruktur og MVA-regler
 
-### 3.1 Privat Booking (2–10 spillere, 90 minutter)
-Prisene er oppgitt **inkludert merverdiavgift (mva)**:
+### 3.1 Privat Booking og Familiepakker (2–10 spillere, 90 minutter)
+Prisene gjelder for familiepakker, escape rooms og actionspill, og er oppgitt **inkludert merverdiavgift (mva)**:
 - 2 personer: 460 NOK per person
 - 3–4 personer: 395 NOK per person
 - 5–7 personer: 385 NOK per person

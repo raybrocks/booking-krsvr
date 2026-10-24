@@ -203,6 +203,36 @@ const nextConfig: NextConfig = {
         destination: '/vr-opplevelser/familie/:slug*',
         permanent: true,
       },
+      {
+        source: '/vr-opplevelser/familiepakker',
+        destination: '/vr-opplevelser/familie',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/familiepakker/:slug*',
+        destination: '/vr-opplevelser/familie/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/familiepakker',
+        destination: '/vr-opplevelser/familie',
+        permanent: true,
+      },
+      {
+        source: '/familiepakker/:slug*',
+        destination: '/vr-opplevelser/familie/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/familiepakke',
+        destination: '/vr-opplevelser/familie',
+        permanent: true,
+      },
+      {
+        source: '/familiepakke/:slug*',
+        destination: '/vr-opplevelser/familie/:slug*',
+        permanent: true,
+      },
       // Arrangementer redirects
       {
         source: '/arrangementer/firmaevent',

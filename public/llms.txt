@@ -22,10 +22,10 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
   - **Abyss Vault:** Sci-fi dypvannsmysterium der laget infiltrerer en hemmelig hvelvstasjon, bruker fargekodede lysvåpen og knekker koder for å unnslippe.
   - **Prison Break:** Klassisk og nervepirrende rømning fra et høysikkerhetsfengsel før vaktene oppdager dere.
   - **Parvous Box:** Dere er krympet til mikroskopisk størrelse og må løse gigantiske gåter for å finne veien tilbake til normal størrelse.
-- [Familie og Bueskyting](https://www.krsvr.no/familiepakker):
-  - **Elven Arrows:** Fantasy-eventyr der dere som alviske bueskyttere forsvarer hellige krystaller fra tårnet mot invaderende fiender (inntil 8 spillere).
-  - **Familiepakke Barn (8–12 år):** Tilpasset miks av trygge og morsomme VR-opplevelser ledet av gamemaster.
-  - **Familiepakke Ungdom (12+):** Actionfylt sammensetning av spill og konkurranser for ungdom.
+- [Familieopplevelser og Bueskyting](https://www.krsvr.no/vr-opplevelser/familie):
+  - **Familiepakke Barn (8–12 år):** En trygg og morsom 90-minutters VR-opplevelse for barnefamilier. Gamemasteren veileder barna hele veien og setter sammen en tilpasset miks av familievennlige spill og enkle samarbeidsoppgaver uten skumle elementer, der mestring og felles glede står i sentrum (2–8 spillere).
+  - **Familiepakke Ungdom (12+):** Actionfylt 90-minutters opplevelse for familier med tenåringer og voksne. Høyere tempo, utfordrende samarbeidsoppdrag og engasjerende konkurranser der både ungdom og foreldre utfordres på like vilkår (2–8 spillere).
+  - **Elven Arrows:** Samarbeidsbasert fantasy-bueskyting der dere som alviske bueskyttere forsvarer hellige krystaller fra tårnet mot innkommende fiender (inntil 8 spillere).
 - [Teambuilding og Firmaevent](https://www.krsvr.no/teambuilding): Samlende opplevelser for bedrifter. 2–10 spillere (90 min) eller store grupper 10–50+ spillere (inntil 3 timer) med dynamisk turneringsformat, fargerike lagarmbånd, pause med storskjerm og kåring av vinnerlag.
 - [Utdrikningslag](https://www.krsvr.no/utdrikningslag): Actionfylte og engasjerende konkurranser for vennegjengen og bruden/brudgommen. Varighet 1,5–3 timer.
 
@@ -35,7 +35,7 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
 - **Avbestilling:** Må skje senest 48 timer før aktiviteten.
 
 ## Priser og MVA-struktur
-- **Privat booking (2–10 spillere, 90 min):** Oppgis alltid inkl. mva.
+- **Privat booking og Familiepakker (2–10 spillere, 90 min):** Oppgis alltid inkl. mva.
   - 2 personer: 460 NOK per person
   - 3–4 personer: 395 NOK per person
   - 5–7 personer: 385 NOK per person
