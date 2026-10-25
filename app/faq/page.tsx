@@ -67,6 +67,14 @@ export const metadata: Metadata = {
     "VR ferieaktivitet",
     "Familiepakke VR"
   ],
+  alternates: {
+    canonical: "https://www.krsvr.no/faq",
+    languages: {
+      "nb-NO": "https://www.krsvr.no/faq",
+      en: "https://www.krsvr.no/en/faq",
+      "x-default": "https://www.krsvr.no/en/faq",
+    },
+  },
   openGraph: {
     title: "FAQ - Ofte stilte spørsmål | KRS VR Arena",
     description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, grupper, ferieåpning, aldersgrenser og booking.",

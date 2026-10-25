@@ -4,11 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Loader2, Calendar as CalendarIcon, Clock, AlertTriangle, ArrowRight, XCircle, Info, Users, Plus, Minus, CheckCircle2, Save } from 'lucide-react';
 import { format, differenceInHours, getDay } from 'date-fns';
-import { nb } from "date-fns/locale";
+import { nb, enUS } from "date-fns/locale";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
+import { localizeExperience } from "@/lib/i18n";
 
-export default function ManageBookingClient({ bookingId }: { bookingId: string }) {
+export default function ManageBookingClient({
+  bookingId,
+  locale = "no",
+}: {
+  bookingId: string;
+  locale?: "no" | "en";
+}) {
+  const isEn = locale === "en";
+  const dateLocale = isEn ? enUS : nb;
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
@@ -38,7 +47,7 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
 
   useEffect(() => {
     if (!token) {
-      setError("Mangler sikkerhetstoken i URL.");
+      setError(isEn ? "Missing security token in URL." : "Mangler sikkerhetstoken i URL.");
       setLoading(false);
       return;
     }
@@ -93,7 +102,7 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
     }
     
     loadInitialData();
-  }, [bookingId, token]);
+  }, [bookingId, token, isEn]);
 
   useEffect(() => {
     async function updateAvailableTimes() {
@@ -174,8 +183,14 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
     return (
       <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl text-center">
         <XCircle className="w-12 h-12 text-zinc-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-light mb-2">Denne bookingen er kansellert</h2>
-        <p className="text-zinc-400">Du kan ikke lenger endre denne bookingen. Kontakt oss hvis du har spørsmål.</p>
+        <h2 className="text-2xl font-light mb-2">
+          {isEn ? "This booking has been cancelled" : "Denne bookingen er kansellert"}
+        </h2>
+        <p className="text-zinc-400">
+          {isEn
+            ? "You can no longer modify this booking. Please contact us at post@krsvr.no if you have any questions."
+            : "Du kan ikke lenger endre denne bookingen. Kontakt oss hvis du har spørsmål."}
+        </p>
       </div>
     );
   }
@@ -201,10 +216,10 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Klarte ikke å oppdatere");
+        throw new Error(err.error || (isEn ? "Failed to update booking" : "Klarte ikke å oppdatere"));
       }
 
-      toast.success("Bookingen din er oppdatert!");
+      toast.success(isEn ? "Your booking has been updated!" : "Bookingen din er oppdatert!");
       // Reload page to reflect changes
       window.location.reload();
     } catch (e: any) {
@@ -215,7 +230,11 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
   };
 
   const handleCancel = async () => {
-    const confirmMsg = (booking?.amountPaid || 0) > 0
+    const confirmMsg = isEn
+      ? (booking?.amountPaid || 0) > 0
+        ? "Are you sure you want to cancel your booking? Refunds are processed in accordance with our cancellation policy (at least 48 hours before your scheduled session)."
+        : "Are you sure you want to cancel your booking?"
+      : (booking?.amountPaid || 0) > 0
       ? "Er du sikker på at du vil kansellere bookingen? Eventuell refusjon behandles i henhold til våre avbestillingsregler (senest 48 timer før aktiviteten)."
       : "Er du sikker på at du vil kansellere bookingen?";
     if (!confirm(confirmMsg)) return;
@@ -228,10 +247,10 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Klarte ikke å kansellere");
+        throw new Error(err.error || (isEn ? "Failed to cancel booking" : "Klarte ikke å kansellere"));
       }
 
-      toast.success("Bookingen er kansellert");
+      toast.success(isEn ? "Booking cancelled" : "Bookingen er kansellert");
       window.location.reload();
     } catch (e: any) {
       toast.error(e.message);
@@ -243,7 +262,11 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
     if (newCount < 1) return;
     const max = booking?.experience?.maxPlayers || 16;
     if (newCount > max) {
-      toast.error(`Maksimal kapasitet for dette spillet er ${max} personer.`);
+      toast.error(
+        isEn
+          ? `Maximum capacity for this game is ${max} players.`
+          : `Maksimal kapasitet for dette spillet er ${max} personer.`
+      );
       return;
     }
     setPlayerCount(newCount);
@@ -278,13 +301,13 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Klarte ikke å lagre navneliste");
+        throw new Error(err.error || (isEn ? "Failed to save player names" : "Klarte ikke å lagre navneliste"));
       }
 
       const updated = await res.json();
       setBooking(updated);
       setPlayerCount(updated.players);
-      toast.success("Navneliste og spillere er lagret!");
+      toast.success(isEn ? "Player names and count saved!" : "Navneliste og spillere er lagret!");
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -293,28 +316,36 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
   };
 
   const allDisplayTimes = Array.from(new Set([...availableTimes, ...bookedTimesForDate])).sort();
+  const localizedCurrentExp = booking.experience ? localizeExperience(booking.experience, locale) : null;
 
   return (
     <div className="space-y-8">
       {/* Current Info */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 md:p-8">
-        <h2 className="text-xl font-medium mb-6">Din Nåværende Booking</h2>
+        <h2 className="text-xl font-medium mb-6">
+          {isEn ? "Your Current Booking" : "Din Nåværende Booking"}
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <p className="text-sm text-zinc-500 mb-1">Navn</p>
+            <p className="text-sm text-zinc-500 mb-1">{isEn ? "Name" : "Navn"}</p>
             <p className="font-medium">{booking.firstName} {booking.lastName}</p>
           </div>
           <div>
-            <p className="text-sm text-zinc-500 mb-1">Opplevelse</p>
-            <p className="font-medium">{booking.experience?.name || "VR Experience"}</p>
+            <p className="text-sm text-zinc-500 mb-1">{isEn ? "Experience" : "Opplevelse"}</p>
+            <p className="font-medium">{localizedCurrentExp?.name || "VR Experience"}</p>
           </div>
           <div>
-            <p className="text-sm text-zinc-500 mb-1">Dato og Tid</p>
-            <p className="font-medium">{format(new Date(booking.date), "dd. MMMM yyyy", { locale: nb })} kl {booking.time}</p>
+            <p className="text-sm text-zinc-500 mb-1">{isEn ? "Date & Time" : "Dato og Tid"}</p>
+            <p className="font-medium">
+              {format(new Date(booking.date), isEn ? "MMMM dd, yyyy" : "dd. MMMM yyyy", { locale: dateLocale })}{" "}
+              {isEn ? "at" : "kl"} {booking.time}
+            </p>
           </div>
           <div>
-            <p className="text-sm text-zinc-500 mb-1">Antall personer</p>
-            <p className="font-medium">{booking.players} personer</p>
+            <p className="text-sm text-zinc-500 mb-1">{isEn ? "Players" : "Antall personer"}</p>
+            <p className="font-medium">
+              {booking.players} {isEn ? "players" : "personer"}
+            </p>
           </div>
         </div>
       </div>
@@ -325,23 +356,27 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Users className="w-5 h-5 text-[#9C39FF]" />
-              <h2 className="text-xl font-medium text-white">Navneliste & Justering av Spillere</h2>
+              <h2 className="text-xl font-medium text-white">
+                {isEn ? "Player Names & Participant Count" : "Navneliste & Justering av Spillere"}
+              </h2>
             </div>
             <p className="text-xs text-zinc-400 max-w-xl leading-relaxed">
-              Legg inn fornavn/kallenavn på alle deltakerne slik at vi kan klargjøre VR-headsettene og opplegget før dere ankommer. Du kan også justere antall spillere ved behov.
+              {isEn
+                ? "Enter first names or nicknames for all participants so we can prepare the VR headsets before your arrival. You can also adjust the number of players if needed."
+                : "Legg inn fornavn/kallenavn på alle deltakerne slik at vi kan klargjøre VR-headsettene og opplegget før dere ankommer. Du kan også justere antall spillere ved behov."}
             </p>
           </div>
 
           {/* Antall spillere stepper */}
           <div className="flex items-center gap-3 bg-zinc-950 px-4 py-2 rounded-xl border border-zinc-800">
-            <span className="text-xs text-zinc-400">Antall:</span>
+            <span className="text-xs text-zinc-400">{isEn ? "Players:" : "Antall:"}</span>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => handlePlayerCountChange(playerCount - 1)}
                 disabled={playerCount <= 1 || isSavingNames}
                 className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 flex items-center justify-center text-white transition-colors"
-                title="Reduser antall"
+                title={isEn ? "Decrease players" : "Reduser antall"}
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
@@ -351,7 +386,7 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
                 onClick={() => handlePlayerCountChange(playerCount + 1)}
                 disabled={playerCount >= (booking?.experience?.maxPlayers || 16) || isSavingNames}
                 className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 flex items-center justify-center text-white transition-colors"
-                title="Øk antall"
+                title={isEn ? "Increase players" : "Øk antall"}
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
@@ -365,11 +400,21 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
             {Array.from({ length: playerCount }).map((_, idx) => (
               <div key={idx} className="space-y-1">
                 <label className="text-xs text-zinc-400 block font-medium">
-                  Spiller {idx + 1} {idx === 0 ? "(Hovedbestiller)" : ""}
+                  {isEn
+                    ? `Player ${idx + 1} ${idx === 0 ? "(Lead Booker)" : ""}`
+                    : `Spiller ${idx + 1} ${idx === 0 ? "(Hovedbestiller)" : ""}`}
                 </label>
                 <input
                   type="text"
-                  placeholder={idx === 0 ? `${booking.firstName} (eller kallenavn)` : `Navn på spiller ${idx + 1}`}
+                  placeholder={
+                    isEn
+                      ? idx === 0
+                        ? `${booking.firstName} (or nickname)`
+                        : `Name of player ${idx + 1}`
+                      : idx === 0
+                      ? `${booking.firstName} (eller kallenavn)`
+                      : `Navn på spiller ${idx + 1}`
+                  }
                   value={namesList[idx] || ""}
                   onChange={(e) => handleNameChange(idx, e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#9C39FF] transition-colors"
@@ -380,7 +425,10 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
 
           <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-zinc-800/80">
             <p className="text-xs text-zinc-500">
-              💡 {namesList.filter(n => n && n.trim()).length} av {playerCount} navn er fylt ut.
+              💡{" "}
+              {isEn
+                ? `${namesList.filter((n) => n && n.trim()).length} of ${playerCount} names filled in.`
+                : `${namesList.filter((n) => n && n.trim()).length} av ${playerCount} navn er fylt ut.`}
             </p>
             <button
               onClick={handleSaveNames}
@@ -388,7 +436,7 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
               className="flex items-center gap-2 bg-[#9C39FF] hover:bg-[#8b32e6] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md shadow-[#9C39FF]/20 disabled:opacity-50"
             >
               {isSavingNames ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Lagre navneliste
+              {isEn ? "Save Player List" : "Lagre navneliste"}
             </button>
           </div>
         </div>
@@ -398,37 +446,56 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
         <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 flex gap-4">
           <Info className="w-6 h-6 text-amber-500 shrink-0" />
           <div>
-            <h3 className="text-lg font-medium text-amber-400 mb-2">For sent å endre automatisk</h3>
-            <p className="text-amber-200/80 mb-4">Det er under 48 timer til bookingen din starter, og den kan derfor ikke endres eller kanselleres via denne portalen (ref. våre kjøpsvilkår).</p>
-            <p className="text-amber-200/80">Vennligst kontakt oss på telefon eller e-post dersom du har akutte endringer.</p>
+            <h3 className="text-lg font-medium text-amber-400 mb-2">
+              {isEn ? "Too Late for Self-Service Time Changes" : "For sent å endre automatisk"}
+            </h3>
+            <p className="text-amber-200/80 mb-4">
+              {isEn
+                ? "There are less than 48 hours remaining before your scheduled session, so time changes or cancellations cannot be made automatically via this portal (per our terms and conditions)."
+                : "Det er under 48 timer til bookingen din starter, og den kan derfor ikke endres eller kanselleres via denne portalen (ref. våre kjøpsvilkår)."}
+            </p>
+            <p className="text-amber-200/80">
+              {isEn
+                ? "Please contact us by phone (+47 40 82 83 02) or email (post@krsvr.no) if you have urgent changes."
+                : "Vennligst kontakt oss på telefon eller e-post dersom du har akutte endringer."}
+            </p>
           </div>
         </div>
       ) : (
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 md:p-8 space-y-8">
-          <h2 className="text-xl font-medium mb-4 border-b border-zinc-800 pb-4">Endre Tidspunkt eller Opplevelse</h2>
+          <h2 className="text-xl font-medium mb-4 border-b border-zinc-800 pb-4">
+            {isEn ? "Change Time Slot or Experience" : "Endre Tidspunkt eller Opplevelse"}
+          </h2>
           
           <div className="space-y-4">
-            <h3 className="font-medium text-zinc-300">1. Velg Spill / Opplevelse</h3>
+            <h3 className="font-medium text-zinc-300">
+              {isEn ? "1. Select Game / Experience" : "1. Velg Spill / Opplevelse"}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {experiences.map(exp => (
-                <button
-                  key={exp.id}
-                  onClick={() => setSelectedExperienceId(exp.id)}
-                  className={`p-4 rounded-xl border text-left transition-all ${
-                    selectedExperienceId === exp.id 
-                      ? 'border-[#9C39FF] bg-[#9C39FF]/10' 
-                      : 'border-zinc-800 bg-zinc-950 hover:border-zinc-700'
-                  }`}
-                >
-                  <p className="font-medium mb-1">{exp.name}</p>
-                  <p className="text-xs text-zinc-500">{exp.shortDescription}</p>
-                </button>
-              ))}
+              {experiences.map((rawExp) => {
+                const exp = localizeExperience(rawExp, locale);
+                return (
+                  <button
+                    key={exp.id}
+                    onClick={() => setSelectedExperienceId(exp.id)}
+                    className={`p-4 rounded-xl border text-left transition-all ${
+                      selectedExperienceId === exp.id 
+                        ? 'border-[#9C39FF] bg-[#9C39FF]/10' 
+                        : 'border-zinc-800 bg-zinc-950 hover:border-zinc-700'
+                    }`}
+                  >
+                    <p className="font-medium mb-1">{exp.name}</p>
+                    <p className="text-xs text-zinc-500">{exp.shortDescription}</p>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           <div className="space-y-4 pt-4">
-            <h3 className="font-medium text-zinc-300">2. Velg Ny Dato og Tid</h3>
+            <h3 className="font-medium text-zinc-300">
+              {isEn ? "2. Select New Date & Time" : "2. Velg Ny Dato og Tid"}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="w-full max-w-sm mx-auto">
                 <Calendar
@@ -474,19 +541,26 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
                                   : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-[#9C39FF]/50'
                             }`}
                           >
-                            {time} {isBooked && <span className="text-[10px] block opacity-70">(Opptatt)</span>}
+                            {time}{" "}
+                            {isBooked && (
+                              <span className="text-[10px] block opacity-70">
+                                {isEn ? "(Booked)" : "(Opptatt)"}
+                              </span>
+                            )}
                           </button>
                         );
                       })}
                     </div>
                   ) : (
                     <p className="text-zinc-500 text-center py-10 bg-zinc-950 rounded-xl border border-zinc-800">
-                      Ingen ledige tider på denne datoen.
+                      {isEn ? "No available times on this date." : "Ingen ledige tider på denne datoen."}
                     </p>
                   )
                 ) : (
                   <p className="text-zinc-500 text-center py-10 bg-zinc-950 rounded-xl border border-zinc-800">
-                    Velg en dato i kalenderen først for å se ledige tider.
+                    {isEn
+                      ? "Please select a date in the calendar first to view available times."
+                      : "Velg en dato i kalenderen først for å se ledige tider."}
                   </p>
                 )}
               </div>
@@ -499,7 +573,13 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
               disabled={!selectedDate || !selectedTime || !selectedExperienceId || isUpdating}
               className="flex items-center gap-2 bg-[#9C39FF] text-white px-8 py-3 rounded-xl font-medium hover:bg-[#8b32e6] transition-colors disabled:opacity-50"
             >
-              {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Bekreft Nytt Tidspunkt"}
+              {isUpdating ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : isEn ? (
+                "Confirm New Time Slot"
+              ) : (
+                "Bekreft Nytt Tidspunkt"
+              )}
             </button>
           </div>
         </div>
@@ -512,7 +592,13 @@ export default function ManageBookingClient({ bookingId }: { bookingId: string }
             disabled={isCancelling}
             className="text-sm text-zinc-500 hover:text-red-400 transition-colors underline"
           >
-            {isCancelling ? "Kansellerer..." : "Ønsker du heller å kansellere bookingen? Klikk her."}
+            {isCancelling
+              ? isEn
+                ? "Cancelling..."
+                : "Kansellerer..."
+              : isEn
+              ? "Would you rather cancel your booking? Click here."
+              : "Ønsker du heller å kansellere bookingen? Klikk her."}
           </button>
         </div>
       )}

@@ -119,11 +119,15 @@ export default function ExperiencesManager() {
     setEditForm({
       id: "new",
       name: "New Experience",
+      nameEn: "",
       subName: "",
+      subNameEn: "",
       shortDescription: "",
+      shortDescriptionEn: "",
       type: "Escape Room",
       age: "12+",
       difficulty: "Medium",
+      difficultyEn: "Medium",
       maxPlayers: 6,
       arenaSize: "",
       isActive: true,
@@ -145,6 +149,7 @@ export default function ExperiencesManager() {
       awards: [],
       languages: ["English"],
       suitableFor: [],
+      suitableForEn: [],
       filterCategories: ["Escape Room"]
     });
     setCustomLang("");
@@ -549,12 +554,58 @@ export default function ExperiencesManager() {
                   </select>
                 </div>
                 <div className="md:col-span-3">
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">Beskrivelse</label>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Beskrivelse (Norsk)</label>
                   <textarea 
                     value={editForm.shortDescription}
                     onChange={(e) => setEditForm({...editForm, shortDescription: e.target.value})}
                     placeholder="Beskriv opplevelsen... (linjeskift fungerer i visningen på forsiden)"
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF] min-h-[120px]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* ENGELSK OVERSETTELSE (EN) */}
+            <div>
+              <h4 className="text-lg font-medium mb-4 text-white border-b border-zinc-800 pb-2">Engelsk oversettelse (EN – /en/*)</h4>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Navn (Engelsk)</label>
+                  <input 
+                    type="text" 
+                    value={editForm.nameEn || ""}
+                    onChange={(e) => setEditForm({...editForm, nameEn: e.target.value})}
+                    placeholder={editForm.name || "English title"}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Undertittel (Engelsk)</label>
+                  <input
+                    type="text"
+                    value={editForm.subNameEn || ""}
+                    onChange={(e) => setEditForm({...editForm, subNameEn: e.target.value})}
+                    placeholder="e.g. Gather your squad. Take control."
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Vanskelighetsgrad (Engelsk)</label>
+                  <input 
+                    type="text" 
+                    value={editForm.difficultyEn || ""}
+                    onChange={(e) => setEditForm({...editForm, difficultyEn: e.target.value})}
+                    placeholder="e.g. Medium / High Action"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF]"
+                  />
+                </div>
+                <div className="md:col-span-3">
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">Beskrivelse (Engelsk)</label>
+                  <textarea 
+                    value={editForm.shortDescriptionEn || ""}
+                    onChange={(e) => setEditForm({...editForm, shortDescriptionEn: e.target.value})}
+                    placeholder="English description shown on /en and /en/experiences..."
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#9C39FF] min-h-[110px]"
                   />
                 </div>
               </div>

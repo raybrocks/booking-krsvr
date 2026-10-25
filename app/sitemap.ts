@@ -8,10 +8,11 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.krsvr.no";
   
-  // Static routes
+  // Static routes (Norwegian, English, German, Dutch)
   const routes: MetadataRoute.Sitemap = [
     '',
     '/vr-opplevelser',
+    '/vr-opplevelser/familie',
     '/arrangementer',
     '/arrangementer/vr-bursdag',
     '/arrangementer/vr-utdrikningslag',
@@ -23,11 +24,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/booking',
     '/personvern',
     '/vilkar',
+    // English static routes
+    '/en',
+    '/en/experiences',
+    '/en/experiences/family',
+    '/en/events',
+    '/en/prices',
+    '/en/faq',
+    '/en/contact',
+    '/en/booking',
+    '/en/privacy',
+    '/en/terms',
+    // German & Dutch tourist landing pages
+    '/de',
+    '/nl',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
-    priority: route === '' ? 1 : 0.8,
+    priority: route === '' || route === '/en' || route === '/de' || route === '/nl' ? 1 : 0.8,
   }));
 
   // Dynamic experiences
@@ -55,19 +70,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     });
 
-    const typeUrls: MetadataRoute.Sitemap = Array.from(typeMap.keys()).map((typeSlug) => ({
-      url: `${baseUrl}/vr-opplevelser/${typeSlug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    }));
+    const typeUrls: MetadataRoute.Sitemap = Array.from(typeMap.keys()).flatMap((typeSlug) => [
+      {
+        url: `${baseUrl}/vr-opplevelser/${typeSlug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      },
+      {
+        url: `${baseUrl}/en/experiences/${typeSlug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      },
+    ]);
 
-    const detailUrls: MetadataRoute.Sitemap = experiences.map(exp => ({
-      url: `${baseUrl}/vr-opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    }));
+    const detailUrls: MetadataRoute.Sitemap = experiences.flatMap(exp => {
+      const typeSlug = exp.experienceType?.slug || slugify(exp.type || "");
+      const expSlug = slugify(exp.name || "");
+      return [
+        {
+          url: `${baseUrl}/vr-opplevelser/${typeSlug}/${expSlug}`,
+          lastModified: new Date(),
+          changeFrequency: 'monthly' as const,
+          priority: 0.6,
+        },
+        {
+          url: `${baseUrl}/en/experiences/${typeSlug}/${expSlug}`,
+          lastModified: new Date(),
+          changeFrequency: 'monthly' as const,
+          priority: 0.6,
+        },
+      ];
+    });
     
     experiencesUrls = [...typeUrls, ...detailUrls];
   } catch (error) {

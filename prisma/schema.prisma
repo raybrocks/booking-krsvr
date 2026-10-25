@@ -12,46 +12,51 @@ datasource db {
 }
 
 model Experience {
-  id              String   @id @default(cuid())
-  name            String
-  subName         String?
-  shortDescription String
-  picture         String?
-  images          String[] @default([])
-  type            String?
-  typeId          String?
-  experienceType  ExperienceType? @relation(fields: [typeId], references: [id])
-  age             String?
-  difficulty      String?
-  maxPlayers      Int      @default(6)
-  arenaSize       String?
-  pricing         Json?    
-  isActive        Boolean  @default(true)
-  isNew           Boolean  @default(false)
-  order           Int      @default(999)
-  familyFriendly  Boolean  @default(false)
-  teambuilding    Boolean  @default(false)
-  party           Boolean  @default(false)
-  jumpScare       Boolean  @default(false)
-  action          Boolean  @default(false)
-  highscore       Boolean  @default(false)
-  mystic          Boolean  @default(false)
-  fantasy         Boolean  @default(false)
-  codeSolving     Boolean  @default(false)
-  cinematic       Boolean  @default(false)
-  mixedReality    Boolean  @default(false)
-  videoUrl        String?
-  awards          Json?
-  languages       String[] @default([])
-  languagesVoice  String[] @default([])
-  languagesText   String[] @default([])
-  suitableFor     String[] @default([])
-  filterCategories String[] @default([])
+  id                 String   @id @default(cuid())
+  name               String
+  nameEn             String?
+  subName            String?
+  subNameEn          String?
+  shortDescription   String
+  shortDescriptionEn String?
+  picture            String?
+  images             String[] @default([])
+  type               String?
+  typeId             String?
+  experienceType     ExperienceType? @relation(fields: [typeId], references: [id])
+  age                String?
+  difficulty         String?
+  difficultyEn       String?
+  maxPlayers         Int      @default(6)
+  arenaSize          String?
+  pricing            Json?    
+  isActive           Boolean  @default(true)
+  isNew              Boolean  @default(false)
+  order              Int      @default(999)
+  familyFriendly     Boolean  @default(false)
+  teambuilding       Boolean  @default(false)
+  party              Boolean  @default(false)
+  jumpScare          Boolean  @default(false)
+  action             Boolean  @default(false)
+  highscore          Boolean  @default(false)
+  mystic             Boolean  @default(false)
+  fantasy            Boolean  @default(false)
+  codeSolving        Boolean  @default(false)
+  cinematic          Boolean  @default(false)
+  mixedReality       Boolean  @default(false)
+  videoUrl           String?
+  awards             Json?
+  languages          String[] @default([])
+  languagesVoice     String[] @default([])
+  languagesText      String[] @default([])
+  suitableFor        String[] @default([])
+  suitableForEn      String[] @default([])
+  filterCategories   String[] @default([])
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
   
-  bookings        Booking[]
+  bookings           Booking[]
 }
 
 model Booking {
@@ -85,6 +90,7 @@ model Booking {
   reminderCount     Int      @default(0)
   reviewEmailSentAt DateTime?
   reviewEmailType   String?
+  locale            String   @default("no")
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -225,6 +231,7 @@ model ContactInquiry {
   status        String    @default("new") // "new", "contacted", "booked", "rejected"
   internalNotes String?
   bookingId     String?   // Linked booking if converted to booking
+  locale        String    @default("no")
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

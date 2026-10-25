@@ -6,6 +6,14 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Personvernerklæring",
   description: "Les om hvordan KRS VR Arena samler inn og behandler personopplysninger i henhold til gjeldende regelverk.",
+  alternates: {
+    canonical: "https://www.krsvr.no/personvern",
+    languages: {
+      "nb-NO": "https://www.krsvr.no/personvern",
+      en: "https://www.krsvr.no/en/privacy",
+      "x-default": "https://www.krsvr.no/en/privacy",
+    },
+  },
   openGraph: {
     title: "Personvernerklæring",
     description: "Les om hvordan KRS VR Arena samler inn og behandler personopplysninger.",

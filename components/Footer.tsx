@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Facebook, Instagram, Youtube } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Facebook, Instagram, Youtube, Globe } from "lucide-react";
+import { detectLocaleFromPath, getTranslatedPath, type Locale } from "@/lib/i18n";
 
 const TikTokIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -16,7 +18,17 @@ const TripAdvisorIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
+const LANGUAGES: { code: Locale; label: string }[] = [
+  { code: "no", label: "Norsk" },
+  { code: "en", label: "English" },
+  { code: "de", label: "Deutsch" },
+  { code: "nl", label: "Nederlands" },
+];
+
 export default function Footer() {
+  const pathname = usePathname();
+  const locale = detectLocaleFromPath(pathname);
+  const isIntl = locale !== "no";
   const [adminEmail, setAdminEmail] = useState("post@krsvr.no");
 
   useEffect(() => {
@@ -36,6 +48,10 @@ export default function Footer() {
     fetchSettings();
   }, []);
 
+  const visitSorlandetUrl = isIntl
+    ? "https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/"
+    : "https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/";
+
   return (
     <footer className="w-full bg-zinc-950 border-t border-white/5 pt-16 pb-8 mt-auto">
       <div className="container mx-auto px-4 md:px-6">
@@ -44,7 +60,9 @@ export default function Footer() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="KRS VR ARENA" className="h-10 mb-6 object-contain" />
             <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-              Sørlandets arena for VR Escape Room, Mixed Reality og unike gruppeopplevelser.
+              {isIntl
+                ? "Southern Norway's largest wireless VR & Mixed Reality arena in Kristiansand. Experiences for families, friends, and companies."
+                : "Sørlandets arena for VR Escape Room, Mixed Reality og unike gruppeopplevelser."}
             </p>
             <div className="flex flex-wrap gap-3">
               <a href="https://www.facebook.com/krs.vr.arena" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook" className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-[#9C39FF] hover:border-[#9C39FF] transition-colors">
@@ -83,14 +101,14 @@ export default function Footer() {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href="https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/"
+                href={visitSorlandetUrl}
                 className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
-                title="KRS VR Arena på Visit Sørlandet"
+                title={isIntl ? "KRS VR Arena on Visit Southern Norway" : "KRS VR Arena på Visit Sørlandet"}
               >
                 <span>
-                  Du finner oss også på{" "}
+                  {isIntl ? "Official partner on " : "Du finner oss også på "}
                   <span className="underline decoration-zinc-700 underline-offset-4 hover:decoration-[#9C39FF]">
-                    Visit Sørlandet
+                    {isIntl ? "Visit Southern Norway" : "Visit Sørlandet"}
                   </span>
                 </span>
               </a>
@@ -102,7 +120,7 @@ export default function Footer() {
                 title="Les reportasjen om KRS VR Arena i KRS – Avisen Kristiansand"
               >
                 <span>
-                  Omtalt i{" "}
+                  {isIntl ? "Featured in " : "Omtalt i "}
                   <span className="underline decoration-zinc-700 underline-offset-4 hover:decoration-[#9C39FF]">
                     KRS – Avisen Kristiansand
                   </span>
@@ -112,49 +130,93 @@ export default function Footer() {
           </div>
           
           <div>
-            <h4 className="text-white font-medium mb-6">Snarveier</h4>
+            <h4 className="text-white font-medium mb-6">{isIntl ? "Quick Links" : "Snarveier"}</h4>
             <ul className="space-y-3">
-              <li><Link href="/" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Hovedside</Link></li>
-              <li><Link href="/vr-opplevelser" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">VR Opplevelser</Link></li>
-              <li><Link href="/arrangementer" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Arrangementer</Link></li>
-              <li><Link href="/booking" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Booking</Link></li>
-              <li><Link href="/faq" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">FAQ</Link></li>
+              {isIntl ? (
+                <>
+                  <li><Link href="/en" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Home</Link></li>
+                  <li><Link href="/en/experiences" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">VR Experiences</Link></li>
+                  <li><Link href="/en/events" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Events & Groups</Link></li>
+                  <li><Link href="/en/prices" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Prices</Link></li>
+                  <li><Link href="/en/booking" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Book Now</Link></li>
+                  <li><Link href="/en/faq" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">FAQ</Link></li>
+                </>
+              ) : (
+                <>
+                  <li><Link href="/" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Hovedside</Link></li>
+                  <li><Link href="/vr-opplevelser" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">VR Opplevelser</Link></li>
+                  <li><Link href="/arrangementer" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Arrangementer</Link></li>
+                  <li><Link href="/priser" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Priser</Link></li>
+                  <li><Link href="/booking" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Booking</Link></li>
+                  <li><Link href="/faq" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">FAQ</Link></li>
+                </>
+              )}
             </ul>
           </div>
           
           <div>
-            <h4 className="text-white font-medium mb-6">Informasjon</h4>
+            <h4 className="text-white font-medium mb-6">{isIntl ? "Information" : "Informasjon"}</h4>
             <ul className="space-y-3">
-              <li><Link href="/kontakt" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Kontakt Oss</Link></li>
-              <li><span className="text-zinc-400 text-sm">Åpningstider:</span></li>
-              <li><span className="text-zinc-500 text-sm">Se bookingside for tilgjengelighet</span></li>
+              <li>
+                <Link href={isIntl ? "/en/contact" : "/kontakt"} className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">
+                  {isIntl ? "Contact Us" : "Kontakt Oss"}
+                </Link>
+              </li>
+              <li><span className="text-zinc-400 text-sm">{isIntl ? "Opening Hours:" : "Åpningstider:"}</span></li>
+              <li>
+                <span className="text-zinc-500 text-sm">
+                  {isIntl ? "Open daily by advance booking — check calendar for times" : "Se bookingside for tilgjengelighet"}
+                </span>
+              </li>
+              <li className="pt-2">
+                <div className="inline-flex flex-wrap items-center gap-1.5 text-xs text-zinc-400">
+                  <Globe className="w-3.5 h-3.5 text-zinc-500" />
+                  {LANGUAGES.map((lang, idx) => (
+                    <React.Fragment key={lang.code}>
+                      <Link
+                        href={getTranslatedPath(pathname, lang.code)}
+                        className={`hover:text-white transition-colors ${
+                          locale === lang.code ? "text-[#9C39FF] font-medium" : "text-zinc-400"
+                        }`}
+                      >
+                        {lang.label}
+                      </Link>
+                      {idx < LANGUAGES.length - 1 && <span className="text-zinc-700">·</span>}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </li>
             </ul>
           </div>
           
           <div>
-            <h4 className="text-white font-medium mb-6">Kontakt</h4>
+            <h4 className="text-white font-medium mb-6">{isIntl ? "Location & Contact" : "Kontakt"}</h4>
             <ul className="space-y-3">
               <li className="text-zinc-400 text-sm">
-                Industrigata 12<br/>4632 Kristiansand
+                Industrigata 12<br/>4632 Kristiansand, Norway
               </li>
               <li className="text-zinc-400 text-sm">
                 <a href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" target="_blank" rel="noopener noreferrer" className="hover:text-[#9C39FF] transition-colors flex items-center">
-                  Google Maps Veibeskrivelse
+                  {isIntl ? "Google Maps Directions" : "Google Maps Veibeskrivelse"}
                 </a>
               </li>
               <li className="text-zinc-400 text-sm"><a href={`mailto:${adminEmail}`} className="hover:text-[#9C39FF] transition-colors">{adminEmail}</a></li>
-              <li className="text-zinc-400 text-sm"><a href="tel:+4740828302" className="hover:text-[#9C39FF] transition-colors">+47 40828302</a></li>
+              <li className="text-zinc-400 text-sm"><a href="tel:+4740828302" className="hover:text-[#9C39FF] transition-colors">+47 40 82 83 02</a></li>
             </ul>
           </div>
         </div>
         
         <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-zinc-500 text-xs">
-            © {new Date().getFullYear()} Krs VR Arena AS (Org.nr 936318878). Alle rettigheter reservert.
+            © {new Date().getFullYear()} Krs VR Arena AS (Org.nr 936318878). {isIntl ? "All rights reserved." : "Alle rettigheter reservert."}
           </p>
           <div className="flex gap-4">
-            <Link href="/personvern" className="text-zinc-500 hover:text-zinc-300 text-xs transition-colors">Personvern</Link>
-            <Link href="/vilkar" className="text-zinc-500 hover:text-zinc-300 text-xs transition-colors">Kjøpsvilkår</Link>
+            <Link href={isIntl ? "/en/privacy" : "/personvern"} className="text-zinc-500 hover:text-zinc-300 text-xs transition-colors">
+              {isIntl ? "Privacy Policy" : "Personvern"}
+            </Link>
+            <Link href={isIntl ? "/en/terms" : "/vilkar"} className="text-zinc-500 hover:text-zinc-300 text-xs transition-colors">
+              {isIntl ? "Terms & Conditions" : "Kjøpsvilkår"}
+            </Link>
           </div>
         </div>
       </div>

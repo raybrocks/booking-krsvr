@@ -7,6 +7,14 @@ export const metadata: Metadata = {
   title: "Priser og prisoversikt for VR opplevelser",
   description: "Se våre priser for VR Escape Room og VR Arcade. Prisen inkluderer en 90 minutters totalopplevelse, dedikert gamemaster, bilder og lån av partylounge.",
   keywords: ["Priser VR", "Hva koster VR Kristiansand", "VR priser pr person", "KRS VR Arena pris"],
+  alternates: {
+    canonical: "https://www.krsvr.no/priser",
+    languages: {
+      "nb-NO": "https://www.krsvr.no/priser",
+      en: "https://www.krsvr.no/en/prices",
+      "x-default": "https://www.krsvr.no/en/prices",
+    },
+  },
   openGraph: {
     title: "Priser på VR i Kristiansand",
     description: "Priser for grupper. 90 minutters totalopplevelse, inkludert partylounge.",

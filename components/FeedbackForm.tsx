@@ -31,7 +31,8 @@ const ISSUE_TAGS = [
   'Annet',
 ];
 
-export default function FeedbackForm() {
+export default function FeedbackForm({ locale = "no" }: { locale?: "no" | "en" }) {
+  const isEn = locale === "en";
   const [step, setStep] = useState<1 | 2>(1);
   const [rating, setRating] = useState<'happy' | 'neutral' | 'sad' | null>(null);
   
@@ -163,9 +164,13 @@ export default function FeedbackForm() {
         <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-400">
           <Check className="w-8 h-8" />
         </div>
-        <h2 className="text-2xl md:text-3xl font-light text-white mb-3">Tusen takk for tilbakemeldingen!</h2>
+        <h2 className="text-2xl md:text-3xl font-light text-white mb-3">
+          {isEn ? "Thank you for your feedback!" : "Tusen takk for tilbakemeldingen!"}
+        </h2>
         <p className="text-zinc-400 mb-6 leading-relaxed">
-          {rating === 'happy' && phone
+          {isEn
+            ? "We truly appreciate you taking the time to share your experience with us."
+            : rating === 'happy' && phone
             ? 'Du er nå registrert i trekningen av gratis semesterpass. Vi setter stor pris på at du deler opplevelsen med oss og andre gjester.'
             : 'Vi setter stor pris på at du tok deg tid til å dele dine tanker med oss.'}
         </p>
@@ -174,20 +179,22 @@ export default function FeedbackForm() {
           <div className="bg-purple-950/40 border border-purple-800/40 rounded-xl p-4 mb-6 text-left text-sm text-purple-200">
             <p className="font-medium text-white mb-1 flex items-center gap-2">
               <Check className="w-4 h-4 text-emerald-400" />
-              Teksten din er kopiert til utklippstavlen
+              {isEn ? "Your text has been copied to the clipboard" : "Teksten din er kopiert til utklippstavlen"}
             </p>
             <p className="text-zinc-300">
-              Vinduet for Google-anmeldelsen åpner i en ny fane. Der kan du enkelt lime inn teksten din (Ctrl+V eller Cmd+V) og sette stjerner.
+              {isEn
+                ? "The Google Review window has opened in a new tab. You can easily paste your text (Ctrl+V or Cmd+V) and select your star rating."
+                : "Vinduet for Google-anmeldelsen åpner i en ny fane. Der kan du enkelt lime inn teksten din (Ctrl+V eller Cmd+V) og sette stjerner."}
             </p>
           </div>
         )}
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/"
+            href={isEn ? "/en" : "/"}
             className="inline-flex justify-center items-center px-6 py-2.5 rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700 text-sm font-medium transition-colors"
           >
-            Tilbake til forsiden
+            {isEn ? "Back to Home" : "Tilbake til forsiden"}
           </Link>
           {rating === 'happy' && (
             <a
@@ -196,7 +203,7 @@ export default function FeedbackForm() {
               rel="noopener noreferrer"
               className="inline-flex justify-center items-center gap-2 px-6 py-2.5 rounded-lg bg-[#9C39FF] text-white hover:bg-[#8A2BE2] text-sm font-medium transition-colors"
             >
-              Åpne Google Anmeldelse <ExternalLink className="w-3.5 h-3.5" />
+              {isEn ? "Open Google Review" : "Åpne Google Anmeldelse"} <ExternalLink className="w-3.5 h-3.5" />
             </a>
           )}
         </div>
@@ -208,7 +215,9 @@ export default function FeedbackForm() {
     <div className="max-w-xl mx-auto bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 md:p-10 text-center">
       {step === 1 && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <h2 className="text-2xl md:text-3xl font-light text-white mb-8">Hvordan var opplevelsen din?</h2>
+          <h2 className="text-2xl md:text-3xl font-light text-white mb-8">
+            {isEn ? "How was your experience?" : "Hvordan var opplevelsen din?"}
+          </h2>
           <div className="flex justify-center gap-6 md:gap-10">
             <button 
               type="button"
@@ -248,16 +257,20 @@ export default function FeedbackForm() {
             onClick={() => setStep(1)}
             className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white mb-4 transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Endre vurdering
+            <ArrowLeft className="w-3.5 h-3.5" /> {isEn ? "Change rating" : "Endre vurdering"}
           </button>
 
-          <h2 className="text-2xl font-medium text-white mb-2">Så hyggelig å høre at dere trivdes!</h2>
+          <h2 className="text-2xl font-medium text-white mb-2">
+            {isEn ? "We are glad to hear you enjoyed your visit!" : "Så hyggelig å høre at dere trivdes!"}
+          </h2>
           <p className="text-zinc-300 text-sm mb-6 leading-relaxed">
-            Ønsker du å være med i trekningen av gratis semesterpass (verdi inntil 5 000 kr)?
-            Del gjerne noen ord om opplevelsen din på Google. Vi trekker en heldig vinner hvert semester.
+            {isEn
+              ? "Would you like to share a few words about your experience on Google or Tripadvisor? Your review helps other visitors discover KRS VR Arena in Kristiansand."
+              : "Ønsker du å være med i trekningen av gratis semesterpass (verdi inntil 5 000 kr)? Del gjerne noen ord om opplevelsen din på Google. Vi trekker en heldig vinner hvert semester."}
           </p>
 
           {/* Stikkord / Hurtigvalg */}
+          {!isEn && (
           <div className="mb-6 space-y-4 bg-zinc-950/60 border border-zinc-800/80 rounded-xl p-4">
             <div>
               <span className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
@@ -322,17 +335,23 @@ export default function FeedbackForm() {
               </div>
             )}
           </div>
+          )}
 
           {/* Tips til omtalen */}
           <div className="mb-4 bg-purple-950/20 border border-purple-900/30 rounded-lg p-3 text-xs text-zinc-300 leading-relaxed">
-            <span className="font-semibold text-purple-300">💡 Tips til anmeldelsen:</span> Nevn gjerne hva slags arrangement dere hadde, hvilke opplevelser dere prøvde, og hvordan instruktøren tok imot dere. Det hjelper andre å finne frem til gode aktiviteter i Kristiansand!
+            <span className="font-semibold text-purple-300">
+              {isEn ? "💡 Review tip:" : "💡 Tips til anmeldelsen:"}
+            </span>{" "}
+            {isEn
+              ? "Feel free to mention which games you tried and how our gamemaster guided your group."
+              : "Nevn gjerne hva slags arrangement dere hadde, hvilke opplevelser dere prøvde, og hvordan instruktøren tok imot dere. Det hjelper andre å finne frem til gode aktiviteter i Kristiansand!"}
           </div>
 
           {/* Tekstfelt */}
           <div className="space-y-4">
             <div>
               <label htmlFor="happy-comments" className="block text-sm font-medium text-zinc-300 mb-1">
-                Din tilbakemelding
+                {isEn ? "Your feedback" : "Din tilbakemelding"}
               </label>
               <textarea
                 id="happy-comments"
@@ -340,13 +359,19 @@ export default function FeedbackForm() {
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#9C39FF] text-sm"
-                placeholder="F.eks.: Vi var en vennegjeng som spilte Tactical Arena og VR Escape Room. Kjempegøy opplegg og topp veiledning i Kristiansand..."
+                placeholder={
+                  isEn
+                    ? "e.g.: Great indoor activity in Kristiansand with our family/friends..."
+                    : "F.eks.: Vi var en vennegjeng som spilte Tactical Arena og VR Escape Room. Kjempegøy opplegg og topp veiledning i Kristiansand..."
+                }
               />
             </div>
 
             <div>
               <label htmlFor="happy-phone" className="block text-sm font-medium text-zinc-300 mb-1">
-                Telefonnummer (valgfritt – for å delta i semesterpass-trekningen)
+                {isEn
+                  ? "Phone number (optional)"
+                  : "Telefonnummer (valgfritt – for å delta i semesterpass-trekningen)"}
               </label>
               <input
                 type="tel"
@@ -354,7 +379,7 @@ export default function FeedbackForm() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#9C39FF] text-sm"
-                placeholder="Ditt telefonnummer"
+                placeholder={isEn ? "Your phone number" : "Ditt telefonnummer"}
               />
             </div>
 
@@ -373,7 +398,7 @@ export default function FeedbackForm() {
                 ) : (
                   <>
                     <Copy className="w-4 h-4" />
-                    Kopier tekst & åpne Google Anmeldelse
+                    {isEn ? "Copy text & open Google Review" : "Kopier tekst & åpne Google Anmeldelse"}
                     <ExternalLink className="w-4 h-4" />
                   </>
                 )}
@@ -385,14 +410,16 @@ export default function FeedbackForm() {
                 disabled={isSubmitting}
                 className="w-full text-center text-xs text-zinc-400 hover:text-zinc-200 py-1 transition-colors"
               >
-                Eller send kun inn til KRS VR Arena uten Google
+                {isEn
+                  ? "Or send feedback directly to KRS VR Arena without Google"
+                  : "Eller send kun inn til KRS VR Arena uten Google"}
               </button>
             </div>
 
             {/* TripAdvisor alternativ */}
             <div className="pt-2 text-center">
               <p className="text-xs text-zinc-500">
-                Har du ikke Google-konto? Du kan også gi oss en anmeldelse på{' '}
+                {isEn ? "Prefer Tripadvisor? You can also review us on " : "Har du ikke Google-konto? Du kan også gi oss en anmeldelse på "}
                 <a
                   href={TRIPADVISOR_URL}
                   target="_blank"
@@ -401,7 +428,7 @@ export default function FeedbackForm() {
                 >
                   Tripadvisor
                 </a>
-                {' '}eller{' '}
+                {isEn ? " or " : " eller "}
                 <a
                   href={GOOGLE_MAPS_URL}
                   target="_blank"
@@ -424,15 +451,20 @@ export default function FeedbackForm() {
             onClick={() => setStep(1)}
             className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white mb-4 transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Endre vurdering
+            <ArrowLeft className="w-3.5 h-3.5" /> {isEn ? "Change rating" : "Endre vurdering"}
           </button>
 
-          <h2 className="text-2xl font-medium text-white mb-2">Takk for at du gir oss beskjed.</h2>
+          <h2 className="text-2xl font-medium text-white mb-2">
+            {isEn ? "Thank you for letting us know." : "Takk for at du gir oss beskjed."}
+          </h2>
           <p className="text-zinc-400 text-sm mb-6">
-            Vi ønsker alltid å levere trygge og gode opplevelser. Fortell oss gjerne hva som hendte, så vi kan forbedre oss.
+            {isEn
+              ? "We always strive to deliver a safe and welcoming experience. Please tell us what happened so we can improve."
+              : "Vi ønsker alltid å levere trygge og gode opplevelser. Fortell oss gjerne hva som hendte, så vi kan forbedre oss."}
           </p>
 
           <form onSubmit={handleInternalSubmit} className="space-y-4">
+            {!isEn && (
             <div>
               <span className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
                 Hva gjaldt det? (Valgfritt)
@@ -457,10 +489,11 @@ export default function FeedbackForm() {
                 })}
               </div>
             </div>
+            )}
 
             <div>
               <label htmlFor="negative-comments" className="block text-sm font-medium text-zinc-300 mb-1">
-                Kommentar
+                {isEn ? "Comments" : "Kommentar"}
               </label>
               <textarea 
                 id="negative-comments" 
@@ -468,13 +501,19 @@ export default function FeedbackForm() {
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#9C39FF] text-sm"
-                placeholder="Fortell oss hva som hendte og hva vi kan gjøre bedre..."
+                placeholder={
+                  isEn
+                    ? "Tell us what happened and how we can improve..."
+                    : "Fortell oss hva som hendte og hva vi kan gjøre bedre..."
+                }
               />
             </div>
             
             <div>
               <label htmlFor="negative-phone" className="block text-sm font-medium text-zinc-300 mb-1">
-                Telefonnummer (om du ønsker at vi tar kontakt for å rydde opp)
+                {isEn
+                  ? "Phone number or email (if you would like us to follow up)"
+                  : "Telefonnummer (om du ønsker at vi tar kontakt for å rydde opp)"}
               </label>
               <input 
                 type="tel"
@@ -482,7 +521,11 @@ export default function FeedbackForm() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#9C39FF] text-sm"
-                placeholder="La stå tomt om du ønsker å være anonym"
+                placeholder={
+                  isEn
+                    ? "Leave blank if you prefer to remain anonymous"
+                    : "La stå tomt om du ønsker å være anonym"
+                }
               />
             </div>
 
@@ -494,7 +537,13 @@ export default function FeedbackForm() {
                 disabled={isSubmitting}
                 className="w-full flex justify-center items-center bg-white text-black font-semibold py-3 px-4 rounded-lg hover:bg-zinc-200 transition-colors disabled:opacity-50 text-sm"
               >
-                {isSubmitting ? <Loader2 className="animate-spin w-5 h-5" /> : 'Send tilbakemelding'}
+                {isSubmitting ? (
+                  <Loader2 className="animate-spin w-5 h-5" />
+                ) : isEn ? (
+                  "Submit Feedback"
+                ) : (
+                  "Send tilbakemelding"
+                )}
               </button>
             </div>
           </form>

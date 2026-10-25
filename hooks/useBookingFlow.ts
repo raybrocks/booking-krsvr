@@ -1,16 +1,23 @@
 import { useState, useEffect, useMemo } from "react";
 import { format, getDay, isSameDay } from "date-fns";
 import { toast } from "sonner";
+import { localizeExperience } from "@/lib/i18n";
 
 export type Experience = {
   id: string;
   name: string;
+  nameEn?: string;
+  subName?: string;
+  subNameEn?: string;
   shortDescription: string;
+  shortDescriptionEn?: string;
   picture: string;
   images?: string[];
   type: string;
+  displayType?: string;
   age: string;
   difficulty: string;
+  difficultyEn?: string;
   maxPlayers: number;
   pricing: Record<string, number>;
   isActive: boolean;
@@ -24,6 +31,7 @@ export type Experience = {
   tags?: string[];
   languages?: string[];
   suitableFor?: string[];
+  suitableForEn?: string[];
 };
 
 export type Settings = {
@@ -34,7 +42,8 @@ export type Settings = {
   bookingsClosed?: boolean;
 };
 
-export function useBookingFlow() {
+export function useBookingFlow(locale: "no" | "en" = "no") {
+  const isEn = locale === "en";
   const [step, setStep] = useState(1);
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -59,8 +68,8 @@ export function useBookingFlow() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedNewsletter, setAcceptedNewsletter] = useState(false);
   
-  // Payment
-  const [paymentType, setPaymentType] = useState<"vipps" | "terminal">("vipps");
+  // Payment: Default to "terminal" (Pay on arrival) for international/English users
+  const [paymentType, setPaymentType] = useState<"vipps" | "terminal">(isEn ? "terminal" : "vipps");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   
@@ -94,7 +103,20 @@ export function useBookingFlow() {
         
         if (expRes.ok) {
            const expData = await expRes.json();
-           setExperiences(expData);
+           const localizedExps: Experience[] = expData.map((e: any) => localizeExperience(e, locale));
+           setExperiences(localizedExps);
+
+           // Preselect experience if ?opplevelse= or ?experience= is in URL
+           if (typeof window !== "undefined") {
+             const params = new URLSearchParams(window.location.search);
+             const preselectedId = params.get("opplevelse") || params.get("experience");
+             if (preselectedId) {
+               const found = localizedExps.find((e) => e.id === preselectedId);
+               if (found) {
+                 setSelectedExperience(found);
+               }
+             }
+           }
         }
         
         if (settingsRes.ok) {
@@ -115,13 +137,13 @@ export function useBookingFlow() {
          }
       } catch (error) {
         console.error("Failed to load data", error);
-        toast.error("Failed to load booking data. Please try again later.");
+        toast.error(isEn ? "Failed to load booking data. Please try again later." : "Kunne ikke laste bookingdata. Prøv igjen.");
       } finally {
         setLoading(false);
       }
     }
     loadData();
-  }, []);
+  }, [locale, isEn]);
 
   useEffect(() => {
     async function fetchBookedTimes() {
@@ -213,31 +235,47 @@ export function useBookingFlow() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setDiscountError(data.error || "Ugyldig rabattkode");
+        setDiscountError(data.error || (isEn ? "Invalid discount code" : "Ugyldig rabattkode"));
         setAppliedDiscount(null);
       } else {
         setAppliedDiscount(data);
-        setDiscountMessage(`Rabattkode lagt til! (-${data.type === 'percentage' ? data.discount + '%' : data.discount + ' kr'})`);
+        setDiscountMessage(
+          isEn
+            ? `Discount code applied! (-${data.type === 'percentage' ? data.discount + '%' : data.discount + ' NOK'})`
+            : `Rabattkode lagt til! (-${data.type === 'percentage' ? data.discount + '%' : data.discount + ' kr'})`
+        );
         setDiscountCodeInput("");
       }
     } catch (err) {
-      setDiscountError("Kunne ikke validere rabattkode");
+      setDiscountError(isEn ? "Could not validate discount code" : "Kunne ikke validere rabattkode");
     } finally {
       setValidatingDiscount(false);
     }
   };
 
   const handleNext = () => {
-    if (step === 1 && (!selectedDate || !selectedTime)) return toast.error("Vennligst velg dato og tid.");
-    if (step === 3 && !selectedExperience) return toast.error("Vennligst velg en opplevelse.");
-    if (step === 4) {
-      if (!firstName || !lastName || !email || !phone) return toast.error("Vennligst fyll inn alle felter.");
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) return toast.error("Vennligst skriv inn en gyldig e-postadresse.");
-      const digitCount = phone.replace(/\D/g, '').length;
-      if (digitCount < 8) return toast.error("Telefonnummeret må inneholde minst 8 siffer.");
+    if (step === 1 && (!selectedDate || !selectedTime)) {
+      return toast.error(isEn ? "Please select a date and time." : "Vennligst velg dato og tid.");
     }
-    if (step === 5 && !acceptedTerms) return toast.error("Du må godta vilkårene.");
+    if (step === 3 && !selectedExperience) {
+      return toast.error(isEn ? "Please select an experience." : "Vennligst velg en opplevelse.");
+    }
+    if (step === 4) {
+      if (!firstName || !lastName || !email || !phone) {
+        return toast.error(isEn ? "Please fill in all required fields." : "Vennligst fyll inn alle felter.");
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return toast.error(isEn ? "Please enter a valid email address." : "Vennligst skriv inn en gyldig e-postadresse.");
+      }
+      const digitCount = phone.replace(/\D/g, '').length;
+      if (digitCount < 8) {
+        return toast.error(isEn ? "Phone number must contain at least 8 digits." : "Telefonnummeret må inneholde minst 8 siffer.");
+      }
+    }
+    if (step === 5 && !acceptedTerms) {
+      return toast.error(isEn ? "Please accept the terms and conditions." : "Du må godta vilkårene.");
+    }
     setStep(s => s + 1);
   };
 
@@ -255,12 +293,13 @@ export function useBookingFlow() {
           date: format(selectedDate, "yyyy-MM-dd"),
           time: selectedTime,
           players,
-          playerNames: playerNames.slice(0, players), // Only send names for actual players
+          playerNames: playerNames.slice(0, players),
           firstName, lastName, email, phone,
           internalNotes: customerNote.trim() !== '' ? customerNote : undefined,
           acceptedTerms, acceptedNewsletter,
           paymentType, totalPrice, amountPaid: amountToPay,
           status: "pending", discountCode: appliedDiscount?.code,
+          locale,
         })
       });
 
@@ -273,11 +312,12 @@ export function useBookingFlow() {
         const confirmZeroRes = await fetch('/api/booking/confirm-zero', {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ bookingId })
+           body: JSON.stringify({ bookingId, locale })
         });
         if (!confirmZeroRes.ok) throw new Error('Kunne ikke bekrefte 0 kr booking');
-        if (window.top) window.top.location.href = `/checkout/return?reference=${bookingId}`;
-        else window.location.href = `/checkout/return?reference=${bookingId}`;
+        const returnUrl = `/checkout/return?reference=${bookingId}${isEn ? "&lang=en" : ""}`;
+        if (window.top) window.top.location.href = returnUrl;
+        else window.location.href = returnUrl;
         return;
       }
 
@@ -287,6 +327,7 @@ export function useBookingFlow() {
         body: JSON.stringify({
           bookingId, amount: amountToPay,
           description: `Booking: ${selectedExperience.name} for ${players} players`,
+          locale,
         }),
       });
 
@@ -298,7 +339,7 @@ export function useBookingFlow() {
       
     } catch (error) {
       console.error("Booking failed", error);
-      toast.error("Payment initialization failed. Please try again.");
+      toast.error(isEn ? "Booking submission failed. Please try again." : "Betalingsinitialisering feilet. Vennligst prøv igjen.");
       setIsSubmitting(false);
     }
   };
@@ -323,7 +364,6 @@ export function useBookingFlow() {
       availableTimes.forEach(slot => {
         const slotStart = timeToMinutes(slot);
         const slotEnd = slotStart + 90;
-        // Overlap condition: slotStart < bEnd && bStart < slotEnd
         if (slotStart < bEnd && bStart < slotEnd) {
           blocked.add(slot.trim());
         }

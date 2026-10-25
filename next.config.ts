@@ -50,7 +50,27 @@ const nextConfig: NextConfig = {
         destination: '/vr-opplevelser/:path*',
         permanent: true,
       },
-      // Specific experience redirects (Tactical Arena)
+      // Specific experience redirects (Tactical Arena & Zombie Shooter)
+      {
+        source: '/vr-opplevelser/tactical-arena',
+        destination: '/vr-opplevelser/action-strategi/tactical-arena',
+        permanent: true,
+      },
+      {
+        source: '/vr-opplevelser/zombie-shooter',
+        destination: '/vr-opplevelser/action-strategi/zombie-shooter-18',
+        permanent: true,
+      },
+      {
+        source: '/en/experiences/tactical-arena',
+        destination: '/en/experiences/action-strategy/tactical-arena',
+        permanent: true,
+      },
+      {
+        source: '/en/experiences/zombie-shooter',
+        destination: '/en/experiences/action-strategy/zombie-shooter-18',
+        permanent: true,
+      },
       {
         source: '/vr-opplevelser/rask-action/mixed-reality-shooter',
         destination: '/vr-opplevelser/action-strategi/tactical-arena',

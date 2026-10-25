@@ -42,6 +42,7 @@ export async function POST(req: Request) {
           food: data.food || null,
           bar: data.bar || null,
           status: 'new',
+          locale: data.locale || 'no',
         }
       });
     } catch (dbError) {

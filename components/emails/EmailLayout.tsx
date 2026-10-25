@@ -5,21 +5,24 @@ interface EmailLayoutProps {
   previewText?: string;
   children: React.ReactNode;
   adminEmail?: string;
+  locale?: "no" | "en";
 }
 
 export const EmailLayout: React.FC<EmailLayoutProps> = ({
   previewText,
   children,
   adminEmail = 'post@krsvr.no',
+  locale = 'no',
 }) => {
+  const isEn = locale === 'en';
   return (
-    <Html lang="no">
+    <Html lang={isEn ? 'en' : 'no'}>
       <Head />
       <Body style={mainStyle}>
         <Container style={containerStyle}>
           {/* Clean Website Header */}
           <Section style={headerStyle}>
-            <Link href="https://krsvr.no" style={{ textDecoration: 'none', display: 'inline-block' }}>
+            <Link href={isEn ? 'https://krsvr.no/en' : 'https://krsvr.no'} style={{ textDecoration: 'none', display: 'inline-block' }}>
               <Img
                 src="https://krsvr.no/krsvrarena_logo_sort.png"
                 alt="KRS VR ARENA"
@@ -44,14 +47,16 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({
           <Hr style={hrStyle} />
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
-              <strong>Krs VR Arena AS</strong> &bull; Org.nr: 936318878 MVA<br />
-              Industrigata 12, 4632 Kristiansand<br />
-              Telefon: <Link href="tel:+4740828302" style={linkStyle}>+47 408 28 302</Link> &bull; E-post: <Link href={`mailto:${adminEmail}`} style={linkStyle}>{adminEmail}</Link>
+              <strong>Krs VR Arena AS</strong> &bull; {isEn ? 'Org. no.: 936318878 MVA' : 'Org.nr: 936318878 MVA'}<br />
+              Industrigata 12, 4632 Kristiansand, {isEn ? 'Norway' : ''}<br />
+              {isEn ? 'Phone:' : 'Telefon:'} <Link href="tel:+4740828302" style={linkStyle}>+47 408 28 302</Link> &bull; {isEn ? 'Email:' : 'E-post:'} <Link href={`mailto:${adminEmail}`} style={linkStyle}>{adminEmail}</Link>
             </Text>
             <Section style={socialLinksStyle}>
               <Link href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" style={socialLinkItem}>Google Maps</Link>
-              <Link href="https://krsvr.no/faq" style={socialLinkItem}>Ofte stilte spørsmål (FAQ)</Link>
-              <Link href="https://krsvr.no" style={socialLinkItem}>krsvr.no</Link>
+              <Link href={isEn ? 'https://krsvr.no/en/faq' : 'https://krsvr.no/faq'} style={socialLinkItem}>
+                {isEn ? 'Frequently Asked Questions (FAQ)' : 'Ofte stilte spørsmål (FAQ)'}
+              </Link>
+              <Link href={isEn ? 'https://krsvr.no/en' : 'https://krsvr.no'} style={socialLinkItem}>krsvr.no</Link>
             </Section>
           </Section>
         </Container>

@@ -23,9 +23,9 @@ export default function ReviewRequestModal({
 
   useEffect(() => {
     if (isOpen) {
-      // Reset defaults when modal opens
+      // Reset defaults when modal opens, pre-selecting English if booking was placed on /en/booking
       setPlatform("both");
-      setLanguage("no");
+      setLanguage(booking?.locale === "en" ? "en" : "no");
       setSending(false);
     }
   }, [isOpen, booking]);

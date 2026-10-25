@@ -54,7 +54,8 @@ export async function sendBookingConfirmationEmail(
   }
 
   const adminEmail = await getAdminEmail();
-  let { id, manageToken, firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId, paymentType } = bookingDetails;
+  let { id, manageToken, firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId, paymentType, locale } = bookingDetails;
+  const isEn = locale === 'en';
   
   if (!manageToken && id) {
     const crypto = await import('crypto');
@@ -69,14 +70,16 @@ export async function sendBookingConfirmationEmail(
     }
   }
 
-  const manageUrl = `https://krsvr.no/booking/manage/${id}?token=${manageToken}`;
+  const manageUrl = isEn
+    ? `https://krsvr.no/en/booking/manage/${id}?token=${manageToken}`
+    : `https://krsvr.no/booking/manage/${id}?token=${manageToken}`;
   
   let experienceTitle = "VR Experience";
   if (experienceId) {
     try {
       const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
-      if (exp && exp.name) {
-        experienceTitle = exp.name;
+      if (exp) {
+        experienceTitle = (isEn && exp.nameEn) ? exp.nameEn : (exp.name || "VR Experience");
       }
     } catch (e) {
       console.error("Error fetching experience title:", e);
@@ -84,9 +87,9 @@ export async function sendBookingConfirmationEmail(
   }
 
   const isUpdate = !!options?.isUpdate;
-  const defaultSubject = isUpdate 
-    ? 'Oppdatert bestillingsbekreftelse - KRS VR Arena' 
-    : 'Bestillingsbekreftelse og kvittering - KRS VR Arena';
+  const defaultSubject = isEn
+    ? (isUpdate ? 'Updated Booking Confirmation - KRS VR Arena' : 'Booking Confirmation & Receipt - KRS VR Arena')
+    : (isUpdate ? 'Oppdatert bestillingsbekreftelse - KRS VR Arena' : 'Bestillingsbekreftelse og kvittering - KRS VR Arena');
   const emailSubject = options?.subject || defaultSubject;
 
   try {
@@ -105,6 +108,7 @@ export async function sendBookingConfirmationEmail(
         customText,
         adminEmail,
         isUpdate,
+        locale: isEn ? 'en' : 'no',
       })
     );
 
@@ -140,7 +144,8 @@ export async function sendNameListDailyReminderEmail(bookingDetails: any) {
   }
 
   const adminEmail = await getAdminEmail();
-  let { id, manageToken, firstName, lastName, date, time, players, email, experienceId } = bookingDetails;
+  let { id, manageToken, firstName, lastName, date, time, players, email, experienceId, locale } = bookingDetails;
+  const isEn = locale === 'en';
   
   if (!manageToken && id) {
     const crypto = await import('crypto');
@@ -155,14 +160,16 @@ export async function sendNameListDailyReminderEmail(bookingDetails: any) {
     }
   }
 
-  const manageUrl = `https://krsvr.no/booking/manage/${id}?token=${manageToken}`;
+  const manageUrl = isEn
+    ? `https://krsvr.no/en/booking/manage/${id}?token=${manageToken}`
+    : `https://krsvr.no/booking/manage/${id}?token=${manageToken}`;
   
   let experienceTitle = "VR Experience";
   if (experienceId) {
     try {
       const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
-      if (exp && exp.name) {
-        experienceTitle = exp.name;
+      if (exp) {
+        experienceTitle = (isEn && exp.nameEn) ? exp.nameEn : (exp.name || "VR Experience");
       }
     } catch (e) {}
   }
@@ -178,6 +185,7 @@ export async function sendNameListDailyReminderEmail(bookingDetails: any) {
         players: Number(players) || 1,
         manageUrl,
         adminEmail,
+        locale: isEn ? 'en' : 'no',
       })
     );
 
@@ -185,7 +193,9 @@ export async function sendNameListDailyReminderEmail(bookingDetails: any) {
       from: 'KRS VR Arena <booking@donotreply.krsvr.no>',
       to: email,
       replyTo: adminEmail,
-      subject: `Påminnelse: Vi trenger navneliste til deres opplevelse den ${date} kl. ${time}`,
+      subject: isEn
+        ? `Reminder: Player list for your VR experience on ${date} at ${time}`
+        : `Påminnelse: Vi trenger navneliste til deres opplevelse den ${date} kl. ${time}`,
       html,
     });
     
@@ -208,13 +218,16 @@ export async function sendBookingCancellationEmail(
 ) {
   if (!process.env.RESEND_API_KEY) return null;
   const adminEmail = await getAdminEmail();
-  const { firstName, lastName, date, time, experienceId } = bookingDetails;
+  const { firstName, lastName, date, time, experienceId, locale } = bookingDetails;
+  const isEn = locale === 'en';
 
   let experienceTitle = "VR Experience";
   if (experienceId) {
     try {
       const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
-      if (exp && exp.name) experienceTitle = exp.name;
+      if (exp) {
+        experienceTitle = (isEn && exp.nameEn) ? exp.nameEn : (exp.name || "VR Experience");
+      }
     } catch (e) {}
   }
 
@@ -228,6 +241,7 @@ export async function sendBookingCancellationEmail(
         time,
         amountRefunded,
         adminEmail,
+        locale: isEn ? 'en' : 'no',
       })
     );
 
@@ -235,7 +249,7 @@ export async function sendBookingCancellationEmail(
       from: 'KRS VR Arena <booking@donotreply.krsvr.no>',
       to,
       replyTo: adminEmail,
-      subject: 'Kansellering av booking - KRS VR Arena',
+      subject: isEn ? 'Booking Cancellation - KRS VR Arena' : 'Kansellering av booking - KRS VR Arena',
       html,
     });
     

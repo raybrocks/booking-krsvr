@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Heading, Text, Section, Link, Button } from '@react-email/components';
 import { EmailLayout } from './EmailLayout';
+import { toApproxEur } from '@/lib/currency';
 
 export interface BookingConfirmationEmailProps {
   firstName: string;
@@ -16,6 +17,7 @@ export interface BookingConfirmationEmailProps {
   customText?: string;
   adminEmail?: string;
   isUpdate?: boolean;
+  locale?: "no" | "en";
 }
 
 export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> = ({
@@ -32,21 +34,44 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
   customText,
   adminEmail = 'post@krsvr.no',
   isUpdate = false,
+  locale = 'no',
 }) => {
+  const isEn = locale === 'en';
   const remainingAmount = totalPrice - amountPaid;
 
   return (
     <EmailLayout 
-      previewText={isUpdate ? `Oppdatert bestilling for ${experienceTitle} den ${date}` : `Bestillingsbekreftelse for ${experienceTitle} den ${date}`} 
+      previewText={
+        isEn
+          ? isUpdate
+            ? `Updated booking for ${experienceTitle} on ${date}`
+            : `Booking confirmation for ${experienceTitle} on ${date}`
+          : isUpdate
+          ? `Oppdatert bestilling for ${experienceTitle} den ${date}`
+          : `Bestillingsbekreftelse for ${experienceTitle} den ${date}`
+      } 
       adminEmail={adminEmail}
+      locale={locale}
     >
       <Heading style={headingStyle}>
-        {isUpdate ? 'Oppdatert bestillingsbekreftelse' : 'Bestillingsbekreftelse og kvittering'}
+        {isEn
+          ? isUpdate
+            ? 'Updated Booking Confirmation'
+            : 'Booking Confirmation & Receipt'
+          : isUpdate
+          ? 'Oppdatert bestillingsbekreftelse'
+          : 'Bestillingsbekreftelse og kvittering'}
       </Heading>
       
-      <Text style={paragraphStyle}>Hei {firstName} {lastName},</Text>
       <Text style={paragraphStyle}>
-        {isUpdate 
+        {isEn ? `Hello ${firstName} ${lastName},` : `Hei ${firstName} ${lastName},`}
+      </Text>
+      <Text style={paragraphStyle}>
+        {isEn
+          ? isUpdate
+            ? 'Here is an updated confirmation for your booking at KRS VR Arena. Below you will find your updated details.'
+            : 'Thank you for your reservation. We look forward to welcoming you at KRS VR Arena.'
+          : isUpdate 
           ? 'Her er en oppdatert bekreftelse på din bestilling hos KRS VR Arena. Nedenfor finner du de oppdaterte detaljene.'
           : 'Takk for din bestilling. Vi gleder oss til å ta imot dere hos KRS VR Arena.'}
       </Text>
@@ -61,56 +86,118 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
 
       {/* Navneliste og justering */}
       <Section style={calloutBoxStyle}>
-        <Text style={calloutTitleStyle}>Navneliste og antall deltakere</Text>
+        <Text style={calloutTitleStyle}>
+          {isEn ? 'Player List & Participant Count' : 'Navneliste og antall deltakere'}
+        </Text>
         <Text style={calloutTextStyle}>
-          For at vi skal kunne klargjøre VR-utstyret og gjøre alt klart før dere kommer, ber vi om at du fyller ut fornavn på deltakerne i forkant.
+          {isEn
+            ? 'So that we can prepare the VR headsets and have everything ready before you arrive, we kindly ask that you enter the first names of the participants in advance.'
+            : 'For at vi skal kunne klargjøre VR-utstyret og gjøre alt klart før dere kommer, ber vi om at du fyller ut fornavn på deltakerne i forkant.'}
         </Text>
         <Text style={calloutSubTextStyle}>
-          Dere kan justere antall deltakere og oppdatere navnelisten helt frem til ankomst. Vær imidlertid oppmerksom på at sene endringer ved oppmøte kan skape forsinkelser i klargjøringen og medføre redusert spilletid.
+          {isEn
+            ? 'You can adjust the number of participants and update the player list right up until arrival. Please note, however, that late changes upon arrival may cause delays in preparation and result in reduced game time.'
+            : 'Dere kan justere antall deltakere og oppdatere navnelisten helt frem til ankomst. Vær imidlertid oppmerksom på at sene endringer ved oppmøte kan skape forsinkelser i klargjøringen og medføre redusert spilletid.'}
         </Text>
         <Button href={manageUrl} style={primaryButtonStyle}>
-          Administrer booking og navneliste &rarr;
+          {isEn ? 'Manage booking & player list →' : 'Administrer booking og navneliste →'}
         </Button>
       </Section>
 
       {/* Booking Detaljer */}
-      <Text style={subheadingStyle}>Bestillingsdetaljer</Text>
+      <Text style={subheadingStyle}>
+        {isEn ? 'Booking Details' : 'Bestillingsdetaljer'}
+      </Text>
       <Section style={detailsTableStyle}>
-        <Text style={detailRowStyle}><strong>Opplevelse:</strong> {experienceTitle}</Text>
-        <Text style={detailRowStyle}><strong>Dato:</strong> {date}</Text>
-        <Text style={detailRowStyle}><strong>Tidspunkt:</strong> {time}</Text>
-        <Text style={detailRowStyle}><strong>Antall personer:</strong> {players} pers</Text>
+        <Text style={detailRowStyle}>
+          <strong>{isEn ? 'Experience:' : 'Opplevelse:'}</strong> {experienceTitle}
+        </Text>
+        <Text style={detailRowStyle}>
+          <strong>{isEn ? 'Date:' : 'Dato:'}</strong> {date}
+        </Text>
+        <Text style={detailRowStyle}>
+          <strong>{isEn ? 'Time:' : 'Tidspunkt:'}</strong> {time}
+        </Text>
+        <Text style={detailRowStyle}>
+          <strong>{isEn ? 'Participants:' : 'Antall personer:'}</strong> {players} {isEn ? 'players' : 'pers'}
+        </Text>
       </Section>
 
       {/* Betalingsinformasjon */}
-      <Text style={subheadingStyle}>Betalingsinformasjon</Text>
+      <Text style={subheadingStyle}>
+        {isEn ? 'Payment Information' : 'Betalingsinformasjon'}
+      </Text>
       <Section style={detailsTableStyle}>
         <Text style={detailRowStyle}>
-          <strong>Betalingsmåte:</strong> {paymentType === 'terminal' || (amountPaid === 0 && totalPrice > 0) ? 'Betales i arenaen (kortterminal)' : 'Vipps'}
+          <strong>{isEn ? 'Payment method:' : 'Betalingsmåte:'}</strong>{' '}
+          {paymentType === 'terminal' || (amountPaid === 0 && totalPrice > 0)
+            ? isEn
+              ? 'Pay on arrival in the arena (card terminal)'
+              : 'Betales i arenaen (kortterminal)'
+            : 'Vipps'}
         </Text>
-        <Text style={detailRowStyle}><strong>Totalpris:</strong> NOK {totalPrice}</Text>
-        <Text style={detailRowStyle}><strong>Betalt på nett:</strong> NOK {amountPaid}</Text>
         <Text style={detailRowStyle}>
-          <strong>Gjenstående beløp:</strong> NOK {remainingAmount} {remainingAmount > 0 ? (paymentType === 'terminal' || amountPaid === 0 ? '(betales i kortterminal ved ankomst)' : '(betales ved oppmøte/faktura)') : ''}
+          <strong>{isEn ? 'Total price:' : 'Totalpris:'}</strong> NOK {totalPrice}
+          {isEn && totalPrice > 0 ? ` (approx. €${toApproxEur(totalPrice)})` : ''}
+        </Text>
+        <Text style={detailRowStyle}>
+          <strong>{isEn ? 'Paid online:' : 'Betalt på nett:'}</strong> NOK {amountPaid}
+        </Text>
+        <Text style={detailRowStyle}>
+          <strong>{isEn ? 'Remaining balance:' : 'Gjenstående beløp:'}</strong> NOK {remainingAmount}
+          {isEn && remainingAmount > 0 ? ` (approx. €${toApproxEur(remainingAmount)})` : ''}{' '}
+          {remainingAmount > 0
+            ? paymentType === 'terminal' || amountPaid === 0
+              ? isEn
+                ? '(paid by card terminal upon arrival)'
+                : '(betales i kortterminal ved ankomst)'
+              : isEn
+              ? '(paid upon arrival / invoice)'
+              : '(betales ved oppmøte/faktura)'
+            : ''}
         </Text>
       </Section>
 
       {/* Praktisk Info */}
       <Section style={infoBoxStyle}>
-        <Text style={infoBoxTitleStyle}>Praktisk informasjon</Text>
-        <Text style={infoBoxTextStyle}>
-          <strong>Adresse:</strong> Industrigata 12, Lund, 4632 Kristiansand (<Link href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" style={{ color: '#7c3aed' }}>Google Maps</Link>)
+        <Text style={infoBoxTitleStyle}>
+          {isEn ? 'Practical Information' : 'Praktisk informasjon'}
         </Text>
         <Text style={infoBoxTextStyle}>
-          <strong>Oppmøte:</strong> Møt presist for å ikke miste spilletid.
+          <strong>{isEn ? 'Address:' : 'Adresse:'}</strong> Industrigata 12, Lund, 4632 Kristiansand (<Link href="https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8" style={{ color: '#7c3aed' }}>Google Maps</Link>)
         </Text>
         <Text style={infoBoxTextStyle}>
-          <strong>Briller og linser:</strong> VR-brillene passer over de fleste vanlige synsbriller.
+          <strong>{isEn ? 'Arrival:' : 'Oppmøte:'}</strong>{' '}
+          {isEn
+            ? 'Please arrive on time so you do not lose any game time.'
+            : 'Møt presist for å ikke miste spilletid.'}
+        </Text>
+        <Text style={infoBoxTextStyle}>
+          <strong>{isEn ? 'Glasses & contact lenses:' : 'Briller og linser:'}</strong>{' '}
+          {isEn
+            ? 'Our VR headsets fit over most regular eyeglasses.'
+            : 'VR-brillene passer over de fleste vanlige synsbriller.'}
         </Text>
       </Section>
 
       <Text style={footnoteStyle}>
-        Har du spørsmål rundt bestillingen, kan du svare direkte på denne e-posten eller kontakte oss på <Link href={`mailto:${adminEmail}`} style={{ color: '#7c3aed' }}>{adminEmail}</Link>.
+        {isEn ? (
+          <>
+            If you have any questions regarding your booking, you can reply directly to this email or contact us at{' '}
+            <Link href={`mailto:${adminEmail}`} style={{ color: '#7c3aed' }}>
+              {adminEmail}
+            </Link>
+            .
+          </>
+        ) : (
+          <>
+            Har du spørsmål rundt bestillingen, kan du svare direkte på denne e-posten eller kontakte oss på{' '}
+            <Link href={`mailto:${adminEmail}`} style={{ color: '#7c3aed' }}>
+              {adminEmail}
+            </Link>
+            .
+          </>
+        )}
       </Text>
     </EmailLayout>
   );

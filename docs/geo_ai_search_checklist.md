@@ -59,6 +59,16 @@ Disse 6 nøytrale testsøkene (uten å nevne «KRS» i søket) kjøres ved hver 
 | **5** | *«Utdrikningslag Kristiansand aktiviteter»* | ❌ **Ikke nevnt** | AI lister Escape Room, SpyGames, Høyt & Lavt, Skyland, X3M Gokart, Glowing Golf. | `utdrikningslag.events`, `utdrikningslag.com`, `escapekristiansand.no`, `hoytlavt.no` | Registrere oppføring på `utdrikningslag.com` / `utdrikningslag.no` + anmeldelser fra utdrikningslag. |
 | **6** | *«Innendørs aktiviteter Kristiansand regnværsdag»* | ❌ **Ikke nevnt** | AI lister Kunstsilo, Kilden, Aquarama, Vitensenteret, X3M Gokart, PlayWorld, Lucky Bowl og Sørlandssenteret. | `visitsorlandet.com`, `visitnorway.no`, `kristiansandguiden.no`, `eventguiden.no` | Kontakte Visit Sørlandet og lokale guider for å bli lagt inn i artikler om *«Innendørs aktiviteter og regnværsdager i Kristiansand»*. |
 
+### D. Internasjonale Turist- og AI-søk (EN / DE / NL – Lagt til `25.10.2026`)
+
+Med lansering av `/en/*`, `/de` og `/nl` kan vi også spore synlighet i AI-søk for engelskspråklige, tyske og nederlandske turister:
+
+| Språk | Kommersielt Turistsøk | Målside (`hreflang`) | Fokuspunkter for AI-sitering |
+| :---: | :--- | :--- | :--- |
+| **🇬🇧 EN** | *«Things to do in Kristiansand when raining»* / *«Indoor activities Kristiansand family»* | `https://www.krsvr.no/en` | 5 min fra Color Line / Fjord Line, 8+ år, engelsk vertskap, 0 NOK forhåndsbetaling (kort ved ankomst). |
+| **🇩🇪 DE** | *«Aktivitäten in Kristiansand bei Regen mit Kindern»* / *«Ausflugsziele Kristiansand Indoor»* | `https://www.krsvr.no/de` | 5 Min. vom Fährhafen, Spiele auf Deutsch/Englisch im Headset, Zahlung vor Ort mit Visa/Mastercard/Apple Pay. |
+| **🇳🇱 NL** | *«Wat te doen in Kristiansand bij regen met kinderen»* / *«Binnenactiviteiten Kristiansand»* | `https://www.krsvr.no/nl` | 5 min van de veerboothaven, 8+ jaar, gratis parkeren (ook voor campers), betaling ter plaatse met pinpas/creditcard. |
+
 ---
 
 ## 1. Registrering i eksterne kanaler og autoritetskilder

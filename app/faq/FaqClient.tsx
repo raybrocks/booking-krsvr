@@ -10,7 +10,14 @@ interface FaqItem {
   answer: string;
 }
 
-export function FaqClient({ faqs }: { faqs: FaqItem[] }) {
+export function FaqClient({
+  faqs,
+  locale = "no",
+}: {
+  faqs: FaqItem[];
+  locale?: "no" | "en";
+}) {
+  const isEn = locale === "en";
   return (
     <>
       <motion.div
@@ -19,10 +26,32 @@ export function FaqClient({ faqs }: { faqs: FaqItem[] }) {
          className="mb-10 text-center px-4"
       >
         <h1 className="text-4xl md:text-5xl font-light tracking-tighter">
-          Ofte Stilte Spørsmål
+          {isEn ? "Frequently Asked Questions" : "Ofte Stilte Spørsmål"}
         </h1>
         <p className="mt-3 text-zinc-400 max-w-lg mx-auto">
-          Her finner du svar på de vanligste spørsmålene. Finner du ikke svar på det du leter etter, ta gjerne <Link href="/kontakt" className="text-[#9C39FF] hover:text-white transition-colors underline underline-offset-4">kontakt med oss</Link>.
+          {isEn ? (
+            <>
+              Find answers to the most common questions about visiting KRS VR Arena. If you cannot find what you are looking for, feel free to{" "}
+              <Link
+                href="/en/contact"
+                className="text-[#9C39FF] hover:text-white transition-colors underline underline-offset-4"
+              >
+                contact us
+              </Link>
+              .
+            </>
+          ) : (
+            <>
+              Her finner du svar på de vanligste spørsmålene. Finner du ikke svar på det du leter etter, ta gjerne{" "}
+              <Link
+                href="/kontakt"
+                className="text-[#9C39FF] hover:text-white transition-colors underline underline-offset-4"
+              >
+                kontakt med oss
+              </Link>
+              .
+            </>
+          )}
         </p>
       </motion.div>
 

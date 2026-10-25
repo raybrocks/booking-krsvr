@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
              cancellationEmailSent: false,
              discountCode: data.discountCode,
              internalNotes: data.internalNotes,
+             locale: data.locale || 'no',
           }
         });
         return NextResponse.json({ id: resetBooking.id }, { status: 201 });
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
                cancellationEmailSent: false,
                discountCode: data.discountCode,
                internalNotes: data.internalNotes,
+               locale: data.locale || 'no',
                manageToken: crypto.randomBytes(32).toString('hex'),
             }
           });
@@ -101,6 +103,7 @@ export async function POST(req: NextRequest) {
         status: data.status || 'pending',
         discountCode: data.discountCode,
         internalNotes: data.internalNotes,
+        locale: data.locale || 'no',
         manageToken: crypto.randomBytes(32).toString('hex'),
       }
     });

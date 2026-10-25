@@ -26,6 +26,13 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: 'https://www.krsvr.no',
+    languages: {
+      'nb-NO': 'https://www.krsvr.no',
+      'en': 'https://www.krsvr.no/en',
+      'de': 'https://www.krsvr.no/de',
+      'nl': 'https://www.krsvr.no/nl',
+      'x-default': 'https://www.krsvr.no/en',
+    },
   },
   openGraph: {
     title: 'KRS VR Arena | Kristiansands mest sosiale VR-opplevelser',

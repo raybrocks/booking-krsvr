@@ -72,20 +72,48 @@
 ## 3. Prisstruktur og MVA-regler
 
 ### 3.1 Privat Booking og Familiepakker (2–10 spillere, 90 minutter)
-Prisene gjelder for familiepakker, escape rooms og actionspill, og er oppgitt **inkludert merverdiavgift (mva)**:
-- 2 personer: 460 NOK per person
-- 3–4 personer: 395 NOK per person
-- 5–7 personer: 385 NOK per person
-- 8–10 personer: 375 NOK per person
+Prisene gjelder for familiepakker, escape rooms og actionspill, og er oppgitt **inkludert merverdiavgift (mva)** (med veiledende euro-priser basert på 1 EUR ≈ 11,75 NOK):
+- 2 personer: 460 NOK per person (approx. €39)
+- 3–4 personer: 395 NOK per person (approx. €34)
+- 5–7 personer: 385 NOK per person (approx. €33)
+- 8–10 personer: 375 NOK per person (approx. €32)
 
 ### 3.2 Bedriftsarrangement og Teambuilding
 Prisene er oppgitt **ekskludert merverdiavgift (+ mva)**:
-- **Teambuilding (2–10 personer):** 375 NOK + mva per person (90 minutter totalopplevelse).
+- **Teambuilding (2–10 personer):** 375 NOK + mva per person (approx. €32 + VAT, 90 minutter totalopplevelse).
 - **Teambuilding / Firmaevent (10–50 personer):** 375 NOK + mva per person (inntil 3 timer totaltid, hele lokalet eksklusivt for kunden, 120 minutter aktivt turneringsformat).
 
 ### 3.3 Utdrikningslag og Bursdag
-- **Utdrikningslag:** Fra 450 NOK per person (varighet 1,5–3 timer).
-- **VR Bursdag / Barnebursdag:** Fra 375 NOK per person (90 minutter totalopplevelse).
+- **Utdrikningslag:** Fra 450 NOK per person (approx. €38, varighet 1,5–3 timer).
+- **VR Bursdag / Barnebursdag:** Fra 375 NOK per person (approx. €32, 90 minutter totalopplevelse).
+
+---
+
+## 3B. International Visitors & Multilingual Support (EN / DE / NL)
+
+KRS VR Arena welcomes international tourists, families, cruise passengers, and ferry travelers visiting Kristiansand and Southern Norway (Sørlandet):
+- **English Website (Full Site):**
+  - Home: https://www.krsvr.no/en
+  - Experiences: https://www.krsvr.no/en/experiences
+  - Family Experiences (Ages 8+): https://www.krsvr.no/en/experiences/family
+  - Prices (NOK & EUR): https://www.krsvr.no/en/prices
+  - Events & Teambuilding: https://www.krsvr.no/en/events
+  - FAQ: https://www.krsvr.no/en/faq
+  - Contact: https://www.krsvr.no/en/contact
+  - Online Booking (English): https://www.krsvr.no/en/booking
+- **German Tourist Landing Page (Deutsch):** https://www.krsvr.no/de
+  - Dedicated German overview of all VR experiences, NOK & EUR prices, ferry port directions, rainy-day tips, and German FAQ, linking directly to `/en/booking`.
+- **Dutch Tourist Landing Page (Nederlands):** https://www.krsvr.no/nl
+  - Dedicated Dutch overview of all VR experiences, NOK & EUR prices, ferry port directions, rainy-day tips, and Dutch FAQ, linking directly to `/en/booking`.
+- **Languages Spoken & In-Game Languages:**
+  - All game masters speak fluent **Norwegian** and **English**.
+  - Inside the VR headsets, most VR Escape Rooms and action games can be set to **English**, **German (Deutsch)**, or **French**.
+- **Ferry Terminal & Travel Logistics:**
+  - Located at **Industrigata 12, 4632 Kristiansand (Lund)** — only **5 minutes by car (approx. 3 km)** from the Kristiansand ferry terminal (**Color Line** & **Fjord Line** from Hirtshals, Denmark) and E18.
+  - Easy parking right outside the arena for cars, vans, and campervans/motorhomes (Wohnmobile / Campers).
+- **Frictionless Payment for International Tourists (`0 NOK` upfront):**
+  - On `/en/booking`, international guests default to **"Pay on arrival in the arena (Card / Apple Pay)"** (`0 NOK` online upfront).
+  - Guests receive instant booking confirmation by email in English and pay upon arrival using **Visa, Mastercard, Apple Pay, or Google Pay** (no Norwegian Vipps required).
 
 ---
 

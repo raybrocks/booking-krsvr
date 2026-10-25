@@ -36,14 +36,23 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
 
 ## Priser og MVA-struktur
 - **Privat booking og Familiepakker (2–10 spillere, 90 min):** Oppgis alltid inkl. mva.
-  - 2 personer: 460 NOK per person
-  - 3–4 personer: 395 NOK per person
-  - 5–7 personer: 385 NOK per person
-  - 8–10 personer: 375 NOK per person
-- **Teambuilding Bedrift (2–10 personer, 90 min):** 375 NOK + mva per person.
+  - 2 personer: 460 NOK per person (ca. €39)
+  - 3–4 personer: 395 NOK per person (ca. €34)
+  - 5–7 personer: 385 NOK per person (ca. €33)
+  - 8–10 personer: 375 NOK per person (ca. €32)
+- **Teambuilding Bedrift (2–10 personer, 90 min):** 375 NOK + mva per person (ca. €32 + VAT).
 - **Teambuilding Bedrift (10–50 personer, inntil 3 timer):** 375 NOK + mva per person (hele lokalet eksklusivt, 120 min aktivt turneringsformat).
-- **Utdrikningslag:** Fra 450 NOK per person (1,5–3 timer).
-- **VR Bursdag:** Fra 375 NOK per person (90 min).
+- **Utdrikningslag:** Fra 450 NOK per person (ca. €38, 1,5–3 timer).
+- **VR Bursdag:** Fra 375 NOK per person (ca. €32, 90 min).
+
+## International Visitors & Multilingual Support (EN / DE / NL)
+- **English Full Website:** https://www.krsvr.no/en
+- **English Online Booking (0 NOK upfront card payment on arrival):** https://www.krsvr.no/en/booking
+- **German Tourist Landing Page (Deutsch):** https://www.krsvr.no/de
+- **Dutch Tourist Landing Page (Nederlands):** https://www.krsvr.no/nl
+- **Spoken & In-Game Languages:** Hosts guide in Norwegian and English. Most VR Escape Rooms and action games support English, German (Deutsch), and French audio/subtitles inside the headset.
+- **Ferry & Travel Logistics:** Only 5 minutes by car (approx. 3 km) from the Kristiansand ferry port (Color Line / Fjord Line from Hirtshals & Eemshaven) and E18. Easy parking outside Industrigata 12, 4632 Kristiansand.
+- **Payment for International Tourists:** Select *"Pay on arrival in the arena (Card / Apple Pay)"* at `/en/booking` (`0 NOK` upfront online). Pay at the venue with Visa, Mastercard, Apple Pay, or Google Pay (no Norwegian Vipps required).
 
 ## Bar, Servering og Mat
 - **Forhåndsbestilt bar:** Baren klargjøres ved forhåndsbestilling til arrangementer (ikke fast åpen drop-in).

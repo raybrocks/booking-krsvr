@@ -23,11 +23,17 @@ export async function generateMetadata({
   // Virtual filter alias: /vr-opplevelser/familie aktiverer Familie-filteret
   if (initialTypeSlug === "familie") {
     const familieUrl = "https://www.krsvr.no/vr-opplevelser/familie";
+    const enFamilyUrl = "https://www.krsvr.no/en/experiences/family";
     return {
       title: "Familievennlige VR-opplevelser i Kristiansand | KRS VR Arena",
       description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Tilpasset for familier med barn og ungdom, bursdag og sosiale aktiviteter.",
       alternates: {
         canonical: familieUrl,
+        languages: {
+          "nb-NO": familieUrl,
+          en: enFamilyUrl,
+          "x-default": enFamilyUrl,
+        },
       },
       openGraph: {
         title: "Familievennlige VR-opplevelser i Kristiansand | KRS VR Arena",
@@ -103,12 +109,24 @@ export async function generateMetadata({
   }
 
   const pageUrl = `https://www.krsvr.no/vr-opplevelser${initialTypeSlug ? `/${initialTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`;
+  const enTypeSlug =
+    initialTypeSlug === "familiepakke" || initialTypeSlug === "familie"
+      ? "family"
+      : initialTypeSlug === "action-strategi"
+      ? "action-strategy"
+      : initialTypeSlug;
+  const enUrl = `https://www.krsvr.no/en/experiences${enTypeSlug ? `/${enTypeSlug}` : ''}${initialExpSlug ? `/${initialExpSlug}` : ''}`;
 
   return {
     title,
     description,
     alternates: {
       canonical: pageUrl,
+      languages: {
+        "nb-NO": pageUrl,
+        en: enUrl,
+        "x-default": enUrl,
+      },
     },
     openGraph: {
       title,

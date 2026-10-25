@@ -5,8 +5,10 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Handshake, Crosshair, Skull, Mountain, Ghost, Gamepad2, Users } from "lucide-react";
 import Tilt from "react-parallax-tilt";
 import { slugify } from "@/lib/utils";
+import { localizeExperience } from "@/lib/i18n";
 
-export default function HomeCarousel() {
+export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }) {
+  const isEn = locale === "en";
   const scrollRef = useRef<HTMLDivElement>(null);
   const [experiences, setExperiences] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,7 +107,7 @@ export default function HomeCarousel() {
       <div className="relative w-full flex items-center">
         <button 
           onClick={scrollLeft} 
-          aria-label="Bla til venstre"
+          aria-label={isEn ? "Scroll left" : "Bla til venstre"}
           className="hidden md:flex absolute -left-12 z-20 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors cursor-pointer"
         >
           <ChevronLeft className="w-14 h-14" strokeWidth={1.5} />
@@ -117,13 +119,38 @@ export default function HomeCarousel() {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <div className="flex items-stretch justify-start gap-5 md:gap-6 px-8 md:px-6 w-max min-w-full">
-          {experiences.map((exp) => {
-            const typeSlug = exp.experienceType?.slug || slugify(exp.type || "");
+          {experiences.map((rawExp) => {
+            const exp = localizeExperience(rawExp, locale);
+            const rawTypeSlug = rawExp.experienceType?.slug || slugify(rawExp.type || "");
+            const typeSlug = isEn
+              ? rawTypeSlug === "familiepakke"
+                ? "family"
+                : rawTypeSlug === "action-strategi"
+                ? "action-strategy"
+                : rawTypeSlug
+              : rawTypeSlug;
+            const expSlug = slugify(rawExp.name);
             const coverImage =
               (Array.isArray(exp.images) && exp.images.length > 0 ? exp.images[0] : null) ||
               exp.picture ||
               null;
             const maxPlayers = exp.maxPlayers || 6;
+            const typeBadge = isEn
+              ? exp.type === "Familiepakke"
+                ? "Family Package"
+                : exp.type === "Action Strategi"
+                ? "Action Strategy"
+                : exp.type
+              : exp.type;
+            const ageLabel = exp.age
+              ? isEn
+                ? String(exp.age).replace("år", "yrs").includes("yrs")
+                  ? String(exp.age).replace("år", "yrs")
+                  : `${exp.age} yrs`
+                : String(exp.age).includes("år")
+                ? exp.age
+                : `${exp.age} år`
+              : null;
 
             return (
               <Tilt
@@ -140,7 +167,7 @@ export default function HomeCarousel() {
                 className="flex-shrink-0 snap-center w-[250px] sm:w-[260px]"
               >
                 <Link
-                  href={`/vr-opplevelser/${typeSlug}/${slugify(exp.name)}`}
+                  href={isEn ? `/en/experiences/${typeSlug}/${expSlug}` : `/vr-opplevelser/${typeSlug}/${expSlug}`}
                   className="flex flex-col justify-between group w-full h-full rounded-3xl overflow-hidden border border-[#9C39FF]/40 bg-zinc-900/70 shadow-[0_0_20px_rgba(156,57,255,0.15)] hover:border-[#9C39FF] hover:shadow-[0_0_30px_rgba(156,57,255,0.35)] transition-all duration-300"
                 >
                   {/* Cover Image or Icon Fallback */}
@@ -150,7 +177,7 @@ export default function HomeCarousel() {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={coverImage}
-                          alt={`${exp.name} – ${exp.type || "VR-opplevelse"} hos KRS VR Arena`}
+                          alt={`${exp.name} – ${typeBadge || (isEn ? "VR Experience" : "VR-opplevelse")} ${isEn ? "at KRS VR Arena" : "hos KRS VR Arena"}`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
@@ -162,9 +189,9 @@ export default function HomeCarousel() {
                     )}
 
                     {/* Genre Pill Top-Left */}
-                    {exp.type && (
+                    {typeBadge && (
                       <span className="absolute top-3 left-3 text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-semibold shadow-md">
-                        {exp.type}
+                        {typeBadge}
                       </span>
                     )}
                   </div>
@@ -185,11 +212,11 @@ export default function HomeCarousel() {
                     <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs text-zinc-400">
                       <span className="inline-flex items-center gap-1.5">
                         <Users className="w-3.5 h-3.5 text-[#9C39FF]" />
-                        2–{maxPlayers >= 10 ? "10" : maxPlayers} spillere
+                        2–{maxPlayers >= 10 ? "10" : maxPlayers} {isEn ? "players" : "spillere"}
                       </span>
-                      {exp.age && (
+                      {ageLabel && (
                         <span className="text-zinc-500 font-medium">
-                          {String(exp.age).includes("år") ? exp.age : `${exp.age} år`}
+                          {ageLabel}
                         </span>
                       )}
                     </div>
@@ -203,7 +230,7 @@ export default function HomeCarousel() {
 
         <button 
           onClick={scrollRight} 
-          aria-label="Bla til høyre"
+          aria-label={isEn ? "Scroll right" : "Bla til høyre"}
           className="hidden md:flex absolute -right-12 z-20 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors cursor-pointer"
         >
           <ChevronRight className="w-14 h-14" strokeWidth={1.5} />
@@ -214,15 +241,15 @@ export default function HomeCarousel() {
       <div className="flex md:hidden items-center justify-center gap-4 mt-1">
         <button
           onClick={scrollLeft}
-          aria-label="Bla til venstre"
+          aria-label={isEn ? "Scroll left" : "Bla til venstre"}
           className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-300 active:scale-95 transition-all"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-xs text-zinc-500">Sveip for å utforske</span>
+        <span className="text-xs text-zinc-500">{isEn ? "Swipe to explore" : "Sveip for å utforske"}</span>
         <button
           onClick={scrollRight}
-          aria-label="Bla til høyre"
+          aria-label={isEn ? "Scroll right" : "Bla til høyre"}
           className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-300 active:scale-95 transition-all"
         >
           <ChevronRight className="w-5 h-5" />

@@ -40,6 +40,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { slugify } from "@/lib/utils";
 import { getLanguageInfo } from "@/lib/languages";
+import { localizeExperience } from "@/lib/i18n";
 
 const getTypeSlug = (exp: any) => exp.experienceType?.slug || slugify(exp.type || "");
 
@@ -253,21 +254,26 @@ function LanguageFlagsRow({ languages }: { languages: string[] }) {
 export function ExperiencesView({ 
   initialExperiences = [],
   initialTypeSlug, 
-  initialExpSlug 
+  initialExpSlug,
+  locale = "no"
 }: { 
   initialExperiences?: any[];
   initialTypeSlug?: string | null;
   initialExpSlug?: string | null;
+  locale?: "no" | "en";
 }) {
+  const isEn = locale === "en";
   const [experiences, setExperiences] = useState<any[]>(
-    initialExperiences.filter((e: any) => e.isActive && e.type !== "Vipps test")
+    initialExperiences
+      .filter((e: any) => e.isActive && e.type !== "Vipps test")
+      .map((e: any) => ({ ...localizeExperience(e, locale), rawName: e.name }))
   );
   const [selectedId, setSelectedId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(experiences.length === 0);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [activePrimaryFilter, setActivePrimaryFilter] = useState<string>(() => {
-    if (initialTypeSlug === "familie" || initialTypeSlug === "familiepakke" || initialTypeSlug === "archer") return "Familie";
-    if (initialTypeSlug === "action-strategi" || initialTypeSlug === "action" || initialTypeSlug === "rask-action" || initialTypeSlug === "fast-action" || initialTypeSlug === "mixed-reality" || initialTypeSlug === "zombie") return "Action Strategi";
+    if (initialTypeSlug === "familie" || initialTypeSlug === "family" || initialTypeSlug === "familiepakke" || initialTypeSlug === "archer") return "Familie";
+    if (initialTypeSlug === "action-strategi" || initialTypeSlug === "action-strategy" || initialTypeSlug === "action" || initialTypeSlug === "rask-action" || initialTypeSlug === "fast-action" || initialTypeSlug === "mixed-reality" || initialTypeSlug === "zombie") return "Action Strategi";
     if (initialTypeSlug === "escape-room" || initialTypeSlug === "escape-rooms") return "Escape Room";
     return "Alle";
   });
@@ -319,7 +325,9 @@ export function ExperiencesView({
             return orderA - orderB;
           });
 
-          exps = exps.filter((e: any) => e.isActive && e.type !== "Vipps test");
+          exps = exps
+            .filter((e: any) => e.isActive && e.type !== "Vipps test")
+            .map((e: any) => ({ ...localizeExperience(e, locale), rawName: e.name }));
           setExperiences(exps);
         }
       } catch (error) {
@@ -330,15 +338,26 @@ export function ExperiencesView({
     };
 
     fetchExperiences();
-  }, [initialExperiences.length]);
+  }, [initialExperiences.length, locale]);
+
+  const normalizeTypeSlug = (slug: string) => {
+    if (slug === "family") return "familie";
+    if (slug === "action-strategy") return "action-strategi";
+    return slug;
+  };
 
   useEffect(() => {
     if (experiences.length > 0) {
       let initialId = "";
-      const typeSlug = initialTypeSlug || "alle";
+      const rawTypeSlug = initialTypeSlug || "alle";
+      const typeSlug = normalizeTypeSlug(rawTypeSlug);
       // Initialize selectedId based on typeSlug and initialExpSlug
       if (typeSlug !== "alle" && initialExpSlug) {
-        const matchedExp = experiences.find(e => getTypeSlug(e) === typeSlug && slugify(e.name) === initialExpSlug);
+        const matchedExp = experiences.find(
+          e =>
+            getTypeSlug(e) === typeSlug &&
+            (slugify(e.rawName || e.name) === initialExpSlug || slugify(e.name) === initialExpSlug)
+        );
         if (matchedExp) initialId = matchedExp.id;
       } else if (typeSlug !== "alle") {
         const matchedExp = experiences.find(e => getTypeSlug(e) === typeSlug);
@@ -346,7 +365,6 @@ export function ExperiencesView({
       }
       
       if (!initialId) {
-        // If no match based on slug, use the first experience based on typeSlug
         const matchingTypeExps = typeSlug === "alle" 
           ? experiences 
           : experiences.filter(e => getTypeSlug(e) === typeSlug);
@@ -379,11 +397,16 @@ export function ExperiencesView({
     // Update URL when selectedId changes (specific experience navigation)
     const exp = experiences.find(e => e.id === selectedId);
     if (exp) {
-      const newUrl = `/vr-opplevelser/${getTypeSlug(exp)}/${slugify(exp.name)}`;
+      const tSlug = getTypeSlug(exp);
+      const enTypeSlug = tSlug === "familie" ? "family" : tSlug === "action-strategi" ? "action-strategy" : tSlug;
+      const expSlug = slugify(exp.rawName || exp.name);
+      const newUrl = isEn
+        ? `/en/experiences/${enTypeSlug}/${expSlug}`
+        : `/vr-opplevelser/${tSlug}/${expSlug}`;
       window.history.replaceState({ path: newUrl }, '', newUrl);
     }
     
-  }, [selectedId, experiences]);
+  }, [selectedId, experiences, isEn]);
 
   const matchesPrimaryFilter = (exp: any, filter: string) => {
     if (filter === "Alle") return true;
@@ -409,14 +432,26 @@ export function ExperiencesView({
     setActivePrimaryFilter(filter);
 
     skipNextUrlUpdate.current = true;
-    if (filter === "Familie") {
-      window.history.pushState({}, '', '/vr-opplevelser/familie');
-    } else if (filter === "Action Strategi" || filter === "Action" || filter === "Rask Action") {
-      window.history.pushState({}, '', '/vr-opplevelser/action-strategi');
-    } else if (filter === "Escape Room") {
-      window.history.pushState({}, '', '/vr-opplevelser/escape-room');
+    if (isEn) {
+      if (filter === "Familie") {
+        window.history.pushState({}, '', '/en/experiences/family');
+      } else if (filter === "Action Strategi" || filter === "Action" || filter === "Rask Action") {
+        window.history.pushState({}, '', '/en/experiences/action-strategy');
+      } else if (filter === "Escape Room") {
+        window.history.pushState({}, '', '/en/experiences/escape-room');
+      } else {
+        window.history.pushState({}, '', '/en/experiences');
+      }
     } else {
-      window.history.pushState({}, '', '/vr-opplevelser');
+      if (filter === "Familie") {
+        window.history.pushState({}, '', '/vr-opplevelser/familie');
+      } else if (filter === "Action Strategi" || filter === "Action" || filter === "Rask Action") {
+        window.history.pushState({}, '', '/vr-opplevelser/action-strategi');
+      } else if (filter === "Escape Room") {
+        window.history.pushState({}, '', '/vr-opplevelser/escape-room');
+      } else {
+        window.history.pushState({}, '', '/vr-opplevelser');
+      }
     }
     
     const newFiltered = experiences.filter(exp => matchesPrimaryFilter(exp, filter));
@@ -482,13 +517,31 @@ export function ExperiencesView({
   if (experiences.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <h2 className="text-2xl font-bold text-white mb-4">Ingen opplevelser lagt til enda</h2>
-        <p className="text-zinc-400">Kom tilbake senere for å se våre opplevelser.</p>
+        <h2 className="text-2xl font-bold text-white mb-4">
+          {isEn ? "No experiences available right now" : "Ingen opplevelser lagt til enda"}
+        </h2>
+        <p className="text-zinc-400">
+          {isEn ? "Please check back soon." : "Kom tilbake senere for å se våre opplevelser."}
+        </p>
       </div>
     );
   }
 
   const getHeadingTitle = () => {
+    if (isEn) {
+      switch (activePrimaryFilter) {
+        case "Familie":
+          return "Family-Friendly VR Experiences";
+        case "Action Strategi":
+        case "Action":
+        case "Rask Action":
+          return "Action & Strategy in VR";
+        case "Escape Room":
+          return "VR Escape Rooms";
+        default:
+          return "VR Experiences in Kristiansand";
+      }
+    }
     switch (activePrimaryFilter) {
       case "Familie":
         return "Familievennlige VR-opplevelser";
@@ -501,6 +554,14 @@ export function ExperiencesView({
       default:
         return "VR-opplevelser i Kristiansand";
     }
+  };
+
+  const filterDisplayLabel = (filter: string) => {
+    if (!isEn) return filter;
+    if (filter === "Alle") return "All";
+    if (filter === "Familie") return "Family";
+    if (filter === "Action Strategi") return "Action & Strategy";
+    return filter;
   };
 
   return (
@@ -516,7 +577,9 @@ export function ExperiencesView({
 
         {/* Simple Primary Filter Row */}
         <p className="text-zinc-400 text-sm md:text-lg text-center font-light mb-5 md:mb-8 max-w-2xl mx-auto px-2">
-          Samle familie, venner eller kolleger til unike opplevelser hos KRS VR Arena i Kristiansand. Laget for samarbeid, kommunikasjon og felles mestring.
+          {isEn
+            ? "Gather family, friends, or colleagues for wireless VR experiences at KRS VR Arena in Kristiansand. Designed for teamwork, communication, and shared excitement."
+            : "Samle familie, venner eller kolleger til unike opplevelser hos KRS VR Arena i Kristiansand. Laget for samarbeid, kommunikasjon og felles mestring."}
         </p>
         <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-4xl mx-auto px-2 mb-2 overflow-x-auto hide-scrollbar">
           {["Alle", "Familie", "Action Strategi", "Escape Room"].map((filter, idx, arr) => {
@@ -531,7 +594,7 @@ export function ExperiencesView({
                       : "text-zinc-400 hover:text-zinc-200 font-normal"
                   }`}
                 >
-                  {filter}
+                  {filterDisplayLabel(filter)}
                   {isActive && (
                     <span className="absolute left-2 right-2 bottom-1 h-[2px] bg-[#9C39FF] rounded-full shadow-[0_0_8px_rgba(156,57,255,0.6)]" />
                   )}
@@ -552,8 +615,12 @@ export function ExperiencesView({
           <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mb-6">
             <X className="w-8 h-8 text-zinc-500" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3 text-center">Ingen opplevelser funnet</h2>
-          <p className="text-zinc-400 text-center max-w-md">Ingen opplevelser matcher filtrene. Prøv å fjerne ett filter.</p>
+          <h2 className="text-2xl font-bold text-white mb-3 text-center">
+            {isEn ? "No experiences found" : "Ingen opplevelser funnet"}
+          </h2>
+          <p className="text-zinc-400 text-center max-w-md">
+            {isEn ? "No experiences match your current filter." : "Ingen opplevelser matcher filtrene. Prøv å fjerne ett filter."}
+          </p>
         </div>
       ) : (
         <>
@@ -588,7 +655,7 @@ export function ExperiencesView({
                   >
                     {exp.isNew && (
                       <span className="absolute -top-2 right-2 bg-[#19EB5B] text-black text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(25,235,91,0.45)]">
-                        Nyhet
+                        {isEn ? "New" : "Nyhet"}
                       </span>
                     )}
                     <div 
@@ -612,7 +679,7 @@ export function ExperiencesView({
                         isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-500 bg-zinc-900"
                       }`}
                     >
-                      {exp.type}
+                      {exp.displayType || exp.type}
                     </span>
                   </button>
                 );
@@ -664,20 +731,20 @@ export function ExperiencesView({
               <div className="flex items-center gap-2 flex-wrap justify-center mt-2">
                 {selected.isNew && (
                   <span className="text-xs md:text-sm uppercase tracking-wider px-3.5 py-1.5 rounded bg-[#19EB5B] text-black font-extrabold shadow-[0_0_15px_rgba(25,235,91,0.3)]">
-                    Nyhet
+                    {isEn ? "New" : "Nyhet"}
                   </span>
                 )}
                 <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
-                  {selected.type}
+                  {selected.displayType || selected.type}
                 </span>
-                {selected.mixedReality && <span title="Fysisk bevegelse der det virkelige rommet blandes med den virtuelle verdenen" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Mixed Reality</span>}
-                {selected.cinematic && <span title="Filmatisk opplevelse med sterk historie og atmosfære" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Cinematic</span>}
-                {selected.action && <span title="Høyt tempo og spenning!" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Action</span>}
-                {selected.jumpScare && <span title="Advarsel: Kan inneholde skremmende elementer" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Jump Scare</span>}
-                {selected.highscore && <span title="Jakt på poeng og sett nye rekorder!" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Highscore</span>}
-                {selected.fantasy && <span title="Opplev magiske og eventyrlige verdener" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Fantasy</span>}
-                {selected.mystic && <span title="Gåtefulle og spennende mysterier venter" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Mystikk</span>}
-                {selected.codeSolving && <span title="Krever kløkt og logisk tenkning for å løse kodene" className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Kodeløsning</span>}
+                {selected.mixedReality && <span title={isEn ? "Physical movement blending the real arena with the virtual world" : "Fysisk bevegelse der det virkelige rommet blandes med den virtuelle verdenen"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Mixed Reality</span>}
+                {selected.cinematic && <span title={isEn ? "Cinematic experience with strong story and atmosphere" : "Filmatisk opplevelse med sterk historie og atmosfære"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Cinematic</span>}
+                {selected.action && <span title={isEn ? "Fast-paced action!" : "Høyt tempo og spenning!"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Action</span>}
+                {selected.jumpScare && <span title={isEn ? "Note: May contain sudden scary elements" : "Advarsel: Kan inneholde skremmende elementer"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Jump Scare</span>}
+                {selected.highscore && <span title={isEn ? "Compete for points and set new records!" : "Jakt på poeng og sett nye rekorder!"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Highscore</span>}
+                {selected.fantasy && <span title={isEn ? "Explore magical fantasy worlds" : "Opplev magiske og eventyrlige verdener"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Fantasy</span>}
+                {selected.mystic && <span title={isEn ? "Mysterious puzzles await" : "Gåtefulle og spennende mysterier venter"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">{isEn ? "Mystery" : "Mystikk"}</span>}
+                {selected.codeSolving && <span title={isEn ? "Requires logic and teamwork to crack the codes" : "Krever kløkt og logisk tenkning for å løse kodene"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">{isEn ? "Code Solving" : "Kodeløsning"}</span>}
               </div>
             </div>
 
@@ -689,7 +756,7 @@ export function ExperiencesView({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src={awardUrl} 
-                      alt={`Utmerkelse for ${selected.name}`} 
+                      alt={`Award for ${selected.name}`} 
                       className="max-h-full max-w-[150px] object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]" 
                     />
                   </div>
@@ -707,34 +774,57 @@ export function ExperiencesView({
                   <Info className="w-4 h-4 text-zinc-400 shrink-0" />
                   
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 p-4 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none text-left whitespace-normal">
-                    <h4 className="font-bold text-white mb-2 text-sm">90 minutter totalopplevelse</h4>
+                    <h4 className="font-bold text-white mb-2 text-sm">
+                      {isEn ? "90-minute total experience" : "90 minutter totalopplevelse"}
+                    </h4>
                     <ul className="text-xs text-zinc-300 space-y-1 list-disc pl-4">
-                      <li>10-15 min forberedelse og intro</li>
-                      <li>Rundt 60 min in-game session</li>
-                      <li>Gruppebilde og gratis vann</li>
-                      <li>Mission debrief og scoreboard i lounge</li>
-                      <li>Lån av party lounge i 30 min etter spill</li>
-                      <li>Gratis kaffe og vann (servering kan forhåndsbestilles)</li>
+                      {isEn ? (
+                        <>
+                          <li>10–15 min briefing & equipment setup</li>
+                          <li>Approx. 60 min active in-game session</li>
+                          <li>Group photo & complimentary water</li>
+                          <li>Mission debrief & scoreboard in the lounge</li>
+                          <li>30 min access to the party lounge after the game</li>
+                          <li>Complimentary coffee & water</li>
+                        </>
+                      ) : (
+                        <>
+                          <li>10-15 min forberedelse og intro</li>
+                          <li>Rundt 60 min in-game session</li>
+                          <li>Gruppebilde og gratis vann</li>
+                          <li>Mission debrief og scoreboard i lounge</li>
+                          <li>Lån av party lounge i 30 min etter spill</li>
+                          <li>Gratis kaffe og vann (servering kan forhåndsbestilles)</li>
+                        </>
+                      )}
                     </ul>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
                   <Users className="w-5 h-5 text-white shrink-0" />
-                  <span>{selected.maxPlayers ? `Fra 2-${selected.maxPlayers} personer` : "Fra 2-10 personer"}</span>
+                  <span>
+                    {isEn
+                      ? selected.maxPlayers
+                        ? `2–${selected.maxPlayers} players`
+                        : "2–10 players"
+                      : selected.maxPlayers
+                      ? `Fra 2-${selected.maxPlayers} personer`
+                      : "Fra 2-10 personer"}
+                  </span>
                 </div>
 
                 {selected.arenaSize && (
                   <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
                     <Maximize className="w-5 h-5 text-white shrink-0" />
-                    <span>{selected.arenaSize}</span>
+                    <span>{isEn ? selected.arenaSize.replace("kvm", "sqm") : selected.arenaSize}</span>
                   </div>
                 )}
 
                 {selected.age && (
                   <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
                     <UserCheck className="w-5 h-5 text-white shrink-0" />
-                    <span>Fra {selected.age} år</span>
+                    <span>{isEn ? `Age ${selected.age.replace("+", "")}+` : `Fra ${selected.age} år`}</span>
                   </div>
                 )}
 
@@ -751,7 +841,7 @@ export function ExperiencesView({
                 <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5 text-sm md:text-base max-w-3xl">
                   <div className="flex items-center gap-2 text-white whitespace-nowrap mr-0.5">
                     <Users className="w-5 h-5 text-white shrink-0" />
-                    <span>Passer for:</span>
+                    <span>{isEn ? "Suitable for:" : "Passer for:"}</span>
                   </div>
                   {selected.suitableFor.map((audience: string, idx: number) => (
                     <React.Fragment key={audience}>
@@ -774,7 +864,9 @@ export function ExperiencesView({
             <div className="flex flex-col gap-12 w-full max-w-3xl mx-auto px-4 items-center">
               {/* DESCRIPTION */}
               <div className="flex flex-col items-center w-full">
-                <h3 className="text-2xl font-bold text-white mb-6 text-center">Om opplevelsen</h3>
+                <h3 className="text-2xl font-bold text-white mb-6 text-center">
+                  {isEn ? "About the experience" : "Om opplevelsen"}
+                </h3>
                 <div className="prose prose-invert prose-lg max-w-none text-zinc-400 text-center">
                   {selected.shortDescription && selected.shortDescription.split('\n').map((paragraph: string, i: number) => (
                     <p key={i} className="mb-4">{paragraph}</p>
@@ -784,15 +876,14 @@ export function ExperiencesView({
 
               {/* PRICING IF AVAILABLE */}
               <div className="w-full">
-                {/* PRICING IF AVAILABLE */}
                 {selected.pricing && Array.isArray(selected.pricing) && selected.pricing.length > 0 && (
                   <div className="bg-gradient-to-br from-zinc-900 to-black p-6 md:p-8 rounded-3xl border border-zinc-800 w-full">
-                    <h3 className="text-2xl font-bold text-white mb-6 text-center">Priser</h3>
+                    <h3 className="text-2xl font-bold text-white mb-6 text-center">{isEn ? "Pricing" : "Priser"}</h3>
                     <div className="flex flex-col gap-3">
                       {selected.pricing.map((p: any, i: number) => (
                         <div key={i} className="flex justify-between items-center border-b border-zinc-800/50 pb-3 last:border-0 last:pb-0">
                           <span className="text-zinc-400">{p.label}</span>
-                          <span className="text-white font-bold">{p.price} kr</span>
+                          <span className="text-white font-bold">{p.price} NOK</span>
                         </div>
                       ))}
                     </div>
@@ -803,9 +894,9 @@ export function ExperiencesView({
             
             {/* BOOK BUTTON */}
             <div className="mt-16 mb-8 w-full px-4 flex justify-center">
-              <Link href={`/booking?opplevelse=${selected.id}`}>
+              <Link href={isEn ? `/en/booking?opplevelse=${selected.id}` : `/booking?opplevelse=${selected.id}`}>
                 <Button size="lg" className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-12 py-8 text-xl rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] hover:shadow-[0_0_40px_rgba(156,57,255,0.6)] hover:-translate-y-1 transition-all duration-300">
-                  Book {selected.name}
+                  {isEn ? `Book ${selected.name}` : `Book ${selected.name}`}
                 </Button>
               </Link>
             </div>

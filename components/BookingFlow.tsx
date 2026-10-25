@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { format, addDays, isSameDay, getDay } from "date-fns";
+import { useState } from "react";
+import { format, isSameDay, getDay } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,14 +11,30 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { toast } from "sonner";
-import { Loader2, CheckCircle2, ChevronRight, ChevronLeft, Users, Clock, Calendar as CalendarIcon } from "lucide-react";
+import { Loader2, CheckCircle2, ChevronRight, ChevronLeft, Clock } from "lucide-react";
 
 import { useBookingFlow } from "@/hooks/useBookingFlow";
 import { getLanguageInfo } from "@/lib/languages";
+import { toApproxEur } from "@/lib/currency";
 
-export default function BookingFlow() {
+const ENGLISH_TERMS_SUMMARY = `Terms & Conditions – KRS VR Arena AS
+
+1. Booking & Capacity
+Your booking reserves a 90-minute experience in the arena (including briefing, equipment setup, gameplay, and lounge time). You may adjust your player count and player names up until arrival, within the maximum capacity of your chosen experience.
+
+2. Payment
+You can pay on arrival in the arena by card (Visa, Mastercard, Apple Pay, Google Pay) or online in advance via Vipps (for Norwegian Vipps users). All prices include VAT.
+
+3. Cancellation & Rescheduling
+Cancellations or rescheduling must be made at least 48 hours prior to the booked start time via the 'Manage Booking' link in your confirmation email or by contacting post@krsvr.no / +47 40 82 83 02.
+
+4. Arrival & Safety
+Please arrive on time so you do not lose any game time. Participants must follow instructions given by the gamemaster. Minimum age is 8 years (18+ for Zombie Shooter).`;
+
+export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" }) {
+  const isEn = locale === "en";
   const {
     step, setStep, experiences, settings, loading,
     selectedDate, setSelectedDate, selectedTime, setSelectedTime,
@@ -30,10 +46,10 @@ export default function BookingFlow() {
     paymentType, setPaymentType, isSubmitting, bookingComplete,
     discountCodeInput, setDiscountCodeInput, appliedDiscount, validatingDiscount,
     discountError, discountMessage,
-    globalPricing, bookedTimes, loadingTimes, availableTimes, bookedDates,
-    isVippsTest, pricePerPerson, rawTotalPrice, discountAmount, totalPrice, amountToPay,
+    bookedTimes, loadingTimes, availableTimes, bookedDates,
+    isVippsTest, pricePerPerson, rawTotalPrice, totalPrice, amountToPay,
     handleApplyDiscount, handleNext, handleBack, handleSubmit
-  } = useBookingFlow();
+  } = useBookingFlow(locale);
 
   const [showSameDayWarning, setShowSameDayWarning] = useState(false);
 
@@ -66,16 +82,26 @@ export default function BookingFlow() {
         <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10 text-green-500" />
         </div>
-        <h2 className="text-3xl font-light mb-4">Booking Bekreftet</h2>
+        <h2 className="text-3xl font-light mb-4">{isEn ? "Booking Confirmed" : "Booking Bekreftet"}</h2>
         <p className="text-zinc-300 mb-8">
-          Takk, {firstName}. VR opplevelsen er booket {selectedDate ? format(selectedDate, "MMMM do, yyyy") : ""} kl. {selectedTime}. Vi har sendt bekreftelse til {email}.
+          {isEn
+            ? `Thank you, ${firstName}. Your VR experience is booked for ${selectedDate ? format(selectedDate, "MMMM do, yyyy") : ""} at ${selectedTime}. We have sent a confirmation email to ${email}.`
+            : `Takk, ${firstName}. VR opplevelsen er booket ${selectedDate ? format(selectedDate, "MMMM do, yyyy") : ""} kl. ${selectedTime}. Vi har sendt bekreftelse til ${email}.`}
         </p>
         <Button onClick={() => window.location.reload()} variant="outline" className="rounded-full border-zinc-700 hover:bg-zinc-800">
-          Book en ny
+          {isEn ? "Make another booking" : "Book en ny"}
         </Button>
       </motion.div>
     );
   }
+
+  const translateCategory = (cat: string) => {
+    if (!isEn) return cat === "All" ? "Alle" : cat;
+    if (cat === "All") return "All";
+    if (cat === "Familie") return "Family";
+    if (cat === "Action Strategi") return "Action & Strategy";
+    return cat;
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -107,17 +133,36 @@ export default function BookingFlow() {
           {step === 1 && (
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">Velg dato & tid</h2>
-                <p className="text-zinc-400">Velg når dere vil besøke Krs VR Arena.</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">
+                  {isEn ? "Select Date & Time" : "Velg dato & tid"}
+                </h2>
+                <p className="text-zinc-400">
+                  {isEn ? "Choose when you would like to visit KRS VR Arena." : "Velg når dere vil besøke Krs VR Arena."}
+                </p>
               </div>
               
               <div className="bg-[#9C39FF]/10 border border-[#9C39FF]/20 rounded-2xl p-4 md:p-5 text-sm text-zinc-300 space-y-3">
-                <p>
-                  <strong>For små grupper (2-10 personer):</strong> <br />Bruk bookingmodulen under.
-                </p>
-                <p>
-                  <strong>For større grupper (10-64 personer):</strong> <br />Utforsk våre arrangementssider og reserver via kontaktskjema.
-                </p>
+                {isEn ? (
+                  <>
+                    <p>
+                      <strong>For groups of 2–10 players:</strong> <br />
+                      Book directly using the calendar below (90-minute total experience). No upfront payment required — pay by card on arrival.
+                    </p>
+                    <p>
+                      <strong>For larger groups (10–64 players):</strong> <br />
+                      Explore our <Link href="/en/events" className="underline text-[#c48fff] hover:text-white">Group & Corporate Events</Link> or send a request via our <Link href="/en/contact" className="underline text-[#c48fff] hover:text-white">contact form</Link>.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      <strong>For små grupper (2-10 personer):</strong> <br />Bruk bookingmodulen under.
+                    </p>
+                    <p>
+                      <strong>For større grupper (10-64 personer):</strong> <br />Utforsk våre arrangementssider og reserver via kontaktskjema.
+                    </p>
+                  </>
+                )}
               </div>
               
               <div className="grid grid-cols-1 gap-10">
@@ -151,7 +196,7 @@ export default function BookingFlow() {
                 <div>
                   <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                     <Clock className="w-5 h-5 text-zinc-400" />
-                    Ledige tider
+                    {isEn ? "Available Times" : "Ledige tider"}
                   </h3>
                   {selectedDate ? (
                     loadingTimes ? (
@@ -160,13 +205,13 @@ export default function BookingFlow() {
                       </div>
                     ) : (availableTimes.length > 0 || bookedTimes.length > 0) ? (
                       <div className="grid grid-cols-2 gap-3">
-{Array.from(new Set([...availableTimes, ...bookedTimes])).sort().map((time) => {
-  const timeStr = typeof time === 'string' ? time.trim() : String(time);
-  const isBooked = bookedTimes.includes(timeStr);
-  return (
-    <button
-      key={timeStr}
-      onClick={() => !isBooked && setSelectedTime(timeStr)}
+                        {Array.from(new Set([...availableTimes, ...bookedTimes])).sort().map((time) => {
+                          const timeStr = typeof time === 'string' ? time.trim() : String(time);
+                          const isBooked = bookedTimes.includes(timeStr);
+                          return (
+                            <button
+                              key={timeStr}
+                              onClick={() => !isBooked && setSelectedTime(timeStr)}
                               disabled={isBooked}
                               className={`py-3 px-4 rounded-xl border text-sm font-medium transition-all ${
                                 isBooked
@@ -176,16 +221,20 @@ export default function BookingFlow() {
                                     : "border-zinc-800 hover:border-zinc-600 text-zinc-300"
                               }`}
                             >
-                              {timeStr} {isBooked && ("(Booket)")}
+                              {timeStr} {isBooked && (isEn ? "(Booked)" : "(Booket)")}
                             </button>
                           );
                         })}
                       </div>
                     ) : (
-                      <p className="text-zinc-400 text-sm">Ingen ledige tider på denne datoen.</p>
+                      <p className="text-zinc-400 text-sm">
+                        {isEn ? "No available time slots on this date." : "Ingen ledige tider på denne datoen."}
+                      </p>
                     )
                   ) : (
-                    <p className="text-zinc-400 text-sm">Vennligst velg en dato først.</p>
+                    <p className="text-zinc-400 text-sm">
+                      {isEn ? "Please select a date in the calendar first." : "Vennligst velg en dato først."}
+                    </p>
                   )}
                 </div>
               </div>
@@ -196,8 +245,12 @@ export default function BookingFlow() {
           {step === 2 && (
             <div className="space-y-8 text-center max-w-lg mx-auto">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">Gruppestørrelse</h2>
-                <p className="text-zinc-400">Hvor mange skal spille?</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">
+                  {isEn ? "Number of Players" : "Gruppestørrelse"}
+                </h2>
+                <p className="text-zinc-400">
+                  {isEn ? "How many people will be playing?" : "Hvor mange skal spille?"}
+                </p>
               </div>
               
               <div className="flex items-center justify-center gap-6 mb-8">
@@ -217,17 +270,38 @@ export default function BookingFlow() {
               </div>
 
               <div className="bg-zinc-900/50 border border-[#9C39FF]/20 rounded-2xl p-6 text-center max-w-sm mx-auto mb-8 shadow-[0_0_15px_rgba(156,57,255,0.05)]">
-                <div className="text-4xl font-medium text-white mb-2">
-                  {pricePerPerson} kr <span className="text-base font-normal text-zinc-400">per pers</span>
+                <div className="text-4xl font-medium text-white mb-1">
+                  {pricePerPerson} {isEn ? "NOK" : "kr"}{" "}
+                  <span className="text-base font-normal text-zinc-400">
+                    {isEn ? "per person" : "per pers"}
+                  </span>
                 </div>
-                <div className="text-sm text-zinc-500 font-medium">
-                  Total for {players}: {pricePerPerson * players} kr
+                {isEn && (
+                  <div className="text-xs text-[#c48fff] mb-2">
+                    approx. €{toApproxEur(pricePerPerson)} per person
+                  </div>
+                )}
+                <div className="text-sm text-zinc-400 font-medium">
+                  {isEn
+                    ? `Total for ${players} players: ${pricePerPerson * players} NOK (approx. €${toApproxEur(pricePerPerson * players)})`
+                    : `Total for ${players}: ${pricePerPerson * players} kr`}
                 </div>
               </div>
               
               <div className="bg-[#9C39FF]/10 border border-[#9C39FF]/20 rounded-2xl p-4 md:p-5 text-sm text-zinc-300 space-y-3">
-                <p>Prisene er per person og synker for større grupper.</p>
-                <p><strong>Merk:</strong> Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst.</p>
+                {isEn ? (
+                  <>
+                    <p>Price per person decreases automatically for larger groups.</p>
+                    <p>
+                      <strong>Flexible group size:</strong> You can adjust the number of players right up until arrival. Please check the maximum player limit on your chosen game before arrival.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>Prisene er per person og synker for større grupper.</p>
+                    <p><strong>Merk:</strong> Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst.</p>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -236,8 +310,12 @@ export default function BookingFlow() {
           {step === 3 && (
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">Velg VR Opplevelse</h2>
-                <p className="text-zinc-400">Velg VR-eventyr for gruppen.</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">
+                  {isEn ? "Choose Your VR Experience" : "Velg VR Opplevelse"}
+                </h2>
+                <p className="text-zinc-400">
+                  {isEn ? "Select a VR adventure for your group." : "Velg VR-eventyr for gruppen."}
+                </p>
               </div>
               
               {/* Filter */}
@@ -253,7 +331,7 @@ export default function BookingFlow() {
                           : "bg-zinc-900/50 text-zinc-400 hover:bg-zinc-800 border border-zinc-800 hover:text-zinc-200"
                       }`}
                     >
-                      {type === "All" ? "Alle" : type}
+                      {translateCategory(type)}
                     </button>
                   ))}
                 </div>
@@ -272,7 +350,7 @@ export default function BookingFlow() {
                       <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')" }}></div>
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#9C39FF]/10 to-transparent"></div>
                       <h3 className="relative text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-white/90 z-10">
-                        {category}
+                        {translateCategory(category)}
                       </h3>
                     </div>
 
@@ -294,11 +372,11 @@ export default function BookingFlow() {
                             <Image src={exp.picture} alt={exp.name} fill className="object-cover" />
                             {exp.isNew && (
                               <div className="absolute top-3 left-3 bg-[#19EB5B] px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider text-black shadow-md">
-                                Nyhet
+                                {isEn ? "New" : "Nyhet"}
                               </div>
                             )}
                             <div className="absolute top-3 right-3 bg-[#9C39FF] px-3 py-1 rounded-full text-xs font-medium text-white shadow-md">
-                              {exp.type}
+                              {exp.displayType || translateCategory(exp.type)}
                             </div>
                           </div>
                           <CardContent className="p-5">
@@ -307,8 +385,14 @@ export default function BookingFlow() {
                             
                             <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
                               <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.duration || "90 min"}</span>
-                              <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Fra {exp.age} år</span>
-                              <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Maks {exp.maxPlayers} spillere</span>
+                              {exp.age && (
+                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                                  {isEn ? `Age ${exp.age.replace("+", "")}+` : `Fra ${exp.age} år`}
+                                </span>
+                              )}
+                              <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                                {isEn ? `Max ${exp.maxPlayers} players` : `Maks ${exp.maxPlayers} spillere`}
+                              </span>
                               {exp.difficulty && <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>}
                               {Array.isArray(exp.suitableFor) && exp.suitableFor.map((audience: string) => (
                                 <span key={audience} className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{audience}</span>
@@ -338,7 +422,7 @@ export default function BookingFlow() {
                                 }}
                                 className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-8 rounded-full shadow-[0_0_15px_rgba(156,57,255,0.3)] hover:scale-105 transition-all"
                               >
-                                Book nå
+                                {isEn ? "Select & Continue" : "Book nå"}
                               </Button>
                             </div>
                           </CardContent>
@@ -353,7 +437,9 @@ export default function BookingFlow() {
                 .filter(e => filterType === "All" || e.type === filterType)
                 .length === 0 && (
                 <div className="text-center py-10 text-zinc-400 bg-zinc-900/30 rounded-2xl border border-zinc-800/50">
-                  Ingen opplevelser tilgjengelig for {players} personer med valgt filter.
+                  {isEn
+                    ? `No experiences available for ${players} players with the selected filter.`
+                    : `Ingen opplevelser tilgjengelig for ${players} personer med valgt filter.`}
                 </div>
               )}
             </div>
@@ -363,14 +449,20 @@ export default function BookingFlow() {
           {step === 4 && (
             <div className="space-y-8 max-w-md mx-auto">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">Dine opplysninger</h2>
-                <p className="text-zinc-400">Hvem står på bookingen?</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">
+                  {isEn ? "Your Contact Details" : "Dine opplysninger"}
+                </h2>
+                <p className="text-zinc-400">
+                  {isEn ? "Who is making this booking?" : "Hvem står på bookingen?"}
+                </p>
               </div>
               
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-zinc-300">Fornavn</Label>
+                    <Label htmlFor="firstName" className="text-zinc-300">
+                      {isEn ? "First Name" : "Fornavn"}
+                    </Label>
                     <Input 
                       id="firstName" 
                       autoComplete="given-name"
@@ -380,7 +472,9 @@ export default function BookingFlow() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-zinc-300">Etternavn</Label>
+                    <Label htmlFor="lastName" className="text-zinc-300">
+                      {isEn ? "Last Name" : "Etternavn"}
+                    </Label>
                     <Input 
                       id="lastName" 
                       autoComplete="family-name"
@@ -392,7 +486,9 @@ export default function BookingFlow() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-zinc-300">E-postadresse</Label>
+                  <Label htmlFor="email" className="text-zinc-300">
+                    {isEn ? "Email Address" : "E-postadresse"}
+                  </Label>
                   <Input 
                     id="email" 
                     type="email" 
@@ -404,12 +500,14 @@ export default function BookingFlow() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-zinc-300">Telefonnummer</Label>
+                  <Label htmlFor="phone" className="text-zinc-300">
+                    {isEn ? "Mobile Phone (incl. country code)" : "Telefonnummer"}
+                  </Label>
                   <Input 
                     id="phone" 
                     type="tel" 
                     autoComplete="tel"
-                    placeholder="+47 "
+                    placeholder={isEn ? "+49 / +31 / +47 ..." : "+47 "}
                     value={phone} 
                     onChange={(e) => setPhone(e.target.value)} 
                     className="bg-zinc-900 border-zinc-800 focus-visible:ring-zinc-700"
@@ -419,16 +517,22 @@ export default function BookingFlow() {
 
               <div className="mt-8 space-y-4">
                 <div className="bg-zinc-900/50 p-4 rounded-xl border border-zinc-800/50">
-                  <h3 className="text-lg font-medium text-white mb-2">Hvem skal spille?</h3>
+                  <h3 className="text-lg font-medium text-white mb-2">
+                    {isEn ? "Who will be playing? (Optional)" : "Hvem skal spille?"}
+                  </h3>
                   <p className="text-sm text-zinc-400 mb-4">
-                    For raskere kalibrering i arenaen, ber vi deg fylle inn fornavnet på spillerne. Er ikke alle navnene klare enda? Ikke noe problem – du kan gjerne bare skrive inn et tall (f.eks. &quot;3&quot;).
+                    {isEn
+                      ? "For faster equipment setup in the arena, feel free to enter the first names of the players. You can also add or update names later via the link in your confirmation email."
+                      : "For raskere kalibrering i arenaen, ber vi deg fylle inn fornavnet på spillerne. Er ikke alle navnene klare enda? Ikke noe problem – du kan gjerne bare skrive inn et tall (f.eks. \"3\")."}
                   </p>
                   <div className="space-y-3">
                     {Array.from({ length: players }).map((_, i) => (
                       <div key={i} className="flex items-center gap-3">
-                        <Label className="text-zinc-500 w-16">Spiller {i + 1}</Label>
+                        <Label className="text-zinc-500 w-20">
+                          {isEn ? `Player ${i + 1}` : `Spiller ${i + 1}`}
+                        </Label>
                         <Input
-                          placeholder={`Fornavn`}
+                          placeholder={isEn ? "First name" : "Fornavn"}
                           value={playerNames[i] || ""}
                           onChange={(e) => {
                             const newNames = [...playerNames];
@@ -444,13 +548,21 @@ export default function BookingFlow() {
               </div>
 
               <div className="mt-8 space-y-2">
-                <Label htmlFor="customerNote" className="text-zinc-300">Kommentar til bookingen (valgfritt)</Label>
+                <Label htmlFor="customerNote" className="text-zinc-300">
+                  {isEn ? "Comment or note for our gamemaster (optional)" : "Kommentar til bookingen (valgfritt)"}
+                </Label>
                 <p className="text-sm text-zinc-400 mb-2">
-                  Fortell oss gjerne litt om aldersspredningen og erfaringsnivået i gruppa (f.eks. om dere er erfarne gamere eller helt nybegynnere). Våre opplevelser er designet for å passe absolutt alle, men med litt info på forhånd kan vi tilpasse servicen og gi dere en enda bedre opplevelse!
+                  {isEn
+                    ? "Feel free to share the approximate age range, preferred language (English/German/Norwegian), or VR experience level of your group so our gamemaster can tailor your session."
+                    : "Fortell oss gjerne litt om aldersspredningen og erfaringsnivået i gruppa (f.eks. om dere er erfarne gamere eller helt nybegynnere). Våre opplevelser er designet for å passe absolutt alle, men med litt info på forhånd kan vi tilpasse servicen og gi dere en enda bedre opplevelse!"}
                 </p>
                 <textarea
                   id="customerNote"
-                  placeholder="Skriv litt om gruppa, erfaringsnivå, eller andre beskjeder til oss..."
+                  placeholder={
+                    isEn
+                      ? "Tell us briefly about your group, preferred language, or any special wishes..."
+                      : "Skriv litt om gruppa, erfaringsnivå, eller andre beskjeder til oss..."
+                  }
                   value={customerNote}
                   onChange={(e) => setCustomerNote(e.target.value)}
                   className="flex min-h-[80px] w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm ring-offset-background placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-white mt-2"
@@ -463,8 +575,12 @@ export default function BookingFlow() {
           {step === 5 && (
             <div className="space-y-8 max-w-md mx-auto">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">Nesten ferdig</h2>
-                <p className="text-zinc-400">Vennligst se over våre vilkår.</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">
+                  {isEn ? "Almost Done" : "Nesten ferdig"}
+                </h2>
+                <p className="text-zinc-400">
+                  {isEn ? "Please review and accept our booking terms." : "Vennligst se over våre vilkår."}
+                </p>
               </div>
               
               <div className="space-y-6">
@@ -477,21 +593,27 @@ export default function BookingFlow() {
                   />
                   <div className="space-y-2 leading-none">
                     <Label htmlFor="terms" className="text-sm font-medium leading-relaxed">
-                      Jeg har lest og aksepterer kjøpsvilkårene, inkludert avbestillingsregler.
+                      {isEn
+                        ? "I have read and accept the terms and conditions, including the cancellation policy."
+                        : "Jeg har lest og aksepterer kjøpsvilkårene, inkludert avbestillingsregler."}
                     </Label>
                     <p className="text-xs text-zinc-400">
-                      Avbestilling må skje senest 48 timer før aktiviteten.
+                      {isEn
+                        ? "Free cancellation up to 48 hours before your scheduled start time."
+                        : "Avbestilling må skje senest 48 timer før aktiviteten."}
                     </p>
                     <Dialog>
                       <DialogTrigger className="text-[#9C39FF] text-xs hover:underline outline-none text-left mt-1">
-                        Les fullstendige vilkår
+                        {isEn ? "Read full terms & conditions" : "Les fullstendige vilkår"}
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
                         <DialogHeader tabIndex={-1} autoFocus className="outline-none">
-                          <DialogTitle>Vilkår og betingelser</DialogTitle>
+                          <DialogTitle>{isEn ? "Terms & Conditions" : "Vilkår og betingelser"}</DialogTitle>
                         </DialogHeader>
                         <div className="mt-4 text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
-                          {settings?.termsContent || "Ingen vilkår tilgjengelig."}
+                          {isEn
+                            ? ENGLISH_TERMS_SUMMARY
+                            : settings?.termsContent || "Ingen vilkår tilgjengelig."}
                         </div>
                         <div className="mt-6 flex justify-between items-center pt-2">
                           <button
@@ -504,9 +626,11 @@ export default function BookingFlow() {
                             }}
                             className="text-zinc-500 hover:text-white text-sm font-medium transition-colors outline-none"
                           >
-                            ↑ Til toppen
+                            {isEn ? "↑ Back to top" : "↑ Til toppen"}
                           </button>
-                          <DialogClose className="bg-[#9C39FF] hover:bg-[#8b33e6] text-white py-2 px-6 rounded-lg text-sm font-medium transition-colors">Lukk</DialogClose>
+                          <DialogClose className="bg-[#9C39FF] hover:bg-[#8b33e6] text-white py-2 px-6 rounded-lg text-sm font-medium transition-colors">
+                            {isEn ? "Close" : "Lukk"}
+                          </DialogClose>
                         </div>
                       </DialogContent>
                     </Dialog>
@@ -522,10 +646,12 @@ export default function BookingFlow() {
                   />
                   <div className="space-y-1 leading-none">
                     <Label htmlFor="newsletter" className="text-sm font-medium leading-relaxed">
-                      Meld meg på nyhetsbrev
+                      {isEn ? "Subscribe to our newsletter" : "Meld meg på nyhetsbrev"}
                     </Label>
                     <p className="text-xs text-zinc-400">
-                      Få oppdateringer om nye VR-opplevelser og tilbud.
+                      {isEn
+                        ? "Receive occasional updates on new VR experiences and offers."
+                        : "Få oppdateringer om nye VR-opplevelser og tilbud."}
                     </p>
                   </div>
                 </div>
@@ -537,15 +663,23 @@ export default function BookingFlow() {
           {step === 6 && (
             <div className="space-y-8 max-w-lg mx-auto">
               <div>
-                <h2 className="text-3xl font-light tracking-tight mb-2">Betaling</h2>
-                <p className="text-zinc-400">Se over bookingen og velg betalingsmetode.</p>
+                <h2 className="text-3xl font-light tracking-tight mb-2">
+                  {isEn ? "Confirm & Payment Option" : "Betaling"}
+                </h2>
+                <p className="text-zinc-400">
+                  {isEn
+                    ? "Review your booking and choose your preferred payment method."
+                    : "Se over bookingen og velg betalingsmetode."}
+                </p>
               </div>
               
               <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
                 <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
                   <div>
                     <h3 className="font-medium">{selectedExperience?.name}</h3>
-                    <p className="text-sm text-zinc-400">{players} Spillere</p>
+                    <p className="text-sm text-zinc-400">
+                      {players} {isEn ? "Players" : "Spillere"}
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">{selectedDate && format(selectedDate, "MMM do")}</p>
@@ -554,16 +688,21 @@ export default function BookingFlow() {
                 </div>
                 
                 <div className="flex justify-between items-end text-lg">
-                  <span className="text-zinc-300">Sum</span>
+                  <span className="text-zinc-300">{isEn ? "Total Price" : "Sum"}</span>
                   <div className="text-right">
                     <div className="text-sm text-zinc-500 line-through">
                       {appliedDiscount && `${rawTotalPrice} NOK`}
                     </div>
                     <div className="font-medium text-white">
-                      {pricePerPerson} NOK <span className="text-sm font-normal text-zinc-400">{isVippsTest ? "totalt" : "per person"}</span>
+                      {pricePerPerson} NOK{" "}
+                      <span className="text-sm font-normal text-zinc-400">
+                        {isVippsTest ? (isEn ? "total" : "totalt") : "per person"}
+                      </span>
                     </div>
-                    <div className="text-sm text-zinc-500 mt-0.5">
-                      {`Total: ${totalPrice} NOK`}
+                    <div className="text-sm text-zinc-400 mt-0.5">
+                      {isEn
+                        ? `Total: ${totalPrice} NOK (approx. €${toApproxEur(totalPrice)})`
+                        : `Total: ${totalPrice} NOK`}
                     </div>
                   </div>
                 </div>
@@ -571,13 +710,15 @@ export default function BookingFlow() {
 
               {/* Discount Code Section */}
               <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
-                <Label htmlFor="discount" className="text-zinc-300">Har du en rabattkode?</Label>
+                <Label htmlFor="discount" className="text-zinc-300">
+                  {isEn ? "Do you have a promo / discount code?" : "Har du en rabattkode?"}
+                </Label>
                 <div className="flex space-x-2">
                   <Input 
                     id="discount"
                     value={discountCodeInput}
                     onChange={(e) => setDiscountCodeInput(e.target.value)}
-                    placeholder="Skriv inn kode"
+                    placeholder={isEn ? "Enter code" : "Skriv inn kode"}
                     className="bg-zinc-950 border-zinc-800"
                     disabled={validatingDiscount}
                   />
@@ -587,7 +728,7 @@ export default function BookingFlow() {
                     variant="secondary"
                     className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700"
                   >
-                    {validatingDiscount ? <Loader2 className="w-4 h-4 animate-spin" /> : "Legg til"}
+                    {validatingDiscount ? <Loader2 className="w-4 h-4 animate-spin" /> : isEn ? "Apply" : "Legg til"}
                   </Button>
                 </div>
                 {discountError && <p className="text-red-400 text-sm">{discountError}</p>}
@@ -595,51 +736,106 @@ export default function BookingFlow() {
               </div>
 
               <div className="bg-zinc-900/50 rounded-xl p-4 text-sm text-zinc-300 border border-zinc-800">
-                <p>Merk: Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst.</p>
+                <p>
+                  {isEn
+                    ? "Note: You can adjust your player count and player list right up until arrival. Please arrive on time so you do not lose any game time."
+                    : "Merk: Du kan justere antall personer helt frem til spillet starter. Vennligst sjekk maks kapasitet på spillet dere velger før ankomst."}
+                </p>
               </div>
 
               <div className="space-y-4">
-                <Label className="text-zinc-300">Betalingsalternativ</Label>
+                <Label className="text-zinc-300">{isEn ? "Payment Method" : "Betalingsalternativ"}</Label>
                 <RadioGroup value={paymentType} onValueChange={(v: "vipps" | "terminal") => setPaymentType(v)}>
-                  <div 
-                    className={`flex items-start justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'vipps' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} 
-                    onClick={() => setPaymentType('vipps')}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <RadioGroupItem value="vipps" id="vipps" className="mt-1 border-zinc-500 text-[#9C39FF]" />
-                      <div className="space-y-1">
-                        <Label htmlFor="vipps" className="cursor-pointer font-medium text-white">
-                          Betal fullt oppgjør nå (Vipps)
-                        </Label>
-                        <p className="text-xs text-zinc-400">Rask og trygg betaling med Vipps på nett</p>
+                  {isEn ? (
+                    <>
+                      {/* On English page: Terminal / Pay on arrival is listed FIRST and pre-selected */}
+                      <div 
+                        className={`flex items-start justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'terminal' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} 
+                        onClick={() => setPaymentType('terminal')}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <RadioGroupItem value="terminal" id="terminal" className="mt-1 border-zinc-500 text-[#9C39FF]" />
+                          <div className="space-y-1">
+                            <Label htmlFor="terminal" className="cursor-pointer font-medium text-white">
+                              Pay on arrival in the arena (Card / Apple Pay)
+                            </Label>
+                            <p className="text-xs text-zinc-300">
+                              Pay with Visa, Mastercard, Apple Pay, or Google Pay when you arrive
+                            </p>
+                            <p className="text-[11px] text-[#c48fff]">
+                              Recommended for international visitors — 0 NOK upfront online
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-medium text-white block">0 NOK now</span>
+                          <span className="text-[11px] text-zinc-400 whitespace-nowrap">
+                            {totalPrice} NOK (~€{toApproxEur(totalPrice)}) at venue
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <span className="font-medium text-white whitespace-nowrap">{totalPrice} NOK</span>
-                  </div>
-                  
-                  <div 
-                    className={`flex items-start justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'terminal' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} 
-                    onClick={() => setPaymentType('terminal')}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <RadioGroupItem value="terminal" id="terminal" className="mt-1 border-zinc-500 text-[#9C39FF]" />
-                      <div className="space-y-1">
-                        <Label htmlFor="terminal" className="cursor-pointer font-medium text-white">
-                          Betal ved oppmøte i arenaen (Kortterminal)
-                        </Label>
-                        <p className="text-xs text-zinc-400">
-                          Betal med bankkort, Visa, Mastercard eller Apple Pay ved ankomst
-                        </p>
-                        <p className="text-[11px] text-zinc-500">
-                          Passer for alle &ndash; også turister og internasjonale gjester uten Vipps
-                        </p>
+
+                      <div 
+                        className={`flex items-start justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'vipps' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} 
+                        onClick={() => setPaymentType('vipps')}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <RadioGroupItem value="vipps" id="vipps" className="mt-1 border-zinc-500 text-[#9C39FF]" />
+                          <div className="space-y-1">
+                            <Label htmlFor="vipps" className="cursor-pointer font-medium text-white">
+                              Pay online now with Vipps
+                            </Label>
+                            <p className="text-xs text-zinc-400">
+                              Norwegian Vipps app users only (requires Norwegian phone number)
+                            </p>
+                          </div>
+                        </div>
+                        <span className="font-medium text-white whitespace-nowrap">{totalPrice} NOK</span>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-medium text-white block">0 NOK</span>
-                      <span className="text-[11px] text-zinc-500 whitespace-nowrap">{totalPrice} NOK i arenaen</span>
-                    </div>
-                  </div>
+                    </>
+                  ) : (
+                    <>
+                      <div 
+                        className={`flex items-start justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'vipps' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} 
+                        onClick={() => setPaymentType('vipps')}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <RadioGroupItem value="vipps" id="vipps" className="mt-1 border-zinc-500 text-[#9C39FF]" />
+                          <div className="space-y-1">
+                            <Label htmlFor="vipps" className="cursor-pointer font-medium text-white">
+                              Betal fullt oppgjør nå (Vipps)
+                            </Label>
+                            <p className="text-xs text-zinc-400">Rask og trygg betaling med Vipps på nett</p>
+                          </div>
+                        </div>
+                        <span className="font-medium text-white whitespace-nowrap">{totalPrice} NOK</span>
+                      </div>
+                      
+                      <div 
+                        className={`flex items-start justify-between p-4 rounded-xl border cursor-pointer transition-colors ${paymentType === 'terminal' ? 'border-[#9C39FF] bg-[#9C39FF]/10' : 'border-zinc-800 hover:border-zinc-700'}`} 
+                        onClick={() => setPaymentType('terminal')}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <RadioGroupItem value="terminal" id="terminal" className="mt-1 border-zinc-500 text-[#9C39FF]" />
+                          <div className="space-y-1">
+                            <Label htmlFor="terminal" className="cursor-pointer font-medium text-white">
+                              Betal ved oppmøte i arenaen (Kortterminal)
+                            </Label>
+                            <p className="text-xs text-zinc-400">
+                              Betal med bankkort, Visa, Mastercard eller Apple Pay ved ankomst
+                            </p>
+                            <p className="text-[11px] text-zinc-500">
+                              Passer for alle &ndash; også turister og internasjonale gjester uten Vipps
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-medium text-white block">0 NOK</span>
+                          <span className="text-[11px] text-zinc-500 whitespace-nowrap">{totalPrice} NOK i arenaen</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </RadioGroup>
               </div>
             </div>
@@ -654,7 +850,7 @@ export default function BookingFlow() {
               className="text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full px-6"
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
-              Tilbake
+              {isEn ? "Back" : "Tilbake"}
             </Button>
             
             {step < 6 ? (
@@ -662,7 +858,7 @@ export default function BookingFlow() {
                 onClick={onNextClick} 
                 className="bg-[#9C39FF] text-white hover:bg-[#9C39FF]/90 rounded-full px-8 shadow-[0_0_20px_rgba(156,57,255,0.4)]"
               >
-                Fortsett
+                {isEn ? "Continue" : "Fortsett"}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : settings?.bookingsClosed ? (
@@ -671,8 +867,8 @@ export default function BookingFlow() {
                 variant="outline"
                 className="border-zinc-800 bg-zinc-900/50 opacity-100 cursor-not-allowed hover:bg-zinc-900/50 hover:text-white text-zinc-300 rounded-2xl h-auto py-3 px-8 flex flex-col items-center"
               >
-                <div className="font-medium">Booking midlertidig stengt</div>
-                <div className="text-xs text-zinc-500 mt-1">Send e-post til post@krsvr.no</div>
+                <div className="font-medium">{isEn ? "Online booking temporarily closed" : "Booking midlertidig stengt"}</div>
+                <div className="text-xs text-zinc-500 mt-1">{isEn ? "Email post@krsvr.no" : "Send e-post til post@krsvr.no"}</div>
               </Button>
             ) : (
               <Button 
@@ -683,12 +879,12 @@ export default function BookingFlow() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Behandler...
+                    {isEn ? "Processing..." : "Behandler..."}
                   </>
                 ) : paymentType === 'terminal' ? (
-                  `Bekreft booking (Betal i arenaen)`
+                  isEn ? "Confirm Booking (Pay at Venue)" : "Bekreft booking (Betal i arenaen)"
                 ) : (
-                  `Betal ${amountToPay} NOK med Vipps`
+                  isEn ? `Pay ${amountToPay} NOK with Vipps` : `Betal ${amountToPay} NOK med Vipps`
                 )}
               </Button>
             )}
@@ -699,23 +895,29 @@ export default function BookingFlow() {
       <Dialog open={showSameDayWarning} onOpenChange={setShowSameDayWarning}>
         <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:rounded-2xl max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-light">Booking samme dag</DialogTitle>
+            <DialogTitle className="text-2xl font-light">
+              {isEn ? "Same-Day Booking" : "Booking samme dag"}
+            </DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-4 text-zinc-300">
             <p>
-              Du har valgt å booke tid på dagens dato. For bookinger samme dag må dette avklares med oss på forhånd for å bekrefte at vi kan ta imot dere.
+              {isEn
+                ? "You have selected a time slot for today. For same-day bookings, please call or send us a quick SMS beforehand so we can confirm a gamemaster is ready to welcome you."
+                : "Du har valgt å booke tid på dagens dato. For bookinger samme dag må dette avklares med oss på forhånd for å bekrefte at vi kan ta imot dere."}
             </p>
             <p className="p-4 bg-zinc-900 rounded-xl border border-zinc-800 text-center text-lg">
-              Ring eller send SMS: <br/>
-              <strong className="text-white text-xl tracking-wide">+47 40828302</strong>
+              {isEn ? "Call or send SMS:" : "Ring eller send SMS:"} <br/>
+              <strong className="text-white text-xl tracking-wide">+47 40 82 83 02</strong>
             </p>
             <p className="text-sm text-zinc-400">
-              Dersom du allerede har vært i kontakt med oss, kan du trykke fortsett for å gå til neste steg i bookingen.
+              {isEn
+                ? "If you have already spoken with us, click Continue to proceed with your booking."
+                : "Dersom du allerede har vært i kontakt med oss, kan du trykke fortsett for å gå til neste steg i bookingen."}
             </p>
           </div>
           <div className="flex justify-end gap-3 mt-4">
             <Button variant="ghost" onClick={() => setShowSameDayWarning(false)} className="hover:bg-zinc-800 text-white rounded-full">
-              Avbryt
+              {isEn ? "Cancel" : "Avbryt"}
             </Button>
             <Button 
               onClick={() => {
@@ -724,7 +926,7 @@ export default function BookingFlow() {
               }} 
               className="bg-[#9C39FF] text-white hover:bg-[#9C39FF]/90 rounded-full"
             >
-              Fortsett
+              {isEn ? "Continue" : "Fortsett"}
             </Button>
           </div>
         </DialogContent>
