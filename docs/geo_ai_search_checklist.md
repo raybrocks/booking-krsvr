@@ -12,26 +12,26 @@ Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for
 
 ### A. Overordnet Utvikling over Tid (KPI-er)
 
-| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT & Profil-scan) | Endring | Mål (Q4 2026) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | **24 sider** | 🟢 **+5** | 25+ sider |
-| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | **10 domener** | 🟢 **+6** | 15+ domener |
-| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | **8 lenker** | 🟢 **+3** | 10+ lenker |
-| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | **5,0 ★ (24 stk)** | 🟢 **+2** | 5,0 ★ (40+ stk) |
-| **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | **8 aktiviteter** | 🟢 **+1 (Zombie Shooter)** | 8+ aktiviteter |
-| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | **5,0 ★ (6 stk)** | 🟢 **+3 (Dobling!)** | 5,0 ★ (10+ stk) |
-| **TripAdvisor Rangering – Leverandører ([Måleside](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html))** | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** | ➖ 0 | **Topp 3** |
-| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | 2 av 6 (33 %) | **Bekreftet konvertering i ChatGPT!** | 🟢 **Aktiv** | **5 av 6 (83 %)** |
-| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
-| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
+| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT) | 25. okt 2026 (Scan #5) | Endring (siden start) | Mål (Q4 2026) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | 24 sider | **24 sider** | 🟢 **+5** | 25+ sider |
+| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | 10 domener | **10 domener** | 🟢 **+6** | 15+ domener |
+| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | 8 lenker | **8 lenker** | 🟢 **+3** | 10+ lenker |
+| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (24 stk) | **5,0 ★ (24 stk)** | 🟢 **+2** | 5,0 ★ (40+ stk) |
+| **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | 8 aktiviteter | **8 aktiviteter** | 🟢 **+1** | 8+ aktiviteter |
+| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (6 stk) | **5,0 ★ (6 stk)** | 🟢 **+3** | 5,0 ★ (10+ stk) |
+| **TripAdvisor Rangering – Leverandører ([Måleside](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html))** | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** | ➖ 0 | **Topp 3** |
+| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | 2 av 6 (33 %) | Bekreftet konvertering | **2 av 6 (33 %)** *(#1 på VR)* | 🟢 **Sterk #1 på VR** | **5 av 6 (83 %)** |
+| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
+| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
 
 ---
 
-### B. Backlinks & Refererende Domener – Autoritetskartlegging (Sist oppdatert: `19.10.2026`)
+### B. Backlinks & Refererende Domener – Autoritetskartlegging (Sist oppdatert: `25.10.2026`)
 
 Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, rangert etter **Global Tranco Rank** (objektivt mål på domeneautoritet/trafikk basert på CrUX, Cloudflare Radar og Majestic) og **Estimert DR (Domain Rating 0–100)**:
 
-| Eksternt Domene | Global Tranco Rank *(lavere = sterkere)* | Est. DR (0–100) | Lenkestatus til `krsvr.no` | Siteres av Gemini AI? | Kategori / Merknad per `19.10.2026` |
+| Eksternt Domene | Global Tranco Rank *(lavere = sterkere)* | Est. DR (0–100) | Lenkestatus til `krsvr.no` | Siteres av Gemini AI? | Kategori / Merknad per `25.10.2026` |
 | :--- | :---: | :---: | :--- | :---: | :--- |
 | **[tripadvisor.com](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)** | **#573** i verden | ~93 | ✅ Aktiv profil + lenke | ✅ Ja | *Fornøyelse og lek i Kristiansand* (5,0★, 6 anmeldelser). |
 | **[visitnorway.com / .se](https://www.visitnorway.no/)** | **#30 488** i verden | ~82 | ✅ Syndikert via Tellus | ✅ **Ja (Ofte!)** | Automatisk syndikert fra Visit Sørlandet. Siteres direkte av Gemini. |
@@ -46,18 +46,18 @@ Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, ra
 
 ---
 
-### C. AI-Søk (GEO) Siteringstest på 6 Kommersielle Søk (Sist scannet: `17.10.2026`)
+### C. AI-Søk (GEO) Siteringstest på 6 Kommersielle Søk (Sist scannet: `25.10.2026`)
 
 Disse 6 nøytrale testsøkene (uten å nevne «KRS» i søket) kjøres ved hver scanning for å måle om Gemini / Google AI anbefaler **KRS VR Arena** til potensielle kunder:
 
-| # | Kommersielt Testsøk | Status `17.10.2026` | Plassering / Omtale i AI-svar | Hvilke kilder AI faktisk siterte i svaret | Hva som må til for å bli #1 |
+| # | Kommersielt Testsøk | Status `25.10.2026` | Plassering / Omtale i AI-svar | Hvilke kilder AI faktisk siterte i svaret | Hva som må til for å bli #1 |
 | :-: | :--- | :---: | :--- | :--- | :--- |
-| **1** | *«VR Kristiansand»* | ✅ **Anbefalt (#1)** | **Nr. 1** – Egen hovedseksjon som byens dedikerte VR-arena på Lund. | `visitnorway.se`, `krsvr.no`, `eventguiden.no`, `instagram.com` | Vedlikeholde posisjonen. |
-| **2** | *«VR Escape Room Kristiansand»* | ✅ **Anbefalt (#1)** | **Nr. 1** – Fremheves som primærleverandør av VR Escape Rooms og Mixed Reality. | `eventguiden.no`, `krsvr.no`, `visitnorway.se` | Oppdatere *«8 spillere»* til *«10 spillere»* på Eventguiden/Tellus. |
-| **3** | *«Escape Room Kristiansand»* | ❌ **Ikke nevnt** | Kun fysiske *Escape Room Kristiansand* (Festningsgata/Kirkegata) nevnes. | `visitsorlandet.com`, `kvadraturen.no`, `worldofescapes.com`, `roomescape.com` | Få flere Google/TripAdvisor-anmeldelser som nevner «Escape Room i Kristiansand». |
-| **4** | *«Teambuilding Kristiansand innendørs aktiviteter»* | ❌ **Ikke nevnt** | AI lister Escape Kristiansand, X3M Gokart, Klatreverket, Glowing Golf og Kunstsilo. | `eventguiden.no`, `visitsorlandet.com`, `teambuildinger.no`, `spygames.no` | Be om plass på Visit Sørlandets & Eventguidens samleartikler for teambuilding + la Google indeksere nye `/vr-teambuilding`. |
-| **5** | *«Utdrikningslag Kristiansand aktiviteter»* | ❌ **Ikke nevnt** | AI lister Høyt & Lavt, X3M Gokart, Skyland, Escape Room og Glowing Golf. | `utdrikningslag.com`, `eventguiden.no`, `visitsorlandet.com`, `skyland.no` | Registrere oppføring på `utdrikningslag.no` / `utdrikningslag.com` + be om omtale i anmeldelser fra utdrikningslag. |
-| **6** | *«Innendørs aktiviteter Kristiansand regnværsdag»* | ❌ **Ikke nevnt** | AI lister Aquarama, Kunstsilo, Vitensenteret, X3M Gokart, Lucky Bowl og Glowing Golf. | `sør.com`, `visitsorlandet.com`, `visitnorway.no`, `eventguiden.no` | Kontakte Visit Sørlandet og `sør.com` for å bli lagt inn i deres artikler om *«Ting å gjøre på en regnværsdag i Kristiansand»*. |
+| **1** | *«VR Kristiansand»* | ✅ **Anbefalt (#1)** | **Nr. 1** – Egen hovedseksjon som byens primære VR-arena på Lund med direkte lenke til `krsvr.no`. | `visitsorlandet.com`, `krsvr.no`, `uia.no`, `luzidlab.com` | Vedlikeholde posisjonen og anmeldelsestrykket. |
+| **2** | *«VR Escape Room Kristiansand»* | ✅ **Anbefalt (#1)** | **Nr. 1** – Fremheves som ubestridt hovedaktør i Kristiansand med 90-min opplevelser og direkte bookinglenke. | `visitsorlandet.com`, `krsvr.no` | Fortsette å samle kundeomtaler som nevner de spesifikke rommene (*Abyss Vault*, *Prison Break*). |
+| **3** | *«Escape Room Kristiansand»* | ❌ **Ikke nevnt** | Kun fysiske *Escape Room Kristiansand* (Festningsgata/Kirkegata) nevnes. | `visitsorlandet.com`, `kvadraturen.no`, `escapekristiansand.no`, `eventguiden.no` | Få flere Google/TripAdvisor-anmeldelser som eksplisitt sammenligner og nevner «Escape Room i Kristiansand». |
+| **4** | *«Teambuilding Kristiansand innendørs aktiviteter»* | ❌ **Ikke nevnt** | AI lister Escape Room Kristiansand, SpyGames, Interactive People, Glowing Golf, X3M Gokart og Klatreverket. | `eventguiden.no`, `escapekristiansand.no`, `inpeople.no`, `visitsorlandet.com` | Innlemmes i Visit Sørlandets & Eventguidens teambuilding-artikler + la Google indeksere den nye `/teambuilding`-siden. |
+| **5** | *«Utdrikningslag Kristiansand aktiviteter»* | ❌ **Ikke nevnt** | AI lister Escape Room, SpyGames, Høyt & Lavt, Skyland, X3M Gokart, Glowing Golf. | `utdrikningslag.events`, `utdrikningslag.com`, `escapekristiansand.no`, `hoytlavt.no` | Registrere oppføring på `utdrikningslag.com` / `utdrikningslag.no` + anmeldelser fra utdrikningslag. |
+| **6** | *«Innendørs aktiviteter Kristiansand regnværsdag»* | ❌ **Ikke nevnt** | AI lister Kunstsilo, Kilden, Aquarama, Vitensenteret, X3M Gokart, PlayWorld, Lucky Bowl og Sørlandssenteret. | `visitsorlandet.com`, `visitnorway.no`, `kristiansandguiden.no`, `eventguiden.no` | Kontakte Visit Sørlandet og lokale guider for å bli lagt inn i artikler om *«Innendørs aktiviteter og regnværsdager i Kristiansand»*. |
 
 ---
 
