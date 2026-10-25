@@ -20,7 +20,7 @@ Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for
 | **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | **5,0 ★ (24 stk)** | 🟢 **+2** | 5,0 ★ (40+ stk) |
 | **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | **8 aktiviteter** | 🟢 **+1 (Zombie Shooter)** | 8+ aktiviteter |
 | **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | **5,0 ★ (6 stk)** | 🟢 **+3 (Dobling!)** | 5,0 ★ (10+ stk) |
-| **TripAdvisor – Rangering i Kristiansand** *(Fornøyelse og lek)* | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** *(#17 i åpen liste)* | ➖ 0 | **Topp 3** |
+| **TripAdvisor Rangering – Leverandører ([Måleside](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html))** | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 7 av 23** | ➖ 0 | **Topp 3** |
 | **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | 2 av 6 (33 %) | **Bekreftet konvertering i ChatGPT!** | 🟢 **Aktiv** | **5 av 6 (83 %)** |
 | **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
 | **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
@@ -68,13 +68,14 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
 ### Høyeste prioritet (De AI søker i først)
 - [x] **TripAdvisor (Fullført – Aktiv profil, bilder, beskrivelser og widget):**
   - **Direkte oppførings-URL:** [Krs VR Arena på TripAdvisor](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)
+  - **Offisiell måleside for rangering og klatring:** [TripAdvisor – Leverandører i Fornøyelse og lek i Kristiansand (c56/SUPPLIERS)](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html)
   - **Målepunkt (Status per 21. oktober 2026):**
     - **Vurdering:** **5,0 av 5,0 stjerner** (100 % toppkarakter!)
     - **Antall anmeldelser:** **6 anmeldelser** (dobling fra baseline på 3 stk!)
     - **Eksternt nettsøk (Google):** **100 % sluppet ut og indeksert.** TripAdvisor-siden for KRS VR Arena rangerer som **#1 organisk søkeresultat** på Google Search direkte under `krsvr.no` sine sitelinks ved merkevaresøk. Google krever ingen minimumsgrense på anmeldelser for å indeksere profilen.
     - **Rangering og synlighet internt på TripAdvisor:**
-      - **Profilrangering:** **Nr. 7 av 23** aktivitetsleverandører i *Fornøyelse og lek i Kristiansand*.
-      - **Åpen kategoriliste («Morsomme aktiviteter og spill i Kristiansand»):** **Nr. 17 av 23** sortert etter «Reisendes favoritter». Har med kun 6 anmeldelser allerede passert *Lucky Bowl (#21)*, *Qula (#22)*, *Gitaristene (#20)* og *Mal På Keramikk (#19)*. Med 2–4 nye 5-stjerners anmeldelser vil arenaen klatre inn blant Topp 10.
+      - **Profilrangering (Leverandørlisten `c56/SUPPLIERS`):** **Nr. 7 av 23** aktivitetsleverandører i *Fornøyelse og lek i Kristiansand*.
+      - **Mål for klatring:** Klatre fra Nr. 7 inn på Topp 3 på denne leverandørsiden ved å oppnå 10–15 verifiserte 5-stjerners omtaler.
     - **Full strategisk målgruppedekning på TripAdvisor:**
       1. **ChatGPT & Venner (19. okt 2026 – thoraamli):** *«Helt fantastisk opplevelse! Anbefales på det sterkeste!»* – Nevner eksplisitt: *«Jeg hadde faktisk ikke hørt om KRS VR Arena før jeg spurte ChatGPT om forslag til aktiviteter i Kristiansand. Det dukket opp som et tips...»* + *«Prison Break»*.
       2. **Barnefamilier (18. okt 2026 – F8809GQveronikal):** *«Gå inn i en magisk verden sammen med barna»* – Supergøy barneaktivitet i høstferien/oktober!

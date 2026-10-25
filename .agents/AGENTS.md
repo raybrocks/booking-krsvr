@@ -32,7 +32,8 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - Antall sider i `https://www.krsvr.no/sitemap.xml`
    - Refererende domener (`"krsvr.no" -site:krsvr.no` og `"Krs VR Arena" -site:krsvr.no`) + Tranco Domain Rank (`https://tranco-list.eu/api/ranks/domain/<domene>`)
    - Brønnøysund NACE-bransjekode (`https://data.brreg.no/enhetsregisteret/api/enheter/936318878`)
-   - Vurdering, antall anmeldelser og rangering på Google Maps og TripAdvisor
+   - Vurdering og antall anmeldelser på Google Maps og TripAdvisor
+   - TripAdvisor-rangering målt spesifikt på leverandørsiden for lek og moro i Kristiansand: `https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html`
    - De 6 faste nøytrale kommersielle AI-søkene i Seksjon 0.C.
 7. **Vedlikehold av `llms.txt` og `llms-full.txt` (AI-agenter og LLM-standard):**
    Hver gang det gjøres endringer i priser, kapasiteter, åpningstider, bar-/matkonsepter, regler for medbrakt eller nye opplevelser, **SKAL** både `public/llms.txt` og `public/llms-full.txt` oppdateres tilsvarende, slik at AI-agenter og språkmodeller alltid har oppdatert, presis og fullstendig forretningslogikk.
