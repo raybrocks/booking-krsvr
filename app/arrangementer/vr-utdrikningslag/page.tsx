@@ -23,6 +23,14 @@ export const metadata: Metadata = {
     "Aktivitet utdrikningslag Kristiansand",
     "VR utdrikningslag",
   ],
+  alternates: {
+    canonical: "https://www.krsvr.no/arrangementer/vr-utdrikningslag",
+    languages: {
+      "nb-NO": "https://www.krsvr.no/arrangementer/vr-utdrikningslag",
+      en: "https://www.krsvr.no/en/events",
+      "x-default": "https://www.krsvr.no/en/events",
+    },
+  },
   openGraph: {
     title: "VR-utdrikningslag i Kristiansand | Bachelor & Bachelorette Party",
     description: "Det perfekte innslaget i utdrikningslaget. Action, samarbeid og feiring i Kristiansand.",

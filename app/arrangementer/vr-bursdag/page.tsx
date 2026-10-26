@@ -20,6 +20,14 @@ export const metadata: Metadata = {
     "Aktivitet bursdag Kristiansand",
     "Bursdag for voksne Kristiansand",
   ],
+  alternates: {
+    canonical: "https://www.krsvr.no/arrangementer/vr-bursdag",
+    languages: {
+      "nb-NO": "https://www.krsvr.no/arrangementer/vr-bursdag",
+      en: "https://www.krsvr.no/en/events",
+      "x-default": "https://www.krsvr.no/en/events",
+    },
+  },
   openGraph: {
     title: "VR-bursdag i Kristiansand | KRS VR Arena",
     description: "Samle venner og familie til en feiring dere faktisk husker. Full bevegelse, samarbeid og egen partylounge.",

@@ -20,6 +20,14 @@ export const metadata: Metadata = {
     "Mobil teambuilding",
     "VR utleie med instruktør",
   ],
+  alternates: {
+    canonical: "https://www.krsvr.no/arrangementer/vr-on-site",
+    languages: {
+      "nb-NO": "https://www.krsvr.no/arrangementer/vr-on-site",
+      en: "https://www.krsvr.no/en/events",
+      "x-default": "https://www.krsvr.no/en/events",
+    },
+  },
   openGraph: {
     title: "VR On-site | Vi kommer til deg | KRS VR Arena",
     description: "Mobil VR-arena rigget opp direkte i deres kantine, konferansesal eller eventlokale i Agder. Komplett rigg med instruktører.",

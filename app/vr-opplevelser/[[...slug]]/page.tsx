@@ -20,8 +20,8 @@ export async function generateMetadata({
   let title = "VR Opplevelser i Kristiansand | KRS VR Arena";
   let description = "Utforsk VR Escape Rooms, Action Strategi og sosiale opplevelser hos KRS VR Arena i Kristiansand. Opplevelser tilrettelagt for vennegjenger, studenter, teambuilding og familie.";
 
-  // Virtual filter alias: /vr-opplevelser/familie aktiverer Familie-filteret
-  if (initialTypeSlug === "familie") {
+  // Virtual filter alias: /vr-opplevelser/familie (uten underslug) aktiverer Familie-filteret
+  if (initialTypeSlug === "familie" && !initialExpSlug) {
     const familieUrl = "https://www.krsvr.no/vr-opplevelser/familie";
     const enFamilyUrl = "https://www.krsvr.no/en/experiences/family";
     return {

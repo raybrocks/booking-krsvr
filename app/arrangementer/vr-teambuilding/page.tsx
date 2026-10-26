@@ -25,6 +25,14 @@ export const metadata: Metadata = {
     "Aktivitet for ansatte Kristiansand",
     "Avdelingsfest Kristiansand",
   ],
+  alternates: {
+    canonical: "https://www.krsvr.no/arrangementer/vr-teambuilding",
+    languages: {
+      "nb-NO": "https://www.krsvr.no/arrangementer/vr-teambuilding",
+      en: "https://www.krsvr.no/en/events",
+      "x-default": "https://www.krsvr.no/en/events",
+    },
+  },
   openGraph: {
     title: "VR-teambuilding & Firmaevent i Kristiansand | KRS VR Arena",
     description: "Samarbeid og konkurranse i VR for små og store bedrifter (2–64 personer). EHF-faktura, instruktør og lounge.",

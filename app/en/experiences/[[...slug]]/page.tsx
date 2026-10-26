@@ -11,8 +11,15 @@ export const dynamic = "force-dynamic";
 
 function normalizeTypeSlug(slug: string | undefined | null): string | null {
   if (!slug) return null;
-  if (slug === "family" || slug === "familiepakke") return "familiepakke";
+  if (slug === "family" || slug === "familie" || slug === "familiepakke") return "familie";
   if (slug === "action-strategy" || slug === "action-strategi") return "action-strategi";
+  return slug;
+}
+
+function toEnglishTypeSlug(slug: string | undefined | null): string | null {
+  if (!slug) return null;
+  if (slug === "family" || slug === "familie" || slug === "familiepakke") return "family";
+  if (slug === "action-strategy" || slug === "action-strategi") return "action-strategy";
   return slug;
 }
 
@@ -29,8 +36,8 @@ export async function generateMetadata({
   let description =
     "Explore wireless free-roam VR Escape Rooms, Action Strategy (Tactical Arena), Zombie Shooter, and Family Packages at KRS VR Arena in Kristiansand, Southern Norway.";
 
-  // Virtual filter alias: /en/experiences/family activates the Family filter
-  if (initialTypeSlug === "family" || initialTypeSlug === "familie") {
+  // Virtual filter alias: /en/experiences/family (without experience slug) activates the Family filter
+  if ((initialTypeSlug === "family" || initialTypeSlug === "familie") && !initialExpSlug) {
     const familyUrl = "https://www.krsvr.no/en/experiences/family";
     return {
       title: "Family-Friendly VR Experiences in Kristiansand | KRS VR Arena",
@@ -136,7 +143,8 @@ export async function generateMetadata({
     }
   }
 
-  const pageUrl = `https://www.krsvr.no/en/experiences${initialTypeSlug ? `/${initialTypeSlug}` : ""}${initialExpSlug ? `/${initialExpSlug}` : ""}`;
+  const enTypeSlug = toEnglishTypeSlug(initialTypeSlug);
+  const pageUrl = `https://www.krsvr.no/en/experiences${enTypeSlug ? `/${enTypeSlug}` : ""}${initialExpSlug ? `/${initialExpSlug}` : ""}`;
   const noUrl = `https://www.krsvr.no/vr-opplevelser${dbTypeSlug ? `/${dbTypeSlug}` : ""}${initialExpSlug ? `/${initialExpSlug}` : ""}`;
 
   return {

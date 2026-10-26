@@ -20,6 +20,14 @@ export const metadata: Metadata = {
     "VR On-site Kristiansand",
     "Gruppeaktivitet Kristiansand",
   ],
+  alternates: {
+    canonical: "https://www.krsvr.no/arrangementer",
+    languages: {
+      "nb-NO": "https://www.krsvr.no/arrangementer",
+      en: "https://www.krsvr.no/en/events",
+      "x-default": "https://www.krsvr.no/en/events",
+    },
+  },
   openGraph: {
     title: "Arrangementer i Kristiansand | KRS VR Arena",
     description: "Samle venner, kolleger eller familien til en engasjerende opplevelse i VR. Egen lounge og dedikert spillvert.",

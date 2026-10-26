@@ -5,6 +5,12 @@ import { slugify } from "@/lib/utils";
 export const revalidate = 3600; // revalidate every hour
 export const dynamic = "force-dynamic";
 
+function toEnglishTypeSlug(slug: string): string {
+  if (slug === "familie" || slug === "familiepakke" || slug === "family") return "family";
+  if (slug === "action-strategi" || slug === "action-strategy") return "action-strategy";
+  return slug;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.krsvr.no";
   
@@ -70,23 +76,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     });
 
-    const typeUrls: MetadataRoute.Sitemap = Array.from(typeMap.keys()).flatMap((typeSlug) => [
-      {
-        url: `${baseUrl}/vr-opplevelser/${typeSlug}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
-      },
-      {
-        url: `${baseUrl}/en/experiences/${typeSlug}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
-      },
-    ]);
+    const typeUrls: MetadataRoute.Sitemap = Array.from(typeMap.keys()).flatMap((typeSlug) => {
+      const enTypeSlug = toEnglishTypeSlug(typeSlug);
+      return [
+        {
+          url: `${baseUrl}/vr-opplevelser/${typeSlug}`,
+          lastModified: new Date(),
+          changeFrequency: 'weekly' as const,
+          priority: 0.7,
+        },
+        {
+          url: `${baseUrl}/en/experiences/${enTypeSlug}`,
+          lastModified: new Date(),
+          changeFrequency: 'weekly' as const,
+          priority: 0.7,
+        },
+      ];
+    });
 
     const detailUrls: MetadataRoute.Sitemap = experiences.flatMap(exp => {
       const typeSlug = exp.experienceType?.slug || slugify(exp.type || "");
+      const enTypeSlug = toEnglishTypeSlug(typeSlug);
       const expSlug = slugify(exp.name || "");
       return [
         {
@@ -96,7 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           priority: 0.6,
         },
         {
-          url: `${baseUrl}/en/experiences/${typeSlug}/${expSlug}`,
+          url: `${baseUrl}/en/experiences/${enTypeSlug}/${expSlug}`,
           lastModified: new Date(),
           changeFrequency: 'monthly' as const,
           priority: 0.6,
@@ -109,5 +119,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Error fetching experiences for sitemap:", error);
   }
 
-  return [...routes, ...experiencesUrls];
+  // Deduplicate by URL (keeping the first entry with higher priority)
+  const uniqueMap = new Map<string, MetadataRoute.Sitemap[number]>();
+  for (const item of [...routes, ...experiencesUrls]) {
+    if (!uniqueMap.has(item.url)) {
+      uniqueMap.set(item.url, item);
+    }
+  }
+
+  return Array.from(uniqueMap.values());
 }
