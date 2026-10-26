@@ -16,8 +16,8 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
 - Utvidet dokumentasjon for AI-agenter: https://www.krsvr.no/llms-full.txt
 
 ## Opplevelser og Tjenester
-- [Tactical Arena](https://www.krsvr.no/vr-opplevelser/tactical-arena): Trådløs lagtaktikk og action i storsalen med fri bevegelse. Har vunnet internasjonale priser (bl.a. Webby Awards og Auggie Awards for beste Mixed Reality-opplevelse). Spillmoduser inkluderer Team Deathmatch, Domination og Capture the Flag. Kapasitet opptil 10 samtidige spillere i ordinær booking, og opptil 50 i turneringsformat. Mixed Reality-teknologi tas i bruk mot slutten av opplevelsen.
-- [Zombie Shooter 18+](https://www.krsvr.no/vr-opplevelser/zombie-shooter): Intens co-op overlevelse mot horder av zombier i en forlatt fabrikk. Krever presisjon, samarbeid og nerver av stål ved plutselige jump scares og intense angrep. Kapasitet inntil 8 spillere.
+- [Tactical Arena](https://www.krsvr.no/vr-opplevelser/action-strategi/tactical-arena): Trådløs lagtaktikk og action i storsalen med fri bevegelse. Har vunnet internasjonale priser (bl.a. Webby Awards og Auggie Awards for beste Mixed Reality-opplevelse). Spillmoduser inkluderer Team Deathmatch, Domination og Capture the Flag. Kapasitet opptil 10 samtidige spillere i ordinær booking, og opptil 50 i turneringsformat. Mixed Reality-teknologi tas i bruk mot slutten av opplevelsen.
+- [Zombie Shooter 18+](https://www.krsvr.no/vr-opplevelser/action-strategi/zombie-shooter-18): Intens co-op overlevelse mot horder av zombier i en forlatt fabrikk. Krever presisjon, samarbeid og nerver av stål ved plutselige jump scares og intense angrep. Kapasitet inntil 8 spillere.
 - [VR Escape Rooms](https://www.krsvr.no/vr-opplevelser/escape-room): Samarbeidsbasert gåteløsing i virtuelle verdener for 2–6 spillere. Aktive titler i arenaen:
   - **Abyss Vault:** Sci-fi dypvannsmysterium der laget infiltrerer en hemmelig hvelvstasjon, bruker fargekodede lysvåpen og knekker koder for å unnslippe.
   - **Prison Break:** Klassisk og nervepirrende rømning fra et høysikkerhetsfengsel før vaktene oppdager dere.
@@ -26,8 +26,8 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
   - **Familiepakke Barn (8–12 år):** En trygg og morsom 90-minutters VR-opplevelse for barnefamilier. Gamemasteren veileder barna hele veien og setter sammen en tilpasset miks av familievennlige spill og enkle samarbeidsoppgaver uten skumle elementer, der mestring og felles glede står i sentrum (2–8 spillere).
   - **Familiepakke Ungdom (12+):** Actionfylt 90-minutters opplevelse for familier med tenåringer og voksne. Høyere tempo, utfordrende samarbeidsoppdrag og engasjerende konkurranser der både ungdom og foreldre utfordres på like vilkår (2–8 spillere).
   - **Elven Arrows:** Samarbeidsbasert fantasy-bueskyting der dere som alviske bueskyttere forsvarer hellige krystaller fra tårnet mot innkommende fiender (inntil 8 spillere).
-- [Teambuilding og Firmaevent](https://www.krsvr.no/teambuilding): Samlende opplevelser for bedrifter. 2–10 spillere (90 min) eller store grupper 10–50+ spillere (inntil 3 timer) med dynamisk turneringsformat, fargerike lagarmbånd, pause med storskjerm og kåring av vinnerlag.
-- [Utdrikningslag](https://www.krsvr.no/utdrikningslag): Actionfylte og engasjerende konkurranser for vennegjengen og bruden/brudgommen. Varighet 1,5–3 timer.
+- [Teambuilding og Firmaevent](https://www.krsvr.no/arrangementer/vr-teambuilding): Samlende opplevelser for bedrifter. 2–10 spillere (90 min) eller store grupper 10–50+ spillere (inntil 3 timer) med dynamisk turneringsformat, fargerike lagarmbånd, pause med storskjerm og kåring av vinnerlag.
+- [Utdrikningslag](https://www.krsvr.no/arrangementer/vr-utdrikningslag): Actionfylte og engasjerende konkurranser for vennegjengen og bruden/brudgommen. Varighet 1,5–3 timer.
 
 ## Kapasitet og Bookingregler
 - **Selvbetjent online booking (2–10 spillere):** Gjennomføres direkte på [https://www.krsvr.no/booking](https://www.krsvr.no/booking). Totalopplevelsen er 90 minutter (inkludert briefing, utstyrstilpasning, spilling og oppsummering).

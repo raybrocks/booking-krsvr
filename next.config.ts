@@ -46,6 +46,16 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/opplevelser/familiepakke',
+        destination: '/vr-opplevelser/familie',
+        permanent: true,
+      },
+      {
+        source: '/opplevelser/familiepakke/:slug*',
+        destination: '/vr-opplevelser/familie/:slug*',
+        permanent: true,
+      },
+      {
         source: '/opplevelser/:path*',
         destination: '/vr-opplevelser/:path*',
         permanent: true,
@@ -69,6 +79,36 @@ const nextConfig: NextConfig = {
       {
         source: '/en/experiences/zombie-shooter',
         destination: '/en/experiences/action-strategy/zombie-shooter-18',
+        permanent: true,
+      },
+      {
+        source: '/en/experiences/familie',
+        destination: '/en/experiences/family',
+        permanent: true,
+      },
+      {
+        source: '/en/experiences/familie/:slug*',
+        destination: '/en/experiences/family/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/en/experiences/familiepakke',
+        destination: '/en/experiences/family',
+        permanent: true,
+      },
+      {
+        source: '/en/experiences/familiepakke/:slug*',
+        destination: '/en/experiences/family/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/en/experiences/action-strategi',
+        destination: '/en/experiences/action-strategy',
+        permanent: true,
+      },
+      {
+        source: '/en/experiences/action-strategi/:slug*',
+        destination: '/en/experiences/action-strategy/:slug*',
         permanent: true,
       },
       {
@@ -311,6 +351,46 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/arrangementer/vi-kommer-til-deg',
+        destination: '/arrangementer/vr-on-site',
+        permanent: true,
+      },
+      {
+        source: '/teambuilding',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/firmaevent',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/julebord',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/kickoff',
+        destination: '/arrangementer/vr-teambuilding',
+        permanent: true,
+      },
+      {
+        source: '/utdrikningslag',
+        destination: '/arrangementer/vr-utdrikningslag',
+        permanent: true,
+      },
+      {
+        source: '/bursdag',
+        destination: '/arrangementer/vr-bursdag',
+        permanent: true,
+      },
+      {
+        source: '/barnebursdag',
+        destination: '/arrangementer/vr-bursdag',
+        permanent: true,
+      },
+      {
+        source: '/vr-on-site',
         destination: '/arrangementer/vr-on-site',
         permanent: true,
       },

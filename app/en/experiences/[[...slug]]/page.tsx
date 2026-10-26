@@ -286,12 +286,7 @@ export default async function EnglishExperiencesPage({
         const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== "und");
         const suitableList: string[] = Array.isArray(exp.suitableFor) ? exp.suitableFor : [];
         const rawTypeSlug = rawExp.experienceType?.slug || slugify(rawExp.type || "");
-        const enTypeSlug =
-          rawTypeSlug === "familiepakke"
-            ? "family"
-            : rawTypeSlug === "action-strategi"
-            ? "action-strategy"
-            : rawTypeSlug;
+        const enTypeSlug = toEnglishTypeSlug(rawTypeSlug) || rawTypeSlug;
 
         return {
           "@type": "ListItem",

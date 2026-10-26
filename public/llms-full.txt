@@ -27,12 +27,12 @@
   - Domination: Taktisk erobring og forsvar av strategiske soner.
   - Capture the Flag: Klassisk flaggkapring med koordinert lagspill.
 - **Kapasitet:** 2 til 10 spillere ved ordinær booking, og inntil 50 spillere i turneringsformat.
-- **URL:** https://www.krsvr.no/vr-opplevelser/tactical-arena
+- **URL:** https://www.krsvr.no/vr-opplevelser/action-strategi/tactical-arena
 
 ### 2.2 Zombie Shooter 18+
 - **Beskrivelse:** Kjemp dere gjennom en forlatt fabrikk full av zombier. Samarbeid, skyt presist og hold hodet kaldt når jump scares og intense angrep kommer fra alle kanter. Krever at laget dekker hverandres flanker under høyt press.
 - **Kapasitet:** 2 til 8 spillere.
-- **URL:** https://www.krsvr.no/vr-opplevelser/zombie-shooter
+- **URL:** https://www.krsvr.no/vr-opplevelser/action-strategi/zombie-shooter-18
 
 ### 2.3 VR Escape Rooms
 - **Beskrivelse:** Virtuelle gåterom med fokus på samarbeid, logisk tenkning, kommunikasjon og utforskning. Spillerne samarbeider i virtuelle verdener med oppgaver som ikke er mulig i fysiske escape rooms.
@@ -57,11 +57,11 @@
   - De som har pause følger med direkte på storskjerm (spectator mode) i loungen, studerer scorecards, nyter forfriskninger og legger taktikk.
   - Felles kåring av vinnerlag ved avslutning.
   - Alle opplever å delta på samme arrangement sammen gjennom hele oppholdet.
-- **URL:** https://www.krsvr.no/teambuilding
+- **URL:** https://www.krsvr.no/arrangementer/vr-teambuilding
 
 ### 2.6 Utdrikningslag (Bachelor / Bachelorette Party)
 - **Beskrivelse:** Morsomme, tilpassede konkurranser og opplevelser der bruden eller brudgommen settes i sentrum sammen med vennegjengen. Varighet 1,5 til 3 timer.
-- **URL:** https://www.krsvr.no/utdrikningslag
+- **URL:** https://www.krsvr.no/arrangementer/vr-utdrikningslag
 
 ### 2.7 Familiepakker og Barnebursdager
 - **Beskrivelse:** Familievennlige opplevelser tilpasset barn fra 8 år og oppover samt ungdom og bursdagsselskap. Vanskelighetsgrad, spillvalg og utstyr tilpasses gruppen med full veiledning fra gamemaster.

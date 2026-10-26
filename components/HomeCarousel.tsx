@@ -123,7 +123,7 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
             const exp = localizeExperience(rawExp, locale);
             const rawTypeSlug = rawExp.experienceType?.slug || slugify(rawExp.type || "");
             const typeSlug = isEn
-              ? rawTypeSlug === "familiepakke"
+              ? rawTypeSlug === "familie" || rawTypeSlug === "familiepakke"
                 ? "family"
                 : rawTypeSlug === "action-strategi"
                 ? "action-strategy"
@@ -136,8 +136,8 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
               null;
             const maxPlayers = exp.maxPlayers || 6;
             const typeBadge = isEn
-              ? exp.type === "Familiepakke"
-                ? "Family Package"
+              ? exp.type === "Familie" || exp.type === "Familiepakke"
+                ? "Family"
                 : exp.type === "Action Strategi"
                 ? "Action Strategy"
                 : exp.type
