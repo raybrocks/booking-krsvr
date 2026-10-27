@@ -39,6 +39,7 @@ export async function generateMetadata({
   // Virtual filter alias: /en/experiences/family (without experience slug) activates the Family filter
   if ((initialTypeSlug === "family" || initialTypeSlug === "familie") && !initialExpSlug) {
     const familyUrl = "https://www.krsvr.no/en/experiences/family";
+    const familyImg = "https://www.krsvr.no/images/vr-familiepakke-8-12-aar.jpg";
     return {
       title: "Family-Friendly VR Experiences in Kristiansand | KRS VR Arena",
       description:
@@ -58,6 +59,21 @@ export async function generateMetadata({
         url: familyUrl,
         locale: "en_US",
         type: "website",
+        images: [
+          {
+            url: familyImg,
+            width: 1200,
+            height: 675,
+            alt: "Family-friendly VR experiences at KRS VR Arena in Kristiansand",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Family-Friendly VR Experiences in Kristiansand | KRS VR Arena",
+        description:
+          "Discover family-friendly wireless VR packages for children (ages 8–12) and youth (12+) at KRS VR Arena in Kristiansand.",
+        images: [familyImg],
       },
     };
   }
@@ -71,6 +87,12 @@ export async function generateMetadata({
   }
 
   let isVippsTest = false;
+  let ogImage: { url: string; width?: number; height?: number; alt?: string } = {
+    url: "https://www.krsvr.no/images/vr-teambuilding-firmaevent-kristiansand.jpg",
+    width: 1600,
+    height: 1200,
+    alt: "KRS VR Arena Kristiansand",
+  };
   const dbTypeSlug = normalizeTypeSlug(initialTypeSlug);
 
   if (initialTypeSlug) {
@@ -107,6 +129,19 @@ export async function generateMetadata({
           ? `${matchedExp.shortDescription} Play ${matchedExp.name} at KRS VR Arena in Kristiansand.`
           : description;
 
+        const expImage =
+          (Array.isArray(matchedRaw.images) && matchedRaw.images.length > 0
+            ? matchedRaw.images[0]
+            : null) || matchedRaw.picture;
+        if (expImage) {
+          ogImage = {
+            url: expImage,
+            width: 1200,
+            height: 630,
+            alt: `${matchedExp.name} at KRS VR Arena in Kristiansand`,
+          };
+        }
+
         if (
           matchedRaw.type?.toLowerCase().includes("vipps-test") ||
           matchedRaw.type?.toLowerCase().includes("vipps test")
@@ -137,6 +172,22 @@ export async function generateMetadata({
         } else {
           title = `${typeName} in Kristiansand | KRS VR Arena`;
         }
+
+        const firstExpOfType = exps.find(
+          (e) =>
+            ((e.experienceType?.slug || slugify(e.type || "")) === dbTypeSlug ||
+              (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug) &&
+            (e.picture || (Array.isArray(e.images) && e.images.length > 0))
+        );
+        const typeImage = firstExpOfType?.images?.[0] || firstExpOfType?.picture;
+        if (typeImage) {
+          ogImage = {
+            url: typeImage,
+            width: 1200,
+            height: 630,
+            alt: `${typeName} at KRS VR Arena in Kristiansand`,
+          };
+        }
       }
     } catch (error) {
       console.error("Error fetching English metadata:", error);
@@ -164,6 +215,13 @@ export async function generateMetadata({
       url: pageUrl,
       locale: "en_US",
       type: "website",
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage.url],
     },
     ...(isVippsTest && { robots: { index: false, follow: false } }),
   };

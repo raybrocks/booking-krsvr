@@ -122,7 +122,7 @@ function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVide
                 <img
                   src={imgUrl}
                   alt={`Spill ${experience.name} (${idx + 1}/${images.length}) - ${experience.type} hos KRS VR Arena i Kristiansand`}
-                  className={`w-full h-full ${imgUrl.includes("hunter-vr-logo") ? "object-contain p-4 md:p-6" : "object-cover"} select-none pointer-events-none`}
+                  className={`w-full h-full ${imgUrl.includes("hunter-vr") ? "object-contain p-4 md:p-6" : "object-cover"} select-none pointer-events-none`}
                   draggable={false}
                 />
               </div>

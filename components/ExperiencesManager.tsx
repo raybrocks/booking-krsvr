@@ -1062,7 +1062,7 @@ export default function ExperiencesManager() {
           <div key={exp.id} className={`bg-zinc-900/50 border ${exp.isActive ? 'border-zinc-800' : 'border-red-900/50 opacity-70'} rounded-2xl overflow-hidden flex flex-col`}>
             {(exp.images?.[0] || exp.picture) ? (
               <div className="relative w-full h-40 bg-zinc-950 border-b border-zinc-800">
-                <Image src={exp.images?.[0] || exp.picture} alt={exp.name} fill className={(exp.images?.[0] || exp.picture)?.includes("hunter-vr-logo") ? "object-contain p-2" : "object-cover"} />
+                <Image src={exp.images?.[0] || exp.picture} alt={exp.name} fill className={(exp.images?.[0] || exp.picture)?.includes("hunter-vr") ? "object-contain p-2" : "object-cover"} />
                 {exp.isNew && (
                   <span className="absolute top-2 left-2 bg-[#19EB5B] text-black text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md shadow-md">
                     Nyhet

@@ -178,7 +178,7 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
                         <img
                           src={coverImage}
                           alt={`${exp.name} – ${typeBadge || (isEn ? "VR Experience" : "VR-opplevelse")} ${isEn ? "at KRS VR Arena" : "hos KRS VR Arena"}`}
-                          className={`w-full h-full ${coverImage.includes("hunter-vr-logo") ? "object-contain p-3" : "object-cover"} group-hover:scale-105 transition-transform duration-500`}
+                          className={`w-full h-full ${coverImage.includes("hunter-vr") ? "object-contain p-3" : "object-cover"} group-hover:scale-105 transition-transform duration-500`}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
                       </>

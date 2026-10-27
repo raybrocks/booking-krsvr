@@ -56,6 +56,20 @@ export const metadata: Metadata = {
     siteName: 'KRS VR Arena',
     locale: 'nb_NO',
     type: 'website',
+    images: [
+      {
+        url: 'https://www.krsvr.no/images/vr-teambuilding-firmaevent-kristiansand.jpg',
+        width: 1600,
+        height: 1200,
+        alt: 'KRS VR Arena Kristiansand',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'KRS VR Arena | Kristiansands mest sosiale VR-opplevelser',
+    description: 'Opplev latter, samarbeid og felles opplevelser i vår 300 kvm arkade på Lund i Kristiansand.',
+    images: ['https://www.krsvr.no/images/vr-teambuilding-firmaevent-kristiansand.jpg'],
   },
   robots: {
     index: true,

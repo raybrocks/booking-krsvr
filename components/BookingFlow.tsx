@@ -369,7 +369,7 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                           onClick={() => setSelectedExperience(exp)}
                         >
                           <div className="relative h-48 w-full bg-zinc-950">
-                            <Image src={exp.picture} alt={exp.name} fill className={exp.picture?.includes("hunter-vr-logo") ? "object-contain p-2" : "object-cover"} />
+                            <Image src={exp.picture} alt={exp.name} fill className={exp.picture?.includes("hunter-vr") ? "object-contain p-2" : "object-cover"} />
                             {exp.isNew && (
                               <div className="absolute top-3 left-3 bg-[#19EB5B] px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider text-black shadow-md">
                                 {isEn ? "New" : "Nyhet"}

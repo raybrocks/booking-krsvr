@@ -24,6 +24,7 @@ export async function generateMetadata({
   if (initialTypeSlug === "familie" && !initialExpSlug) {
     const familieUrl = "https://www.krsvr.no/vr-opplevelser/familie";
     const enFamilyUrl = "https://www.krsvr.no/en/experiences/family";
+    const familieImg = "https://www.krsvr.no/images/vr-familiepakke-8-12-aar.jpg";
     return {
       title: "Familievennlige VR-opplevelser i Kristiansand | KRS VR Arena",
       description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Tilpasset for familier med barn og ungdom, bursdag og sosiale aktiviteter.",
@@ -40,6 +41,20 @@ export async function generateMetadata({
         description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Tilpasset for familier med barn og ungdom, bursdag og sosiale aktiviteter.",
         url: familieUrl,
         type: "website",
+        images: [
+          {
+            url: familieImg,
+            width: 1200,
+            height: 675,
+            alt: "Familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Familievennlige VR-opplevelser i Kristiansand | KRS VR Arena",
+        description: "Se familievennlige VR-opplevelser hos KRS VR Arena i Kristiansand. Tilpasset for familier med barn og ungdom, bursdag og sosiale aktiviteter.",
+        images: [familieImg],
       },
     };
   }
@@ -54,6 +69,12 @@ export async function generateMetadata({
   }
 
   let isVippsTest = false;
+  let ogImage: { url: string; width?: number; height?: number; alt?: string } = {
+    url: "https://www.krsvr.no/images/vr-teambuilding-firmaevent-kristiansand.jpg",
+    width: 1600,
+    height: 1200,
+    alt: "KRS VR Arena Kristiansand",
+  };
 
   if (initialTypeSlug) {
     try {
@@ -76,6 +97,20 @@ export async function generateMetadata({
           title = `${matchedExp.name} | ${matchedExp.type} i Kristiansand`;
         }
         description = matchedExp.shortDescription ? `${matchedExp.shortDescription} Opplev ${matchedExp.name} hos KRS VR Arena i Kristiansand.` : description;
+
+        const expImage =
+          (Array.isArray(matchedExp.images) && matchedExp.images.length > 0
+            ? matchedExp.images[0]
+            : null) || matchedExp.picture;
+        if (expImage) {
+          ogImage = {
+            url: expImage,
+            width: 1200,
+            height: 630,
+            alt: `${matchedExp.name} hos KRS VR Arena i Kristiansand`,
+          };
+        }
+
         if (matchedExp.type?.toLowerCase().includes("vipps-test") || matchedExp.type?.toLowerCase().includes("vipps test")) {
           isVippsTest = true;
         }
@@ -95,6 +130,20 @@ export async function generateMetadata({
           title = `${typeName} i Kristiansand`;
           description = `Opplev ${typeName.toLowerCase()} hos KRS VR Arena i Kristiansand. Populært for vennegjenger, teambuilding, studenter og grupper.`;
         }
+
+        const firstExpOfType = exps.find(
+          e => (e.experienceType?.slug || slugify(e.type || "")) === initialTypeSlug && (e.picture || (Array.isArray(e.images) && e.images.length > 0))
+        );
+        const typeImage = firstExpOfType?.images?.[0] || firstExpOfType?.picture;
+        if (typeImage) {
+          ogImage = {
+            url: typeImage,
+            width: 1200,
+            height: 630,
+            alt: `${typeName} hos KRS VR Arena i Kristiansand`,
+          };
+        }
+
         if (typeName.toLowerCase().includes("vipps-test") || typeName.toLowerCase().includes("vipps test")) {
           isVippsTest = true;
         }
@@ -133,6 +182,13 @@ export async function generateMetadata({
       description,
       url: pageUrl,
       type: "website",
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage.url],
     },
     ...(isVippsTest && { robots: { index: false, follow: false } }),
   };
