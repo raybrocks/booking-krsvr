@@ -111,3 +111,8 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - Drikke serveres via våre to forhåndsbestilte barkonsepter (Pakke 1: Øl/cider/mineralvann eller Pakke 2: Vin & bobler).
    - Mat serveres ved at vi koordinerer levering av fersk, varm lokal pizza direkte til partyloungen.
    - **Unntak for barnebursdag:** Ved barnebursdager er det tillatt å ta med egen bursdagskake, godteri, snacks og brus.
+
+# Leverandørkonfidensialitet og Interne Kilder
+1. **Ingen eksponering av leverandørnavn:** Navn på eksterne plattform- og spill-leverandører (som Spawnpoint) skal ALDRI nevnes eller avsløres i offentlig kildekode, frontend-komponenter, metadata, JSON-LD, sitemap, llms.txt eller commit-meldinger.
+2. **Interne ressurser for Browser Agent:** Interne spilldatabaser og markedsføringsressurser for oppslag og verifisering skal utelukkende lagres og leses fra den Git-ignorerte mappen `.antigravity/` (`.antigravity/internal_supplier_resources.md`).
+
