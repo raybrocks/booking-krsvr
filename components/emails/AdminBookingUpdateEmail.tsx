@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { Heading, Text, Section, Link, Button } from '@react-email/components';
+import { Heading, Text, Section, Button } from '@react-email/components';
 import { EmailLayout } from './EmailLayout';
+
+export type AdminBookingChangeType = 'time' | 'players' | 'names' | 'names_and_players' | 'multiple';
 
 export interface AdminBookingUpdateEmailProps {
   firstName: string;
@@ -8,8 +10,14 @@ export interface AdminBookingUpdateEmailProps {
   email: string;
   date: string;
   time: string;
+  oldDate?: string;
+  oldTime?: string;
   players?: number;
+  oldPlayers?: number;
   experienceTitle?: string;
+  oldExperienceTitle?: string;
+  playerNames?: string[];
+  changeType?: AdminBookingChangeType;
   adminEmail?: string;
 }
 
@@ -19,23 +27,118 @@ export const AdminBookingUpdateEmail: React.FC<AdminBookingUpdateEmailProps> = (
   email,
   date,
   time,
+  oldDate,
+  oldTime,
   players,
+  oldPlayers,
   experienceTitle,
+  oldExperienceTitle,
+  playerNames = [],
+  changeType = 'time',
   adminEmail = 'post@krsvr.no',
 }) => {
-  return (
-    <EmailLayout previewText={`Booking endret av kunde: ${firstName} ${lastName}`} adminEmail={adminEmail}>
-      <Heading style={headingStyle}>Booking endret av kunde</Heading>
+  const isTimeChanged =
+    changeType === 'time' ||
+    (changeType === 'multiple' && Boolean((oldDate && oldDate !== date) || (oldTime && oldTime !== time)));
 
-      <Text style={paragraphStyle}>
-        Kunden <strong>{firstName} {lastName}</strong> ({email}) har oppdatert bookingen sin via kundeportalen.
-      </Text>
+  const validPlayerNames = Array.isArray(playerNames)
+    ? playerNames.map((n) => (typeof n === 'string' ? n.trim() : '')).filter(Boolean)
+    : [];
+
+  const getHeading = () => {
+    switch (changeType) {
+      case 'names':
+        return 'Navneliste oppdatert av kunde';
+      case 'names_and_players':
+        return 'Navneliste og deltakere oppdatert';
+      case 'players':
+        return 'Deltakerantall endret av kunde';
+      case 'time':
+        return 'Tidspunkt endret av kunde';
+      default:
+        return 'Booking oppdatert av kunde';
+    }
+  };
+
+  const getIntroText = () => {
+    switch (changeType) {
+      case 'names':
+        return (
+          <Text style={paragraphStyle}>
+            Kunden <strong>{firstName} {lastName}</strong> ({email}) har lagt inn eller oppdatert navnelisten for bookingen sin. <em>Tidspunktet er uendret.</em>
+          </Text>
+        );
+      case 'names_and_players':
+        return (
+          <Text style={paragraphStyle}>
+            Kunden <strong>{firstName} {lastName}</strong> ({email}) har oppdatert navnelisten og endret antall deltakere{oldPlayers && oldPlayers !== players ? ` (fra ${oldPlayers} til ${players} pers)` : ''}. <em>Tidspunktet er uendret.</em>
+          </Text>
+        );
+      case 'players':
+        return (
+          <Text style={paragraphStyle}>
+            Kunden <strong>{firstName} {lastName}</strong> ({email}) har endret antall deltakere{oldPlayers && oldPlayers !== players ? ` fra ${oldPlayers} til ${players} pers` : ''}. <em>Tidspunktet er uendret.</em>
+          </Text>
+        );
+      case 'time':
+        return (
+          <Text style={paragraphStyle}>
+            Kunden <strong>{firstName} {lastName}</strong> ({email}) har flyttet bookingen sin til et nytt tidspunkt via kundeportalen.
+          </Text>
+        );
+      default:
+        return (
+          <Text style={paragraphStyle}>
+            Kunden <strong>{firstName} {lastName}</strong> ({email}) har oppdatert bookingen sin via kundeportalen.
+          </Text>
+        );
+    }
+  };
+
+  return (
+    <EmailLayout previewText={`${getHeading()}: ${firstName} ${lastName}`} adminEmail={adminEmail}>
+      <Heading style={headingStyle}>{getHeading()}</Heading>
+
+      {getIntroText()}
 
       <Section style={detailsTableStyle}>
         <Text style={detailRowStyle}><strong>Kunde:</strong> {firstName} {lastName}</Text>
-        <Text style={detailRowStyle}><strong>Nytt tidspunkt:</strong> {date} kl {time}</Text>
-        {experienceTitle && <Text style={detailRowStyle}><strong>Opplevelse:</strong> {experienceTitle}</Text>}
-        {players && <Text style={detailRowStyle}><strong>Antall deltakere:</strong> {players} pers</Text>}
+
+        {isTimeChanged ? (
+          <>
+            {oldDate && oldTime && (
+              <Text style={detailRowStyle}><strong>Tidligere tidspunkt:</strong> {oldDate} kl {oldTime}</Text>
+            )}
+            <Text style={detailRowStyle}><strong>Nytt tidspunkt:</strong> {date} kl {time}</Text>
+          </>
+        ) : (
+          <Text style={detailRowStyle}><strong>Tidspunkt:</strong> {date} kl {time}</Text>
+        )}
+
+        {experienceTitle && (
+          <Text style={detailRowStyle}>
+            <strong>Opplevelse:</strong> {experienceTitle}
+            {oldExperienceTitle && oldExperienceTitle !== experienceTitle ? ` (tidligere: ${oldExperienceTitle})` : ''}
+          </Text>
+        )}
+
+        {players !== undefined && (
+          <Text style={detailRowStyle}>
+            <strong>Antall deltakere:</strong> {players} pers
+            {oldPlayers && oldPlayers !== players ? ` (tidligere: ${oldPlayers} pers)` : ''}
+          </Text>
+        )}
+
+        {validPlayerNames.length > 0 && (
+          <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #fde047' }}>
+            <Text style={{ ...detailRowStyle, fontWeight: '700', marginBottom: '4px' }}>
+              Registrerte spillernavn ({validPlayerNames.length} av {players || validPlayerNames.length}):
+            </Text>
+            <Text style={{ ...detailRowStyle, margin: '2px 0', fontSize: '13px', lineHeight: '1.5' }}>
+              {validPlayerNames.map((name, i) => `${i + 1}. ${name}`).join(' • ')}
+            </Text>
+          </div>
+        )}
       </Section>
 
       <Button href="https://krsvr.no/admin" style={primaryButtonStyle}>

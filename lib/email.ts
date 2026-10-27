@@ -361,10 +361,22 @@ export async function sendAdminNewBookingNotification(bookingDetails: any) {
   }
 }
 
-export async function sendAdminBookingUpdateNotification(bookingDetails: any) {
+export async function sendAdminBookingUpdateNotification(
+  bookingDetails: any,
+  changes?: {
+    timeChanged?: boolean;
+    experienceChanged?: boolean;
+    playersChanged?: boolean;
+    namesUpdated?: boolean;
+    oldDate?: string;
+    oldTime?: string;
+    oldPlayers?: number;
+    oldExperienceName?: string;
+  }
+) {
   if (!process.env.RESEND_API_KEY) return null;
   const adminEmail = await getAdminEmail();
-  const { firstName, lastName, email, date, time, players, experienceId } = bookingDetails;
+  const { firstName, lastName, email, date, time, players, experienceId, playerNames } = bookingDetails;
   
   let experienceTitle: string | undefined;
   if (experienceId) {
@@ -372,6 +384,30 @@ export async function sendAdminBookingUpdateNotification(bookingDetails: any) {
       const exp = await prisma.experience.findUnique({ where: { id: experienceId } });
       if (exp && exp.name) experienceTitle = exp.name;
     } catch (e) {}
+  }
+
+  const timeChanged = Boolean(changes?.timeChanged);
+  const playersChanged = Boolean(changes?.playersChanged);
+  const namesUpdated = Boolean(changes?.namesUpdated);
+
+  let changeType: 'time' | 'players' | 'names' | 'names_and_players' | 'multiple' = 'time';
+  let subject = `Booking oppdatert av kunde: ${firstName} ${lastName}`;
+
+  if (namesUpdated && !timeChanged && !playersChanged) {
+    changeType = 'names';
+    subject = `Navneliste oppdatert av kunde: ${firstName} ${lastName} (${date} kl ${time})`;
+  } else if (namesUpdated && playersChanged && !timeChanged) {
+    changeType = 'names_and_players';
+    subject = `Navneliste og deltakere oppdatert: ${firstName} ${lastName} (${players} pers)`;
+  } else if (playersChanged && !timeChanged && !namesUpdated) {
+    changeType = 'players';
+    subject = `Deltakerantall endret av kunde: ${firstName} ${lastName} (${players} pers)`;
+  } else if (timeChanged) {
+    changeType = 'time';
+    subject = `Tidspunkt endret av kunde: ${firstName} ${lastName} (${date} kl ${time})`;
+  } else if (changes?.experienceChanged && !timeChanged) {
+    changeType = 'multiple';
+    subject = `Opplevelse endret av kunde: ${firstName} ${lastName} (${experienceTitle || 'VR'})`;
   }
 
   try {
@@ -382,8 +418,14 @@ export async function sendAdminBookingUpdateNotification(bookingDetails: any) {
         email,
         date,
         time,
+        oldDate: changes?.oldDate,
+        oldTime: changes?.oldTime,
         players: players ? Number(players) : undefined,
+        oldPlayers: changes?.oldPlayers ? Number(changes.oldPlayers) : undefined,
         experienceTitle,
+        oldExperienceTitle: changes?.oldExperienceName,
+        playerNames: Array.isArray(playerNames) ? playerNames : undefined,
+        changeType,
         adminEmail,
       })
     );
@@ -391,7 +433,7 @@ export async function sendAdminBookingUpdateNotification(bookingDetails: any) {
     await resend.emails.send({
       from: 'KRS VR Arena Admin <booking@donotreply.krsvr.no>',
       to: adminEmail,
-      subject: `Booking endret av kunde: ${firstName} ${lastName}`,
+      subject,
       html,
     });
   } catch (err) {

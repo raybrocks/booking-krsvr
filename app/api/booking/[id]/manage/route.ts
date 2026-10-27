@@ -111,13 +111,36 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Ingen endringer spesifisert' }, { status: 400 });
     }
 
+    const timeChanged = Boolean(
+      (updateData.date && updateData.date !== booking.date) ||
+      (updateData.time && updateData.time !== booking.time)
+    );
+    const experienceChanged = Boolean(
+      updateData.experienceId && updateData.experienceId !== booking.experienceId
+    );
+    const playersChanged = Boolean(
+      updateData.players !== undefined && updateData.players !== booking.players
+    );
+    const namesUpdated = Boolean(updateData.playerNames !== undefined);
+
+    const changes = {
+      timeChanged,
+      experienceChanged,
+      playersChanged,
+      namesUpdated,
+      oldDate: booking.date,
+      oldTime: booking.time,
+      oldPlayers: booking.players,
+      oldExperienceName: booking.experience?.name,
+    };
+
     const updated = await prisma.booking.update({
       where: { id },
       data: updateData,
       include: { experience: true }
     });
     
-    await sendAdminBookingUpdateNotification(updated);
+    await sendAdminBookingUpdateNotification(updated, changes);
 
     return NextResponse.json(updated);
   } catch (error) {
