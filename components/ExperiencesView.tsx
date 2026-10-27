@@ -103,7 +103,7 @@ function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVide
     <div className="w-full flex flex-col items-center relative">
       {/* IMAGE SLIDER */}
       <div
-        className={`w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 shadow-2xl select-none ${
+        className={`w-full aspect-video md:aspect-auto md:h-[450px] rounded-3xl overflow-hidden relative border border-white/5 bg-zinc-950 shadow-2xl select-none ${
           hasMultiple ? "cursor-grab active:cursor-grabbing" : ""
         }`}
         onTouchStart={handleTouchStart}
@@ -122,7 +122,7 @@ function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVide
                 <img
                   src={imgUrl}
                   alt={`Spill ${experience.name} (${idx + 1}/${images.length}) - ${experience.type} hos KRS VR Arena i Kristiansand`}
-                  className="w-full h-full object-cover select-none pointer-events-none"
+                  className={`w-full h-full ${imgUrl.includes("hunter-vr-logo") ? "object-contain p-4 md:p-6" : "object-cover"} select-none pointer-events-none`}
                   draggable={false}
                 />
               </div>
@@ -499,7 +499,7 @@ export function ExperiencesView({
     const ltype = type ? type.toLowerCase() : "";
     
     if (ltype.includes("escape") || lname.includes("escape")) return <Handshake className="w-10 h-10" />;
-    if (ltype.includes("shooter") || lname.includes("shooter") || lname.includes("tactical")) return <Crosshair className="w-10 h-10" />;
+    if (ltype.includes("shooter") || lname.includes("shooter") || lname.includes("tactical") || lname.includes("hunter") || lname.includes("jakt")) return <Crosshair className="w-10 h-10" />;
     if (ltype.includes("zomb") || lname.includes("zomb") || lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10" />;
     if (ltype.includes("archer") || lname.includes("archer") || lname.includes("arrow")) return <Mountain className="w-10 h-10" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10" />;
@@ -647,7 +647,7 @@ export function ExperiencesView({
                     key={exp.id}
                     data-id={exp.id}
                     onClick={() => setSelectedId(exp.id)}
-                    className={`relative flex flex-col items-center justify-between flex-shrink-0 snap-center focus:outline-none group w-[115px] sm:w-[130px] md:w-[150px] px-2 py-3 rounded-2xl border transition-all duration-300 min-h-[120px] sm:min-h-[130px] md:min-h-[140px] ${
+                    className={`relative flex flex-col items-center justify-between flex-shrink-0 snap-center focus:outline-none group w-[125px] sm:w-[140px] md:w-[165px] px-2 py-3 rounded-2xl border transition-all duration-300 min-h-[124px] sm:min-h-[134px] md:min-h-[144px] ${
                       isSelected 
                         ? "border-[#9C39FF] bg-[#9C39FF]/10 shadow-[0_0_15px_rgba(156,57,255,0.2)]" 
                         : "border-transparent hover:border-zinc-800 hover:bg-zinc-800/30"
@@ -667,13 +667,15 @@ export function ExperiencesView({
                     >
                       {getIconForType(exp.type, exp.name)}
                     </div>
-                    <span 
-                      className={`w-full text-center text-xs sm:text-sm md:text-base font-medium mb-1.5 transition-colors line-clamp-2 [text-wrap:balance] h-9 sm:h-10 md:h-11 flex items-center justify-center leading-tight md:leading-snug px-1 ${
-                        isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
-                      }`}
-                    >
-                      {exp.name}
-                    </span>
+                    <div className="w-full min-h-[2.5rem] sm:min-h-[2.75rem] flex items-center justify-center mb-1.5 px-1">
+                      <span 
+                        className={`w-full text-center text-xs sm:text-sm md:text-[15px] font-medium transition-colors [text-wrap:balance] leading-tight ${
+                          isSelected ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
+                        }`}
+                      >
+                        {exp.name}
+                      </span>
+                    </div>
                     <span 
                       className={`text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-wider px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
                         isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-500 bg-zinc-900"

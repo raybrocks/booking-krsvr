@@ -34,6 +34,12 @@
 - **Kapasitet:** 2 til 8 spillere.
 - **URL:** https://www.krsvr.no/vr-opplevelser/action-strategi/zombie-shooter-18
 
+### 2.2B Hunter VR - Jaktsimulator
+- **Beskrivelse:** Sosial innendørs jaktsimulator i VR for jaktlaget, kompisgjengen og kollegaer – uansett vær og utenom jaktsesongen (akkurat som golfsimulator for golfere). Spillerne står fysisk sammen i arenaen, prater underveis og konkurrerer i tre ulike jaktterreng med elg, kronhjort, villsvin, bjørn, rev, hare og fugl, kombinert med bonusrunder med blinkskyting og poengtavle.
+- **Aldersgrense:** Fra 16 år.
+- **Kapasitet:** 2 til 10 spillere (90 minutter totalopplevelse).
+- **URL:** https://www.krsvr.no/vr-opplevelser/action-strategi/hunter-vr-jaktsimulator
+
 ### 2.3 VR Escape Rooms
 - **Beskrivelse:** Virtuelle gåterom med fokus på samarbeid, logisk tenkning, kommunikasjon og utforskning. Spillerne samarbeider i virtuelle verdener med oppgaver som ikke er mulig i fysiske escape rooms.
 - **Aktive oppdrag i arenaen:**

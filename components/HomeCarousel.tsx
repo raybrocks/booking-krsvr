@@ -79,7 +79,7 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
     const ltype = type ? type.toLowerCase() : "";
     
     if (ltype.includes("escape") || lname.includes("escape")) return <Handshake className="w-10 h-10 md:w-12 md:h-12" />;
-    if (ltype.includes("shooter") || lname.includes("shooter") || lname.includes("tactical")) return <Crosshair className="w-10 h-10 md:w-12 md:h-12" />;
+    if (ltype.includes("shooter") || lname.includes("shooter") || lname.includes("tactical") || lname.includes("hunter") || lname.includes("jakt")) return <Crosshair className="w-10 h-10 md:w-12 md:h-12" />;
     if (ltype.includes("zomb") || lname.includes("zomb") || lname.includes("fear") || lname.includes("blood")) return <Skull className="w-10 h-10 md:w-12 md:h-12" />;
     if (ltype.includes("archer") || lname.includes("archer")) return <Mountain className="w-10 h-10 md:w-12 md:h-12" />;
     if (lname.includes("sanctum")) return <Ghost className="w-10 h-10 md:w-12 md:h-12" />;
@@ -178,7 +178,7 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
                         <img
                           src={coverImage}
                           alt={`${exp.name} – ${typeBadge || (isEn ? "VR Experience" : "VR-opplevelse")} ${isEn ? "at KRS VR Arena" : "hos KRS VR Arena"}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className={`w-full h-full ${coverImage.includes("hunter-vr-logo") ? "object-contain p-3" : "object-cover"} group-hover:scale-105 transition-transform duration-500`}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
                       </>
