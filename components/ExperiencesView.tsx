@@ -581,32 +581,25 @@ export function ExperiencesView({
             ? "Gather family, friends, or colleagues for wireless VR experiences at KRS VR Arena in Kristiansand. Designed for teamwork, communication, and shared excitement."
             : "Samle familie, venner eller kolleger til unike opplevelser hos KRS VR Arena i Kristiansand. Laget for samarbeid, kommunikasjon og felles mestring."}
         </p>
-        <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-4xl mx-auto px-2 mb-2 overflow-x-auto hide-scrollbar">
-          {["Alle", "Familie", "Action Strategi", "Escape Room"].map((filter, idx, arr) => {
-            const isActive = activePrimaryFilter === filter;
-            return (
-              <React.Fragment key={filter}>
+        <div className="flex items-center justify-center w-full max-w-2xl mx-auto px-2 mb-2 sm:mb-4">
+          <div className="inline-flex items-center justify-center gap-1 sm:gap-1.5 p-1 rounded-full bg-zinc-900/90 border border-white/10 backdrop-blur-md overflow-x-auto max-w-full hide-scrollbar shadow-inner">
+            {["Alle", "Familie", "Action Strategi", "Escape Room"].map((filter) => {
+              const isActive = activePrimaryFilter === filter;
+              return (
                 <button
+                  key={filter}
                   onClick={() => handlePrimaryFilterClick(filter)}
-                  className={`relative min-h-[40px] px-2.5 py-2 text-xs sm:text-sm md:text-base tracking-wide whitespace-nowrap transition-colors cursor-pointer inline-flex items-center ${
+                  className={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm tracking-wide whitespace-nowrap transition-all cursor-pointer font-medium ${
                     isActive
-                      ? "text-white font-semibold"
-                      : "text-zinc-400 hover:text-zinc-200 font-normal"
+                      ? "bg-[#9C39FF] text-white font-semibold shadow-[0_0_12px_rgba(156,57,255,0.45)]"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   {filterDisplayLabel(filter)}
-                  {isActive && (
-                    <span className="absolute left-2 right-2 bottom-1 h-[2px] bg-[#9C39FF] rounded-full shadow-[0_0_8px_rgba(156,57,255,0.6)]" />
-                  )}
                 </button>
-                {idx < arr.length - 1 && (
-                  <span className="text-zinc-700 text-xs sm:text-sm select-none" aria-hidden="true">
-                    |
-                  </span>
-                )}
-              </React.Fragment>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </motion.div>
 
@@ -625,7 +618,7 @@ export function ExperiencesView({
       ) : (
         <>
           {/* HORIZONTAL CAROUSEL NAV */}
-          <div className="sticky top-[81px] md:top-[189px] lg:top-[199px] z-40 w-full bg-black py-2 mb-12 shadow-[0_20px_40px_rgba(0,0,0,0.8)] border-b border-white/5">
+          <div className="relative w-full bg-black py-2 mb-8 md:mb-12 border-b border-white/5">
             <div className="relative w-full max-w-6xl mx-auto flex items-center">
               <button 
                 onClick={scrollLeft} 

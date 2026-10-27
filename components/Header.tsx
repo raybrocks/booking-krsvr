@@ -80,7 +80,7 @@ export default function Header() {
   const logoHref = locale === "no" ? "/" : "/en";
 
   return (
-    <header className="w-full sticky top-0 z-50 pointer-events-none flex flex-col md:pt-4">
+    <header className="w-full relative md:sticky top-0 z-50 pointer-events-none flex flex-col md:pt-4">
       {/* Background container */}
       <div className="absolute inset-0 bg-background/90 backdrop-blur-md border-b border-white/5 md:bg-gradient-to-b md:from-background md:via-background/90 md:to-transparent md:border-none md:h-[200px]" />
 
