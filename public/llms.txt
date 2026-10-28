@@ -20,6 +20,7 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
 - [Zombie Shooter 18+](https://www.krsvr.no/vr-opplevelser/action-strategi/zombie-shooter-18): Intens co-op overlevelse mot horder av zombier i en forlatt fabrikk. Krever presisjon, samarbeid og nerver av stål ved plutselige jump scares og intense angrep. Kapasitet inntil 8 spillere.
 - [Hunter VR - Jaktsimulator](https://www.krsvr.no/vr-opplevelser/action-strategi/hunter-vr-jaktsimulator): Sosial innendørs jaktsimulator i VR for jaktlag, kompisgjenger og kollegaer (fra 16 år, 2–10 spillere, 90 min). Tre ulike jaktterreng med elg, kronhjort, villsvin, bjørn og småvilt, pluss bonusrunder med blinkskyting og poengkonkurranse.
 - [VR Escape Rooms](https://www.krsvr.no/vr-opplevelser/escape-room): Samarbeidsbasert gåteløsing i virtuelle verdener for 2–6 spillere. Aktive titler i arenaen:
+  - **Mask of the Pharaoh:** Familievennlig egyptisk pyramideeventyr (fra 8 år, 2–6 spillere). Et museumsbesøk tar en uventet vending når en professor rammes av en forbannelse, og dere må løse eldgamle gåter sammen for å bryte forbannelsen.
   - **Abyss Vault:** Sci-fi dypvannsmysterium der laget infiltrerer en hemmelig hvelvstasjon, bruker fargekodede lysvåpen og knekker koder for å unnslippe.
   - **Prison Break:** Klassisk og nervepirrende rømning fra et høysikkerhetsfengsel før vaktene oppdager dere.
   - **Parvous Box:** Dere er krympet til mikroskopisk størrelse og må løse gigantiske gåter for å finne veien tilbake til normal størrelse.

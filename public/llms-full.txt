@@ -43,6 +43,7 @@
 ### 2.3 VR Escape Rooms
 - **Beskrivelse:** Virtuelle gåterom med fokus på samarbeid, logisk tenkning, kommunikasjon og utforskning. Spillerne samarbeider i virtuelle verdener med oppgaver som ikke er mulig i fysiske escape rooms.
 - **Aktive oppdrag i arenaen:**
+  - **Mask of the Pharaoh (2–6 spillere, fra 8 år):** Familievennlig egyptisk pyramideeventyr. Et museumsbesøk tar en uventet vending når en professor rammes av en egyptisk forbannelse. Laget må trå inn i en virtuell pyramide, navigere skjulte kamre og løse urgamle gåter sammen for å heve forbannelsen. Spesielt godt egnet for barn sammen med foreldre, ungdommer og familier.
   - **Abyss Vault (2–6 spillere):** Sci-fi dypvannsmysterium. Eliten etterlot dere for å dø; opprørsgruppen deres må infiltrere et høyteknologisk dypvannshvelv og kapre raketten deres. Bruk fargekodede lysvåpen (rødt, blått, grønt) og kombiner strålene for å knekke koder og bekjempe fiender.
   - **Prison Break (2–6 spillere):** Vaktene nærmer seg, og tiden renner ut. Teamet må samarbeide for å finne spor, løse gåter og bryte seg ut av et høysikkerhetsfengsel før dere blir tatt.
   - **Parvous Box (2–6 spillere):** Et eksperiment går galt, og dere er krympet til mikroskopisk størrelse. Teamet må samarbeide for å løse enorme gåter og finne veien tilbake til normal størrelse før tiden renner ut.
