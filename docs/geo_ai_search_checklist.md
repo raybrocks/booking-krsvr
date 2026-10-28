@@ -183,16 +183,17 @@ Gemini leser direkte fra «Spørsmål og svar»-seksjonen på Google Maps. Du ka
 ### C. Månedlige Google-oppdateringer (Innlegg)
 - [ ] Legg ut et kort innlegg i Google Maps hver 2.–3. uke (f.eks. sesongåpning for julebord, regnværstips, studentkveld). Innleggene indekseres av Gemini i sanntid.
 
-### D. Opplevelsesaktiviteter og Produkter i Google Bedriftsprofil (Fullført 21. oktober 2026)
-- [x] **8 aktiviteter konfigurert med opplevelsesfokusert tekst, riktige priser og direkte landingsside-lenker:**
+### D. Opplevelsesaktiviteter og Produkter i Google Bedriftsprofil
+- [x] **9 aktiviteter konfigurert med opplevelsesfokusert tekst, riktige priser og direkte landingsside-lenker:**
   1. **Zombie Shooter i Kristiansand** *(Ny opprettelse 21.10.2026)*: 375 kr (Voksen), varighet 1 t 30 min, bilde lastet opp fra databasens CDN (`zombie_shooter.png`), direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/action`.
   2. **Tactical Arena i Kristiansand** *(Omdøpt fra VR Shooter & Mixed Reality)*: 375 kr, opplevelsesfokusert tekst med mixed reality nevnt i bisetning, direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/action`.
-  3. **VR Escape Room i Kristiansand**: 375 kr, fokus på samarbeid og mysterieopplevelse, direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/escape-room`.
+  3. **VR Escape Room i Kristiansand**: 375 kr, felles produkt for alle våre VR escape rooms (inkl. Mask of the Pharaoh, Prison Break, Alice, m.fl.), direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/escape-room`.
   4. **Utdrikningslag i VR i Kristiansand**: Oppdatert pris til 450 kr, fokus på latter, felles energi og opplevelse, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-utdrikningslag`.
   5. **Teambuilding & Firmaevent i VR i Kristiansand**: 375 kr, fokus på samhold, turneringsformat, felles mestring på tvers av alder og forhåndsbestilt bar/pizza, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-teambuilding`.
   6. **Bursdag i VR Arena i Kristiansand**: 375 kr, fokus på bursdagsfeiring i partyloungen og actionfylt moro, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-bursdag`.
   7. **VR Familiepakke Ungdom 12+ i Kristiansand**: 375 kr, beholdt opprinnelig tekst og URL `https://www.krsvr.no/booking`.
   8. **VR Familiepakke Barn 8-12 år i Kristiansand**: 375 kr, beholdt opprinnelig tekst og URL `https://www.krsvr.no/booking`.
+  9. **Hunter VR - Jaktsimulator i Kristiansand** *(Ny opprettelse 28.10.2026)*: 375 kr, sosial innendørs jaktsimulator for jaktlag, vennegjenger og kollegaer (fra 16 år, 2–10 spillere, 90 min), bilde: `hunter-vr-cover.png`, direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/action-strategi/hunter-vr-jaktsimulator`.
 - **Hvorfor dette styrker SEO og AI-søk:**
   - Google viser disse produktene direkte i Knowledge Panel / Google Maps med bilde, pris og en klikkbar «Bestill»-knapp.
   - De nye dedikerte landingssidene (`/arrangementer/vr-teambuilding`, `/arrangementer/vr-utdrikningslag` osv.) får direkte klikk og sterk relevans i Googles lokale indeks.
