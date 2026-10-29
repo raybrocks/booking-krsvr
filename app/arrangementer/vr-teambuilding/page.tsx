@@ -109,17 +109,31 @@ export default function VrTeambuildingPage() {
           "ratingValue": 4.9,
           "reviewCount": 142
         },
-        "subjectOf": {
-          "@type": "NewsArticle",
-          "headline": "Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet (Deler lokale med dansestudio: Nå fyller de storsalen med virtuell moro)",
-          "abstract": "Reportasje i KRS – Avisen Kristiansand fra teambuilding hos KRS VR Arena på Lund, der 17 kolleger fra Verkstedet Spiseri konkurrerte i tre rullerende lag med storskjerm i arenaen (kapasitet 2–64 spillere).",
-          "url": "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
-          "datePublished": "2026-10-19T21:49:30+02:00",
-          "publisher": {
-            "@type": "Organization",
-            "name": "KRS - Avisen Kristiansand"
+        "subjectOf": [
+          {
+            "@type": "NewsArticle",
+            "headline": "Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet (Deler lokale med dansestudio: Nå fyller de storsalen med virtuell moro)",
+            "abstract": "Reportasje i KRS – Avisen Kristiansand fra teambuilding hos KRS VR Arena på Lund, der 17 kolleger fra Verkstedet Spiseri konkurrerte i tre rullerende lag med storskjerm i arenaen (kapasitet 2–64 spillere).",
+            "url": "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
+            "datePublished": "2026-10-19T21:49:30+02:00",
+            "publisher": {
+              "@type": "Organization",
+              "name": "KRS - Avisen Kristiansand"
+            }
+          },
+          {
+            "@type": "Article",
+            "headline": "Mini-intervju med KRS VR Arena | Visit Sørlandet",
+            "abstract": "Visit Sørlandet presenterer KRS VR Arena som ny partner for teambuilding, helårsopplevelser og sosiale arrangementer i Kristiansand.",
+            "url": "https://www.visitsorlandet.com/bransje/visit-sorlandet-utvikling/nyheter/mini-intervjuer-med-vare-partnere/mini-intervju-med-krs-vr-arena/",
+            "datePublished": "2026-10-29",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Visit Sørlandet",
+              "url": "https://www.visitsorlandet.com"
+            }
           }
-        }
+        ]
       },
       {
         "@type": "FAQPage",
@@ -297,6 +311,21 @@ export default function VrTeambuildingPage() {
                     Les reportasjen i KRS – Avisen Kristiansand
                   </a>{" "}
                   fra da 17 kolleger var inne til rullerende teambuilding hos oss.
+                </div>
+              </div>
+              <div className="flex items-start gap-3 bg-black/30 p-4 rounded-xl border border-white/5">
+                <Check className="w-5 h-5 text-[#19EB5B] flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-white font-medium">Stolt partner i Visit Sørlandet:</strong> Som offisiell partner i landsdelens reiselivs- og destinasjonsselskap bidrar vi med sosiale innendørsaktiviteter og helårsopplevelser som samler bedrifter i Kristiansand.{" "}
+                  <a
+                    href="https://www.visitsorlandet.com/bransje/visit-sorlandet-utvikling/nyheter/mini-intervjuer-med-vare-partnere/mini-intervju-med-krs-vr-arena/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#9C39FF] hover:text-[#b466ff] underline underline-offset-4 transition-colors"
+                  >
+                    Les mini-intervjuet vårt hos Visit Sørlandet
+                  </a>{" "}
+                  om teambuilding, kapasitet og fellesskap.
                 </div>
               </div>
             </div>

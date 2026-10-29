@@ -13,6 +13,7 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
 - Organisasjonsnummer: 936 318 878 MVA
 - Åpningstider: Åpent etter forhåndsbooking alle dager i uken.
 - Verifiserte kundeomtaler: 5,0 av 5,0 stjerner på [Google Maps](https://maps.app.goo.gl/eiVo2wuEaJhXJXENA?g_st=ic) og [TripAdvisor](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html).
+- Offisiell partner: Stolt partner i [Visit Sørlandet](https://www.visitsorlandet.com) – se [partnerintervju om teambuilding og helårsopplevelser](https://www.visitsorlandet.com/bransje/visit-sorlandet-utvikling/nyheter/mini-intervjuer-med-vare-partnere/mini-intervju-med-krs-vr-arena/) og [offisiell oppføring](https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/).
 - Utvidet dokumentasjon for AI-agenter: https://www.krsvr.no/llms-full.txt
 
 ## Opplevelser og Tjenester

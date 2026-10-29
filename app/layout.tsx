@@ -189,6 +189,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       "ratingValue": "5.0",
       "reviewCount": "22"
     },
+    "memberOf": {
+      "@type": "Organization",
+      "name": "Visit Sørlandet",
+      "url": "https://www.visitsorlandet.com"
+    },
     "subjectOf": [
       {
         "@type": "NewsArticle",
@@ -207,9 +212,23 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           "name": "KRS - Avisen Kristiansand",
           "url": "https://www.krs.no"
         }
+      },
+      {
+        "@type": "Article",
+        "headline": "Mini-intervju med KRS VR Arena | Visit Sørlandet",
+        "description": "Visit Sørlandet presenterer KRS VR Arena – Sørlandets eneste trådløse free-roam VR-arena på Lund i Kristiansand med teambuilding, firmaevent og unike helårsopplevelser.",
+        "abstract": "Mini-intervju publisert av Visit Sørlandet med KRS VR Arena som ny partner. Omtaler arenaen på Lund i Kristiansand med 143 kvm spillflate for opptil 10 samtidige spillere i frittgående VR og opptil 64 personer i sosialt turneringsformat med partylounge og storskjerm for teambuilding, firmaevent, bursdag og utdrikningslag.",
+        "url": "https://www.visitsorlandet.com/bransje/visit-sorlandet-utvikling/nyheter/mini-intervjuer-med-vare-partnere/mini-intervju-med-krs-vr-arena/",
+        "datePublished": "2026-10-29",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Visit Sørlandet",
+          "url": "https://www.visitsorlandet.com"
+        }
       }
     ],
     "sameAs": [
+      "https://www.visitsorlandet.com/bransje/visit-sorlandet-utvikling/nyheter/mini-intervjuer-med-vare-partnere/mini-intervju-med-krs-vr-arena/",
       "https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
       "https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
       "https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html",
