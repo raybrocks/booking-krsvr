@@ -293,17 +293,11 @@ export function ExperiencesView({
         embedUrl = embedUrl.substring(0, ampIndex);
       }
     } else if (url.includes("youtu.be/")) {
-      embedUrl = url.replace("youtu.be/", "www.youtube.com/embed/");
-      const questionIndex = embedUrl.indexOf("?");
-      if (questionIndex !== -1) {
-        embedUrl = embedUrl.substring(0, questionIndex);
-      }
-    } else if (url.includes("youtube.com/shorts/")) {
-      embedUrl = url.replace("youtube.com/shorts/", "www.youtube.com/embed/");
-      const questionIndex = embedUrl.indexOf("?");
-      if (questionIndex !== -1) {
-        embedUrl = embedUrl.substring(0, questionIndex);
-      }
+      const videoId = url.split("youtu.be/")[1]?.split(/[?#&]/)[0];
+      embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    } else if (url.includes("/shorts/")) {
+      const videoId = url.split("/shorts/")[1]?.split(/[?#&]/)[0];
+      embedUrl = `https://www.youtube.com/embed/${videoId}`;
     } else if (url.includes("vimeo.com/")) {
       embedUrl = url.replace("vimeo.com/", "player.vimeo.com/video/");
     }
