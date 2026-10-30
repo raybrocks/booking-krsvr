@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil, Star, Building2 } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil, Star, Building2, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import SettingsManager from "./SettingsManager";
@@ -97,8 +97,46 @@ export default function AdminDashboard() {
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [reviewModalBooking, setReviewModalBooking] = useState<any | null>(null);
   const [resendingEmailId, setResendingEmailId] = useState<string | null>(null);
+  const [copiedBookingId, setCopiedBookingId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const supabase = createClient();
+
+  const handleCopyPlayerNames = async (bookingId: string, names: string[]) => {
+    const validNames = (names || []).map((n) => (n || "").trim()).filter((n) => n.length > 0);
+    if (validNames.length === 0) {
+      toast.error("Ingen navn å kopiere");
+      return;
+    }
+
+    const jsonOutput = JSON.stringify(
+      validNames.map((name) => ({ displayName: name })),
+      null,
+      2
+    );
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(jsonOutput);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = jsonOutput;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setCopiedBookingId(bookingId);
+      toast.success(`Kopierte ${validNames.length} navn i JSON-format!`);
+      setTimeout(() => {
+        setCopiedBookingId((prev) => (prev === bookingId ? null : prev));
+      }, 2000);
+    } catch (err) {
+      console.error("Feil ved kopiering:", err);
+      toast.error("Kunne ikke kopiere til utklippstavle");
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -657,16 +695,58 @@ export default function AdminDashboard() {
                           title="Klikk for å fylle ut eller redigere navneliste"
                         >
                           {isComplete ? (
-                            <div className="flex flex-wrap items-center gap-1">
+                            <div className="flex flex-wrap items-center gap-1.5">
                               <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-1 group-hover:border-emerald-500/40">
                                 ✓ Navneliste ({validNames.length}/{booking.players})
                               </span>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopyPlayerNames(booking.id, validNames);
+                                }}
+                                className="text-[10px] font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/70 hover:border-zinc-500 px-1.5 py-0.5 rounded flex items-center gap-1 transition-all active:scale-95 shadow-sm"
+                                title="Kopier navneliste i JSON-format"
+                              >
+                                {copiedBookingId === booking.id ? (
+                                  <>
+                                    <Check className="w-2.5 h-2.5 text-emerald-400" />
+                                    <span className="text-emerald-400 font-semibold">Kopiert!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-2.5 h-2.5 text-zinc-400" />
+                                    <span>Kopier JSON</span>
+                                  </>
+                                )}
+                              </button>
                             </div>
                           ) : hasSome ? (
-                            <div className="flex flex-wrap items-center gap-1">
+                            <div className="flex flex-wrap items-center gap-1.5">
                               <span className="text-[10px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded group-hover:border-amber-500/40">
                                 Delvis navneliste ({validNames.length}/{booking.players})
                               </span>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopyPlayerNames(booking.id, validNames);
+                                }}
+                                className="text-[10px] font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/70 hover:border-zinc-500 px-1.5 py-0.5 rounded flex items-center gap-1 transition-all active:scale-95 shadow-sm"
+                                title="Kopier navneliste i JSON-format"
+                              >
+                                {copiedBookingId === booking.id ? (
+                                  <>
+                                    <Check className="w-2.5 h-2.5 text-emerald-400" />
+                                    <span className="text-emerald-400 font-semibold">Kopiert!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-2.5 h-2.5 text-zinc-400" />
+                                    <span>Kopier JSON</span>
+                                  </>
+                                )}
+                              </button>
                             </div>
                           ) : isUpcomingSoon ? (
                             <div className="flex items-center gap-1">

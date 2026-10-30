@@ -16,7 +16,9 @@ import {
   Minus, 
   RotateCcw,
   Tag,
-  Lock
+  Lock,
+  Copy,
+  Check
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -77,6 +79,45 @@ export default function EditBookingModal({
   // Players & Names State
   const [players, setPlayers] = useState(1);
   const [playerNames, setPlayerNames] = useState<string[]>([]);
+  const [copiedJson, setCopiedJson] = useState(false);
+
+  const handleCopyPlayerNamesJson = async () => {
+    const validNames = (playerNames || [])
+      .map((n) => (n || "").trim())
+      .filter((n) => n.length > 0);
+
+    if (validNames.length === 0) {
+      toast.error("Ingen navn å kopiere");
+      return;
+    }
+
+    const jsonOutput = JSON.stringify(
+      validNames.map((name) => ({ displayName: name })),
+      null,
+      2
+    );
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(jsonOutput);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = jsonOutput;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setCopiedJson(true);
+      toast.success(`Kopierte ${validNames.length} navn i JSON-format!`);
+      setTimeout(() => setCopiedJson(false), 2000);
+    } catch (err) {
+      console.error("Feil ved kopiering:", err);
+      toast.error("Kunne ikke kopiere til utklippstavle");
+    }
+  };
 
   // Price & Payment State
   const [totalPrice, setTotalPrice] = useState<number>(0);
@@ -482,9 +523,31 @@ export default function EditBookingModal({
                 <Users className="w-3.5 h-3.5" />
                 Deltakere & Navneliste
               </h3>
-              <span className="text-xs text-zinc-400">
-                {playerNames.filter((n) => n.trim().length > 0).length} av {players} navn registrert
-              </span>
+              <div className="flex items-center gap-2">
+                {playerNames.filter((n) => (n || "").trim().length > 0).length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleCopyPlayerNamesJson}
+                    className="text-[11px] font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/80 px-2 py-0.5 rounded flex items-center gap-1 transition-all shadow-sm active:scale-95"
+                    title="Kopier navneliste i JSON-format"
+                  >
+                    {copiedJson ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span className="text-emerald-400 font-semibold">Kopiert JSON!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3 text-zinc-400" />
+                        <span>Kopier JSON</span>
+                      </>
+                    )}
+                  </button>
+                )}
+                <span className="text-xs text-zinc-400">
+                  {playerNames.filter((n) => (n || "").trim().length > 0).length} av {players} navn registrert
+                </span>
+              </div>
             </div>
 
             {/* Players Stepper */}
