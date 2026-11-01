@@ -6,7 +6,8 @@ import { Metadata } from "next";
 import ArrangementSubNav from "@/components/ArrangementSubNav";
 import ArrangementTrustBar from "@/components/ArrangementTrustBar";
 import { ArrangementFaq } from "@/components/ArrangementFaq";
-import ClientLogoTicker from "@/components/ClientLogoTicker";
+import ClientLogoTicker, { LogoClientItem } from "@/components/ClientLogoTicker";
+import { prisma } from "@/lib/prisma";
 
 export const revalidate = 60;
 
@@ -49,7 +50,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function VrTeambuildingPage() {
+export default async function VrTeambuildingPage() {
+  let clientLogos: LogoClientItem[] = [];
+  try {
+    clientLogos = await prisma.testimonial.findMany({
+      where: { isActive: true, showInLogoSlider: true },
+      select: { id: true, companyName: true, logoImage: true, websiteUrl: true },
+      orderBy: { order: "asc" }
+    });
+  } catch (e) {
+    console.error("Failed to prefetch client logos:", e);
+  }
+
   const faqs = [
     {
       question: "Passer VR-teambuilding for alle aldre – hva med eldre kolleger (50–65+ år)?",
@@ -222,7 +234,7 @@ export default function VrTeambuildingPage() {
         </div>
 
         {/* KLASSISK HORISONTAL KUNDE-LOGO STRIPE (EARLY TRUST) */}
-        <ClientLogoTicker />
+        <ClientLogoTicker initialClients={clientLogos} />
 
         {/* 4 ANLEDNINGER I ÉN */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
