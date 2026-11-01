@@ -328,6 +328,7 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
           bookingId, amount: amountToPay,
           description: `Booking: ${selectedExperience.name} for ${players} players`,
           locale,
+          phone,
         }),
       });
 

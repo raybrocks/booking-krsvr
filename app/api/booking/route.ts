@@ -49,16 +49,22 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ id: resetBooking.id }, { status: 201 });
       }
 
-      // If pending for more than 15 mins, we can overwrite it.
+      // If pending for more than 15 mins, or if it is the same customer retrying, allow overwriting/updating.
       if (existing.status.toLowerCase() === 'pending') {
         const now = new Date().getTime();
         const createdMs = new Date(existing.createdAt).getTime();
-        if (now - createdMs > 15 * 60 * 1000) {
+        const isSameCustomer = Boolean(
+          (data.email && existing.email && data.email.toLowerCase().trim() === existing.email.toLowerCase().trim()) ||
+          (data.phone && existing.phone && data.phone.replace(/\D/g, '') === existing.phone.replace(/\D/g, ''))
+        );
+
+        if (isSameCustomer || now - createdMs > 15 * 60 * 1000) {
           const resetBooking = await prisma.booking.update({
             where: { id: existing.id },
             data: {
                experienceId: data.experienceId,
                players: data.players,
+               playerNames: data.playerNames || [],
                firstName: data.firstName,
                lastName: data.lastName,
                email: data.email,

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { bookingId, amount, description } = body;
+    const { bookingId, amount, description, phone } = body;
 
     if (!bookingId || !amount) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -19,10 +19,13 @@ export async function POST(req: Request) {
     const protocol = req.headers.get('x-forwarded-proto') || 'https';
     const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
     
-    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `${protocol}://${host}` : 'https://krsvr.no');
+    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `${protocol}://${host}` : 'https://www.krsvr.no');
     
-    // Fjern eventuell trailing slash (/) på slutten av base URL
+    // Standardiser til https://www.krsvr.no for a unnga 307-redirects
     appBaseUrl = appBaseUrl.replace(/\/$/, "");
+    if (appBaseUrl === 'https://krsvr.no' || appBaseUrl === 'http://krsvr.no') {
+      appBaseUrl = 'https://www.krsvr.no';
+    }
     
     // Vipps requires HTTPS. Force it. 
     // Note: If running locally without ngrok/https, Vipps callbacks won't reach localhost anyway.
@@ -32,7 +35,7 @@ export async function POST(req: Request) {
     
     // Vipps requires valid DNS. If host is localhost, dummy it out for dev.
     if (appBaseUrl.includes('localhost')) {
-        appBaseUrl = 'https://krs-vr-arena.no';
+        appBaseUrl = 'https://www.krsvr.no';
     }
 
     if (!clientId || !clientSecret || !subscriptionKey || !merchantSerialNumber) {
@@ -65,8 +68,25 @@ export async function POST(req: Request) {
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-// 2. Create ePayment Session
-    // Vipps expects amount in øre (1 NOK = 100 øre)
+    // Formater telefonnummer for Vipps (MSISDN: 47xxxxxxxx)
+    let customerObj: { phoneNumber: string } | undefined = undefined;
+    if (phone) {
+      const cleanPhone = String(phone).replace(/\D/g, '');
+      let msisdn = '';
+      if (cleanPhone.length === 8) {
+        msisdn = `47${cleanPhone}`;
+      } else if (cleanPhone.startsWith('47') && cleanPhone.length === 10) {
+        msisdn = cleanPhone;
+      } else if (cleanPhone.length > 8) {
+        msisdn = cleanPhone;
+      }
+      if (msisdn && /^\d{8,15}$/.test(msisdn)) {
+        customerObj = { phoneNumber: msisdn };
+      }
+    }
+
+    // 2. Create ePayment Session
+    // Vipps expects amount in ore (1 NOK = 100 ore)
     const amountInOre = Math.round(amount * 100);
 
     const epaymentResponse = await fetch(`${baseUrl}/epayment/v1/payments`, {
@@ -92,10 +112,11 @@ export async function POST(req: Request) {
         paymentMethod: {
           type: 'WALLET'
         },
+        ...(customerObj ? { customer: customerObj } : {}),
         reference: bookingId,
         userFlow: 'WEB_REDIRECT',
         returnUrl: `${appBaseUrl}/checkout/return?reference=${bookingId}`,
-        paymentDescription: 'VR Booking - ' + bookingId,
+        paymentDescription: description || ('VR Booking - ' + bookingId),
       }),
     });
 

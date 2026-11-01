@@ -12,8 +12,11 @@ export async function GET(req: Request) {
     const protocol = req.headers.get('x-forwarded-proto') || 'https';
     const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
     
-    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `${protocol}://${host}` : 'https://krsvr.no');
+    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `${protocol}://${host}` : 'https://www.krsvr.no');
     appBaseUrl = appBaseUrl.replace(/\/$/, "");
+    if (appBaseUrl === 'https://krsvr.no' || appBaseUrl === 'http://krsvr.no') {
+      appBaseUrl = 'https://www.krsvr.no';
+    }
     
     if (!clientId || !clientSecret || !subscriptionKey) {
       return NextResponse.json({ error: 'Missing credentials' }, { status: 500 });
