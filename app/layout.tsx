@@ -32,11 +32,16 @@ export const metadata: Metadata = {
     'Mixed Reality Shooter',
     'Escape Room Kristiansand',
     'VR Escape Room Kristiansand',
+    'Gåterom Kristiansand',
+    'Innendørs aktiviteter Kristiansand',
+    'Aktiviteter regnværsdag Kristiansand',
     'Zombie Shooter Kristiansand',
     'Arcade Kristiansand',
     'VR Arcade Kristiansand',
     'Teambuilding Kristiansand',
     'Utdrikningslag Kristiansand',
+    'Bachelor party Kristiansand',
+    'Bachelorette party Kristiansand',
     'Bursdag Kristiansand',
     'Firmaevent Kristiansand',
     'Virtual Reality'
@@ -146,8 +151,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           "@type": "Offer",
           "itemOffered": {
             "@type": "Service",
-            "name": "VR Escape Room i Kristiansand",
-            "description": "Gåteløsing og samarbeid i virtuelle rom for 2–6 spillere."
+            "name": "Escape Room og Gåterom i Kristiansand (VR)",
+            "description": "Trådløs gåteløsing, koder og felles mestring som et moderne Escape Room i Kristiansand for 2–6 spillere per rom."
           }
         },
         {
@@ -170,8 +175,16 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           "@type": "Offer",
           "itemOffered": {
             "@type": "Service",
-            "name": "Utdrikningslag i VR",
-            "description": "Morsomme konkurranser og action for utdrikningslag i Kristiansand."
+            "name": "Utdrikningslag i Kristiansand (Bachelor & Bachelorette)",
+            "description": "Skreddersydd feiring med Tactical Arena, VR Escape Rooms, partylounge og forhåndsbestilte forfriskninger for utdrikningslag i Kristiansand."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Innendørs aktiviteter og opplevelser på regnværsdager",
+            "description": "Helinnendørs 300 kvm opplevelsesarena på Lund i Kristiansand. Perfekt aktivitet for vennegjenger, familier og bedrifter uansett vær og vind."
           }
         },
         {
@@ -187,7 +200,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "5.0",
-      "reviewCount": "22"
+      "reviewCount": "28"
     },
     "memberOf": {
       "@type": "Organization",
@@ -233,6 +246,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       "https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
       "https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html",
       "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
+      "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/",
+      "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
       "https://www.instagram.com/krs.vr.arena",
       "https://www.tiktok.com/@krs.vr.arena",
       "https://www.facebook.com/krs.vr.arena",

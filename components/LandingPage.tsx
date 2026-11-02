@@ -54,8 +54,13 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
     },
     "availableLanguage": ["nb", "en", "de"],
     "keywords": isEn
-      ? "VR Kristiansand, Things to do in Kristiansand, Indoor activities Kristiansand, Rainy day activities Southern Norway, VR Escape Room Kristiansand, Escape Room Kristiansand, Family activities Kristiansand, Tactical Arena, Zombie Shooter, Team building Kristiansand"
-      : "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room, Tactical Arena Kristiansand, Action Strategi Kristiansand, Zombie Shooter Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bursdag Kristiansand",
+      ? "VR Kristiansand, Things to do in Kristiansand, Indoor activities Kristiansand, Rainy day activities Southern Norway, VR Escape Room Kristiansand, Escape Room Kristiansand, Bachelor party Kristiansand, Bachelorette party Kristiansand, Family activities Kristiansand, Tactical Arena, Zombie Shooter, Team building Kristiansand"
+      : "VR Kristiansand, Mixed Reality Kristiansand, Escape Room Kristiansand, VR Escape Room Kristiansand, Gåterom Kristiansand, Tactical Arena Kristiansand, Action Strategi Kristiansand, Zombie Shooter Kristiansand, Teambuilding Kristiansand, Utdrikningslag Kristiansand, Bachelor party Kristiansand, Bachelorette party Kristiansand, Innendørs aktiviteter Kristiansand, Aktiviteter regnværsdag Kristiansand, Bursdag Kristiansand",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "reviewCount": "28"
+    },
     "offers": {
       "@type": "AggregateOffer",
       "offerCount": 10,
@@ -107,6 +112,8 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
       "https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
       "https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html",
       "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
+      "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/",
+      "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
       "https://www.instagram.com/krs.vr.arena",
       "https://www.tiktok.com/@krs.vr.arena",
       "https://www.facebook.com/krs.vr.arena",

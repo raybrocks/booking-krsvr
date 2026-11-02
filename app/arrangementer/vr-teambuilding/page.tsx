@@ -144,7 +144,18 @@ export default async function VrTeambuildingPage() {
               "name": "Visit Sørlandet",
               "url": "https://www.visitsorlandet.com"
             }
+          },
+          {
+            "@type": "WebPage",
+            "name": "KRS VR Arena – Teambuilding & Firmafest | Eventguiden",
+            "description": "Eventguiden presenterer KRS VR Arena med skreddersydde pakker for teambuilding, firmafest og store grupper opptil 64 personer i Kristiansand.",
+            "url": "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/"
           }
+        ],
+        "sameAs": [
+          "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/",
+          "https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/",
+          "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800"
         ]
       },
       {

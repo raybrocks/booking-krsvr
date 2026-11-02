@@ -59,6 +59,94 @@ export async function generateMetadata({
     };
   }
 
+  // Virtual filter alias: /vr-opplevelser/escape-room (uten underslug) aktiverer Escape Room-filteret
+  if ((initialTypeSlug === "escape-room" || initialTypeSlug === "escape-rooms") && !initialExpSlug) {
+    const escapeUrl = "https://www.krsvr.no/vr-opplevelser/escape-room";
+    const enEscapeUrl = "https://www.krsvr.no/en/experiences/escape-room";
+    const escapeImg = "https://sfncdchlxjgbdgojtemd.supabase.co/storage/v1/object/public/krsvr-images/experiences/1792090692105_abyss-vault.jpg";
+    return {
+      title: "Escape Room i Kristiansand – Trådløs Gåteløsing & Samarbeid | KRS VR Arena",
+      description: "Leter du etter et Escape Room i Kristiansand? Hos KRS VR Arena på Lund løser dere koder, mysterier og gåter i trådløse, storslåtte virtuelle rom. Samarbeid for 2–6 spillere per rom.",
+      keywords: [
+        "Escape Room Kristiansand",
+        "VR Escape Room Kristiansand",
+        "Escape Room",
+        "Gåterom Kristiansand",
+        "Teambuilding Kristiansand",
+        "Innendørs aktivitet Kristiansand",
+      ],
+      alternates: {
+        canonical: escapeUrl,
+        languages: {
+          "nb-NO": escapeUrl,
+          en: enEscapeUrl,
+          "x-default": enEscapeUrl,
+        },
+      },
+      openGraph: {
+        title: "Escape Room i Kristiansand | KRS VR Arena",
+        description: "Leter du etter et Escape Room i Kristiansand? Løs koder, mysterier og gåter sammen i trådløse virtuelle rom på Lund. 90 min totalopplevelse for 2–6 spillere.",
+        url: escapeUrl,
+        type: "website",
+        images: [
+          {
+            url: escapeImg,
+            width: 1200,
+            height: 630,
+            alt: "VR Escape Room hos KRS VR Arena i Kristiansand",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Escape Room i Kristiansand | KRS VR Arena",
+        description: "Leter du etter et Escape Room i Kristiansand? Løs koder, mysterier og gåter sammen i trådløse virtuelle rom på Lund.",
+        images: [escapeImg],
+      },
+    };
+  }
+
+  // Virtual filter alias: /vr-opplevelser/action-strategi (uten underslug)
+  if ((initialTypeSlug === "action-strategi" || initialTypeSlug === "action") && !initialExpSlug) {
+    const actionUrl = "https://www.krsvr.no/vr-opplevelser/action-strategi";
+    const enActionUrl = "https://www.krsvr.no/en/experiences/action-strategy";
+    const actionImg = "https://www.krsvr.no/images/vr-vennegjeng.jpg";
+    return {
+      title: "Action & Strategi i VR i Kristiansand | Tactical Arena | KRS VR Arena",
+      description: "Opplev trådløse skytespill og taktisk lagspill i VR og Mixed Reality hos KRS VR Arena i Kristiansand. Taktisk lagkonkurranse og action for vennegjenger, utdrikningslag og teambuilding.",
+      keywords: [
+        "Tactical Arena Kristiansand",
+        "Action Strategi Kristiansand",
+        "Zombie Shooter Kristiansand",
+        "Mixed Reality Kristiansand",
+        "VR Kristiansand",
+        "Utdrikningslag Kristiansand",
+      ],
+      alternates: {
+        canonical: actionUrl,
+        languages: {
+          "nb-NO": actionUrl,
+          en: enActionUrl,
+          "x-default": enActionUrl,
+        },
+      },
+      openGraph: {
+        title: "Action & Strategi i VR i Kristiansand | Tactical Arena",
+        description: "Opplev trådløse skytespill og taktisk lagspill i VR og Mixed Reality hos KRS VR Arena i Kristiansand.",
+        url: actionUrl,
+        type: "website",
+        images: [
+          {
+            url: actionImg,
+            width: 1200,
+            height: 630,
+            alt: "Tactical Arena og Action Strategi hos KRS VR Arena",
+          },
+        ],
+      },
+    };
+  }
+
   // Immediately block SEO for vipps-test regardless of DB content
   if (initialTypeSlug && (initialTypeSlug.includes("vipps-test") || initialTypeSlug.includes("vipps test"))) {
     return {

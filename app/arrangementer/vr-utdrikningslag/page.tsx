@@ -87,6 +87,17 @@ export default function VrUtdrikningslagPage() {
           "name": "KRS VR Arena"
         },
         "category": "Bachelor and Bachelorette Parties",
+        "subjectOf": {
+          "@type": "WebPage",
+          "name": "VR Utdrikningslag hos KRS VR Arena – utdrikningslag.events",
+          "url": "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
+          "publisher": {
+            "@type": "Organization",
+            "name": "utdrikningslag.events",
+            "url": "https://utdrikningslag.events"
+          }
+        },
+        "sameAs": "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
         "offers": {
           "@type": "AggregateOffer",
           "lowPrice": 450,
@@ -97,7 +108,7 @@ export default function VrUtdrikningslagPage() {
         "aggregateRating": {
           "@type": "AggregateRating",
           "ratingValue": 5.0,
-          "reviewCount": 96
+          "reviewCount": 28
         }
       },
       {

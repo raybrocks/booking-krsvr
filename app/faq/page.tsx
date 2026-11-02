@@ -48,21 +48,31 @@ const faqs = [
     answer: "Absolutt! Vår 140 kvm store trådløse arena er en av Kristiansands mest populære innendørs aktiviteter. Her er dere i full aktivitet med dedikert gamemaster, uavhengig av vær og vind – perfekt for vennegjenger, studenter, kollegaer og familier.",
   },
   {
+    question: "Hva er forskjellen på VR Escape Room hos dere og et tradisjonelt Escape Room i Kristiansand?",
+    answer: "Våre VR Escape Rooms byr på nøyaktig samme kodelogikk, gåteløsing og samarbeid som tradisjonelle escape rooms i Kristiansand, men i stedet for å være begrenset til et lite fysisk rom, beveger dere dere fritt i trådløse, storslåtte virtuelle verdener. Dere kan utforske egyptiske pyramider, dypvannshvelv og fengselsceller der dere fysisk samarbeider, finner ledetråder og knekker koder sammen.",
+  },
+  {
+    question: "Hva tilbyr dere for utdrikningslag i Kristiansand?",
+    answer: "Vi skreddersyr actionfylte og sosiale opplevelser for utdrikningslag i Kristiansand (både bachelor og bachelorette). Dere får en 90-minutters totalopplevelse med dedikert gamemaster, valg mellom taktiske skytespill (Tactical Arena/Zombie Shooter) eller VR Escape Rooms, samt eksklusiv tilgang til vår partylounge. Ved forhåndsbestilling kan vi også klargjøre drikkepakker (kald øl/cider/mineralvann eller vin/bobler) og koordinere varm lokal pizzalevering.",
+  },
+  {
     question: "Hva er Familiepakke Barn og Familiepakke Ungdom?",
     answer: "For familier som ønsker en samlet opplevelse tilbyr vi to egne pakker: Familiepakke Barn (8–12 år) med trygge, engasjerende spill barna mestrer, og Familiepakke Ungdom (12+) med mer action, samarbeidsoppdrag og konkurranser for tenåringer og voksne. Begge inkluderer 90 minutters opplegg med gamemaster og partylounge.",
   }
 ];
 
 export const metadata: Metadata = {
-  title: "FAQ - Ofte stilte spørsmål",
-  description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, inkludert grupper, utstyr, ferier, aldersgrense og booking.",
+  title: "FAQ - Ofte stilte spørsmål | KRS VR Arena",
+  description: "Få svar på de vanligste spørsmålene om våre VR-opplevelser, inkludert Escape Room i Kristiansand, utdrikningslag, innendørsaktiviteter på regnværsdager, aldersgrenser og booking.",
   keywords: [
     "FAQ VR Kristiansand", 
     "Ofte stilte spørsmål KRS VR Arena", 
-    "VR aldersgrense", 
-    "VR utstyr", 
-    "Spørsmål og svar VR",
+    "Escape Room Kristiansand",
+    "VR Escape Room Kristiansand",
+    "Utdrikningslag Kristiansand",
+    "Bachelor party Kristiansand",
     "Innendørs aktivitet Kristiansand",
+    "Aktiviteter regnværsdag Kristiansand",
     "Ting å gjøre i Kristiansand",
     "VR ferieaktivitet",
     "Familiepakke VR"

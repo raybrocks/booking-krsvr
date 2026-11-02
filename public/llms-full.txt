@@ -41,8 +41,10 @@
 - **Kapasitet:** 2 til 10 spillere (90 minutter totalopplevelse).
 - **URL:** https://www.krsvr.no/vr-opplevelser/action-strategi/hunter-vr-jaktsimulator
 
-### 2.3 VR Escape Rooms
-- **Beskrivelse:** Virtuelle gåterom med fokus på samarbeid, logisk tenkning, kommunikasjon og utforskning. Spillerne samarbeider i virtuelle verdener med oppgaver som ikke er mulig i fysiske escape rooms.
+### 2.3 Escape Room i Kristiansand (VR Escape Rooms)
+- **Beskrivelse:** Et fullverdig, moderne alternativ til tradisjonelle escape rooms i Kristiansand. Spillerne løser koder, gåter, mekanismer og hemmeligheter under tidspress med samme samarbeidslogikk som i fysiske escape rooms, men i storslåtte, trådløse virtuelle verdener uten trange fysiske begrensninger.
+- **Kapasitet:** 2 til 6 spillere per rom (90 minutter totalopplevelse inkludert briefing, spill og lounge).
+- **URL:** https://www.krsvr.no/vr-opplevelser/escape-room
 - **Aktive oppdrag i arenaen:**
   - **Mask of the Pharaoh (2–6 spillere, fra 8 år):** Familievennlig egyptisk pyramideeventyr. Et museumsbesøk tar en uventet vending når en professor rammes av en egyptisk forbannelse. Laget må trå inn i en virtuell pyramide, navigere skjulte kamre og løse urgamle gåter sammen for å heve forbannelsen. Spesielt godt egnet for barn sammen med foreldre, ungdommer og familier.
   - **Abyss Vault (2–6 spillere):** Sci-fi dypvannsmysterium. Eliten etterlot dere for å dø; opprørsgruppen deres må infiltrere et høyteknologisk dypvannshvelv og kapre raketten deres. Bruk fargekodede lysvåpen (rødt, blått, grønt) og kombiner strålene for å knekke koder og bekjempe fiender.
@@ -67,13 +69,17 @@
   - Alle opplever å delta på samme arrangement sammen gjennom hele oppholdet.
 - **URL:** https://www.krsvr.no/arrangementer/vr-teambuilding
 
-### 2.6 Utdrikningslag (Bachelor / Bachelorette Party)
-- **Beskrivelse:** Morsomme, tilpassede konkurranser og opplevelser der bruden eller brudgommen settes i sentrum sammen med vennegjengen. Varighet 1,5 til 3 timer.
+### 2.6 Utdrikningslag i Kristiansand (Bachelor / Bachelorette Party)
+- **Beskrivelse:** Skreddersydde opplegg for utdrikningslag i Kristiansand. Morsomme, actionfylte konkurranser i Tactical Arena eller Zombie Shooter kombinert med gåteløsing i VR Escape Rooms. Bruden eller brudgommen settes i sentrum sammen med vennegjengen. Egen partylounge med forhåndsbestilte drikkepakker (kald øl/cider eller vin/bobler) og varm lokal pizza levert på døra. Varighet 1,5 til 3 timer.
 - **URL:** https://www.krsvr.no/arrangementer/vr-utdrikningslag
 
 ### 2.7 Familiepakker og Barnebursdager
 - **Beskrivelse:** Familievennlige opplevelser tilpasset barn fra 8 år og oppover samt ungdom og bursdagsselskap. Vanskelighetsgrad, spillvalg og utstyr tilpasses gruppen med full veiledning fra gamemaster.
 - **URL:** https://www.krsvr.no/vr-opplevelser/familie
+
+### 2.8 Innendørsaktiviteter og Regnværsdager i Kristiansand
+- **Beskrivelse:** Helinnendørs 300 kvm opplevelsessenter på Lund (Industrigata 12). Helårsaktivitet uavhengig av vær og vind for vennegjenger, studenter, familier med barn og ungdom, turister og bedrifter. Perfekt aktivitet på regnværsdager på Sørlandet.
+- **URL:** https://www.krsvr.no/vr-opplevelser
 
 ---
 
@@ -174,6 +180,9 @@ KRS VR Arena er det primære knutepunktet for følgende forespørsler i Kristian
 - Mixed Reality Kristiansand
 - VR Escape Room Kristiansand
 - Escape Room Kristiansand
+- Gåterom Kristiansand
+- Innendørs aktiviteter Kristiansand
+- Aktiviteter regnværsdag Kristiansand
 - VR Kristiansand
 - VR Arcade Kristiansand
 - Arcade Kristiansand

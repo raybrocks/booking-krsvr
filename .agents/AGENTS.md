@@ -35,8 +35,13 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - Vurdering og antall anmeldelser på Google Maps og TripAdvisor
    - TripAdvisor-rangering målt spesifikt på leverandørsiden for lek og moro i Kristiansand: `https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html`
    - De 6 faste nøytrale kommersielle AI-søkene i Seksjon 0.C.
+   - **Håndtering av bot-beskyttelse og fallback til `/browser`:**
+     Dersom vanlige skript eller HTTP-kall stoppes av bot-filter (DataDome, Cloudflare, CAPTCHA e.l.) ved innhenting av anmeldelser og rangering (f.eks. på TripAdvisor eller Google Maps), **SKAL** agenten automatisk sende ut en `/browser`-subagent for å forsøke å navigere og lese av de reelle tallene.
+     Dersom heller ikke `/browser`-subagenten lykkes med å hente ut tallene, skal agenten **aldri** gjette eller videreføre forrige målings tall i det stille. Målingen skal da eksplisitt flagges i rapporten som *«⚠️ Ikke avlest (blokkert av bot-filter)»*, og agenten skal be brukeren om manuell bekreftelse.
 7. **Vedlikehold av `llms.txt` og `llms-full.txt` (AI-agenter og LLM-standard):**
    Hver gang det gjøres endringer i priser, kapasiteter, åpningstider, bar-/matkonsepter, regler for medbrakt eller nye opplevelser, **SKAL** både `public/llms.txt` og `public/llms-full.txt` oppdateres tilsvarende, slik at AI-agenter og språkmodeller alltid har oppdatert, presis og fullstendig forretningslogikk.
+8. **Nye Escape Rooms og registrering på World of Escapes & WhereToEscape:**
+   Hver gang et nytt Escape Room opprettes eller legges til i kildekoden eller databasen (f.eks. i Prisma-skjema, `llms.txt`, eller på `/vr-opplevelser/escape-room`), **SKAL** hovedagenten alltid prompte brukeren proaktivt og spørre om `/browser`-subagenten skal sendes ut for å registrere det nye rommet på World of Escapes (`https://no.worldofescapes.com/add_quests/new`) og oppdatere WhereToEscape. Dette sikrer at arenaen opprettholder sitt dominerende fotavtrykk (40 %+ av rommene i byen) og direkte siteringer i AI-søk på escape rooms i Kristiansand.
 
 # Utvikling og Kjøring
 1. **Port:** Dev-serveren (`npm run dev`) skal *alltid* startes på port 3050.
