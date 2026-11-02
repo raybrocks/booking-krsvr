@@ -39,7 +39,7 @@ Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, ra
 | **[1850.no](https://www.1850.no/bedrifter/it/dataprogrammering/agder/kristiansand/krs-vr-arena-as-936605192)** | **#381 360** i verden | ~45 | ✅ Schema `sameAs: www.krsvr.no` | Ja (NAP) | Har riktig tlf og URL, men står under *IT / Dataprogrammering*. |
 | **[krs.no (KRS – Avisen Kristiansand)](https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800)** | **#576 519** i verden | ~62 | ✅ **Redaksjonell reportasje + Schema `subjectOf`** | 🔄 Indekseres | Nyhetsreportasje 19.10.2026 (*«Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet»*). Koblet via `subjectOf` og footer. |
 | **[visitsorlandet.com](https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/)** | **#718 409** i verden | ~58 | ✅ **Oppføring (NO+EN) + Redaksjonelt Intervju** | ✅ **Ja (Hovedkilde)** | Offisiell destinasjonsportal for Agder. Nytt mini-intervju (29.10.2026) med ren dofollow-lenke direkte til `/arrangementer/vr-teambuilding`. |
-| **[eventguiden.no](https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/)** | **#3 927 835** i verden | ~32 | ✅ **Optimalisert & Live (94 %)** | ✅ **Ja (#1 kilde!)** | Hovedkilde for Gemini AI på teambuilding-søk! Fullt optimalisert via browser-agent 02.11. Kapasitet hevet til 64 pers, 4 pakker opprettet (Teambuilding 375 kr, Utdrikningslag 450 kr, Escape Room 375 kr, Julebord og nyttårsfest flat pris 375 kr), direkte «Bestill»-knapp til krsvr.no/booking, sosiale medier og toveis Schema.org `sameAs` & `subjectOf`. |
+| **[eventguiden.no](https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/)** | **#3 927 835** i verden | ~32 | ✅ **Optimalisert & Live (94 %)** | ✅ **Ja (#1 kilde!)** | Hovedkilde for Gemini AI på teambuilding-søk! Fullt optimalisert via browser-agent 02.11. Kapasitet hevet til 64 pers, 4 pakker opprettet (Teambuilding 375 kr, Utdrikningslag 450 kr, Escape Room 375 kr, Julebord og nyttårsfest fra 450 kr), direkte «Bestill»-knapp til krsvr.no/booking, sosiale medier og toveis Schema.org `sameAs` & `subjectOf`. |
 | **[lokalebedrifter.no](https://lokalebedrifter.no/bedrift/936318878/krs-vr-arena-as)** | Utenfor Topp 5M | ~20 | ✅ JSON-LD `url: krsvr.no` | Ja (NAP) | Har riktig tlf og URL, men kategorisert som *Softwareutvikling* (`62.100`). |
 | **dendagen.no** | Utenfor Topp 5M | ~18 | ✅ Omtale + `krsvr.no` | Ja (NAP) | Indeksert med kontaktinfo, e-post, tlf og beskrivelse av partylounge. |
 | **falio.no** | Utenfor Topp 5M | ~15 | ✅ Katalogoppføring | Nei | Henter registerdata fra Brønnøysund (`62.100`). |
@@ -142,11 +142,11 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
   - **Gjennomførte optimaliseringer (02.11.2026):**
     - [x] **1. Kapasitet og merkevare:** Rettet til `KRS VR Arena`, økt maks kapasitet fra 8 til **64 personer** (`capacity_max: 64`).
     - [x] **2. Teambuilding- og firmapresentasjon:** Omskrevet etter `AGENTS.md` med fokus på 143 kvm arena, dynamisk turneringsformat for 10–64 personer, 10 samtidige spillere på banen, lagarmbånd, live spectator i partyloungen og kåring av vinnerlag.
-    - [x] **3. 4 publiserte pakker med priser:**
-      1. *VR Teambuilding & Firmafest* – Fra 375 kr (90 min).
-      2. *VR Utdrikningslag* – Fra 450 kr.
-      3. *VR Escape Room* – Fra 375 kr.
-      4. *Julebord og nyttårsfest (10–64 pers)* – Fra 375 kr (flat pris 375 kr eks. mva / pers).
+    - [x] **3. 4 publiserte pakker med priser og forhåndsbestilt åpen bar:**
+      1. *Teambuilding & Firmaevent (2–64 pers)* – Fra 375 kr (flat pris 375 kr eks. mva, turnering over 10 pers, erfaring med at alle aldre engasjeres, mulighet for forhåndsbestilt åpen bar & pizza).
+      2. *VR Utdrikningslag* – Fra 450 kr (brud/brudgom i sentrum, lounge, mulighet for forhåndsbestilt åpen bar & pizza).
+      3. *VR Escape Room* – Fra 375 kr (Mask of the Pharaoh, Abyss Vault, Prison Break, Parvous Box).
+      4. *Julebord og nyttårsfest (10–64 pers)* – Fra 450 kr (helaften/turnering, lounge, premiekåring, mulighet for forhåndsbestilt åpen bar & pizza).
     - [x] **4. Knapper og lenker:**
       - Direkte «Book / bestill»-knapp til `https://www.krsvr.no/booking`.
       - Nettsidelenke til `https://www.krsvr.no/`.

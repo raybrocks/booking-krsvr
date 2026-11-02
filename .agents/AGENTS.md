@@ -98,6 +98,7 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
      - De som har pause følger med på storskjerm (spectator), sjekker scorecards, tar en forfriskning og legger taktikk.
      - Felles kåring av vinnerlaget på slutten.
      - Alle opplever å delta på samme arrangement hele tiden &mdash; aldri isolert oppdelt i parallelle 4-timers økter.
+     - **Dokumentert erfaring og trygghet for arrangøren:** Ved grupper på flere enn 10 personer har vi solid erfaring med profesjonelt oppsett av turneringer. Vår erfaring er at kolleger i alle aldre og med ulik teknisk bakgrunn engasjerer seg like sterkt fra første minutt (ingen gaming-erfaring kreves, dedikerte spillverter veileder trygt).
 2. **Bar og Servering (Kun ved forhåndsbestilling):**
    - Baren er ikke fast åpen drop-in, men klargjøres ved forhåndsbestilling til arrangementer.
    - **Pakke 1 (Øl & Cider):** Kald Tuborg, Corona Extra, Bacardi Breezer og mineralvann. Veldig trygt og uformelt med tanke på utstyr.
@@ -108,10 +109,11 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 3. **Pakkepriser og MVA-skille:**
    - **Normal booking / Privat (2–10 personer, 90 min):** Oppgis **inkl. mva** på `/priser` (2 pers: 460 kr/pers, 3–4 pers: 395 kr/pers, 5–7 pers: 385 kr/pers, 8–10 pers: 375 kr/pers).
    - **Teambuilding og firmaarrangement (2–64 personer):** **Flat pris 375 kr + mva / pers** uansett antall deltakere (2–10 pers: 90 min; 10–64 pers: inntil 3 timer totaltid / hele lokalet eksklusivt / 120 min aktivt turneringsformat med opptil 10 samtidige spillere).
+   - **Julebord og nyttårsfest (2–64 personer):** Fra **450 kr / pers** (inntil 3 timer totaltid / hele lokalet eksklusivt / 120 min aktivt turneringsformat med opptil 10 samtidige spillere, lounge og mulighet for forhåndsbestilt bar/pizza).
    - **Utdrikningslag:** Fra 450 kr / pers (Varighet: 1,5–3 timer).
    - **VR Bursdag:** Fra 375 kr / pers (90 min totalopplevelse).
-4. **Ingen medbrakt mat og drikke på teambuilding, voksenbursdag (18+) og utdrikningslag:**
-   - Det er **ikke** anledning til medbrakt mat og drikke på teambuilding, firmaarrangementer, voksenbursdager (18+) og utdrikningslag.
+4. **Ingen medbrakt mat og drikke på teambuilding, julebord, voksenbursdag (18+) og utdrikningslag:**
+   - Det er **ikke** anledning til medbrakt mat og drikke på teambuilding, firmaarrangementer, julebord, voksenbursdager (18+) og utdrikningslag.
    - Drikke serveres via våre to forhåndsbestilte barkonsepter (Pakke 1: Øl/cider/mineralvann eller Pakke 2: Vin & bobler).
    - Mat serveres ved at vi koordinerer levering av fersk, varm lokal pizza direkte til partyloungen.
    - **Unntak for barnebursdag:** Ved barnebursdager er det tillatt å ta med egen bursdagskake, godteri, snacks og brus.
