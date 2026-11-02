@@ -533,7 +533,7 @@ export default async function VrTeambuildingPage() {
             <div className="bg-zinc-900/60 border border-[#9C39FF]/40 rounded-2xl p-8 flex flex-col justify-between relative shadow-[0_0_30px_rgba(156,57,255,0.15)]">
               <div>
                 <div className="text-xs uppercase tracking-wider text-[#9C39FF] font-semibold mb-2">Større grupper</div>
-                <h3 className="text-2xl font-medium text-white mb-2">Teambuilding 10–50 personer</h3>
+                <h3 className="text-2xl font-medium text-white mb-2">Teambuilding 10–64 personer</h3>
                 <div className="text-3xl font-bold text-white mb-1">375 kr <span className="text-xs font-normal text-zinc-400">+ mva / pers</span></div>
                 <div className="text-xs text-zinc-400 mb-6">Inntil 3 timer totaltid &middot; 120 min aktivt turneringsformat</div>
                 <ul className="text-xs sm:text-sm text-zinc-300 space-y-2.5 mb-8">
