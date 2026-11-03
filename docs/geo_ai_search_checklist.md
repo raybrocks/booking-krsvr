@@ -45,7 +45,7 @@ Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, ra
 | **falio.no** | Utenfor Topp 5M | ~15 | ✅ Katalogoppføring | Nei | Henter registerdata fra Brønnøysund (`62.100`). |
 | **[utdrikningslag.events](https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena)** | Utenfor Topp 5M | ~25 | ✅ **Aktiv profil + lenke (NY 02.11)** | 🔄 Indekseres | Direkte kilde for Gemini AI på søk #5 (*Utdrikningslag Kristiansand aktiviteter*). Komplett profil med priser, bilder, innendørs og leadsskjema. |
 | **[wheretoescape.com](https://www.wheretoescape.com/)** | **#820 140** i verden | ~42 | ⏳ Søknad til godkjenning (02.11) | 🔄 Under behandling | Global katalog for escape rooms. Søknad levert med NAP, 400 000 cruiseturister og fergenærhet. |
-| **[worldofescapes.com](https://no.worldofescapes.com/kristiansand)** | **#1 328 033** i verden | ~40 | ⏳ 4 rom levert til godkjenning (02.11) | 🔄 Under publisering (innen 5 dager) | Siteres direkte av Gemini AI på «Escape Room Kristiansand». 4 VR Escape Rooms levert (Mask of the Pharaoh, Abyss Vault m/Action, Prison Break, Parvous Box) med NAP og backlink til krsvr.no. |
+| **[worldofescapes.com](https://no.worldofescapes.com/companies/krs-vr-arena)** | **#1 328 033** i verden | ~40 | ✅ **Publisert & Live (03.11)** | ✅ **Ja (4 rom live)** | Siteres direkte av Gemini AI på «Escape Room Kristiansand». Profil live med 4 VR Escape Rooms (*Mask of the Pharaoh*, *Abyss Vault*, *Prison Break*, *Parvous Box*) og dofollow-lenke til krsvr.no. Koblet via `sameAs` i Schema.org. |
 
 ---
 
@@ -177,29 +177,29 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
     - [ ] Sjekke at rommene er registrert med riktige titler (*Abyss Vault*, *Mask of the Pharaoh*, *Prison Break*, *Parvous Box*), antall spillere (2–6 per rom) og språkmuligheter.
     - [ ] **Schema.org toveis entitetskobling (`sameAs` & `subjectOf`):** Legg godkjent profil-URL inn i `sameAs` i `app/layout.tsx` og `components/LandingPage.tsx`, samt som `subjectOf` i `app/vr-opplevelser/[[...slug]]/page.tsx` under Escape Room. Dette forankrer KRS VR Arena i den internasjonale escape room-entiteten hos Google og LLM-er.
 
-- [x] **World of Escapes (4 VR Escape Rooms levert 02.11.2026 – Venter på publisering innen 5 dager):**
-  - **Portal-URL:** [no.worldofescapes.com/kristiansand](https://no.worldofescapes.com/kristiansand) / [worldofescapes.com/add_quests](https://worldofescapes.com/add_quests)
-  - **Status:** Samtlige **4 VR Escape Rooms** levert via browser-agent 02.11.2026 med Google-konto `post@krsvr.no`. Offisiell bekreftelse: *«Thanks for your request! Your escape room will be published within 5 days.»*
-  - **De 4 innsendte rommene:**
+- [x] **World of Escapes (Publisert & Live 03.11.2026 – 4 VR Escape Rooms aktive):**
+  - **Portal-URL:** [no.worldofescapes.com/companies/krs-vr-arena](https://no.worldofescapes.com/companies/krs-vr-arena)
+  - **Status:** Godkjent og publisert på under 24 timer! Samtlige **4 VR Escape Rooms** er live:
     1. *Mask of the Pharaoh - VR Escape Room* (Familievennlig, Historisk, Mystisk, 2–6 spillere, fra 8 år).
     2. *Abyss Vault - Sci-Fi Action VR Escape Room* (Action game, Sci-Fi, Eventyrlig, 2–6 spillere, fra 10 år).
     3. *Prison Break - VR Escape Room* (Fengselsbrudd, Spenning, 2–6 spillere, fra 10 år).
     4. *Parvous Box - VR Escape Room* (Mystisk, Utfordrende, Eventyrlig, 2–6 spillere, fra 10 år).
-  - **Hvorfor dette er et gjennombrudd for AI-søk:**
-    - I dag har konkurrenten *Escape Room Kristiansand* alle 6 rommene i byen på World of Escapes.
-    - Når våre 4 rom publiseres, vil KRS VR Arena eie **4 av 10 rom (40 % av hele byen)** på portalen, samt bli den **eneste reelle aktøren** under [Virtuell virkelighet escape-rom i Kristiansand](https://no.worldofescapes.com/kristiansand/tags/vr-no).
+  - **Betydning for AI-søk og Knowledge Graph:**
+    - KRS VR Arena eier nå **4 av 10 rom (~40 % av markedet)** på Kristiansands mest siterte escape room-portal, og er byens eneste aktør under [Virtuell virkelighet escape-rom i Kristiansand](https://no.worldofescapes.com/kristiansand/tags/vr-no).
     - Gemini AI siterer World of Escapes direkte på søk #3 (*«Escape Room Kristiansand»*).
-  - **Konkrete oppfølgingstiltak straks rommene publiseres (innen 5 dager):**
-    - [ ] Verifisere at selskapssiden `https://no.worldofescapes.com/companies/krs-vr-arena` er opprettet med dofollow-lenke til `https://www.krsvr.no/vr-opplevelser/escape-room`.
-    - [ ] Kontrollere at alle 4 rommene vises på `https://no.worldofescapes.com/kristiansand` og under taggen `/tags/vr-no` (samt at Abyss Vault har Action-kategori).
-    - [ ] **Schema.org toveis entitetskobling (`sameAs` & `subjectOf`):** Legg selskapsprofilen og rom-URL-ene inn i `sameAs` i `app/layout.tsx` og `components/LandingPage.tsx`, samt som `subjectOf` i `app/vr-opplevelser/[[...slug]]/page.tsx` for Escape Room. Dette forankrer KRS VR Arena i Knowledge Graph og løser søk #3 (*«Escape Room Kristiansand»*).
+  - **Gjennomførte tiltak:**
+    - [x] Verifisert at selskapssiden `https://no.worldofescapes.com/companies/krs-vr-arena` er opprettet med dofollow-lenke til `https://www.krsvr.no/vr-opplevelser/escape-room`.
+    - [x] Kontrollert at alle 4 rommene vises på World of Escapes i Kristiansand.
+    - [x] **Schema.org toveis entitetskobling (`sameAs`):** Lagt inn `https://no.worldofescapes.com/companies/krs-vr-arena` i `sameAs` i `app/layout.tsx`, `components/LandingPage.tsx` og `app/vr-opplevelser/[[...slug]]/page.tsx`.
 
-- [ ] **Utdrikningslag.com & Utdrikningslag.no:**
-  - **Status:** Vurdert 02.11.2026. Begge portalene siteres av Gemini AI når den svarer på *«Utdrikningslag Kristiansand aktiviteter»*.
-  - **Oppfølgingstiltak:**
-    - [ ] Undersøke vilkår og evt. oppføringspris for listing under Kristiansand/Agder.
-    - [ ] Vurdere kost/nytte opp mot den nå aktive gratisoppføringen på `utdrikningslag.events`.
-    - [ ] **Schema.org kobling:** Dersom listing etableres, legg profil-URL inn i `sameAs` og som `subjectOf` på `/arrangementer/vr-utdrikningslag`.
+- [x] **Utdrikningslag.com & Utdrikningslag.no:**
+  - **Status:** Avtale i boks 03.11.2026 med Niclas Lanneteg (Utdrikningslag.com / Highjump Event AS).
+  - **Vilkår:** Gratis profilering i november måned, fakturering for desember og 2027.
+  - **Gjennomførte tiltak:**
+    - [x] Organisasjonsopplysninger oversendt: `KRS VR ARENA AS` (Org.nr: `936 318 878 MVA`).
+    - [x] Bildepakke med høyoppløselige lenker levert.
+    - [x] Skreddersydd profiltekst oversendt, optimalisert for både jente- og guttegjenger, partylounge med storskjerm-spectator, forhåndsbestilt åpen bar og pizza.
+    - [ ] **Schema.org kobling:** Så snart profilen er live på `utdrikningslag.com`, legges URL inn i `sameAs` og `subjectOf` på `/arrangementer/vr-utdrikningslag`.
 
 - [ ] **Teambuilding.no / Firmatur.no:**
   - Legg inn profil for teambuilding, kickoff og bedriftsarrangementer.

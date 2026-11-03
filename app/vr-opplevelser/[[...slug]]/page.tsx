@@ -333,7 +333,11 @@ export default async function ExperiencesPage({
       "addressLocality": "Kristiansand",
       "addressCountry": "NO"
     },
-    "hasMap": "https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8"
+    "hasMap": "https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8",
+    "sameAs": [
+      "https://no.worldofescapes.com/companies/krs-vr-arena",
+      "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/"
+    ]
   };
 
   if (matchedExp) {

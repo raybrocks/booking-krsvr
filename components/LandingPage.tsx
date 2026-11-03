@@ -114,6 +114,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
       "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
       "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/",
       "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
+      "https://no.worldofescapes.com/companies/krs-vr-arena",
       "https://www.instagram.com/krs.vr.arena",
       "https://www.tiktok.com/@krs.vr.arena",
       "https://www.facebook.com/krs.vr.arena",
