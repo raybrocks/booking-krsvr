@@ -104,6 +104,28 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
           "name": "Visit Sørlandet",
           "url": "https://www.visitsorlandet.com"
         }
+      },
+      {
+        "@type": "WebPage",
+        "name": "KRS VR Arena på World of Escapes",
+        "description": "Offisiell oversikt og profil for KRS VR Arena sine 4 VR Escape Rooms i Kristiansand på World of Escapes.",
+        "url": "https://no.worldofescapes.com/companies/krs-vr-arena",
+        "publisher": {
+          "@type": "Organization",
+          "name": "World of Escapes",
+          "url": "https://no.worldofescapes.com"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "name": "KRS VR Arena på WhereToEscape",
+        "description": "Offisiell profil og oppføring for KRS VR Arena sine 4 VR Escape Rooms i Kristiansand på WhereToEscape.",
+        "url": "https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena",
+        "publisher": {
+          "@type": "Organization",
+          "name": "WhereToEscape",
+          "url": "https://www.wheretoescape.com"
+        }
       }
     ],
     "sameAs": [

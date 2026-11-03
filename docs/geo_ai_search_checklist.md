@@ -16,7 +16,7 @@ Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | 24 sider | 24 sider | 50 sider | **50 sider** | 🟢 **+31** | 25+ sider (Nådd! 🎉) |
 | **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | 10 domener | 10 domener | 11 domener *(+2 u/behandl.)* | **13 domener** *(+1 u/avtale)* | 🟢 **+9** | 15+ domener |
-| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | 8 lenker | 8 lenker | 12 lenker | **18+ lenker** | 🟢 **+13 (Over 3x!)** | 10+ lenker (Nådd! 🎉) |
+| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | 8 lenker | 8 lenker | 12 lenker | **20+ lenker** | 🟢 **+15 (4x økning!)** | 10+ lenker (Nådd! 🎉) |
 | **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (24 stk) | 5,0 ★ (24 stk) | 5,0 ★ (28 stk) | **5,0 ★ (28 stk)** | 🟢 **+6** | 5,0 ★ (40+ stk) |
 | **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | 8 aktiviteter | 8 aktiviteter | 9 aktiviteter | **9 aktiviteter** | 🟢 **+2** | 8+ aktiviteter (Nådd! 🎉) |
 | **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (6 stk) | 5,0 ★ (6 stk) | 5,0 ★ (9 stk) | **5,0 ★ (9 stk)** | 🟢 **+6 (Tredobling!)** | 5,0 ★ (10+ stk) |
@@ -181,7 +181,7 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
     - [x] Verifisert at KRS VR Arena listes med klikkbar backlink til `https://www.krsvr.no/vr-opplevelser/escape-room` (og `https://www.krsvr.no/`).
     - [x] Rommene registrert med riktige titler, antall spillere (2–6 per rom), 60 min, alder, egenskaper (wheelchair accessible, child friendly, puzzle heavy) og plakater.
     - [x] **Valutakorreksjon til NOK:** Venue-valutaen endret fra standard GBP til **Norwegian Krone (NOK / kr)** (`currency_id: 26`) med fast pris `375 kr pp` på samtlige rom.
-    - [x] **Schema.org toveis entitetskobling (`sameAs`):** Lagt godkjent profil-URL inn i `sameAs` i `app/layout.tsx`, `components/LandingPage.tsx`, `app/vr-opplevelser/[[...slug]]/page.tsx` og `app/en/experiences/[[...slug]]/page.tsx`. Dette forankrer KRS VR Arena i den internasjonale escape room-entiteten hos Google og LLM-er.
+    - [x] **Schema.org toveis entitetskobling (`sameAs` & `subjectOf`):** Lagt godkjent profil-URL inn i `sameAs` og `subjectOf` i `app/layout.tsx`, `components/LandingPage.tsx`, `app/vr-opplevelser/[[...slug]]/page.tsx` og `app/en/experiences/[[...slug]]/page.tsx`. Dette forankrer KRS VR Arena i den internasjonale escape room-entiteten hos Google og LLM-er.
 
 - [x] **World of Escapes (Publisert & Live 03.11.2026 – 4 VR Escape Rooms aktive):**
   - **Portal-URL:** [no.worldofescapes.com/companies/krs-vr-arena](https://no.worldofescapes.com/companies/krs-vr-arena)

@@ -366,16 +366,28 @@ export default async function ExperiencesPage({
       "category": matchedExp.type,
       ...(woeQuestUrl && {
         "sameAs": woeQuestUrl,
-        "subjectOf": {
-          "@type": "WebPage",
-          "name": `${matchedExp.name} hos KRS VR Arena på World of Escapes`,
-          "url": woeQuestUrl,
-          "publisher": {
-            "@type": "Organization",
-            "name": "World of Escapes",
-            "url": "https://no.worldofescapes.com"
+        "subjectOf": [
+          {
+            "@type": "WebPage",
+            "name": `${matchedExp.name} hos KRS VR Arena på World of Escapes`,
+            "url": woeQuestUrl,
+            "publisher": {
+              "@type": "Organization",
+              "name": "World of Escapes",
+              "url": "https://no.worldofescapes.com"
+            }
+          },
+          {
+            "@type": "WebPage",
+            "name": `${matchedExp.name} hos KRS VR Arena på WhereToEscape`,
+            "url": "https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena",
+            "publisher": {
+              "@type": "Organization",
+              "name": "WhereToEscape",
+              "url": "https://www.wheretoescape.com"
+            }
           }
-        }
+        ]
       }),
       ...(isoLangs.length > 0 && { inLanguage: isoLangs, availableLanguage: allLangs }),
       ...(suitableList.length > 0 && {
