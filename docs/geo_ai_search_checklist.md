@@ -12,18 +12,18 @@ Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for
 
 ### A. Overordnet Utvikling over Tid (KPI-er)
 
-| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT) | 25. okt 2026 (Scan #5) | 2. nov 2026 (Scan #6) | Endring (siden start) | Mål (Q4 2026) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | 24 sider | 24 sider | **50 sider** | 🟢 **+31** | 25+ sider (Nådd! 🎉) |
-| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | 10 domener | 10 domener | **11 domener** *(+2 u/behandl.)* | 🟢 **+7** | 15+ domener |
-| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | 8 lenker | 8 lenker | **12 lenker** | 🟢 **+7** | 10+ lenker (Nådd! 🎉) |
-| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (24 stk) | 5,0 ★ (24 stk) | **5,0 ★ (28 stk)** | 🟢 **+6** | 5,0 ★ (40+ stk) |
-| **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | 8 aktiviteter | 8 aktiviteter | **9 aktiviteter** | 🟢 **+2** | 8+ aktiviteter (Nådd! 🎉) |
-| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (6 stk) | 5,0 ★ (6 stk) | **5,0 ★ (9 stk)** | 🟢 **+6 (Tredobling!)** | 5,0 ★ (10+ stk) |
-| **TripAdvisor Rangering – Leverandører ([Måleside](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html))** | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | **Nr. 3 av 23 (Fornøyelse)** *(#16 standard)* | 🟢 **Klatret til Topp 3!** | **Topp 3 (Nådd! 🎉)** |
-| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | 2 av 6 (33 %) | Bekreftet konvertering | 2 av 6 (33 %) *(#1 på VR)* | **3 av 6 (50 %)** *(#1 VR + Teambuilding)* | 🟢 **+1 (Klatret til 50 %!)** | **5 av 6 (83 %)** |
-| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
-| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
+| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT) | 25. okt 2026 (Scan #5) | 2. nov 2026 (Scan #6) | 3. nov 2026 (WOE Live) | Endring (siden start) | Mål (Q4 2026) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | 24 sider | 24 sider | 50 sider | **50 sider** | 🟢 **+31** | 25+ sider (Nådd! 🎉) |
+| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | 10 domener | 10 domener | 11 domener *(+2 u/behandl.)* | **12 domener** *(+2 avtale/beh.)* | 🟢 **+8** | 15+ domener |
+| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | 8 lenker | 8 lenker | 12 lenker | **17+ lenker** | 🟢 **+12 (Tredobling!)** | 10+ lenker (Nådd! 🎉) |
+| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (24 stk) | 5,0 ★ (24 stk) | 5,0 ★ (28 stk) | **5,0 ★ (28 stk)** | 🟢 **+6** | 5,0 ★ (40+ stk) |
+| **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | 8 aktiviteter | 8 aktiviteter | 9 aktiviteter | **9 aktiviteter** | 🟢 **+2** | 8+ aktiviteter (Nådd! 🎉) |
+| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (6 stk) | 5,0 ★ (6 stk) | 5,0 ★ (9 stk) | **5,0 ★ (9 stk)** | 🟢 **+6 (Tredobling!)** | 5,0 ★ (10+ stk) |
+| **TripAdvisor Rangering – Leverandører ([Måleside](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html))** | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 3 av 23 (Fornøyelse) *(#16 standard)* | **Nr. 3 av 23 (Fornøyelse)** *(#16 standard)* | 🟢 **Klatret til Topp 3!** | **Topp 3 (Nådd! 🎉)** |
+| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | 2 av 6 (33 %) | Bekreftet konvertering | 2 av 6 (33 %) *(#1 på VR)* | 3 av 6 (50 %) *(#1 VR + Teambuilding)* | **3 av 6 (50 %)** *(#1 VR + Teambuilding)* | 🟢 **+1 (Klatret til 50 %!)** | **5 av 6 (83 %)** |
+| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
+| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
 
 ---
 
@@ -44,8 +44,9 @@ Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, ra
 | **dendagen.no** | Utenfor Topp 5M | ~18 | ✅ Omtale + `krsvr.no` | Ja (NAP) | Indeksert med kontaktinfo, e-post, tlf og beskrivelse av partylounge. |
 | **falio.no** | Utenfor Topp 5M | ~15 | ✅ Katalogoppføring | Nei | Henter registerdata fra Brønnøysund (`62.100`). |
 | **[utdrikningslag.events](https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena)** | Utenfor Topp 5M | ~25 | ✅ **Aktiv profil + lenke (NY 02.11)** | 🔄 Indekseres | Direkte kilde for Gemini AI på søk #5 (*Utdrikningslag Kristiansand aktiviteter*). Komplett profil med priser, bilder, innendørs og leadsskjema. |
+| **[utdrikningslag.com](https://www.utdrikningslag.com/)** | Utenfor Topp 5M | ~25 | 🔄 **Avtale inngått (03.11)** | 🔄 Under oppsett | Avtale inngått med Niclas Lanneteg. Gratis profilering i november måned, deretter aktiv avtale for desember og 2027. Skreddersydd tekst, bildepakke og org.opplysninger oversendt. |
 | **[wheretoescape.com](https://www.wheretoescape.com/)** | **#820 140** i verden | ~42 | ⏳ Søknad til godkjenning (02.11) | 🔄 Under behandling | Global katalog for escape rooms. Søknad levert med NAP, 400 000 cruiseturister og fergenærhet. |
-| **[worldofescapes.com](https://no.worldofescapes.com/companies/krs-vr-arena)** | **#1 328 033** i verden | ~40 | ✅ **Publisert & Live (03.11)** | ✅ **Ja (4 rom live)** | Siteres direkte av Gemini AI på «Escape Room Kristiansand». Profil live med 4 VR Escape Rooms (*Mask of the Pharaoh*, *Abyss Vault*, *Prison Break*, *Parvous Box*) og dofollow-lenke til krsvr.no. Koblet via `sameAs` i Schema.org. |
+| **[worldofescapes.com](https://no.worldofescapes.com/companies/krs-vr-arena)** | **#1 328 033** i verden | ~40 | ✅ **Publisert & Live (03.11)** | ✅ **Ja (4 rom live)** | Siteres direkte av Gemini AI på «Escape Room Kristiansand». Profil live med 4 VR Escape Rooms (*Mask of the Pharaoh*, *Abyss Vault*, *Prison Break*, *Parvous Box*) og dofollow-lenke til krsvr.no. Koblet via `sameAs` og `subjectOf` på selskapsnivå og for alle individuelle rom på både norsk og engelsk. |
 
 ---
 
@@ -340,7 +341,9 @@ Når en bruker spør Gemini: *«Beste aktiviteter for utdrikningslag i Kristians
 
 ## 4. Andre ting du ikke må glemme (Proaktive tiltak)
 
-### A. Google Search Console – Tving reindeksering (Fullført)
+### A. Google Search Console – Indekseringsstatus & API-inspeksjon (Verifisert 03.11.2026)
+- [x] **URL-inspeksjon via GSC API (Fullført 03.11.2026):** Samtlige 14 kjerne-URL-er (forside, `/vr-opplevelser/escape-room`, `/arrangementer/vr-teambuilding`, `/arrangementer/vr-utdrikningslag`, alle 4 individuelle escape rooms, action-spill og engelske sider) ble inspisert direkte mot Googles Search Console API (`searchconsole.urlInspection.index.inspect`).
+  - **Resultat:** **100 % dekning (PASS / Submitted and indexed).** Samtlige nøkkelsider er indeksert av Google med gyldig mobilvennlighet og rike resultater. Ingen ytterligere manuell «Be om indeksering» er nødvendig i GSC.
 - [x] Gå til [Google Search Console](https://search.google.com/search-console).
 - [x] Bruk **URL-inspeksjon** for forsiden (`https://krsvr.no/`) og FAQ-siden (`https://krsvr.no/faq`).
 - [x] Klikk på **«Be om indeksering»** (Request Indexing).
