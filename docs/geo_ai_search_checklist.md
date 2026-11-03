@@ -191,6 +191,7 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
     - [x] Verifisert at selskapssiden `https://no.worldofescapes.com/companies/krs-vr-arena` er opprettet med dofollow-lenke til `https://www.krsvr.no/vr-opplevelser/escape-room`.
     - [x] Kontrollert at alle 4 rommene vises på World of Escapes i Kristiansand.
     - [x] **Schema.org toveis entitetskobling (`sameAs`):** Lagt inn `https://no.worldofescapes.com/companies/krs-vr-arena` i `sameAs` i `app/layout.tsx`, `components/LandingPage.tsx` og `app/vr-opplevelser/[[...slug]]/page.tsx`.
+    - [x] **Granulær spill-entitetskobling (`sameAs` & `subjectOf`):** Samtlige 4 individuelle escape room-sider (`/vr-opplevelser/escape-room/[spill]`) og `ItemList` er beriket med direkte `sameAs`- og `subjectOf`-koblinger til sine respektive quest-URL-er på World of Escapes (*Prison Break*, *Mask of the Pharaoh*, *Abyss Vault*, *Parvous Box*) på både norsk og engelsk.
 
 - [x] **Utdrikningslag.com & Utdrikningslag.no:**
   - **Status:** Avtale i boks 03.11.2026 med Niclas Lanneteg (Utdrikningslag.com / Highjump Event AS).

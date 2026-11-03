@@ -340,7 +340,16 @@ export default async function ExperiencesPage({
     ]
   };
 
+  const WORLD_OF_ESCAPES_QUESTS: Record<string, string> = {
+    "prison-break": "https://no.worldofescapes.com/kristiansand/quests/krs-vr-arena-prison-break",
+    "mask-of-the-pharaoh": "https://no.worldofescapes.com/kristiansand/quests/krs-vr-arena-mask-of-the-pharaoh",
+    "abyss-vault": "https://no.worldofescapes.com/kristiansand/quests/krs-vr-arena-abyss-vault",
+    "parvous-box": "https://no.worldofescapes.com/kristiansand/quests/krs-vr-arena-parvous-box"
+  };
+
   if (matchedExp) {
+    const matchedExpSlug = slugify(matchedExp.name || "");
+    const woeQuestUrl = WORLD_OF_ESCAPES_QUESTS[matchedExpSlug];
     const allLangs: string[] = Array.isArray(matchedExp.languages) ? matchedExp.languages : [];
     const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== 'und');
     const langSummary = allLangs.length > 0 ? ` Available languages: ${allLangs.join(", ")}.` : "";
@@ -354,6 +363,19 @@ export default async function ExperiencesPage({
       "description": `${matchedExp.shortDescription || ""} Spilles hos KRS VR Arena i Kristiansand.${suitableSummary}${langSummary}`,
       "brand": providerInfo,
       "category": matchedExp.type,
+      ...(woeQuestUrl && {
+        "sameAs": woeQuestUrl,
+        "subjectOf": {
+          "@type": "WebPage",
+          "name": `${matchedExp.name} hos KRS VR Arena på World of Escapes`,
+          "url": woeQuestUrl,
+          "publisher": {
+            "@type": "Organization",
+            "name": "World of Escapes",
+            "url": "https://no.worldofescapes.com"
+          }
+        }
+      }),
       ...(isoLangs.length > 0 && { inLanguage: isoLangs, availableLanguage: allLangs }),
       ...(suitableList.length > 0 && {
         audience: {
@@ -395,6 +417,8 @@ export default async function ExperiencesPage({
       "name": "VR Opplevelser hos KRS VR Arena",
       "description": "Se vårt store utvalg av VR-opplevelser, inkludert Escape Rooms, skytespill og eventyr i Kristiansand.",
       "itemListElement": experiences.map((exp, index) => {
+        const expSlug = slugify(exp.name || "");
+        const woeQuestUrl = WORLD_OF_ESCAPES_QUESTS[expSlug];
         const allLangs: string[] = Array.isArray(exp.languages) ? exp.languages : [];
         const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== 'und');
         const langSummary = allLangs.length > 0 ? ` Available languages: ${allLangs.join(", ")}.` : "";
@@ -410,6 +434,7 @@ export default async function ExperiencesPage({
             "description": `${exp.shortDescription || ""}${suitableSummary}${langSummary}`,
             "url": `https://www.krsvr.no/vr-opplevelser/${exp.experienceType?.slug || slugify(exp.type || "")}/${slugify(exp.name || "")}`,
             "brand": providerInfo,
+            ...(woeQuestUrl && { "sameAs": woeQuestUrl }),
             ...(isoLangs.length > 0 && { inLanguage: isoLangs, availableLanguage: allLangs }),
             ...(suitableList.length > 0 && {
               audience: {

@@ -297,10 +297,19 @@ export default async function EnglishExperiencesPage({
     ],
   };
 
+  const WORLD_OF_ESCAPES_QUESTS: Record<string, string> = {
+    "prison-break": "https://no.worldofescapes.com/kristiansand/quests/krs-vr-arena-prison-break",
+    "mask-of-the-pharaoh": "https://no.worldofescapes.com/kristiansand/quests/krs-vr-arena-mask-of-the-pharaoh",
+    "abyss-vault": "https://no.worldofescapes.com/kristiansand/quests/krs-vr-arena-abyss-vault",
+    "parvous-box": "https://no.worldofescapes.com/kristiansand/quests/krs-vr-arena-parvous-box",
+  };
+
   let jsonLd: any = null;
 
   if (matchedRaw) {
     const matchedExp = localizeExperience(matchedRaw, "en");
+    const matchedExpSlug = slugify(matchedRaw.name || "");
+    const woeQuestUrl = WORLD_OF_ESCAPES_QUESTS[matchedExpSlug];
     const allLangs: string[] = Array.isArray(matchedExp.languages) ? matchedExp.languages : [];
     const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== "und");
     const langSummary = allLangs.length > 0 ? ` Available languages: ${allLangs.join(", ")}.` : "";
@@ -314,6 +323,19 @@ export default async function EnglishExperiencesPage({
       description: `${matchedExp.shortDescription || ""} Played at KRS VR Arena in Kristiansand, Norway.${suitableSummary}${langSummary}`,
       brand: providerInfo,
       category: matchedExp.type,
+      ...(woeQuestUrl && {
+        sameAs: woeQuestUrl,
+        subjectOf: {
+          "@type": "WebPage",
+          name: `${matchedExp.name} at KRS VR Arena on World of Escapes`,
+          url: woeQuestUrl,
+          publisher: {
+            "@type": "Organization",
+            name: "World of Escapes",
+            url: "https://no.worldofescapes.com",
+          },
+        },
+      }),
       ...(isoLangs.length > 0 && { inLanguage: isoLangs, availableLanguage: allLangs }),
       ...(suitableList.length > 0 && {
         audience: {
@@ -343,6 +365,8 @@ export default async function EnglishExperiencesPage({
       description:
         "Wireless free-roam VR Escape Rooms, Action Strategy (Tactical Arena), Zombie Shooter, and Family VR Packages in Kristiansand, Norway.",
       itemListElement: experiences.map((rawExp, index) => {
+        const expSlug = slugify(rawExp.name || "");
+        const woeQuestUrl = WORLD_OF_ESCAPES_QUESTS[expSlug];
         const exp = localizeExperience(rawExp, "en");
         const allLangs: string[] = Array.isArray(exp.languages) ? exp.languages : [];
         const isoLangs = allLangs.map((l: string) => getLanguageInfo(l).iso).filter((iso: string) => iso && iso !== "und");
@@ -359,6 +383,7 @@ export default async function EnglishExperiencesPage({
             description: exp.shortDescription || "",
             url: `https://www.krsvr.no/en/experiences/${enTypeSlug}/${slugify(rawExp.name || "")}`,
             brand: providerInfo,
+            ...(woeQuestUrl && { sameAs: woeQuestUrl }),
             ...(isoLangs.length > 0 && { inLanguage: isoLangs, availableLanguage: allLangs }),
             ...(suitableList.length > 0 && {
               audience: {
