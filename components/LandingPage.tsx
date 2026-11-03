@@ -115,6 +115,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
       "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/",
       "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
       "https://no.worldofescapes.com/companies/krs-vr-arena",
+      "https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena",
       "https://www.instagram.com/krs.vr.arena",
       "https://www.tiktok.com/@krs.vr.arena",
       "https://www.facebook.com/krs.vr.arena",

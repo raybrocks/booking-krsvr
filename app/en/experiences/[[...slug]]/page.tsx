@@ -293,6 +293,7 @@ export default async function EnglishExperiencesPage({
     hasMap: "https://maps.app.goo.gl/JdnDJvuqd3rX9cDb8",
     sameAs: [
       "https://no.worldofescapes.com/companies/krs-vr-arena",
+      "https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena",
       "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/"
     ],
   };

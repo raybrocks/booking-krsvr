@@ -15,8 +15,8 @@ Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for
 | Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT) | 25. okt 2026 (Scan #5) | 2. nov 2026 (Scan #6) | 3. nov 2026 (WOE Live) | Endring (siden start) | Mål (Q4 2026) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | 24 sider | 24 sider | 50 sider | **50 sider** | 🟢 **+31** | 25+ sider (Nådd! 🎉) |
-| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | 10 domener | 10 domener | 11 domener *(+2 u/behandl.)* | **12 domener** *(+2 avtale/beh.)* | 🟢 **+8** | 15+ domener |
-| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | 8 lenker | 8 lenker | 12 lenker | **17+ lenker** | 🟢 **+12 (Tredobling!)** | 10+ lenker (Nådd! 🎉) |
+| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | 10 domener | 10 domener | 11 domener *(+2 u/behandl.)* | **13 domener** *(+1 u/avtale)* | 🟢 **+9** | 15+ domener |
+| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | 8 lenker | 8 lenker | 12 lenker | **18+ lenker** | 🟢 **+13 (Over 3x!)** | 10+ lenker (Nådd! 🎉) |
 | **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (24 stk) | 5,0 ★ (24 stk) | 5,0 ★ (28 stk) | **5,0 ★ (28 stk)** | 🟢 **+6** | 5,0 ★ (40+ stk) |
 | **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | 8 aktiviteter | 8 aktiviteter | 9 aktiviteter | **9 aktiviteter** | 🟢 **+2** | 8+ aktiviteter (Nådd! 🎉) |
 | **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (6 stk) | 5,0 ★ (6 stk) | 5,0 ★ (9 stk) | **5,0 ★ (9 stk)** | 🟢 **+6 (Tredobling!)** | 5,0 ★ (10+ stk) |
@@ -45,7 +45,7 @@ Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, ra
 | **falio.no** | Utenfor Topp 5M | ~15 | ✅ Katalogoppføring | Nei | Henter registerdata fra Brønnøysund (`62.100`). |
 | **[utdrikningslag.events](https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena)** | Utenfor Topp 5M | ~25 | ✅ **Aktiv profil + lenke (NY 02.11)** | 🔄 Indekseres | Direkte kilde for Gemini AI på søk #5 (*Utdrikningslag Kristiansand aktiviteter*). Komplett profil med priser, bilder, innendørs og leadsskjema. |
 | **[utdrikningslag.com](https://www.utdrikningslag.com/)** | Utenfor Topp 5M | ~25 | 🔄 **Avtale inngått (03.11)** | 🔄 Under oppsett | Avtale inngått med Niclas Lanneteg. Gratis profilering i november måned, deretter aktiv avtale for desember og 2027. Skreddersydd tekst, bildepakke og org.opplysninger oversendt. |
-| **[wheretoescape.com](https://www.wheretoescape.com/)** | **#820 140** i verden | ~42 | ⏳ Søknad til godkjenning (02.11) | 🔄 Under behandling | Global katalog for escape rooms. Søknad levert med NAP, 400 000 cruiseturister og fergenærhet. |
+| **[wheretoescape.com](https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena)** | **#820 140** i verden | ~42 | ✅ **Publisert & Live (03.11)** | ✅ **Ja (4 rom live)** | Global autoritet for escape rooms. Komplett profilside med alle 4 VR Escape Rooms (*Mask of the Pharaoh*, *Abyss Vault*, *Prison Break*, *Parvous Box*), 375 kr pp (NOK), åpningstider, NAP og dofollow-lenker til krsvr.no. Koblet via `sameAs` i Schema.org. |
 | **[worldofescapes.com](https://no.worldofescapes.com/companies/krs-vr-arena)** | **#1 328 033** i verden | ~40 | ✅ **Publisert & Live (03.11)** | ✅ **Ja (4 rom live)** | Siteres direkte av Gemini AI på «Escape Room Kristiansand». Profil live med 4 VR Escape Rooms (*Mask of the Pharaoh*, *Abyss Vault*, *Prison Break*, *Parvous Box*) og dofollow-lenke til krsvr.no. Koblet via `sameAs` og `subjectOf` på selskapsnivå og for alle individuelle rom på både norsk og engelsk. |
 
 ---
@@ -169,14 +169,19 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
     - [ ] Følge opp eventuelle innkommende henvendelser i EventAdmin-dashbordet (`eventadmin.io/leads`).
     - [ ] Kjøre ny AI-siteringstest på søk #5 (*«Utdrikningslag Kristiansand aktiviteter»*) i neste scanning for å verifisere når Google/Gemini begynner å sitere profilen.
 
-- [x] **WhereToEscape.com (Søknad levert 02.11.2026 – Venter på godkjenning):**
-  - **Portal-URL:** [wheretoescape.com/en-gb/members/owner-application](https://www.wheretoescape.com/en-gb/members/owner-application)
-  - **Status:** Søknad om eierregistrering levert 02.11.2026 med grundig engelsk profiltekst, NAP, 400 000 årlige cruiseturister og fergenærhet (Color Line / Fjord Line). Status: *«Application Pending»* (forventet 1–3 dagers behandlingstid).
+- [x] **WhereToEscape.com (Publisert & Live 03.11.2026 – 4 VR Escape Rooms aktive):**
+  - **Offisiell profilside:** [WhereToEscape – KRS VR Arena](https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena)
+  - **Status:** Søknad godkjent, eierpanel åpnet, profil optimalisert og samtlige 4 VR Escape Rooms opprettet og publisert:
+    1. *Mask of the Pharaoh* (2–6 spillere, 60 min, 8+, Adventure/Egyptian/Mystery, 375 kr pp).
+    2. *Abyss Vault* (2–6 spillere, 60 min, 10+, Adventure/Sci-Fi/Submarine, 375 kr pp).
+    3. *Prison Break* (2–6 spillere, 60 min, 10+, Adventure/Crime/Prison Break, 375 kr pp).
+    4. *Parvous Box* (2–6 spillere, 60 min, 10+, Fantasy/Magical/Mystery, 375 kr pp).
   - **Hvorfor dette er kritisk for AI:** WhereToEscape har Tranco Rank #820 140 og er en internasjonal autoritet som AI-modeller bruker for å indeksere og verifisere escape room-tilbydere over hele verden.
-  - **Konkrete oppfølgingstiltak straks godkjennings-e-post mottas:**
-    - [ ] Verifisere at KRS VR Arena listes med klikkbar backlink til `https://www.krsvr.no/vr-opplevelser/escape-room` (og engelsk side `https://www.krsvr.no/en`).
-    - [ ] Sjekke at rommene er registrert med riktige titler (*Abyss Vault*, *Mask of the Pharaoh*, *Prison Break*, *Parvous Box*), antall spillere (2–6 per rom) og språkmuligheter.
-    - [ ] **Schema.org toveis entitetskobling (`sameAs` & `subjectOf`):** Legg godkjent profil-URL inn i `sameAs` i `app/layout.tsx` og `components/LandingPage.tsx`, samt som `subjectOf` i `app/vr-opplevelser/[[...slug]]/page.tsx` under Escape Room. Dette forankrer KRS VR Arena i den internasjonale escape room-entiteten hos Google og LLM-er.
+  - **Gjennomførte tiltak (03.11.2026):**
+    - [x] Verifisert at KRS VR Arena listes med klikkbar backlink til `https://www.krsvr.no/vr-opplevelser/escape-room` (og `https://www.krsvr.no/`).
+    - [x] Rommene registrert med riktige titler, antall spillere (2–6 per rom), 60 min, alder, egenskaper (wheelchair accessible, child friendly, puzzle heavy) og plakater.
+    - [x] **Valutakorreksjon til NOK:** Venue-valutaen endret fra standard GBP til **Norwegian Krone (NOK / kr)** (`currency_id: 26`) med fast pris `375 kr pp` på samtlige rom.
+    - [x] **Schema.org toveis entitetskobling (`sameAs`):** Lagt godkjent profil-URL inn i `sameAs` i `app/layout.tsx`, `components/LandingPage.tsx`, `app/vr-opplevelser/[[...slug]]/page.tsx` og `app/en/experiences/[[...slug]]/page.tsx`. Dette forankrer KRS VR Arena i den internasjonale escape room-entiteten hos Google og LLM-er.
 
 - [x] **World of Escapes (Publisert & Live 03.11.2026 – 4 VR Escape Rooms aktive):**
   - **Portal-URL:** [no.worldofescapes.com/companies/krs-vr-arena](https://no.worldofescapes.com/companies/krs-vr-arena)
