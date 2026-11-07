@@ -4,6 +4,7 @@ import {
   getVippsAccessToken,
   ensureVippsCaptured,
   confirmPaidVippsBookingAtomically,
+  recordVippsRefundAtomically,
 } from '@/lib/vipps';
 
 export const dynamic = 'force-dynamic';
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
 
       const eventName = String(event.name || event.eventName || 'vipps_webhook').toUpperCase();
 
+      // Raw technical webhook events belong ONLY in WebhookLog — never in Receipt!
       await prisma.webhookLog
         .create({
           data: {
@@ -74,40 +76,34 @@ export async function POST(req: Request) {
       try {
         const summary = await ensureVippsCaptured(reference, globalAccessToken);
 
-        // 1. Fully refunded on Vipps
-        if (summary.normalizedStatus === 'REFUNDED') {
-          const existingRefundReceipt = await prisma.receipt.findFirst({
-            where: { bookingId: booking.id, status: 'REFUNDED' },
-          });
-
-          if (!existingRefundReceipt) {
-            await prisma.receipt.create({
-              data: {
-                bookingId: booking.id,
-                amount: -(summary.refundedOre / 100),
-                status: 'REFUNDED',
-                paymentRef: reference,
-                type: 'refund',
-              },
-            });
-          }
-
-          await prisma.booking.update({
-            where: { id: booking.id },
-            data: {
-              status: 'cancelled',
-              amountPaid: 0,
-            },
-          });
-          continue;
-        }
-
-        // 2. Genuinely PAID & CAPTURED on Vipps (`aggregate.capturedAmount.value > 0`)
-        if (summary.normalizedStatus === 'CAPTURED' && summary.capturedOre > 0) {
+        // 1. Genuinely PAID & CAPTURED on Vipps (`aggregate.capturedAmount.value > 0`)
+        if (summary.capturedOre > 0 && summary.netCapturedOre > 0) {
           await confirmPaidVippsBookingAtomically({
             bookingId: booking.id,
             vippsRef: reference,
             capturedOre: summary.capturedOre,
+            netCapturedOre: summary.netCapturedOre,
+          });
+
+          // If a partial refund also occurred on Vipps, ensure its credit note delta is recorded
+          if (summary.refundedOre > 0) {
+            await recordVippsRefundAtomically({
+              bookingId: booking.id,
+              vippsRef: reference,
+              capturedOre: summary.capturedOre,
+              refundedOre: summary.refundedOre,
+            });
+          }
+          continue;
+        }
+
+        // 2. Fully refunded on Vipps (`capturedOre > 0` and `refundedOre >= capturedOre`)
+        if (summary.normalizedStatus === 'REFUNDED' && summary.refundedOre > 0) {
+          await recordVippsRefundAtomically({
+            bookingId: booking.id,
+            vippsRef: reference,
+            capturedOre: summary.capturedOre,
+            refundedOre: summary.refundedOre,
           });
           continue;
         }
@@ -117,35 +113,15 @@ export async function POST(req: Request) {
           continue;
         }
 
-        // 3. Payment attempt failed, expired, or was aborted by customer WITHOUT paying (`capturedOre === 0`)
+        // 3. Payment attempt failed, expired, or was aborted by customer WITHOUT paying (`capturedOre === 0`).
+        // IMPORTANT ACCOUNTING RULE: Never write EXPIRED / ABORTED / CANCELLED / CREATED / AUTHORIZED
+        // to `Receipt` — `Receipt` strictly holds completed Vipps sales (`CAPTURED`) and credit notes (`REFUNDED`).
         if (
           summary.normalizedStatus === 'EXPIRED' ||
           summary.normalizedStatus === 'ABORTED' ||
           summary.normalizedStatus === 'CANCELLED'
         ) {
-          const existingFailedReceipt = await prisma.receipt.findFirst({
-            where: {
-              bookingId: booking.id,
-              paymentRef: reference,
-              status: summary.normalizedStatus,
-            },
-          });
-
-          if (!existingFailedReceipt) {
-            await prisma.receipt.create({
-              data: {
-                bookingId: booking.id,
-                amount: 0,
-                status: summary.normalizedStatus,
-                paymentRef: reference,
-                type: 'payment',
-              },
-            });
-          }
-
-          // IMPORTANT: Only cancel if booking is still `pending` (unconfirmed).
-          // Never overwrite an already `confirmed` booking, and NEVER send a cancellation
-          // or confirmation email for an uncompleted Vipps checkout!
+          // Only cancel if booking is still `pending` (unconfirmed).
           await prisma.booking.updateMany({
             where: {
               id: booking.id,
@@ -157,36 +133,6 @@ export async function POST(req: Request) {
             },
           });
           continue;
-        }
-
-        // 4. `AUTHORIZED` (if auto-capture somehow didn't complete yet) or `CREATED`
-        if (summary.normalizedStatus === 'AUTHORIZED' || summary.normalizedStatus === 'CREATED') {
-          // Never insert a lower-priority receipt if CAPTURED already exists
-          const alreadyCaptured = await prisma.receipt.findFirst({
-            where: { bookingId: booking.id, status: 'CAPTURED' },
-          });
-
-          if (!alreadyCaptured) {
-            const existingStateReceipt = await prisma.receipt.findFirst({
-              where: {
-                bookingId: booking.id,
-                paymentRef: reference,
-                status: summary.normalizedStatus,
-              },
-            });
-
-            if (!existingStateReceipt) {
-              await prisma.receipt.create({
-                data: {
-                  bookingId: booking.id,
-                  amount: summary.amountOre / 100,
-                  status: summary.normalizedStatus,
-                  paymentRef: event.pspReference || reference,
-                  type: 'payment',
-                },
-              });
-            }
-          }
         }
       } catch (verifyErr) {
         console.error(`Feil ved verifisering av Vipps-betaling i webhook for ${reference}:`, verifyErr);

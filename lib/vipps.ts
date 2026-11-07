@@ -211,74 +211,92 @@ export async function ensureVippsCaptured(
 
 /**
  * Atomically transitions a booking to `confirmed` ONLY when `capturedOre > 0` has been
- * verified against Vipps. Guarantees:
+ * verified against Vipps, and creates AT MOST ONE `CAPTURED` accounting voucher in `Receipt`.
+ *
+ * Uses a PostgreSQL row-level `FOR UPDATE` lock on `Booking` inside an interactive transaction so
+ * concurrent calls (e.g. Vipps webhook + `/api/booking/verify` arriving simultaneously) serialize:
  * - Never confirms an unpaid booking.
+ * - Never creates duplicate `CAPTURED` receipts for the same booking.
  * - Never reverts an already `confirmed` booking back to `pending`.
- * - Sends customer confirmation + admin notification emails AT MOST ONCE, even when
- *   webhook and return-page verification execute simultaneously.
+ * - Sends customer confirmation + admin notification emails AT MOST ONCE.
  */
 export async function confirmPaidVippsBookingAtomically(params: {
   bookingId: string;
   vippsRef: string;
   capturedOre: number;
+  netCapturedOre?: number;
 }) {
-  const { bookingId, vippsRef, capturedOre } = params;
+  const { bookingId, vippsRef, capturedOre, netCapturedOre } = params;
 
   if (capturedOre <= 0) {
     throw new Error(`Refusing to confirm booking ${bookingId}: capturedOre is ${capturedOre}`);
   }
 
-  const capturedNok = capturedOre / 100;
+  const capturedNok = Number((capturedOre / 100).toFixed(2));
+  const effectivePaidNok =
+    netCapturedOre !== undefined ? Number((netCapturedOre / 100).toFixed(2)) : capturedNok;
 
-  // 1. Ensure a single CAPTURED receipt exists for this booking
-  try {
-    const existingCapturedReceipt = await prisma.receipt.findFirst({
-      where: { bookingId, status: 'CAPTURED' },
+  const { newlyConfirmed } = await prisma.$transaction(async (tx) => {
+    // Serialize concurrent webhook + return-page verification for this booking
+    await tx.$queryRaw`SELECT id FROM "Booking" WHERE id = ${bookingId} FOR UPDATE`;
+
+    const currentBooking = await tx.booking.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!currentBooking) {
+      throw new Error(`Booking ${bookingId} not found`);
+    }
+
+    // 1. Ensure strictly ONE CAPTURED webshop receipt exists for this booking
+    const existingCapturedReceipt = await tx.receipt.findFirst({
+      where: {
+        bookingId,
+        status: 'CAPTURED',
+        type: 'payment',
+      },
     });
 
     if (!existingCapturedReceipt) {
-      await prisma.receipt.create({
+      await tx.receipt.create({
         data: {
           bookingId,
           amount: capturedNok,
+          currency: 'NOK',
           status: 'CAPTURED',
           paymentRef: vippsRef,
           type: 'payment',
         },
       });
     }
-  } catch (err) {
-    console.error('Failed to ensure CAPTURED receipt:', err);
-  }
 
-  // 2. Atomic DB state transition: only ONE concurrent caller gets count === 1
-  const transition = await prisma.booking.updateMany({
-    where: {
-      id: bookingId,
-      status: { not: 'confirmed' },
-    },
-    data: {
-      status: 'confirmed',
-      amountPaid: capturedNok,
-      paymentRef: vippsRef,
-    },
+    // 2. Transition booking state if not yet confirmed
+    const wasConfirmed = currentBooking.status === 'confirmed';
+
+    if (!wasConfirmed) {
+      await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          status: 'confirmed',
+          amountPaid: effectivePaidNok,
+          paymentRef: vippsRef,
+        },
+      });
+    } else if (
+      (currentBooking.amountPaid || 0) < effectivePaidNok ||
+      !currentBooking.paymentRef
+    ) {
+      await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          amountPaid: effectivePaidNok,
+          paymentRef: vippsRef,
+        },
+      });
+    }
+
+    return { newlyConfirmed: !wasConfirmed };
   });
-
-  const newlyConfirmed = transition.count === 1;
-
-  if (!newlyConfirmed) {
-    // Booking was already confirmed; ensure amountPaid and paymentRef are accurate without altering status
-    await prisma.booking.updateMany({
-      where: {
-        id: bookingId,
-        OR: [{ amountPaid: { lt: capturedNok } }, { paymentRef: null }],
-      },
-      data: {
-        amountPaid: capturedNok,
-        paymentRef: vippsRef,
-      },
-    });
-  }
 
   const confirmedBooking = await prisma.booking.findUnique({
     where: { id: bookingId },
@@ -345,4 +363,97 @@ export async function confirmPaidVippsBookingAtomically(params: {
   }
 
   return { booking: confirmedBooking, newlyConfirmed };
+}
+
+/**
+ * Atomically records a genuine Vipps refund (credit note) in `Receipt` without risking
+ * duplicate credit notes when `/api/vipps/refund` and `/api/vipps/callback` both fire.
+ * Compares authoritative cumulative `refundedOre` from Vipps against already-recorded
+ * `REFUNDED` vouchers for this booking, and only creates a credit note for the unrecorded delta.
+ */
+export async function recordVippsRefundAtomically(params: {
+  bookingId: string;
+  vippsRef: string;
+  capturedOre: number;
+  refundedOre: number;
+}) {
+  const { bookingId, vippsRef, capturedOre, refundedOre } = params;
+
+  if (refundedOre <= 0) {
+    return { createdReceipt: null };
+  }
+
+  const totalRefundedNok = Number((refundedOre / 100).toFixed(2));
+  const netPaidNok = Math.max(0, Number(((capturedOre - refundedOre) / 100).toFixed(2)));
+
+  return await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM "Booking" WHERE id = ${bookingId} FOR UPDATE`;
+
+    const currentBooking = await tx.booking.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!currentBooking) {
+      return { createdReceipt: null };
+    }
+
+    // If a payment was captured and then immediately refunded before a CAPTURED receipt was stored,
+    // ensure the original CAPTURED sale voucher is also recorded so the ledger nets out accurately.
+    if (capturedOre > 0) {
+      const existingCaptured = await tx.receipt.findFirst({
+        where: { bookingId, status: 'CAPTURED', type: 'payment' },
+      });
+      if (!existingCaptured) {
+        await tx.receipt.create({
+          data: {
+            bookingId,
+            amount: Number((capturedOre / 100).toFixed(2)),
+            currency: 'NOK',
+            status: 'CAPTURED',
+            paymentRef: vippsRef,
+            type: 'payment',
+          },
+        });
+      }
+    }
+
+    const existingRefunds = await tx.receipt.findMany({
+      where: {
+        bookingId,
+        status: 'REFUNDED',
+        type: 'refund',
+      },
+    });
+
+    const alreadyRecordedRefundNok = existingRefunds.reduce(
+      (sum, r) => sum + Math.abs(r.amount || 0),
+      0
+    );
+
+    const deltaRefundNok = Number((totalRefundedNok - alreadyRecordedRefundNok).toFixed(2));
+
+    let createdReceipt = null;
+    if (deltaRefundNok >= 0.01) {
+      createdReceipt = await tx.receipt.create({
+        data: {
+          bookingId,
+          amount: -deltaRefundNok,
+          currency: 'NOK',
+          status: 'REFUNDED',
+          paymentRef: vippsRef,
+          type: 'refund',
+        },
+      });
+    }
+
+    await tx.booking.update({
+      where: { id: bookingId },
+      data: {
+        amountPaid: netPaidNok,
+        status: netPaidNok === 0 ? 'cancelled' : currentBooking.status,
+      },
+    });
+
+    return { createdReceipt };
+  });
 }

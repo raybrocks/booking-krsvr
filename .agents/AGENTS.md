@@ -50,6 +50,7 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - **1. Lint:** Kjør `npm run lint` for å verifisere kodekvalitet. Eventuelle feil eller advarsler skal feilsøkes og rettes automatisk.
    - **2. Build:** Kjør `npm run build` for å sikre at prosjektet bygger og typer uten feil. Eventuelle byggfeil skal rettes opp.
    - **3. Push:** Når alt passerer med null feil, legg til endringer (`git add`), opprett en presis commit-melding og kjør `git push origin main`.
+   - **Unngå unødvendig dobbeltkjøring:** Dersom `npm run lint` og `npm run build` allerede nettopp er kjørt med 0 feil i samme sesjon og **ingen kodefiler er endret siden da**, skal agenten ikke kaste bort tid på å kjøre `lint` og `build` enda en gang når brukeren skriver `lbp`, men gå direkte til `git add`, `git commit` og `git push origin main`.
    - **VIKTIG OM GSC / INDEKSERING:** Kjør **IKKE** `npm run gsc:submit` automatisk ved push! Overdreven innsending av sitemap og re-indeksering kan føre til at Google nedprioriterer eller kvotestenger domenet. GSC-innsending skal **KUN** kjøres når brukeren eksplisitt ber om det (f.eks. «send til gsc» eller «meld inn til google»).
 
 # E-postmaler og Forhåndsvisning
@@ -117,6 +118,20 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - Drikke serveres via våre to forhåndsbestilte barkonsepter (Pakke 1: Øl/cider/mineralvann eller Pakke 2: Vin & bobler).
    - Mat serveres ved at vi koordinerer levering av fersk, varm lokal pizza direkte til partyloungen.
    - **Unntak for barnebursdag:** Ved barnebursdager er det tillatt å ta med egen bursdagskake, godteri, snacks og brus.
+
+# Regnskap, Bokføring og Betalingsflyt (Vipps vs. Kasse/Terminal)
+1. **Streng regnskapsmessig standard for `Receipt`-tabellen (Nettbutikkens bilagsjournal):**
+   - `Receipt`-tabellen i databasen og oversikten under *Transaksjoner / Regnskap* i `/admin` skal **UTELUKKENDE** inneholde reelle, gjennomførte pengebevegelser fra nettbutikken via **Vipps**:
+     1. **Salgskvittering (`status: 'CAPTURED'`, `type: 'payment'`, positivt beløp):** Opprettes kun når betalingen er verifisert trukket (`aggregate.capturedAmount.value > 0`) mot Vipps ePayment API — **maks 1 kvittering per gjennomført trekk** (beskyttet med radlås `FOR UPDATE` i transaksjon mot duplikater).
+     2. **Kreditnota / Refusjon (`status: 'REFUNDED'`, `type: 'refund'`, negativt beløp):** Opprettes kun ved faktisk gjennomført refusjon i Vipps.
+   - Tekniske mellomnivå- og avbruddsstatuser (`CREATED`, `AUTHORIZED`, `EXPIRED`, `ABORTED`, `CANCELLED`, eller beløp `0`) er **ikke** regnskapsbilag og skal **ALDRI** lagres i `Receipt`-tabellen. Slike tekniske hendelser skal kun logges i `WebhookLog`.
+2. **Absolutt skille mellom Nettbutikk (Vipps) og Fysisk Kasse/Terminal (Superb / Kassasystemloven):**
+   - Kjøp som betales fysisk ved oppmøte i arenaens kasse/kortterminal (`paymentType: 'terminal'` eller `'manual'`) bokføres i eget kassasystem (Superb) etter kassasystemloven.
+   - Backend og nettbutikk skal **ALDRI** generere rader i `Receipt`-tabellen for betalinger i kasse/terminal, da dette fører til **dobbeltføring av inntekt** i regnskapet.
+   - Admin-handlingen «Registrer betalt i terminal» (`/api/admin/bookings/[id]/mark-paid`) er kun en operasjonell statusmarkør på selve `Booking`-raden (`amountPaid` og `status: 'confirmed'`) slik at vaktlisten ser at kunden har gjort opp ved oppmøte.
+   - *Merk:* Navnet på kassaleverandøren (Superb) er kun til intern arkitekturforståelse og skal ikke eksponeres i offentlig frontend-kode eller commit-meldinger.
+3. **Ingen ordrebekreftelse før verifisert betaling:**
+   - Ved Vipps-betaling i nettbutikken skal verken kunde-bekreftelse eller admin-varsel om betalt ordre sendes ut før `capturedAmount > 0` er bekreftet direkte mot Vipps API (i Vipps ePayment v1 forblir `state: "AUTHORIZED"` også etter capture, så `aggregate.capturedAmount.value` må alltid sjekkes).
 
 # Leverandørkonfidensialitet og Interne Kilder
 1. **Ingen eksponering av leverandørnavn:** Navn på eksterne plattform- og spill-leverandører (som Spawnpoint) skal ALDRI nevnes eller avsløres i offentlig kildekode, frontend-komponenter, metadata, JSON-LD, sitemap, llms.txt eller commit-meldinger.

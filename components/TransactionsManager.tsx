@@ -35,7 +35,14 @@ export default function TransactionsManager() {
 
       if (receiptsRes.ok) {
         const fetchedReceipts = await receiptsRes.json();
-        const data = fetchedReceipts.map((r: any) => {
+        const validAccountingReceipts = fetchedReceipts.filter(
+          (r: any) =>
+            (r.status === 'CAPTURED' || r.status === 'REFUNDED') &&
+            r.type !== 'terminal' &&
+            !String(r.paymentRef || '').startsWith('terminal-') &&
+            Number(r.amount) !== 0
+        );
+        const data = validAccountingReceipts.map((r: any) => {
           const createdAtDate = r.createdAt ? new Date(r.createdAt) : new Date();
           const isRefund = r.type === 'refund' || r.amount < 0 || r.status === 'REFUNDED';
           
@@ -145,9 +152,7 @@ export default function TransactionsManager() {
     const totalExVat = amountVal / (1 + vatRate);
     const vatAmount = amountVal - totalExVat;
 
-    const betalingsform = (selectedTx.paymentType === 'vipps' || selectedTx.paymentType === 'reservation' || selectedTx.paymentType === 'full') 
-      ? 'Vipps' 
-      : (selectedTx.paymentType === 'terminal' ? 'Kortterminal (Oppmøte)' : (selectedTx.paymentType === 'manual' || selectedTx.paymentType === 'system' ? 'Manuell / Oppmøte' : (selectedTx.paymentType || 'Vipps')));
+    const betalingsform = 'Vipps (Nettbutikk)';
 
     return (
       <div className="bg-white text-black font-mono text-sm max-w-sm mx-auto shadow-md p-8 print:shadow-none print:p-0 print:max-w-none">
@@ -274,7 +279,7 @@ export default function TransactionsManager() {
           <span className="text-[#9C39FF] text-xs font-bold">i</span>
         </div>
         <p>
-          Her finner du alle individuelle transaksjoner og kvitteringer fra nettbookingen. Hvert kjøp genererer en <strong>salgskvittering</strong>, og hver refusjon genererer en separat <strong>kreditnota</strong> for regnskapet.
+          Her finner du kun bokføringspliktige <strong>salgskvitteringer</strong> og <strong>kreditnotaer</strong> fra faktiske Vipps-betalinger i nettbutikken. Kjøp betalt fysisk i kasse/kortterminal ved oppmøte bokføres direkte i kassasystemet etter kassasystemloven og skal ikke dobbeltføres her.
         </p>
       </div>
 

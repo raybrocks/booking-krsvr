@@ -28,21 +28,11 @@ export async function POST(
       include: { experience: true }
     });
 
-    // Create receipt record for transaction history
-    try {
-      await prisma.receipt.create({
-        data: {
-          bookingId: id,
-          amount: totalPrice,
-          currency: 'NOK',
-          status: 'CAPTURED',
-          paymentRef: `terminal-${id}-${Date.now()}`,
-          type: 'terminal',
-        }
-      });
-    } catch (receiptError) {
-      console.error('Failed to create receipt for terminal mark-paid:', receiptError);
-    }
+    // VIKTIG REGNSKAPSREGEL:
+    // Betalinger i fysisk kasse/kortterminal ved oppmøte bokføres direkte i kassasystemet
+    // etter kassasystemloven. Vi skal ALDRI opprette en rad i `Receipt`-tabellen her,
+    // da `Receipt` utelukkende er nettbutikkens bilagsjournal for faktiske Vipps-transaksjoner
+    // (ellers oppstår dobbeltføring av omsetning i regnskapet).
 
     return NextResponse.json({
       success: true,

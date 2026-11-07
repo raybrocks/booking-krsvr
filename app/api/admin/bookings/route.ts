@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 export async function GET(req: NextRequest) {
   try {
-    const [bookings, receipts] = await Promise.all([
+    const [bookings, receipts, webhookLogs] = await Promise.all([
       prisma.booking.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
@@ -14,12 +14,23 @@ export async function GET(req: NextRequest) {
         }
       }),
       prisma.receipt.findMany({
+        where: {
+          status: { in: ['CAPTURED', 'REFUNDED'] },
+          type: { in: ['payment', 'refund'] },
+          NOT: { paymentRef: { startsWith: 'terminal-' } },
+        },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.webhookLog.findMany({
+        select: {
+          reference: true,
+          event: true,
+        },
         orderBy: { createdAt: 'desc' }
       })
     ]);
 
-    // Group all receipts per bookingId / paymentRef so out-of-order webhooks
-    // (e.g. an AUTHORIZED or CREATED log arriving after CAPTURED) never mask a CAPTURED state.
+    // Group accounting receipts per bookingId / paymentRef
     const receiptsByKey = new Map<string, typeof receipts>();
     const pushReceipt = (key: string, r: typeof receipts[0]) => {
       const list = receiptsByKey.get(key) || [];
@@ -32,12 +43,24 @@ export async function GET(req: NextRequest) {
       if (r.paymentRef && r.paymentRef !== r.bookingId) pushReceipt(r.paymentRef, r);
     });
 
+    // Group technical Vipps webhook events per reference for uncaptured/failed payment diagnostics
+    const eventsByRef = new Map<string, string[]>();
+    webhookLogs.forEach((w) => {
+      if (!w.reference) return;
+      const list = eventsByRef.get(w.reference) || [];
+      list.push((w.event || '').toUpperCase());
+      eventsByRef.set(w.reference, list);
+    });
+
     // Formatting for frontend compatibility
     const formattedBookings = bookings.map((b) => {
       const bookingReceipts = [
         ...(receiptsByKey.get(b.id) || []),
         ...(b.paymentRef && b.paymentRef !== b.id ? receiptsByKey.get(b.paymentRef) || [] : []),
       ];
+
+      const activeRef = b.paymentRef || b.id;
+      const refEvents = eventsByRef.get(activeRef) || [];
 
       let vippsStatus: string | null = null;
       let vippsAmount = 0;
@@ -48,18 +71,17 @@ export async function GET(req: NextRequest) {
       const capturedReceipt = bookingReceipts.find(
         (r) => (r.status || '').toUpperCase() === 'CAPTURED'
       );
-      const authorizedReceipt = bookingReceipts.find((r) => {
-        const s = (r.status || '').toUpperCase();
-        return s === 'AUTHORIZED' || s.includes('RESERVED');
-      });
-      const failedReceipt = bookingReceipts.find((r) =>
-        ['EXPIRED', 'ABORTED', 'CANCELLED', 'TERMINATED'].includes((r.status || '').toUpperCase())
+
+      const hasAuthorizedWebhook = refEvents.some((ev) => ev.includes('AUTHORIZED'));
+      const failedWebhookEvent = refEvents.find((ev) =>
+        ev.includes('EXPIRED') ||
+        ev.includes('ABORTED') ||
+        ev.includes('CANCELLED') ||
+        ev.includes('TERMINATED') ||
+        ev.includes('ADMIN_CANCEL_RESERVATION')
       );
 
-      if (refundReceipt && (b.amountPaid || 0) === 0) {
-        vippsStatus = 'REFUNDED';
-        vippsAmount = Math.round(Math.abs(refundReceipt.amount) * 100);
-      } else if (b.paymentType === 'terminal') {
+      if (b.paymentType === 'terminal') {
         if ((b.amountPaid || 0) >= (b.totalPrice || 0) && (b.totalPrice || 0) > 0) {
           vippsStatus = 'TERMINAL_BETALT';
           vippsAmount = Math.round((b.amountPaid || 0) * 100);
@@ -67,6 +89,9 @@ export async function GET(req: NextRequest) {
           vippsStatus = 'TERMINAL_VENTER';
           vippsAmount = 0;
         }
+      } else if (refundReceipt && (b.amountPaid || 0) === 0) {
+        vippsStatus = 'REFUNDED';
+        vippsAmount = Math.round(Math.abs(refundReceipt.amount) * 100);
       } else if (capturedReceipt) {
         vippsStatus = 'CAPTURED';
         vippsAmount = Math.round(capturedReceipt.amount * 100);
@@ -74,11 +99,13 @@ export async function GET(req: NextRequest) {
         if (b.status === 'confirmed' && (b.amountPaid || 0) > 0) {
           vippsStatus = 'CAPTURED';
           vippsAmount = Math.round((b.amountPaid || 0) * 100);
-        } else if (authorizedReceipt && b.status !== 'cancelled') {
+        } else if (hasAuthorizedWebhook && !failedWebhookEvent && b.status !== 'cancelled') {
           vippsStatus = 'AUTHORIZED';
-          vippsAmount = Math.round(authorizedReceipt.amount * 100);
-        } else if (b.status === 'cancelled' || failedReceipt) {
-          vippsStatus = failedReceipt ? failedReceipt.status.toUpperCase() : 'CANCELLED';
+          vippsAmount = Math.round((b.totalPrice || 0) * 100);
+        } else if (b.status === 'cancelled' || failedWebhookEvent) {
+          if (failedWebhookEvent?.includes('EXPIRED')) vippsStatus = 'EXPIRED';
+          else if (failedWebhookEvent?.includes('ABORTED')) vippsStatus = 'ABORTED';
+          else vippsStatus = 'CANCELLED';
           vippsAmount = 0;
         } else {
           vippsStatus = 'VENTER_PAA_BETALING';

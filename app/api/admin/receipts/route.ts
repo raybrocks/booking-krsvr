@@ -6,8 +6,19 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const limit = searchParams.get('limit');
 
+    // STRICT ACCOUNTING FILTER:
+    // Only return genuine completed Vipps webshop vouchers (`CAPTURED` sales and `REFUNDED` credit notes).
+    // Terminal/POS payments are booked in the physical POS register under Kassasystemloven and
+    // intermediate webhook states (`CREATED`, `AUTHORIZED`, `EXPIRED`, `ABORTED`, `CANCELLED`)
+    // belong exclusively in `WebhookLog`.
     const [receipts, bookings] = await Promise.all([
       prisma.receipt.findMany({
+        where: {
+          status: { in: ['CAPTURED', 'REFUNDED'] },
+          type: { in: ['payment', 'refund'] },
+          NOT: { paymentRef: { startsWith: 'terminal-' } },
+          amount: { not: 0 },
+        },
         orderBy: { createdAt: 'desc' },
         take: limit ? parseInt(limit, 10) : undefined
       }),

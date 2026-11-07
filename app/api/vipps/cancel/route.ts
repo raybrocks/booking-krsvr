@@ -56,14 +56,13 @@ export async function POST(req: Request) {
       data: { status: 'cancelled', amountPaid: 0 },
     });
 
-    await prisma.receipt
+    // Log cancellation event to WebhookLog (never to Receipt, as no money was captured/refunded)
+    await prisma.webhookLog
       .create({
         data: {
-          bookingId,
-          amount: 0,
-          status: 'CANCELLED',
-          paymentRef: vippsRef,
-          type: 'payment',
+          reference: vippsRef,
+          event: 'ADMIN_CANCEL_RESERVATION',
+          payload: { bookingId, vippsRef, cancelledAt: new Date().toISOString() },
         },
       })
       .catch(() => {});
