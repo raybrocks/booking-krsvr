@@ -1,72 +1,90 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
+import { prisma } from '@/lib/prisma';
+import { getVippsConfig, getVippsAccessToken } from '@/lib/vipps';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { bookingId, amount, description, phone } = body;
+    const { bookingId, amount, description, phone, locale } = body;
 
-    if (!bookingId || !amount) {
+    if (!bookingId || !amount || Number(amount) <= 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const isTest = process.env.VIPPS_ENV !== 'production';
-    const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
-    
-    const clientId = process.env.VIPPS_CLIENT_ID;
-    const clientSecret = process.env.VIPPS_CLIENT_SECRET;
-    const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
-    const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
-    const protocol = req.headers.get('x-forwarded-proto') || 'https';
-    const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
-    
-    let appBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || (host ? `${protocol}://${host}` : 'https://www.krsvr.no');
-    
-    // Standardiser til https://www.krsvr.no for a unnga 307-redirects
-    appBaseUrl = appBaseUrl.replace(/\/$/, "");
-    if (appBaseUrl === 'https://krsvr.no' || appBaseUrl === 'http://krsvr.no') {
-      appBaseUrl = 'https://www.krsvr.no';
-    }
-    
-    // Vipps requires HTTPS. Force it. 
-    // Note: If running locally without ngrok/https, Vipps callbacks won't reach localhost anyway.
-    if (appBaseUrl.startsWith('http://')) {
-      appBaseUrl = appBaseUrl.replace('http://', 'https://');
-    }
-    
-    // Vipps requires valid DNS. If host is localhost, dummy it out for dev.
-    if (appBaseUrl.includes('localhost')) {
-        appBaseUrl = 'https://www.krsvr.no';
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (!clientId || !clientSecret || !subscriptionKey || !merchantSerialNumber) {
+    if (booking.status === 'confirmed' && (booking.amountPaid || 0) > 0) {
+      return NextResponse.json({ error: 'Booking is already paid and confirmed' }, { status: 409 });
+    }
+
+    let config;
+    try {
+      config = getVippsConfig();
+    } catch {
       console.error('Missing Vipps credentials in environment variables');
       return NextResponse.json({ error: 'Payment gateway configuration error' }, { status: 500 });
     }
 
-    // 1. Get Access Token
-    const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
-      method: 'POST',
-      headers: {
-        'client_id': clientId,
-        'client_secret': clientSecret,
-        'Ocp-Apim-Subscription-Key': subscriptionKey,
-      },
-    });
+    const { baseUrl, clientId, clientSecret, subscriptionKey, merchantSerialNumber } = config;
 
-    if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
-      console.error('Vipps Token Error:', errorText);
+    const protocol = req.headers.get('x-forwarded-proto') || 'https';
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
 
-      let errorMessage = 'Failed to authenticate with payment gateway';
-      if (errorText.includes('AADSTS700016')) {
-        errorMessage = 'Invalid Vipps credentials for the current environment. If you are using Production keys, make sure to set VIPPS_ENV=production in your environment variables. Currently pointing to: ' + baseUrl;
-      }
+    let appBaseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL || (host ? `${protocol}://${host}` : 'https://www.krsvr.no');
 
-      return NextResponse.json({ error: errorMessage, details: errorText }, { status: 500 });
+    // Standardiser til https://www.krsvr.no for å unngå 307-redirects
+    appBaseUrl = appBaseUrl.replace(/\/$/, '');
+    if (appBaseUrl === 'https://krsvr.no' || appBaseUrl === 'http://krsvr.no') {
+      appBaseUrl = 'https://www.krsvr.no';
+    }
+    if (appBaseUrl.startsWith('http://')) {
+      appBaseUrl = appBaseUrl.replace('http://', 'https://');
+    }
+    if (appBaseUrl.includes('localhost')) {
+      appBaseUrl = 'https://www.krsvr.no';
     }
 
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
+    let accessToken: string;
+    try {
+      accessToken = await getVippsAccessToken();
+    } catch (err: any) {
+      console.error('Vipps Token Error:', err?.message || err);
+      return NextResponse.json(
+        { error: 'Failed to authenticate with payment gateway' },
+        { status: 500 }
+      );
+    }
+
+    // Generate a unique Vipps reference per payment attempt so retries on an expired/aborted
+    // booking slot never collide with a previous Vipps reference.
+    const [priorReceiptsCount, priorWebhooksCount] = await Promise.all([
+      prisma.receipt.count({ where: { OR: [{ bookingId }, { paymentRef: bookingId }] } }),
+      prisma.webhookLog.count({ where: { reference: bookingId } }),
+    ]);
+
+    const hasPriorVippsAttempt =
+      Boolean(booking.paymentRef) || priorReceiptsCount > 0 || priorWebhooksCount > 0;
+
+    const vippsReference = hasPriorVippsAttempt
+      ? `${bookingId}-${crypto.randomBytes(2).toString('hex')}`.slice(0, 50)
+      : bookingId;
+
+    // Persist the active Vipps reference and keep amountPaid = 0 until capture is verified
+    await prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        paymentRef: vippsReference,
+        amountPaid: 0,
+      },
+    });
 
     // Formater telefonnummer for Vipps (MSISDN: 47xxxxxxxx)
     let customerObj: { phoneNumber: string } | undefined = undefined;
@@ -85,24 +103,24 @@ export async function POST(req: Request) {
       }
     }
 
-    // 2. Create ePayment Session
-    // Vipps expects amount in ore (1 NOK = 100 ore)
-    const amountInOre = Math.round(amount * 100);
+    // Vipps expects amount in øre (1 NOK = 100 øre)
+    const amountInOre = Math.round(Number(amount) * 100);
+    const langSuffix = locale === 'en' || booking.locale === 'en' ? '&lang=en' : '';
 
     const epaymentResponse = await fetch(`${baseUrl}/epayment/v1/payments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'client_id': clientId,
-        'client_secret': clientSecret,
+        client_id: clientId,
+        client_secret: clientSecret,
         'Ocp-Apim-Subscription-Key': subscriptionKey,
         'Merchant-Serial-Number': merchantSerialNumber,
-        'Authorization': `Bearer ${accessToken}`,
-        'Idempotency-Key': bookingId,
+        Authorization: `Bearer ${accessToken}`,
+        'Idempotency-Key': vippsReference,
         'Vipps-System-Name': 'KrsVRArena',
         'Vipps-System-Version': '1.0.0',
         'Vipps-System-Plugin-Name': 'KrsVRArena-Checkout',
-        'Vipps-System-Plugin-Version': '1.0.0'
+        'Vipps-System-Plugin-Version': '1.0.0',
       },
       body: JSON.stringify({
         amount: {
@@ -110,26 +128,30 @@ export async function POST(req: Request) {
           value: amountInOre,
         },
         paymentMethod: {
-          type: 'WALLET'
+          type: 'WALLET',
         },
         ...(customerObj ? { customer: customerObj } : {}),
-        reference: bookingId,
+        reference: vippsReference,
         userFlow: 'WEB_REDIRECT',
-        returnUrl: `${appBaseUrl}/checkout/return?reference=${bookingId}`,
-        paymentDescription: description || ('VR Booking - ' + bookingId),
+        returnUrl: `${appBaseUrl}/checkout/return?reference=${bookingId}${langSuffix}`,
+        paymentDescription: description || `VR Booking - ${bookingId}`,
       }),
     });
 
     if (!epaymentResponse.ok) {
       const errorText = await epaymentResponse.text();
-      return NextResponse.json({ error: 'Failed to create payment session', details: errorText }, { status: 500 });
+      console.error('Vipps create payment error:', errorText);
+      return NextResponse.json(
+        { error: 'Failed to create payment session', details: errorText },
+        { status: 500 }
+      );
     }
 
     const paymentData = await epaymentResponse.json();
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       checkoutUrl: paymentData.redirectUrl,
-      token: paymentData.reference 
+      token: paymentData.reference,
     });
   } catch (error) {
     console.error('Vipps API Route Error:', error);

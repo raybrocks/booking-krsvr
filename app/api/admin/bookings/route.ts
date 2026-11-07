@@ -18,44 +18,73 @@ export async function GET(req: NextRequest) {
       })
     ]);
 
-    // Create lookup map for latest receipt per bookingId / paymentRef
-    const receiptMap = new Map<string, typeof receipts[0]>();
+    // Group all receipts per bookingId / paymentRef so out-of-order webhooks
+    // (e.g. an AUTHORIZED or CREATED log arriving after CAPTURED) never mask a CAPTURED state.
+    const receiptsByKey = new Map<string, typeof receipts>();
+    const pushReceipt = (key: string, r: typeof receipts[0]) => {
+      const list = receiptsByKey.get(key) || [];
+      list.push(r);
+      receiptsByKey.set(key, list);
+    };
+
     receipts.forEach((r) => {
-      if (r.bookingId && !receiptMap.has(r.bookingId)) {
-        receiptMap.set(r.bookingId, r);
-      }
-      if (r.paymentRef && !receiptMap.has(r.paymentRef)) {
-        receiptMap.set(r.paymentRef, r);
-      }
+      if (r.bookingId) pushReceipt(r.bookingId, r);
+      if (r.paymentRef && r.paymentRef !== r.bookingId) pushReceipt(r.paymentRef, r);
     });
 
     // Formatting for frontend compatibility
-    const formattedBookings = bookings.map(b => {
-      const receipt = receiptMap.get(b.id) || (b.paymentRef ? receiptMap.get(b.paymentRef) : null);
-      
-      let vippsStatus: string | null = null;
-      let vippsAmount: number = 0;
+    const formattedBookings = bookings.map((b) => {
+      const bookingReceipts = [
+        ...(receiptsByKey.get(b.id) || []),
+        ...(b.paymentRef && b.paymentRef !== b.id ? receiptsByKey.get(b.paymentRef) || [] : []),
+      ];
 
-      if (receipt) {
-        vippsStatus = receipt.status;
-        vippsAmount = Math.round(receipt.amount * 100);
+      let vippsStatus: string | null = null;
+      let vippsAmount = 0;
+
+      const refundReceipt = bookingReceipts.find((r) =>
+        (r.status || '').toUpperCase().includes('REFUND')
+      );
+      const capturedReceipt = bookingReceipts.find(
+        (r) => (r.status || '').toUpperCase() === 'CAPTURED'
+      );
+      const authorizedReceipt = bookingReceipts.find((r) => {
+        const s = (r.status || '').toUpperCase();
+        return s === 'AUTHORIZED' || s.includes('RESERVED');
+      });
+      const failedReceipt = bookingReceipts.find((r) =>
+        ['EXPIRED', 'ABORTED', 'CANCELLED', 'TERMINATED'].includes((r.status || '').toUpperCase())
+      );
+
+      if (refundReceipt && (b.amountPaid || 0) === 0) {
+        vippsStatus = 'REFUNDED';
+        vippsAmount = Math.round(Math.abs(refundReceipt.amount) * 100);
       } else if (b.paymentType === 'terminal') {
-        if (b.amountPaid >= b.totalPrice && b.totalPrice > 0) {
+        if ((b.amountPaid || 0) >= (b.totalPrice || 0) && (b.totalPrice || 0) > 0) {
           vippsStatus = 'TERMINAL_BETALT';
           vippsAmount = Math.round((b.amountPaid || 0) * 100);
         } else {
           vippsStatus = 'TERMINAL_VENTER';
           vippsAmount = 0;
         }
+      } else if (capturedReceipt) {
+        vippsStatus = 'CAPTURED';
+        vippsAmount = Math.round(capturedReceipt.amount * 100);
       } else if (['reservation', 'full', 'vipps'].includes(b.paymentType)) {
-        if (b.amountPaid > 0 || b.status === 'confirmed') {
+        if (b.status === 'confirmed' && (b.amountPaid || 0) > 0) {
           vippsStatus = 'CAPTURED';
           vippsAmount = Math.round((b.amountPaid || 0) * 100);
-        } else if (b.status === 'pending') {
+        } else if (authorizedReceipt && b.status !== 'cancelled') {
+          vippsStatus = 'AUTHORIZED';
+          vippsAmount = Math.round(authorizedReceipt.amount * 100);
+        } else if (b.status === 'cancelled' || failedReceipt) {
+          vippsStatus = failedReceipt ? failedReceipt.status.toUpperCase() : 'CANCELLED';
+          vippsAmount = 0;
+        } else {
           vippsStatus = 'VENTER_PAA_BETALING';
           vippsAmount = 0;
         }
-      } else if (['manual', 'system'].includes(b.paymentType) || b.amountPaid === 0) {
+      } else if (['manual', 'system'].includes(b.paymentType) || (b.amountPaid || 0) === 0) {
         vippsStatus = 'MANUELL';
         vippsAmount = 0;
       }

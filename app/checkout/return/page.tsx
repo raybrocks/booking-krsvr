@@ -66,16 +66,21 @@ function CheckoutReturnContent() {
       <div className="flex flex-col items-center justify-center p-4 text-center py-20">
         <XCircle className="w-16 h-16 text-red-500 mb-6" />
         <h2 className="text-3xl font-light mb-4">
-          {isEn ? "Could not verify booking" : "Kunne ikke verifisere bestilling"}
+          {isEn ? "Payment Not Completed" : "Betalingen ble ikke fullført"}
         </h2>
         <p className="text-zinc-400 mb-8 max-w-md">
           {isEn
-            ? "We could not locate or verify your booking. Please contact us at post@krsvr.no if you have any questions."
-            : "Vi klarte ikke å finne eller verifisere bestillingen din. Ta kontakt med oss på post@krsvr.no dersom du har spørsmål."}
+            ? "The payment was cancelled or could not be verified, so your booking has not been confirmed and no charge was made. You can try booking again below or contact us at post@krsvr.no."
+            : "Betalingen ble avbrutt eller ikke gjennomført i Vipps. Ingen penger er trukket, og bestillingen er ikke bekreftet. Du kan prøve på nytt under, eller ta kontakt på post@krsvr.no."}
         </p>
-        <Button onClick={() => router.push(isEn ? "/en" : "/")} className="bg-zinc-800 hover:bg-zinc-700 text-white rounded-full px-8">
-          {isEn ? "Back to Home" : "Tilbake til forsiden"}
-        </Button>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button onClick={() => router.push(isEn ? "/en/booking" : "/booking")} className="bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full px-8">
+            {isEn ? "Try Booking Again" : "Gå tilbake til booking"}
+          </Button>
+          <Button onClick={() => router.push(isEn ? "/en" : "/")} variant="outline" className="border-zinc-700 hover:bg-zinc-800 text-white rounded-full px-8">
+            {isEn ? "Back to Home" : "Tilbake til forsiden"}
+          </Button>
+        </div>
       </div>
     );
   }

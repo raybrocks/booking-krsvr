@@ -6,6 +6,10 @@ export async function POST(req: Request) {
   try {
     const { bookingId } = await req.json();
 
+    if (!bookingId) {
+      return NextResponse.json({ error: 'Missing bookingId' }, { status: 400 });
+    }
+
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: { experience: true }
@@ -15,60 +19,87 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.amountPaid > 0) {
-      return NextResponse.json({ error: 'Amount is not zero' }, { status: 400 });
+    // SECURITY GUARD: confirm-zero is ONLY allowed for Pay-at-Venue (`terminal`) or
+    // genuine 0 NOK bookings (e.g. 100% discount code). Vipps bookings MUST go through Vipps!
+    const isZeroUpfrontAllowed =
+      booking.paymentType === 'terminal' || (booking.totalPrice || 0) === 0;
+
+    if (!isZeroUpfrontAllowed) {
+      return NextResponse.json(
+        { error: 'Denne bestillingen krever gjennomført Vipps-betaling før bekreftelse.' },
+        { status: 400 }
+      );
     }
 
-    // Mark as confirmed
-    const updatedBooking = await prisma.booking.update({
-      where: { id: bookingId },
-      data: { status: 'confirmed' },
-      include: { experience: true }
+    // Atomic state transition so concurrent calls / refreshes never send duplicate emails
+    const transition = await prisma.booking.updateMany({
+      where: {
+        id: bookingId,
+        status: { not: 'confirmed' },
+      },
+      data: {
+        status: 'confirmed',
+        amountPaid: 0,
+      },
     });
 
-    // Auto-sync customer contact to Resend (Audience + Segment)
-    if (updatedBooking.email) {
-      addContactToNewsletter(
-        updatedBooking.email,
-        updatedBooking.firstName,
-        updatedBooking.lastName
-      ).catch((err) => console.error("Resend sync error on confirm-zero:", err));
+    const updatedBooking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { experience: true },
+    });
+
+    if (!updatedBooking) {
+      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    // Increment discount usage
-    if (booking.discountCode) {
-       try {
+    if (transition.count === 1) {
+      // Auto-sync customer contact to Resend (Audience + Segment)
+      if (updatedBooking.email) {
+        addContactToNewsletter(
+          updatedBooking.email,
+          updatedBooking.firstName,
+          updatedBooking.lastName
+        ).catch((err) => console.error('Resend sync error on confirm-zero:', err));
+      }
+
+      // Increment discount usage once
+      if (updatedBooking.discountCode) {
+        try {
           await prisma.discountCode.update({
-             where: { code: booking.discountCode },
-             data: { usageCount: { increment: 1 } }
+            where: { code: updatedBooking.discountCode },
+            data: { usageCount: { increment: 1 } },
           });
-       } catch (e) {
-          console.error("Failed to increment discount code:", e);
-       }
-    }
+        } catch (e) {
+          console.error('Failed to increment discount code:', e);
+        }
+      }
 
-    // Send confirmation email
-    try {
-      const settingsDoc = await prisma.setting.findUnique({ where: { key: 'general' } });
-      const generalSettings = settingsDoc?.value || { email: 'booking@krsvr.no', phone: '+47 000 00 000' };
-      
-      const experienceData = updatedBooking.experience || {
-         name: 'Valgt VR Opplevelse', 
-         picture: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc07d',
-         age: 'Alle',
-         duration: '1 time'
-      };
-      
-      await sendEmail(
-        updatedBooking.email, 
-        updatedBooking, 
-        experienceData, 
-        generalSettings as any
-      );
-      
-      await sendAdminNewBookingNotification(updatedBooking);
-    } catch (e) {
-       console.error("Failed to send zero confirmation email:", e);
+      // Send confirmation email once
+      try {
+        const settingsDoc = await prisma.setting.findUnique({ where: { key: 'general' } });
+        const generalSettings = settingsDoc?.value || {
+          email: 'post@krsvr.no',
+          phone: '+47 408 28 302',
+        };
+
+        const experienceData = updatedBooking.experience || {
+          name: 'Valgt VR Opplevelse',
+          picture: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc07d',
+          age: 'Alle',
+          duration: '90 min',
+        };
+
+        await sendEmail(
+          updatedBooking.email,
+          updatedBooking,
+          experienceData,
+          generalSettings as any
+        );
+
+        await sendAdminNewBookingNotification(updatedBooking);
+      } catch (e) {
+        console.error('Failed to send zero confirmation email:', e);
+      }
     }
 
     return NextResponse.json({ success: true, booking: updatedBooking });

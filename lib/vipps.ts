@@ -1,0 +1,348 @@
+import { prisma } from '@/lib/prisma';
+
+export type NormalizedVippsStatus =
+  | 'CREATED'
+  | 'AUTHORIZED'
+  | 'CAPTURED'
+  | 'REFUNDED'
+  | 'ABORTED'
+  | 'EXPIRED'
+  | 'CANCELLED'
+  | 'UNKNOWN';
+
+export interface VippsPaymentSummary {
+  reference: string;
+  pspReference?: string;
+  rawState: string;
+  normalizedStatus: NormalizedVippsStatus;
+  amountOre: number;
+  authorizedOre: number;
+  capturedOre: number;
+  refundedOre: number;
+  cancelledOre: number;
+  netCapturedOre: number;
+  remainingCapturableOre: number;
+}
+
+export function getVippsConfig() {
+  const isTest = process.env.VIPPS_ENV !== 'production';
+  const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
+  const clientId = process.env.VIPPS_CLIENT_ID;
+  const clientSecret = process.env.VIPPS_CLIENT_SECRET;
+  const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
+  const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
+
+  if (!clientId || !clientSecret || !subscriptionKey || !merchantSerialNumber) {
+    throw new Error('Missing Vipps credentials in environment variables');
+  }
+
+  return {
+    isTest,
+    baseUrl,
+    clientId,
+    clientSecret,
+    subscriptionKey,
+    merchantSerialNumber,
+  };
+}
+
+export async function getVippsAccessToken(): Promise<string> {
+  const { baseUrl, clientId, clientSecret, subscriptionKey } = getVippsConfig();
+
+  const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
+    method: 'POST',
+    headers: {
+      client_id: clientId,
+      client_secret: clientSecret,
+      'Ocp-Apim-Subscription-Key': subscriptionKey,
+    },
+    cache: 'no-store',
+  });
+
+  if (!tokenResponse.ok) {
+    const errorText = await tokenResponse.text();
+    throw new Error(`Vipps token error (${tokenResponse.status}): ${errorText}`);
+  }
+
+  const tokenData = await tokenResponse.json();
+  if (!tokenData?.access_token) {
+    throw new Error('Vipps token response missing access_token');
+  }
+
+  return tokenData.access_token;
+}
+
+/**
+ * Fetches payment details from Vipps ePayment v1 API and normalizes status.
+ * IMPORTANT: In Vipps ePayment v1, `state` NEVER becomes "CAPTURED" — it stays
+ * "AUTHORIZED" even after 100% capture, while `aggregate.capturedAmount.value`
+ * reflects the actual captured amount in øre.
+ */
+export async function fetchVippsPayment(
+  reference: string,
+  existingToken?: string
+): Promise<VippsPaymentSummary> {
+  const { baseUrl, subscriptionKey, merchantSerialNumber } = getVippsConfig();
+  const accessToken = existingToken || (await getVippsAccessToken());
+
+  const res = await fetch(`${baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Ocp-Apim-Subscription-Key': subscriptionKey,
+      'Merchant-Serial-Number': merchantSerialNumber,
+    },
+    cache: 'no-store',
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Vipps GET payment failed for ${reference} (${res.status}): ${errText}`);
+  }
+
+  const data = await res.json();
+  const rawState = String(data.state || data.status || 'UNKNOWN').toUpperCase();
+  const amountOre = Number(data.amount?.value ?? 0);
+  const authorizedOre = Number(data.aggregate?.authorizedAmount?.value ?? 0);
+  const capturedOre = Number(data.aggregate?.capturedAmount?.value ?? 0);
+  const refundedOre = Number(data.aggregate?.refundedAmount?.value ?? 0);
+  const cancelledOre = Number(data.aggregate?.cancelledAmount?.value ?? 0);
+
+  const netCapturedOre = Math.max(0, capturedOre - refundedOre);
+  const remainingCapturableOre = Math.max(0, authorizedOre - capturedOre - cancelledOre);
+
+  let normalizedStatus: NormalizedVippsStatus = 'UNKNOWN';
+
+  if (capturedOre > 0 && refundedOre >= capturedOre) {
+    normalizedStatus = 'REFUNDED';
+  } else if (capturedOre > 0) {
+    normalizedStatus = 'CAPTURED';
+  } else if (rawState === 'AUTHORIZED' && remainingCapturableOre > 0) {
+    normalizedStatus = 'AUTHORIZED';
+  } else if (rawState === 'EXPIRED') {
+    normalizedStatus = 'EXPIRED';
+  } else if (rawState === 'ABORTED') {
+    normalizedStatus = 'ABORTED';
+  } else if (
+    rawState === 'TERMINATED' ||
+    rawState === 'CANCELLED' ||
+    (authorizedOre > 0 && cancelledOre >= authorizedOre)
+  ) {
+    normalizedStatus = 'CANCELLED';
+  } else if (rawState === 'CREATED') {
+    normalizedStatus = 'CREATED';
+  }
+
+  return {
+    reference,
+    pspReference: data.pspReference,
+    rawState,
+    normalizedStatus,
+    amountOre,
+    authorizedOre,
+    capturedOre,
+    refundedOre,
+    cancelledOre,
+    netCapturedOre,
+    remainingCapturableOre,
+  };
+}
+
+/**
+ * Checks Vipps payment status and automatically captures if currently AUTHORIZED with
+ * remaining capturable balance. Uses a deterministic Idempotency-Key (`autocap-<reference>`)
+ * so concurrent webhook + return-URL calls never collide, and always re-verifies
+ * `capturedOre` directly against Vipps API afterwards.
+ */
+export async function ensureVippsCaptured(
+  reference: string,
+  existingToken?: string
+): Promise<VippsPaymentSummary> {
+  const { baseUrl, subscriptionKey, merchantSerialNumber } = getVippsConfig();
+  const accessToken = existingToken || (await getVippsAccessToken());
+
+  const initialSummary = await fetchVippsPayment(reference, accessToken);
+
+  // Already captured (or refunded) — no capture call needed
+  if (initialSummary.capturedOre > 0) {
+    return initialSummary;
+  }
+
+  // Only attempt capture when customer has genuinely AUTHORIZED in Vipps
+  if (initialSummary.normalizedStatus === 'AUTHORIZED' && initialSummary.remainingCapturableOre > 0) {
+    const idempotencyKey = `autocap-${reference}`.slice(0, 50);
+
+    try {
+      const captureRes = await fetch(
+        `${baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}/capture`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+            'Ocp-Apim-Subscription-Key': subscriptionKey,
+            'Merchant-Serial-Number': merchantSerialNumber,
+            'Idempotency-Key': idempotencyKey,
+          },
+          body: JSON.stringify({
+            modificationAmount: {
+              currency: 'NOK',
+              value: initialSummary.remainingCapturableOre,
+            },
+          }),
+          cache: 'no-store',
+        }
+      );
+
+      if (!captureRes.ok) {
+        const errText = await captureRes.text();
+        console.warn(`Vipps auto-capture warning for ${reference} (${captureRes.status}): ${errText}`);
+      }
+    } catch (err) {
+      console.error(`Vipps auto-capture network error for ${reference}:`, err);
+    }
+
+    // Always re-fetch authoritative state from Vipps after capture attempt
+    return await fetchVippsPayment(reference, accessToken);
+  }
+
+  return initialSummary;
+}
+
+/**
+ * Atomically transitions a booking to `confirmed` ONLY when `capturedOre > 0` has been
+ * verified against Vipps. Guarantees:
+ * - Never confirms an unpaid booking.
+ * - Never reverts an already `confirmed` booking back to `pending`.
+ * - Sends customer confirmation + admin notification emails AT MOST ONCE, even when
+ *   webhook and return-page verification execute simultaneously.
+ */
+export async function confirmPaidVippsBookingAtomically(params: {
+  bookingId: string;
+  vippsRef: string;
+  capturedOre: number;
+}) {
+  const { bookingId, vippsRef, capturedOre } = params;
+
+  if (capturedOre <= 0) {
+    throw new Error(`Refusing to confirm booking ${bookingId}: capturedOre is ${capturedOre}`);
+  }
+
+  const capturedNok = capturedOre / 100;
+
+  // 1. Ensure a single CAPTURED receipt exists for this booking
+  try {
+    const existingCapturedReceipt = await prisma.receipt.findFirst({
+      where: { bookingId, status: 'CAPTURED' },
+    });
+
+    if (!existingCapturedReceipt) {
+      await prisma.receipt.create({
+        data: {
+          bookingId,
+          amount: capturedNok,
+          status: 'CAPTURED',
+          paymentRef: vippsRef,
+          type: 'payment',
+        },
+      });
+    }
+  } catch (err) {
+    console.error('Failed to ensure CAPTURED receipt:', err);
+  }
+
+  // 2. Atomic DB state transition: only ONE concurrent caller gets count === 1
+  const transition = await prisma.booking.updateMany({
+    where: {
+      id: bookingId,
+      status: { not: 'confirmed' },
+    },
+    data: {
+      status: 'confirmed',
+      amountPaid: capturedNok,
+      paymentRef: vippsRef,
+    },
+  });
+
+  const newlyConfirmed = transition.count === 1;
+
+  if (!newlyConfirmed) {
+    // Booking was already confirmed; ensure amountPaid and paymentRef are accurate without altering status
+    await prisma.booking.updateMany({
+      where: {
+        id: bookingId,
+        OR: [{ amountPaid: { lt: capturedNok } }, { paymentRef: null }],
+      },
+      data: {
+        amountPaid: capturedNok,
+        paymentRef: vippsRef,
+      },
+    });
+  }
+
+  const confirmedBooking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: { experience: true },
+  });
+
+  if (!confirmedBooking) {
+    throw new Error(`Booking ${bookingId} not found after confirmation`);
+  }
+
+  // 3. Side effects (discount counter, Resend contact sync, confirmation & admin emails)
+  // execute ONLY for the single atomic winner (`newlyConfirmed === true`).
+  if (newlyConfirmed) {
+    if (confirmedBooking.discountCode) {
+      try {
+        await prisma.discountCode.update({
+          where: { code: confirmedBooking.discountCode },
+          data: { usageCount: { increment: 1 } },
+        });
+      } catch (e) {
+        console.error('Failed to increment discount code usage:', e);
+      }
+    }
+
+    const { sendEmail, sendAdminNewBookingNotification, addContactToNewsletter } = await import(
+      '@/lib/email'
+    );
+
+    if (confirmedBooking.email) {
+      addContactToNewsletter(
+        confirmedBooking.email,
+        confirmedBooking.firstName,
+        confirmedBooking.lastName
+      ).catch((e) => console.error('Failed to sync contact to Resend:', e));
+    }
+
+    try {
+      const settingsDoc = await prisma.setting.findUnique({ where: { key: 'general' } });
+      const generalSettings = settingsDoc?.value || {
+        email: 'post@krsvr.no',
+        phone: '+47 408 28 302',
+      };
+
+      const experienceData = confirmedBooking.experience || {
+        name: 'Valgt VR Opplevelse',
+        picture: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc07d',
+        age: 'Alle',
+        duration: '90 min',
+      };
+
+      await sendEmail(
+        confirmedBooking.email,
+        confirmedBooking,
+        experienceData,
+        generalSettings
+      );
+
+      await sendAdminNewBookingNotification(confirmedBooking).catch((err) =>
+        console.error('Failed to send admin new booking notification:', err)
+      );
+    } catch (emailErr) {
+      console.error('Failed to send confirmation email after Vipps capture:', emailErr);
+    }
+  }
+
+  return { booking: confirmedBooking, newlyConfirmed };
+}

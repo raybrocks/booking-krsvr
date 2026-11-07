@@ -1,62 +1,75 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getVippsConfig, getVippsAccessToken, fetchVippsPayment } from '@/lib/vipps';
 
 export async function POST(req: Request) {
-    try {
-        const { bookingId } = await req.json();
-        if (!bookingId) {
-            return NextResponse.json({ error: 'Missing bookingId' }, { status: 400 });
-        }
-
-        const isTest = process.env.VIPPS_ENV !== 'production';
-        const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
-        const clientId = process.env.VIPPS_CLIENT_ID;
-        const clientSecret = process.env.VIPPS_CLIENT_SECRET;
-        const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
-        const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
-
-        if (!clientId || !clientSecret || !subscriptionKey || !merchantSerialNumber) {
-            return NextResponse.json({ error: 'Missing Vipps credentials' }, { status: 500 });
-        }
-
-        const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
-            method: 'POST',
-            headers: {
-                'client_id': clientId,
-                'client_secret': clientSecret,
-                'Ocp-Apim-Subscription-Key': subscriptionKey,
-            },
-        });
-        const tokenData = await tokenResponse.json();
-
-        // Release/Cancel a reserved payment (Void)
-        const cancelResponse = await fetch(`${baseUrl}/epayment/v1/payments/${bookingId}/cancel`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${tokenData.access_token}`,
-                'Ocp-Apim-Subscription-Key': subscriptionKey,
-                'Merchant-Serial-Number': merchantSerialNumber,
-                'Idempotency-Key': `cancel-${bookingId}-${Date.now()}`
-            }
-        });
-
-        if (!cancelResponse.ok) {
-            const errText = await cancelResponse.text();
-            return NextResponse.json({ error: errText }, { status: cancelResponse.status });
-        }
-
-        try {
-             await prisma.booking.update({
-                 where: { id: bookingId },
-                 data: { status: 'cancelled' }
-             });
-        } catch (dbErr) {
-            console.error('Failed to update DB on cancel:', dbErr);
-        }
-
-        return NextResponse.json({ success: true, message: 'Reservation cancelled successfully.' });
-    } catch (e: any) {
-        return NextResponse.json({ error: e.message }, { status: 500 });
+  try {
+    const { bookingId } = await req.json();
+    if (!bookingId) {
+      return NextResponse.json({ error: 'Missing bookingId' }, { status: 400 });
     }
+
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      return NextResponse.json({ error: 'Booking ikke funnet' }, { status: 404 });
+    }
+
+    const { baseUrl, subscriptionKey, merchantSerialNumber } = getVippsConfig();
+    const accessToken = await getVippsAccessToken();
+    const vippsRef = booking.paymentRef || booking.id;
+
+    // Check current Vipps state first — cannot cancel an already captured payment (must use refund)
+    const summary = await fetchVippsPayment(vippsRef, accessToken);
+    if (summary.capturedOre > 0 && summary.netCapturedOre > 0) {
+      return NextResponse.json(
+        { error: 'Betalingen er allerede trukket (captured) på Vipps. Bruk «Refunder (Vipps)» i stedet.' },
+        { status: 400 }
+      );
+    }
+
+    if (summary.normalizedStatus === 'AUTHORIZED') {
+      const cancelResponse = await fetch(
+        `${baseUrl}/epayment/v1/payments/${encodeURIComponent(vippsRef)}/cancel`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+            'Ocp-Apim-Subscription-Key': subscriptionKey,
+            'Merchant-Serial-Number': merchantSerialNumber,
+            'Idempotency-Key': `cancel-${vippsRef}-${Date.now()}`.slice(0, 50),
+          },
+        }
+      );
+
+      if (!cancelResponse.ok) {
+        const errText = await cancelResponse.text();
+        return NextResponse.json({ error: errText }, { status: cancelResponse.status });
+      }
+    }
+
+    await prisma.booking.update({
+      where: { id: bookingId },
+      data: { status: 'cancelled', amountPaid: 0 },
+    });
+
+    await prisma.receipt
+      .create({
+        data: {
+          bookingId,
+          amount: 0,
+          status: 'CANCELLED',
+          paymentRef: vippsRef,
+          type: 'payment',
+        },
+      })
+      .catch(() => {});
+
+    return NextResponse.json({ success: true, message: 'Reservasjon frigitt og kansellert.' });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
 }

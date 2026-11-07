@@ -1,224 +1,166 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendEmail, sendAdminNewBookingNotification } from '@/lib/email';
+import { ensureVippsCaptured, confirmPaidVippsBookingAtomically } from '@/lib/vipps';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const reference = body.reference;
-    
+
     if (!reference) {
       return NextResponse.json({ error: 'Missing reference' }, { status: 400 });
     }
 
-    const booking = await prisma.booking.findUnique({
-      where: { id: reference }
+    const booking = await prisma.booking.findFirst({
+      where: {
+        OR: [{ id: reference }, { paymentRef: reference }],
+      },
+      include: { experience: true },
     });
 
     if (!booking) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.status === 'confirmed') {
+    const requiresVippsPayment =
+      ['vipps', 'full', 'reservation'].includes(booking.paymentType) &&
+      (booking.totalPrice || 0) > 0;
+
+    // 1. Non-Vipps bookings (Pay on arrival in arena / 0 NOK free bookings)
+    if (!requiresVippsPayment) {
+      if (booking.status === 'confirmed') {
+        return NextResponse.json({ success: true, booking });
+      }
+
+      if (booking.paymentType === 'terminal' || (booking.totalPrice || 0) === 0) {
+        const transition = await prisma.booking.updateMany({
+          where: { id: booking.id, status: { not: 'confirmed' } },
+          data: { status: 'confirmed', amountPaid: 0 },
+        });
+
+        const updatedBooking = await prisma.booking.findUnique({
+          where: { id: booking.id },
+          include: { experience: true },
+        });
+
+        if (transition.count === 1 && updatedBooking) {
+          try {
+            const { sendEmail, sendAdminNewBookingNotification, addContactToNewsletter } =
+              await import('@/lib/email');
+            const settingsDoc = await prisma.setting.findUnique({ where: { key: 'general' } });
+            const generalSettings = settingsDoc?.value || {
+              email: 'post@krsvr.no',
+              phone: '+47 408 28 302',
+            };
+            const experienceData = updatedBooking.experience || {
+              name: 'Valgt VR Opplevelse',
+              picture: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc07d',
+              age: 'Alle',
+              duration: '90 min',
+            };
+
+            if (updatedBooking.email) {
+              addContactToNewsletter(
+                updatedBooking.email,
+                updatedBooking.firstName,
+                updatedBooking.lastName
+              ).catch(() => {});
+            }
+
+            await sendEmail(
+              updatedBooking.email,
+              updatedBooking,
+              experienceData,
+              generalSettings as any
+            );
+            await sendAdminNewBookingNotification(updatedBooking).catch(console.error);
+          } catch (e) {
+            console.error('Failed to send terminal confirmation email in verify:', e);
+          }
+        }
+
+        return NextResponse.json({ success: true, booking: updatedBooking });
+      }
+
+      return NextResponse.json({ error: 'Invalid booking payment state' }, { status: 400 });
+    }
+
+    // 2. Vipps bookings: Already confirmed with verified payment?
+    if (booking.status === 'confirmed' && (booking.amountPaid || 0) > 0) {
       return NextResponse.json({ success: true, booking });
     }
 
-    // -- Fetch Vipps Payment Status --
-    const isTest = process.env.VIPPS_ENV !== 'production';
-    const baseUrl = isTest ? 'https://apitest.vipps.no' : 'https://api.vipps.no';
-    const clientId = process.env.VIPPS_CLIENT_ID;
-    const clientSecret = process.env.VIPPS_CLIENT_SECRET;
-    const subscriptionKey = process.env.VIPPS_SUBSCRIPTION_KEY;
-    const merchantSerialNumber = process.env.VIPPS_MERCHANT_SERIAL_NUMBER;
+    // 3. Query Vipps API directly (and auto-capture if AUTHORIZED)
+    const vippsRef = booking.paymentRef || booking.id;
 
-    if (clientId && clientSecret && subscriptionKey && merchantSerialNumber) {
-      // 1. Get Access Token
-      const tokenResponse = await fetch(`${baseUrl}/accessToken/get`, {
-        method: 'POST',
-        headers: {
-          'client_id': clientId,
-          'client_secret': clientSecret,
-          'Ocp-Apim-Subscription-Key': subscriptionKey,
-        },
-      });
-      
-      if (tokenResponse.ok) {
-        const tokenData = await tokenResponse.json();
-        
-        // 2. Get Payment Details
-        const paymentResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}`, {
-           method: 'GET',
-           headers: {
-             'Authorization': `Bearer ${tokenData.access_token}`,
-             'Ocp-Apim-Subscription-Key': subscriptionKey,
-             'Merchant-Serial-Number': merchantSerialNumber
-           }
-        });
-        
-        if (paymentResponse.ok) {
-          const paymentInfo = await paymentResponse.json();
-          const pStatus = paymentInfo.state || paymentInfo.status || 'UNKNOWN';
-          
-          let updatedStatus = booking.status;
-          const successStates = ['AUTHORIZED', 'RESERVED', 'epayment.payment.reserved', 'CAPTURED', 'epayment.payment.captured', 'SALE'];
+    let summary;
+    try {
+      summary = await ensureVippsCaptured(vippsRef);
 
-          if (!successStates.includes(pStatus)) {
-             await prisma.booking.update({
-               where: { id: reference },
-               data: { status: 'cancelled' }
-             });
-             return NextResponse.json({ error: `Payment was not successful. Status: ${pStatus}` }, { status: 400 });
-          }
-
-          if (pStatus !== 'CAPTURED' && !pStatus.includes('captured')) {
-              // 3. Automatically Capture the Payment
-              const captureResponse = await fetch(`${baseUrl}/epayment/v1/payments/${reference}/capture`, {
-                 method: 'POST',
-                 headers: {
-                   'Content-Type': 'application/json',
-                   'Authorization': `Bearer ${tokenData.access_token}`,
-                   'Ocp-Apim-Subscription-Key': subscriptionKey,
-                   'Merchant-Serial-Number': merchantSerialNumber,
-                   'Idempotency-Key': (`cap-v-${reference}-${Date.now()}`).substring(0, 50)
-                 },
-                 body: JSON.stringify({
-                   modificationAmount: {
-                     currency: 'NOK',
-                     value: paymentInfo.amount?.value || Math.round((booking.amountPaid || 0) * 100) 
-                   }
-                 })
-              });
-              
-              if (!captureResponse.ok) {
-                 const errText = await captureResponse.text();
-                 console.error("Auto-capture in verify failed:", errText);
-              } else {
-                 console.log("Auto-capture in verify succeeded!");
-                 updatedStatus = 'confirmed';
-              }
-          } else {
-             updatedStatus = 'confirmed';
-          }
-          
-          const existingStatus = booking.status;
-          const newAmountPaid = (paymentInfo.amount?.value || Math.round((booking.amountPaid || 0) * 100)) / 100;
-
-          await prisma.booking.update({
-            where: { id: reference },
-            data: { 
-              status: updatedStatus,
-              ...(updatedStatus === 'confirmed' ? { amountPaid: newAmountPaid, paymentRef: reference } : {})
-            }
-          });
-          
-          if (existingStatus !== 'confirmed' && updatedStatus === 'confirmed') {
-             // Create receipt
-             try {
-                const receiptExists = await prisma.receipt.findFirst({
-                  where: { bookingId: reference, status: 'CAPTURED' }
-                });
-                
-                if (!receiptExists) {
-                  await prisma.receipt.create({
-                    data: {
-                      bookingId: reference,
-                      amount: (paymentInfo.amount?.value || Math.round((booking.amountPaid || 0) * 100)) / 100,
-                      status: 'CAPTURED',
-                      paymentRef: reference,
-                      type: 'payment',
-                    }
-                  });
-                }
-             } catch (e) {
-                console.error("Failed to create receipt in verify", e);
-             }
-
-             // Handle discount code usage
-             if (booking.discountCode) {
-                try {
-                   await prisma.discountCode.update({
-                      where: { code: booking.discountCode },
-                      data: { usageCount: { increment: 1 } }
-                   });
-                } catch (e) {}
-             }
-
-             // Send email
-             if (!booking.cancellationEmailSent) { // wait, previously this meant confirmation email
-                try {
-                  const settingsDoc = await prisma.setting.findUnique({ where: { key: 'general' } });
-                  const generalSettings = settingsDoc?.value || { email: 'booking@krsvr.no', phone: '+47 000 00 000' };
-                  
-                  const verifiedBooking = await prisma.booking.findUnique({
-                    where: { id: reference },
-                    include: { experience: true }
-                  });
-                  
-                  if (verifiedBooking) {
-                    // Auto-sync customer contact to Resend (Audience + Segment)
-                    if (verifiedBooking.email) {
-                      const { addContactToNewsletter } = await import('@/lib/email');
-                      addContactToNewsletter(
-                        verifiedBooking.email,
-                        verifiedBooking.firstName,
-                        verifiedBooking.lastName
-                      ).catch((e) => console.error("Failed to sync contact to Resend in booking verify:", e));
-                    }
-
-                    const experienceData = verifiedBooking.experience || {
-                      name: 'Valgt VR Opplevelse', 
-                      picture: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc07d',
-                      age: 'Alle',
-                      duration: '1 time'
-                    };
-                    
-                    const { sendEmail, sendAdminNewBookingNotification } = await import('@/lib/email');
-
-                    await sendEmail(
-                      verifiedBooking.email, 
-                      verifiedBooking, 
-                      experienceData, 
-                      generalSettings as any
-                    );
-                    
-                    await sendAdminNewBookingNotification(verifiedBooking).catch(console.error);
-
-                    // Mark as email sent by repurposing cancellationEmailSent for now. 
-                    // Actually, we shouldn't change the db column if it breaks cancelling. 
-                    // Actually let's just create a new 'confirmationEmailSent' inside booking schema if possible, or just leave it. 
-                    // But we don't want to trigger schema migrations right now unless needed. 
-                  }
-                } catch (e) {
-                   console.error("Failed to send email in verify", e);
-                }
-             }
-          }
-          
-        } else {
-             const errorText = await paymentResponse.text();
-             return NextResponse.json({ error: 'Could not verify payment with Vipps' }, { status: 400 });
-        }
+      // Mobile redirect can occasionally land on /checkout/return a split-second before Vipps
+      // finishes transitioning CREATED -> AUTHORIZED. Wait briefly once if still CREATED.
+      if (summary.normalizedStatus === 'CREATED' && summary.capturedOre === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        summary = await ensureVippsCaptured(vippsRef);
       }
+    } catch (vippsErr: any) {
+      console.error('Vipps verification API error:', vippsErr?.message || vippsErr);
+
+      // Check if concurrent webhook already confirmed the booking in the meantime
+      const rechecked = await prisma.booking.findUnique({
+        where: { id: booking.id },
+        include: { experience: true },
+      });
+      if (rechecked?.status === 'confirmed' && (rechecked.amountPaid || 0) > 0) {
+        return NextResponse.json({ success: true, booking: rechecked });
+      }
+
+      return NextResponse.json(
+        { error: 'Kunne ikke verifisere betalingen mot Vipps. Ingen bekreftelse er sendt.' },
+        { status: 502 }
+      );
     }
 
-    // Re-fetch to get newest status
-    const verifiedData = await prisma.booking.findUnique({ 
-        where: { id: reference },
-        include: { experience: true }
+    // 4. Verified PAID & CAPTURED on Vipps!
+    if (summary.normalizedStatus === 'CAPTURED' && summary.capturedOre > 0) {
+      const { booking: confirmedBooking } = await confirmPaidVippsBookingAtomically({
+        bookingId: booking.id,
+        vippsRef,
+        capturedOre: summary.capturedOre,
+      });
+
+      return NextResponse.json({ success: true, booking: confirmedBooking });
+    }
+
+    // 5. NOT PAID (`capturedOre === 0`): Re-check DB once in case another paymentRef succeeded,
+    // NEVER overwrite `confirmed` back to `pending`, and NEVER return 200 OK if unpaid!
+    const latestBooking = await prisma.booking.findUnique({
+      where: { id: booking.id },
+      include: { experience: true },
     });
 
-    if (!verifiedData) return NextResponse.json({ error: 'Booking missing after verification' }, { status: 404 });
-
-    // Auto-update to confirmed if it was pending and we bypassed vipps (e.g., pay at venue)
-    if (verifiedData.status === 'pending' && verifiedData.paymentType !== 'vipps') {
-      await prisma.booking.update({
-        where: { id: reference },
-        data: { status: 'confirmed' }
-      });
-      verifiedData.status = 'confirmed';
+    if (latestBooking?.status === 'confirmed' && (latestBooking.amountPaid || 0) > 0) {
+      return NextResponse.json({ success: true, booking: latestBooking });
     }
 
-    return NextResponse.json({ success: true, booking: verifiedData });
+    if (
+      summary.normalizedStatus === 'ABORTED' ||
+      summary.normalizedStatus === 'EXPIRED' ||
+      summary.normalizedStatus === 'CANCELLED'
+    ) {
+      await prisma.booking.updateMany({
+        where: { id: booking.id, status: 'pending' },
+        data: { status: 'cancelled', amountPaid: 0 },
+      });
+    }
+
+    return NextResponse.json(
+      {
+        error: 'Vipps-betalingen ble avbrutt eller ikke fullført.',
+        paymentStatus: summary.normalizedStatus,
+      },
+      { status: 400 }
+    );
   } catch (error) {
     console.error('Verify booking error:', error);
     return NextResponse.json({ error: 'Failed to verify booking' }, { status: 500 });

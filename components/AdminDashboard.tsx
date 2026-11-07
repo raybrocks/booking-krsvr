@@ -318,10 +318,10 @@ export default function AdminDashboard() {
               return { ...b, vippsStatus: 'REFUNDED', status: 'cancelled' };
             }
             if (action === 'capture') {
-              return { ...b, vippsStatus: 'CAPTURED', amountPaid: amount || b.totalPrice };
+              return { ...b, vippsStatus: 'CAPTURED', status: 'confirmed', amountPaid: amount || b.totalPrice };
             }
             if (action === 'cancel') {
-              return { ...b, vippsStatus: 'CANCELLED', status: 'cancelled' };
+              return { ...b, vippsStatus: 'CANCELLED', status: 'cancelled', amountPaid: 0 };
             }
           }
           return b;
@@ -831,11 +831,26 @@ export default function AdminDashboard() {
                           const remaining = Math.max(0, totalPrice - amountPaid);
                           const status = (booking.vippsStatus || '').toUpperCase();
                           const isRefunded = status === 'REFUNDED' || status.includes('REFUND');
-                          const isPending = status === 'VENTER_PAA_BETALING' || (booking.paymentType === 'vipps' && amountPaid === 0 && booking.status === 'pending');
-                          const isFullyPaid = (booking.paymentType === 'full' || amountPaid >= totalPrice) && totalPrice > 0;
-                          const isFree = totalPrice === 0;
-
+                          const isAuthorizedUncaptured =
+                            (status === 'AUTHORIZED' || status.includes('RESERVED')) &&
+                            status !== 'CAPTURED';
                           const isTerminal = booking.paymentType === 'terminal';
+                          const isCancelledUnpaid =
+                            booking.status === 'cancelled' && amountPaid === 0;
+                          const isPendingBooking = booking.status === 'pending';
+                          const nowMs = new Date(currentTime).getTime();
+                          const createdMs = booking.createdAt
+                            ? new Date(booking.createdAt).getTime()
+                            : nowMs;
+                          const isPendingExpired =
+                            isPendingBooking && nowMs - createdMs > 15 * 60 * 1000;
+                          const isFree = totalPrice === 0 && booking.status === 'confirmed';
+                          const isFullyPaid =
+                            !isPendingBooking &&
+                            amountPaid >= totalPrice &&
+                            totalPrice > 0 &&
+                            status !== 'EXPIRED' &&
+                            status !== 'ABORTED';
 
                           if (isRefunded) {
                             return (
@@ -843,6 +858,16 @@ export default function AdminDashboard() {
                                 <span className="text-blue-400 font-medium text-xs">refundert</span>
                                 <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-sm w-fit">
                                   REFUNDERT (VIPPS)
+                                </span>
+                              </div>
+                            );
+                          }
+                          if (isCancelledUnpaid) {
+                            return (
+                              <div className="flex flex-col gap-1">
+                                <span className="text-zinc-400 font-medium text-xs">ikke betalt</span>
+                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-zinc-800 text-zinc-400 border border-zinc-700/60 shadow-sm w-fit">
+                                  AVBRUTT / UTLØPT (0 KR)
                                 </span>
                               </div>
                             );
@@ -867,7 +892,27 @@ export default function AdminDashboard() {
                               </div>
                             );
                           }
-                          if (isPending) {
+                          if (isAuthorizedUncaptured) {
+                            return (
+                              <div className="flex flex-col gap-1">
+                                <span className="text-amber-400 font-medium text-xs">reservert i vipps</span>
+                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm w-fit">
+                                  RESERVERT (MÅ TREKKES)
+                                </span>
+                              </div>
+                            );
+                          }
+                          if (isPendingBooking) {
+                            if (isPendingExpired) {
+                              return (
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-red-400 font-medium text-xs">ikke betalt</span>
+                                  <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-red-500/15 text-red-300 border border-red-500/30 shadow-sm w-fit">
+                                    UTLØPT (IKKE BETALT)
+                                  </span>
+                                </div>
+                              );
+                            }
                             return (
                               <div className="flex flex-col gap-1">
                                 <span className="text-yellow-400 font-medium text-xs">venter på vipps</span>
@@ -897,7 +942,7 @@ export default function AdminDashboard() {
                               </div>
                             );
                           }
-                          if (amountPaid > 0 && remaining > 0) {
+                          if (!isPendingBooking && amountPaid > 0 && remaining > 0) {
                             return (
                               <div className="flex flex-col gap-1">
                                 <span className="text-amber-400 font-medium text-xs">delbetalt</span>
@@ -926,7 +971,7 @@ export default function AdminDashboard() {
                             const createdAt = booking.createdAt ? new Date(booking.createdAt).getTime() : now;
                             const isExpired = (now - createdAt) > 15 * 60 * 1000;
                             return isExpired ? (
-                              <span className="text-red-400">Utløpt bestilling (ikke betalt)</span>
+                              <span className="text-zinc-500 text-[11px]">Ingen betaling mottatt (0 NOK)</span>
                             ) : (
                               <span className="text-amber-400">Venter på betaling fra kunde</span>
                             );
@@ -955,32 +1000,46 @@ export default function AdminDashboard() {
                       )}
 
                       {/* Handlingsknapper for Vipps (Capture, Frigi, Refunder) */}
-                      {((booking.vippsStatus?.toUpperCase().includes("RESERVED") || booking.vippsStatus === "AUTHORIZED") || (['vipps', 'reservation', 'full'].includes(booking.paymentType) && booking.amountPaid > 0 && booking.vippsStatus !== 'REFUNDED')) && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {(booking.vippsStatus?.toUpperCase().includes("RESERVED") || booking.vippsStatus === "AUTHORIZED") && (
-                            <>
-                              <button onClick={() => handleVippsAction(booking.id, 'capture', booking.totalPrice)} className="text-[11px] bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-2 py-0.5 rounded transition-colors whitespace-nowrap">
-                                Complete (Capture)
+                      {(() => {
+                        const vStatus = (booking.vippsStatus || '').toUpperCase();
+                        const canCaptureOrCancel =
+                          (vStatus === 'AUTHORIZED' || vStatus.includes('RESERVED')) &&
+                          vStatus !== 'CAPTURED';
+                        const canRefund =
+                          ['vipps', 'reservation', 'full'].includes(booking.paymentType) &&
+                          (booking.amountPaid || 0) > 0 &&
+                          vStatus === 'CAPTURED' &&
+                          booking.status !== 'pending';
+
+                        if (!canCaptureOrCancel && !canRefund) return null;
+
+                        return (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {canCaptureOrCancel && (
+                              <>
+                                <button onClick={() => handleVippsAction(booking.id, 'capture', booking.totalPrice)} className="text-[11px] bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-2 py-0.5 rounded transition-colors whitespace-nowrap">
+                                  Complete (Capture)
+                                </button>
+                                <button onClick={() => handleVippsAction(booking.id, 'cancel')} className="text-[11px] bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-0.5 rounded transition-colors whitespace-nowrap">
+                                  Frigi (Avbryt)
+                                </button>
+                              </>
+                            )}
+
+                            {canRefund && (
+                              <button onClick={() => {
+                                const defaultAmt = booking.amountPaid || booking.totalPrice || 0;
+                                const amt = prompt(`Hvor mye ønsker du å refundere til ${booking.firstName} ${booking.lastName} via Vipps? (i NOK)\n\nKunden vil automatisk motta en refusjonskvittering på e-post.`, String(defaultAmt));
+                                if (amt && !isNaN(Number(amt.replace(',', '.'))) && Number(amt.replace(',', '.')) > 0) {
+                                  handleVippsAction(booking.id, 'refund', Number(amt.replace(',', '.')));
+                                }
+                              }} className="text-[11px] bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium" title="Refunder via Vipps og send refusjonskvittering på e-post">
+                                Refunder (Vipps)
                               </button>
-                              <button onClick={() => handleVippsAction(booking.id, 'cancel')} className="text-[11px] bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-0.5 rounded transition-colors whitespace-nowrap">
-                                Frigi (Avbryt)
-                              </button>
-                            </>
-                          )}
-                          
-                          {['vipps', 'reservation', 'full'].includes(booking.paymentType) && booking.amountPaid > 0 && booking.vippsStatus !== 'REFUNDED' && (
-                            <button onClick={() => {
-                              const defaultAmt = booking.amountPaid || booking.totalPrice || 0;
-                              const amt = prompt(`Hvor mye ønsker du å refundere til ${booking.firstName} ${booking.lastName} via Vipps? (i NOK)\n\nKunden vil automatisk motta en refusjonskvittering på e-post.`, String(defaultAmt));
-                              if (amt && !isNaN(Number(amt.replace(',', '.'))) && Number(amt.replace(',', '.')) > 0) {
-                                handleVippsAction(booking.id, 'refund', Number(amt.replace(',', '.')));
-                              }
-                            }} className="text-[11px] bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium" title="Refunder via Vipps og send refusjonskvittering på e-post">
-                              Refunder (Vipps)
-                            </button>
-                          )}
-                        </div>
-                      )}
+                            )}
+                          </div>
+                        );
+                      })()}
 
                       {/* Handlingsknapp for Kortterminal i arena */}
                       {booking.paymentType === 'terminal' && ((booking.totalPrice || 0) > (booking.amountPaid || 0)) && booking.status !== 'cancelled' && (

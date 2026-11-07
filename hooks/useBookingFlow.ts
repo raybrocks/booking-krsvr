@@ -297,7 +297,7 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
           firstName, lastName, email, phone,
           internalNotes: customerNote.trim() !== '' ? customerNote : undefined,
           acceptedTerms, acceptedNewsletter,
-          paymentType, totalPrice, amountPaid: amountToPay,
+          paymentType, totalPrice, amountPaid: 0,
           status: "pending", discountCode: appliedDiscount?.code,
           locale,
         })
