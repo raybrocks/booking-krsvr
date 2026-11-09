@@ -97,6 +97,27 @@ export async function POST(req: Request) {
         );
 
         await sendAdminNewBookingNotification(updatedBooking);
+
+        // Send instant Web Push notification to Admin's iPhone / devices
+        try {
+          const { sendAdminPushNotification } = await import('@/lib/push');
+          const expName = updatedBooking.experience?.name || 'VR Opplevelse';
+          const dateStr = updatedBooking.date;
+          const timeStr = updatedBooking.time;
+          const playersStr = `${updatedBooking.players} ${updatedBooking.players === 1 ? 'spiller' : 'spillere'}`;
+          const amountStr = updatedBooking.paymentType === 'terminal' ? 'Betales i kasse' : '0 kr';
+          const custName = `${updatedBooking.firstName} ${updatedBooking.lastName}`.trim();
+
+          await sendAdminPushNotification({
+            title: `Ny booking: ${custName} (${amountStr})`,
+            body: `${expName} • ${dateStr} kl. ${timeStr} • ${playersStr}`,
+            url: `/admin`,
+            tag: `booking-${updatedBooking.id}`,
+            bookingId: updatedBooking.id,
+          });
+        } catch (pushErr) {
+          console.error('Failed to send admin push notification on confirm-zero:', pushErr);
+        }
       } catch (e) {
         console.error('Failed to send zero confirmation email:', e);
       }

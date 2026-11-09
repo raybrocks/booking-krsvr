@@ -7,9 +7,10 @@ import { format, addDays } from "date-fns";
 import { nb } from "date-fns/locale";
 import DiscountCodesManager from "./DiscountCodesManager";
 import EmailPreviewClient from "./EmailPreviewClient";
+import AdminPushNotificationManager from "./AdminPushNotificationManager";
 
 export default function SettingsManager() {
-  const [activeSettingsTab, setActiveSettingsTab] = useState<"hours" | "general" | "discounts" | "emails">("hours");
+  const [activeSettingsTab, setActiveSettingsTab] = useState<"hours" | "general" | "push" | "discounts" | "emails">("hours");
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -586,6 +587,12 @@ export default function SettingsManager() {
           Generelle Innstillinger
         </button>
         <button 
+          onClick={() => setActiveSettingsTab("push")} 
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSettingsTab === 'push' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+        >
+          Push-varsler
+        </button>
+        <button 
           onClick={() => setActiveSettingsTab("discounts")} 
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSettingsTab === 'discounts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
         >
@@ -1094,6 +1101,9 @@ export default function SettingsManager() {
         </div>
       </div>
     )}
+      {activeSettingsTab === "push" && (
+        <AdminPushNotificationManager />
+      )}
       {activeSettingsTab === "discounts" && (
         <DiscountCodesManager />
       )}

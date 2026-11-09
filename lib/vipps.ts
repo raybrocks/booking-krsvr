@@ -357,6 +357,27 @@ export async function confirmPaidVippsBookingAtomically(params: {
       await sendAdminNewBookingNotification(confirmedBooking).catch((err) =>
         console.error('Failed to send admin new booking notification:', err)
       );
+
+      // Send instant Web Push notification to Admin's iPhone / devices
+      try {
+        const { sendAdminPushNotification } = await import('@/lib/push');
+        const expName = confirmedBooking.experience?.name || 'VR Opplevelse';
+        const dateStr = confirmedBooking.date;
+        const timeStr = confirmedBooking.time;
+        const playersStr = `${confirmedBooking.players} ${confirmedBooking.players === 1 ? 'spiller' : 'spillere'}`;
+        const amountStr = `${confirmedBooking.totalPrice || capturedNok} kr`;
+        const custName = `${confirmedBooking.firstName} ${confirmedBooking.lastName}`.trim();
+
+        await sendAdminPushNotification({
+          title: `Ny booking: ${custName} (${amountStr})`,
+          body: `${expName} • ${dateStr} kl. ${timeStr} • ${playersStr}`,
+          url: `/admin`,
+          tag: `booking-${confirmedBooking.id}`,
+          bookingId: confirmedBooking.id,
+        });
+      } catch (pushErr) {
+        console.error('Failed to send admin push notification on Vipps capture:', pushErr);
+      }
     } catch (emailErr) {
       console.error('Failed to send confirmation email after Vipps capture:', emailErr);
     }

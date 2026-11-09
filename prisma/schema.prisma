@@ -122,6 +122,16 @@ model WebhookLog {
   createdAt         DateTime @default(now())
 }
 
+model AdminPushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model ExperienceType {
   id        String       @id @default(cuid())
   name      String       @unique

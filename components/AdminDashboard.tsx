@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil, Star, Building2, Copy, Check } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil, Star, Building2, Copy, Check, Bell } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import SettingsManager from "./SettingsManager";
@@ -214,6 +214,11 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    // Pre-register service worker for Web Push if supported
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+    }
+
     const fetchData = async () => {
       try {
         const [bookingsRes, experiencesRes, settingsRes] = await Promise.all([
@@ -1207,8 +1212,17 @@ export default function AdminDashboard() {
             <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-purple-300 hover:text-white hover:bg-purple-900/20 border border-purple-500/20"><Mail className="w-4 h-4 text-purple-400" /> Nyhetsbrev</Link>
           </nav>
 
-          {/* Right: Logout button + Mobile/Tablet Hamburger */}
+          {/* Right: Push Notifications, Logout button + Mobile/Tablet Hamburger */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setActiveTab("settings")}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-zinc-900/90 hover:bg-[#9C39FF]/15 hover:text-purple-300 hover:border-[#9C39FF]/30 text-zinc-300 border border-zinc-800 rounded-xl transition-all shadow-sm"
+              title="Push-varsler innstillinger"
+            >
+              <Bell className="w-3.5 h-3.5 text-[#9C39FF]" />
+              <span className="hidden sm:inline">Push-varsler</span>
+            </button>
+
             <button
               onClick={handleLogout}
               className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-zinc-900/90 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 text-zinc-300 border border-zinc-800 rounded-xl transition-all shadow-sm"
@@ -1251,6 +1265,7 @@ export default function AdminDashboard() {
               <button onClick={() => { setActiveTab("shifts"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
               <button onClick={() => { setActiveTab("employees"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
               <button onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
+              <button onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-purple-300 hover:text-white bg-purple-900/10 border border-purple-500/20"><Bell className="w-4 h-4 text-purple-400" /> Push-varsler</button>
               <Link href="/admin/newsletter" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-purple-300 hover:text-white bg-purple-900/10 border border-purple-500/20"><Mail className="w-4 h-4 text-purple-400" /> Nyhetsbrev</Link>
               <button onClick={handleLogout} className="col-span-2 sm:col-span-4 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 border border-red-500/20 mt-1">
                 <LogOut className="w-4 h-4" /> Logg ut
