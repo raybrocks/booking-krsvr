@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { prisma } from '@/lib/prisma';
+import { sendAdminPushNotification } from '@/lib/push';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -105,6 +106,32 @@ export async function POST(req: Request) {
       }
     } catch (emailErr) {
       console.error('Resend email send exception:', emailErr);
+    }
+
+    // Dispatch push notification to admin devices
+    try {
+      const isArrangement = data.formType === 'arrangement';
+      let summary = '';
+      if (isArrangement) {
+        const parts = [];
+        if (data.eventType) parts.push(data.eventType);
+        if (data.peopleCount) parts.push(`${data.peopleCount} pers`);
+        if (data.companyName) parts.push(data.companyName);
+        if (data.date) parts.push(data.date);
+        summary = parts.join(' · ');
+        if (!summary && data.message) summary = data.message.slice(0, 100);
+      } else {
+        summary = (data.message || '').replace(/\s+/g, ' ').slice(0, 100);
+      }
+
+      await sendAdminPushNotification({
+        title: `Ny henvendelse: ${data.name}`,
+        body: summary || 'En ny henvendelse er mottatt via kontaktskjemaet.',
+        url: '/admin?tab=inquiries',
+        tag: `inquiry-${createdInquiry?.id || Date.now()}`,
+      });
+    } catch (pushErr) {
+      console.error('Failed to dispatch admin push notification for inquiry:', pushErr);
     }
 
     return NextResponse.json({ 

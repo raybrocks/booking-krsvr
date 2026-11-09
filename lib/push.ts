@@ -1,10 +1,16 @@
 import * as webpush from 'web-push';
 import { prisma } from '@/lib/prisma';
 
-function getVapidConfig() {
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  const privateKey = process.env.VAPID_PRIVATE_KEY;
-  const subject = process.env.VAPID_SUBJECT || 'mailto:post@krsvr.no';
+export const DEFAULT_VAPID_PUBLIC_KEY =
+  'BMWY6n7hf1jDA5cUXtok5GwSYA5ckVUi3rsbXh9tX6cmogH35IgoO-PGj0d6hHrVnz0ajWU0bEtFZaHjiIRpAPk';
+export const DEFAULT_VAPID_PRIVATE_KEY =
+  'V4VU3QhPDn9SbeITNEkXXEPcOExZ_7wIgphvtD3BHLM';
+export const DEFAULT_VAPID_SUBJECT = 'mailto:post@krsvr.no';
+
+export function getVapidConfig() {
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || DEFAULT_VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY || DEFAULT_VAPID_PRIVATE_KEY;
+  const subject = process.env.VAPID_SUBJECT || DEFAULT_VAPID_SUBJECT;
 
   if (!publicKey || !privateKey) {
     return null;

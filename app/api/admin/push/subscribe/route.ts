@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getVapidConfig, DEFAULT_VAPID_PUBLIC_KEY } from '@/lib/push';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,9 +67,10 @@ export async function DELETE(req: NextRequest) {
 export async function GET() {
   try {
     const count = await prisma.adminPushSubscription.count();
+    const config = getVapidConfig();
     return NextResponse.json({
       activeSubscriptions: count,
-      vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || null,
+      vapidPublicKey: config?.publicKey || DEFAULT_VAPID_PUBLIC_KEY,
     });
   } catch (error: any) {
     return NextResponse.json({ error: 'Kunne ikke hente push-status' }, { status: 500 });

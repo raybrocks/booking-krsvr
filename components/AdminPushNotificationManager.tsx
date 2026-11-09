@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, BellRing, BellOff, CheckCircle2, AlertCircle, Loader2, Send, Smartphone } from 'lucide-react';
 
+const FALLBACK_VAPID_PUBLIC_KEY = 'BMWY6n7hf1jDA5cUXtok5GwSYA5ckVUi3rsbXh9tX6cmogH35IgoO-PGj0d6hHrVnz0ajWU0bEtFZaHjiIRpAPk';
+
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -97,7 +99,7 @@ export default function AdminPushNotificationManager() {
       // 2. Fetch VAPID public key
       const statusRes = await fetch('/api/admin/push/subscribe');
       const statusData = await statusRes.json();
-      const vapidPublicKey = statusData.vapidPublicKey || process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      const vapidPublicKey = statusData.vapidPublicKey || process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || FALLBACK_VAPID_PUBLIC_KEY;
 
       if (!vapidPublicKey) {
         throw new Error('VAPID public key mangler fra serveren.');
@@ -249,7 +251,7 @@ export default function AdminPushNotificationManager() {
               )}
             </h3>
             <p className="text-xs text-zinc-400 mt-0.5">
-              Motta øyeblikkelige varsler på låst skjerm når en ny booking gjennomføres.
+              Motta øyeblikkelige varsler på låst skjerm når en ny booking gjennomføres eller en ny henvendelse mottas.
             </p>
           </div>
         </div>

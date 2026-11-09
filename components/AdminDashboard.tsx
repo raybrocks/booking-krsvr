@@ -219,6 +219,19 @@ export default function AdminDashboard() {
       navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
     }
 
+    // Check URL parameters for tab (e.g. ?tab=inquiries from push notification)
+    const syncTabFromUrl = () => {
+      if (typeof window === 'undefined') return;
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      const validTabs = ['upcoming', 'archive', 'inquiries', 'experiences', 'clients', 'transactions', 'settings', 'manual', 'shifts', 'employees'];
+      if (tabParam && validTabs.includes(tabParam)) {
+        setActiveTab(tabParam as any);
+      }
+    };
+    syncTabFromUrl();
+    window.addEventListener('popstate', syncTabFromUrl);
+
     const fetchData = async () => {
       try {
         const [bookingsRes, experiencesRes, settingsRes] = await Promise.all([
@@ -283,6 +296,7 @@ export default function AdminDashboard() {
     const intervalTime = setInterval(() => setCurrentTime(Date.now()), 5000);
 
     return () => {
+      window.removeEventListener('popstate', syncTabFromUrl);
       clearInterval(intervalData);
       clearInterval(intervalTime);
     };
