@@ -1,8 +1,26 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Minus, RotateCcw, Tag } from "lucide-react";
 import { toast } from "sonner";
+
+const DEFAULT_PRICING_TIERS: Record<string, number> = {
+  "1": 460,
+  "2": 460,
+  "3": 395,
+  "4": 395,
+  "5": 385,
+  "6": 385,
+  "7": 385,
+  "8": 375,
+};
+
+function getGlobalTierPricePerPerson(count: number, tiers: Record<string, number>): number {
+  const validCount = Math.max(1, count || 1);
+  if (validCount === 1) return Number(tiers["1"] ?? tiers["2"] ?? 460);
+  const tierKey = validCount >= 8 ? "8" : validCount.toString();
+  return Number(tiers[tierKey] ?? 375);
+}
 
 export interface ManualBookingInitialData {
   firstName?: string;
@@ -39,6 +57,7 @@ interface ManualBookingManagerProps {
 export default function ManualBookingManager({ initialData, onBookingCreated, onClearInitialData }: ManualBookingManagerProps = {}) {
   const [experiences, setExperiences] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
+  const [globalPricing, setGlobalPricing] = useState<Record<string, number>>(DEFAULT_PRICING_TIERS);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,7 +66,7 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [duration, setDuration] = useState(90); // default 90 mins
-  const [players, setPlayers] = useState(1);
+  const [players, setPlayers] = useState(2);
   const [bookingType, setBookingType] = useState("private"); // private or corporate
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -55,7 +74,12 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
   const [phone, setPhone] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [internalNotes, setInternalNotes] = useState("");
-  const [totalPrice, setTotalPrice] = useState(0);
+
+  // Pricing State: "global" (follows global tiers), "custom_per_person" (fixed kr/pers), or "custom_total" (fixed total)
+  const [pricingMode, setPricingMode] = useState<"global" | "custom_per_person" | "custom_total">("global");
+  const [pricePerPerson, setPricePerPerson] = useState<number>(DEFAULT_PRICING_TIERS["2"]);
+  const [totalPrice, setTotalPrice] = useState<number>(DEFAULT_PRICING_TIERS["2"] * 2);
+
   const [sendConfirmation, setSendConfirmation] = useState(true);
   const [customEmailText, setCustomEmailText] = useState("");
   const [subscribeNewsletter, setSubscribeNewsletter] = useState(false);
@@ -76,9 +100,16 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
       if (initialData.date !== undefined) setDate(initialData.date);
       if (initialData.time !== undefined) setTime(initialData.time);
       if (initialData.duration !== undefined) setDuration(initialData.duration);
-      if (initialData.players !== undefined) setPlayers(initialData.players);
+      if (initialData.players !== undefined) setPlayers(Math.max(1, initialData.players));
       if (initialData.internalNotes !== undefined) setInternalNotes(initialData.internalNotes);
-      if (initialData.totalPrice !== undefined) setTotalPrice(initialData.totalPrice);
+      if (initialData.totalPrice !== undefined) {
+        setPricingMode("custom_total");
+        setTotalPrice(initialData.totalPrice);
+        const pCount = Math.max(1, initialData.players || 2);
+        setPricePerPerson(Math.round((initialData.totalPrice / pCount) * 100) / 100);
+      } else {
+        setPricingMode("global");
+      }
     }
   }, [initialData]);
 
@@ -96,6 +127,15 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
           const sett = await settingsRes.json();
           setExperiences(exps);
           setSettings(sett.general || sett);
+
+          const fetchedPricing =
+            sett?.pricing?.pricing ||
+            (sett?.pricing && typeof sett.pricing === "object" ? sett.pricing : null) ||
+            sett?.general?.pricing;
+          if (fetchedPricing && typeof fetchedPricing === "object") {
+            setGlobalPricing({ ...DEFAULT_PRICING_TIERS, ...fetchedPricing });
+          }
+
           if (initialData?.experienceId) {
             setExperienceId(initialData.experienceId);
           } else if (exps.length > 0) {
@@ -110,6 +150,55 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
     }
     loadData();
   }, [initialData?.experienceId]);
+
+  const selectedExpObj = experiences.find((ex) => ex.id === experienceId);
+  const isVippsTest = Boolean(selectedExpObj?.type && selectedExpObj.type.toLowerCase() === "vipps test");
+  const currentGlobalTierPerPerson = isVippsTest ? 2 : getGlobalTierPricePerPerson(players, globalPricing);
+  const currentGlobalTierTotal = isVippsTest ? 2 : currentGlobalTierPerPerson * Math.max(1, players);
+
+  // Sync prices automatically when in global tier mode
+  useEffect(() => {
+    if (pricingMode === "global") {
+      const validPlayers = Math.max(1, players || 1);
+      const tierPerPerson = isVippsTest ? 2 : getGlobalTierPricePerPerson(validPlayers, globalPricing);
+      const tierTotal = isVippsTest ? 2 : tierPerPerson * validPlayers;
+      setPricePerPerson(tierPerPerson);
+      setTotalPrice(tierTotal);
+    }
+  }, [players, globalPricing, isVippsTest, pricingMode]);
+
+  const handlePlayersChange = (newCount: number) => {
+    const valid = Math.max(1, newCount || 1);
+    setPlayers(valid);
+    if (pricingMode === "custom_per_person") {
+      setTotalPrice(Math.round(pricePerPerson * valid));
+    } else if (pricingMode === "custom_total") {
+      setPricePerPerson(Math.round((totalPrice / valid) * 100) / 100);
+    }
+  };
+
+  const handlePricePerPersonInputChange = (valStr: string) => {
+    const num = valStr === "" ? 0 : Math.max(0, Number(valStr));
+    setPricingMode("custom_per_person");
+    setPricePerPerson(num);
+    setTotalPrice(Math.round(num * Math.max(1, players)));
+  };
+
+  const handleTotalPriceInputChange = (valStr: string) => {
+    const num = valStr === "" ? 0 : Math.max(0, Number(valStr));
+    setPricingMode("custom_total");
+    setTotalPrice(num);
+    setPricePerPerson(Math.round((num / Math.max(1, players)) * 100) / 100);
+  };
+
+  const handleResetToGlobalPricing = () => {
+    const validPlayers = Math.max(1, players || 1);
+    const tierPerPerson = isVippsTest ? 2 : getGlobalTierPricePerPerson(validPlayers, globalPricing);
+    const tierTotal = isVippsTest ? 2 : tierPerPerson * validPlayers;
+    setPricingMode("global");
+    setPricePerPerson(tierPerPerson);
+    setTotalPrice(tierTotal);
+  };
 
   // Update available times when date changes
   useEffect(() => {
@@ -267,7 +356,8 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
         setPhone("");
         setCompanyName("");
         setInternalNotes("");
-        setTotalPrice(0);
+        setPlayers(2);
+        setPricingMode("global");
         setDuration(90);
         setCustomEmailText("");
         setSubscribeNewsletter(false);
@@ -407,26 +497,151 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
 
             <div>
               <label className="text-sm text-zinc-400 mb-1 block">Antall spillere</label>
-              <input
-                type="number"
-                min="1"
-                required
-                className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
-                value={players}
-                onChange={(e) => setPlayers(Number(e.target.value))}
-              />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handlePlayersChange(players - 1)}
+                  disabled={players <= 1}
+                  className="w-10 h-10 flex items-center justify-center bg-zinc-950 hover:bg-zinc-900 disabled:opacity-40 disabled:pointer-events-none text-white rounded-xl border border-zinc-800 transition-colors shrink-0"
+                  aria-label="Reduser antall spillere"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  className="flex-1 min-w-0 max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-center font-medium text-white outline-none focus:border-[#9C39FF]"
+                  value={players}
+                  onChange={(e) => handlePlayersChange(Number(e.target.value))}
+                />
+                <button
+                  type="button"
+                  onClick={() => handlePlayersChange(players + 1)}
+                  className="w-10 h-10 flex items-center justify-center bg-zinc-950 hover:bg-zinc-900 text-white rounded-xl border border-zinc-800 transition-colors shrink-0"
+                  aria-label="Øk antall spillere"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            
-            <div>
-              <label className="text-sm text-zinc-400 mb-1 block">Total Pris (NOK)</label>
-              <input
-                type="number"
-                min="0"
-                required
-                className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-white outline-none focus:border-[#9C39FF]"
-                value={totalPrice}
-                onChange={(e) => setTotalPrice(Number(e.target.value))}
-              />
+
+            {/* Pricing Section: Global Tiers + Custom Per Person / Custom Total Override */}
+            <div className="bg-zinc-950/70 border border-zinc-800 rounded-xl p-4 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-[#9C39FF]">
+                  <Tag className="w-3.5 h-3.5" />
+                  <span>Prisberegning</span>
+                </div>
+                {pricingMode !== "global" && (
+                  <button
+                    type="button"
+                    onClick={handleResetToGlobalPricing}
+                    className="text-xs text-[#9C39FF] hover:text-purple-300 flex items-center gap-1 transition-colors"
+                    title="Tilbakestill til globalt pristrinn"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Bruk global pris ({currentGlobalTierPerPerson} kr/pers)</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Mode Selector Pills */}
+              <div className="grid grid-cols-3 gap-1.5 p-1 bg-zinc-900/90 border border-zinc-800 rounded-lg text-xs">
+                <button
+                  type="button"
+                  onClick={handleResetToGlobalPricing}
+                  className={`py-1.5 px-2 rounded-md font-medium transition-all text-center ${
+                    pricingMode === "global"
+                      ? "bg-[#9C39FF] text-white shadow-sm"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  Globalt trinn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPricingMode("custom_per_person")}
+                  className={`py-1.5 px-2 rounded-md font-medium transition-all text-center ${
+                    pricingMode === "custom_per_person"
+                      ? "bg-[#9C39FF] text-white shadow-sm"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  Egen kr/pers
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPricingMode("custom_total")}
+                  className={`py-1.5 px-2 rounded-md font-medium transition-all text-center ${
+                    pricingMode === "custom_total"
+                      ? "bg-[#9C39FF] text-white shadow-sm"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  Egen totalpris
+                </button>
+              </div>
+
+              {/* Side-by-side Price Per Person & Total Price Inputs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="text-xs text-zinc-400 mb-1 block">
+                    Pris per deltaker (NOK)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    className={`w-full box-border bg-zinc-900 border rounded-xl px-3.5 py-2 text-white outline-none transition-colors ${
+                      pricingMode === "custom_per_person"
+                        ? "border-[#9C39FF] ring-1 ring-[#9C39FF]/30"
+                        : "border-zinc-800 focus:border-[#9C39FF]"
+                    }`}
+                    value={pricePerPerson}
+                    onChange={(e) => handlePricePerPersonInputChange(e.target.value)}
+                  />
+                  <span className="text-[11px] text-zinc-500 mt-1 block">
+                    {pricingMode === "global"
+                      ? `Automatisk trinn for ${players} pers`
+                      : pricingMode === "custom_per_person"
+                      ? `Overstyrt kr/pers (global: ${currentGlobalTierPerPerson} kr)`
+                      : `Effektiv pris pr. pers ved fast total`}
+                  </span>
+                </div>
+
+                <div>
+                  <label className="text-xs text-zinc-400 mb-1 block">
+                    Total Pris (NOK)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    required
+                    className={`w-full box-border bg-zinc-900 border rounded-xl px-3.5 py-2 font-semibold text-white outline-none transition-colors ${
+                      pricingMode === "custom_total"
+                        ? "border-[#9C39FF] ring-1 ring-[#9C39FF]/30"
+                        : "border-zinc-800 focus:border-[#9C39FF]"
+                    }`}
+                    value={totalPrice}
+                    onChange={(e) => handleTotalPriceInputChange(e.target.value)}
+                  />
+                  <span className="text-[11px] text-zinc-500 mt-1 block">
+                    {pricingMode === "custom_total"
+                      ? `Låst totalpris (global: ${currentGlobalTierTotal} kr)`
+                      : `${players} pers × ${pricePerPerson} kr = ${totalPrice} kr`}
+                  </span>
+                </div>
+              </div>
+
+              {/* Global Pricing Reference Bar */}
+              <div className="pt-2 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-1 text-[11px] text-zinc-500">
+                <span>Globale pristrinn:</span>
+                <span>
+                  2p: {globalPricing["2"] ?? 460},- · 3–4p: {globalPricing["3"] ?? 395},- · 5–7p: {globalPricing["5"] ?? 385},- · 8+p: {globalPricing["8"] ?? 375},-
+                </span>
+              </div>
             </div>
 
           </div>

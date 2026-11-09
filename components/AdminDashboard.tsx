@@ -279,7 +279,11 @@ export default function AdminDashboard() {
 
         if (settingsRes.ok) {
           const sett = await settingsRes.json();
-          if (sett?.general?.pricing) {
+          if (sett?.pricing?.pricing) {
+            setPricingTiers(sett.pricing.pricing);
+          } else if (sett?.pricing && typeof sett.pricing === 'object') {
+            setPricingTiers(sett.pricing);
+          } else if (sett?.general?.pricing) {
             setPricingTiers(sett.general.pricing);
           }
         }

@@ -41,7 +41,7 @@ interface EditBookingModalProps {
 }
 
 const DEFAULT_PRICING_TIERS: Record<string, number> = {
-  "1": 595,
+  "1": 460,
   "2": 460,
   "3": 395,
   "4": 395,
@@ -50,6 +50,13 @@ const DEFAULT_PRICING_TIERS: Record<string, number> = {
   "7": 385,
   "8": 375,
 };
+
+function getTierPricePerPerson(count: number, tiers: Record<string, number>): number {
+  const validCount = Math.max(1, count || 1);
+  if (validCount === 1) return Number(tiers["1"] ?? tiers["2"] ?? 460);
+  const tierKey = validCount >= 8 ? "8" : validCount.toString();
+  return Number(tiers[tierKey] ?? 375);
+}
 
 export default function EditBookingModal({
   booking,
@@ -172,8 +179,8 @@ export default function EditBookingModal({
 
   // Handler for changing player count
   const handlePlayerCountChange = (newCount: number) => {
-    const validCount = Math.max(1, Math.min(20, newCount));
-    const previousPlayers = players;
+    const validCount = Math.max(1, Math.min(64, newCount));
+    const previousPlayers = Math.max(1, players);
     setPlayers(validCount);
 
     // Adjust player names array
@@ -189,16 +196,16 @@ export default function EditBookingModal({
       return next;
     });
 
-    // Proportional auto-price update if total price exists
-    if (previousPlayers > 0 && totalPrice > 0) {
-      const pricePerPerson = totalPrice / previousPlayers;
-      const newTotal = Math.round(pricePerPerson * validCount);
-      setTotalPrice(newTotal);
+    const prevTierPerPerson = getTierPricePerPerson(previousPlayers, pricingTiers);
+    const wasFollowingGlobalTier = totalPrice === 0 || Math.round(totalPrice) === Math.round(prevTierPerPerson * previousPlayers);
+
+    if (wasFollowingGlobalTier) {
+      const newTierPerPerson = getTierPricePerPerson(validCount, pricingTiers);
+      setTotalPrice(newTierPerPerson * validCount);
     } else {
-      // Fallback to pricing tier
-      const tierKey = validCount > 8 ? "8" : validCount.toString();
-      const perPerson = pricingTiers[tierKey] || 385;
-      setTotalPrice(perPerson * validCount);
+      // Keep custom price per person proportional
+      const customPerPerson = totalPrice / previousPlayers;
+      setTotalPrice(Math.round(customPerPerson * validCount));
     }
   };
 
@@ -211,8 +218,7 @@ export default function EditBookingModal({
   };
 
   const handleApplyTierPricing = () => {
-    const tierKey = players > 8 ? "8" : players.toString();
-    const perPerson = pricingTiers[tierKey] || 385;
+    const perPerson = getTierPricePerPerson(players, pricingTiers);
     const calculated = perPerson * players;
     setTotalPrice(calculated);
     toast.success(`Totalpris satt til ${calculated} NOK (${perPerson} kr/pers)`);
@@ -618,7 +624,27 @@ export default function EditBookingModal({
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-zinc-950/70 p-4 rounded-xl border border-zinc-800">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-zinc-950/70 p-4 rounded-xl border border-zinc-800">
+              <div>
+                <label className="block text-xs font-medium text-zinc-400 mb-1">
+                  Pris per pers (NOK)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={players > 0 ? Math.round((totalPrice / players) * 100) / 100 : 0}
+                  onChange={(e) => {
+                    const perPers = Math.max(0, Number(e.target.value) || 0);
+                    setTotalPrice(Math.round(perPers * Math.max(1, players)));
+                  }}
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm font-bold text-white focus:outline-none focus:border-[#9C39FF]"
+                />
+                <span className="text-[10px] text-zinc-500 mt-1 block">
+                  Global: {getTierPricePerPerson(players, pricingTiers)} kr/pers
+                </span>
+              </div>
+
               <div>
                 <label className="block text-xs font-medium text-zinc-400 mb-1">
                   Totalpris (NOK)
@@ -631,7 +657,7 @@ export default function EditBookingModal({
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm font-bold text-white focus:outline-none focus:border-[#9C39FF]"
                 />
                 <span className="text-[10px] text-zinc-500 mt-1 block">
-                  {players > 0 ? `${Math.round(totalPrice / players)} kr per pers` : ""}
+                  {players} pers × {players > 0 ? Math.round(totalPrice / players) : 0} kr
                 </span>
               </div>
 
