@@ -79,6 +79,19 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
   const [validatingDiscount, setValidatingDiscount] = useState(false);
   const [discountError, setDiscountError] = useState("");
   const [discountMessage, setDiscountMessage] = useState("");
+
+  // Gift Card
+  const [giftCardCodeInput, setGiftCardCodeInput] = useState("");
+  const [appliedGiftCard, setAppliedGiftCard] = useState<{
+    id: string;
+    code: string;
+    balance: number;
+    initialAmount: number;
+    targetPersons: number;
+  } | null>(null);
+  const [validatingGiftCard, setValidatingGiftCard] = useState(false);
+  const [giftCardError, setGiftCardError] = useState("");
+  const [giftCardMessage, setGiftCardMessage] = useState("");
   
   // Global Pricing State
   const [globalPricing, setGlobalPricing] = useState<Record<string, number>>({
@@ -219,7 +232,13 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
     }
     if (discountAmount > rawTotalPrice) discountAmount = rawTotalPrice;
   }
-  const totalPrice = rawTotalPrice - discountAmount;
+  const priceAfterDiscount = Math.max(0, rawTotalPrice - discountAmount);
+
+  let giftCardDeduction = 0;
+  if (!isVippsTest && appliedGiftCard) {
+    giftCardDeduction = Math.min(priceAfterDiscount, appliedGiftCard.balance);
+  }
+  const totalPrice = priceAfterDiscount - giftCardDeduction;
   const amountToPay = isVippsTest ? 2 : (paymentType === "vipps" ? totalPrice : 0);
 
   const handleApplyDiscount = async () => {
@@ -246,11 +265,48 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
         );
         setDiscountCodeInput("");
       }
-    } catch (err) {
+    } catch {
       setDiscountError(isEn ? "Could not validate discount code" : "Kunne ikke validere rabattkode");
     } finally {
       setValidatingDiscount(false);
     }
+  };
+
+  const handleApplyGiftCard = async () => {
+    if (!giftCardCodeInput.trim()) return;
+    setValidatingGiftCard(true);
+    setGiftCardError("");
+    setGiftCardMessage("");
+    try {
+      const res = await fetch("/api/gift-cards/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: giftCardCodeInput.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.isValid) {
+        setGiftCardError(data.error || (isEn ? "Invalid gift card" : "Ugyldig gavekortkode"));
+        setAppliedGiftCard(null);
+      } else {
+        setAppliedGiftCard(data.giftCard);
+        setGiftCardMessage(
+          isEn
+            ? `Gift card applied! Balance: ${data.giftCard.balance} NOK`
+            : `Gavekort lagt til! Saldo: ${data.giftCard.balance} kr`
+        );
+        setGiftCardCodeInput("");
+      }
+    } catch {
+      setGiftCardError(isEn ? "Could not validate gift card" : "Kunne ikke validere gavekort");
+    } finally {
+      setValidatingGiftCard(false);
+    }
+  };
+
+  const handleRemoveGiftCard = () => {
+    setAppliedGiftCard(null);
+    setGiftCardMessage("");
+    setGiftCardError("");
   };
 
   const handleNext = () => {
@@ -297,8 +353,13 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
           firstName, lastName, email, phone,
           internalNotes: customerNote.trim() !== '' ? customerNote : undefined,
           acceptedTerms, acceptedNewsletter,
-          paymentType, totalPrice, amountPaid: 0,
-          status: "pending", discountCode: appliedDiscount?.code,
+          paymentType,
+          totalPrice: priceAfterDiscount,
+          giftCardCode: appliedGiftCard?.code || null,
+          giftCardAmount: giftCardDeduction,
+          amountPaid: 0,
+          status: "pending",
+          discountCode: appliedDiscount?.code,
           locale,
         })
       });
@@ -397,6 +458,9 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
     paymentType, setPaymentType, isSubmitting, bookingComplete,
     discountCodeInput, setDiscountCodeInput, appliedDiscount, validatingDiscount,
     discountError, discountMessage,
+    giftCardCodeInput, setGiftCardCodeInput, appliedGiftCard, validatingGiftCard,
+    giftCardError, giftCardMessage, handleApplyGiftCard, handleRemoveGiftCard,
+    giftCardDeduction, priceAfterDiscount,
     globalPricing, bookedTimes: effectiveBookedTimes, loadingTimes, availableTimes, bookedDates,
     isVippsTest, pricePerPerson, rawTotalPrice, discountAmount, totalPrice, amountToPay,
     handleApplyDiscount, handleNext, handleBack, handleSubmit

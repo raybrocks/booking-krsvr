@@ -55,6 +55,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     if (data.status === 'cancelled') {
+      try {
+        const { restoreGiftCardBalanceForBooking } = await import('@/lib/giftcard');
+        await restoreGiftCardBalanceForBooking(id);
+      } catch (gcErr) {
+        console.error("Failed to restore gift card balance on admin cancellation:", gcErr);
+      }
       await sendBookingCancellationEmail(updatedBooking.email, updatedBooking);
     } else if (sendConfirmation && updatedBooking.email && !updatedBooking.email.includes('system@sperret')) {
       await sendBookingConfirmationEmail(
@@ -128,6 +134,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     });
 
     if (existingBooking) {
+      try {
+        const { restoreGiftCardBalanceForBooking } = await import('@/lib/giftcard');
+        await restoreGiftCardBalanceForBooking(id);
+      } catch (gcErr) {
+        console.error("Failed to restore gift card balance on admin deletion:", gcErr);
+      }
+
       try {
         await sendBookingChangePushNotification({
           booking: { ...existingBooking, status: 'cancelled' },

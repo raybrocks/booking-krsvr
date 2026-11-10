@@ -19,16 +19,52 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    // SECURITY GUARD: confirm-zero is ONLY allowed for Pay-at-Venue (`terminal`) or
-    // genuine 0 NOK bookings (e.g. 100% discount code). Vipps bookings MUST go through Vipps!
+    // SECURITY GUARD: confirm-zero is ONLY allowed for Pay-at-Venue (`terminal`),
+    // full gift card coverage, or genuine 0 NOK bookings (e.g. 100% discount code).
+    const isGiftCardCovered = Boolean(
+      booking.giftCardCode &&
+      (booking.giftCardAmount || 0) > 0 &&
+      (booking.giftCardAmount || 0) >= (booking.totalPrice || 0)
+    );
+
     const isZeroUpfrontAllowed =
-      booking.paymentType === 'terminal' || (booking.totalPrice || 0) === 0;
+      booking.paymentType === 'terminal' || (booking.totalPrice || 0) === 0 || isGiftCardCovered;
 
     if (!isZeroUpfrontAllowed) {
       return NextResponse.json(
         { error: 'Denne bestillingen krever gjennomført Vipps-betaling før bekreftelse.' },
         { status: 400 }
       );
+    }
+
+    // Hvis bookingen er dekket av et gavekort, trekk fra saldoen atomisk
+    let effectiveAmountPaid = 0;
+    if (isGiftCardCovered && booking.giftCardCode) {
+      const { redeemGiftCard } = await import('@/lib/giftcard');
+      const giftCard = await prisma.giftCard.findUnique({
+        where: { code: booking.giftCardCode.toUpperCase().trim() },
+      });
+
+      if (!giftCard || giftCard.status !== 'active' || giftCard.balance < (booking.giftCardAmount || 0)) {
+        return NextResponse.json(
+          { error: 'Gavekortet er ikke lenger gyldig eller har utilstrekkelig saldo.' },
+          { status: 400 }
+        );
+      }
+
+      const existingRedemption = await prisma.giftCardRedemption.findFirst({
+        where: { bookingId, giftCardId: giftCard.id },
+      });
+
+      if (!existingRedemption) {
+        await redeemGiftCard({
+          giftCardId: giftCard.id,
+          amount: booking.giftCardAmount || 0,
+          bookingId,
+          channel: 'web_booking',
+        });
+      }
+      effectiveAmountPaid = booking.giftCardAmount || 0;
     }
 
     // Atomic state transition so concurrent calls / refreshes never send duplicate emails
@@ -39,7 +75,7 @@ export async function POST(req: Request) {
       },
       data: {
         status: 'confirmed',
-        amountPaid: 0,
+        amountPaid: effectiveAmountPaid,
       },
     });
 

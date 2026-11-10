@@ -270,7 +270,43 @@ export async function confirmPaidVippsBookingAtomically(params: {
       });
     }
 
-    // 2. Transition booking state if not yet confirmed
+    // 2. Hvis bookingen er delvis betalt med gavekort, trekk gavekortsaldoen atomisk i samme transaksjon
+    let totalPaidNok = effectivePaidNok;
+    if (currentBooking.giftCardCode && (currentBooking.giftCardAmount || 0) > 0) {
+      const giftCard = await tx.giftCard.findUnique({
+        where: { code: currentBooking.giftCardCode.toUpperCase().trim() },
+      });
+      if (giftCard && giftCard.status === 'active' && giftCard.balance >= (currentBooking.giftCardAmount || 0)) {
+        const existingRedemption = await tx.giftCardRedemption.findFirst({
+          where: { bookingId, giftCardId: giftCard.id },
+        });
+        if (!existingRedemption) {
+          const deductAmount = currentBooking.giftCardAmount || 0;
+          const newBalance = Number((giftCard.balance - deductAmount).toFixed(2));
+          await tx.giftCardRedemption.create({
+            data: {
+              giftCardId: giftCard.id,
+              bookingId,
+              amount: deductAmount,
+              balanceBefore: giftCard.balance,
+              balanceAfter: newBalance,
+              channel: 'web_booking',
+              note: `Restbeløp betalt via Vipps (${effectivePaidNok} kr)`,
+            },
+          });
+          await tx.giftCard.update({
+            where: { id: giftCard.id },
+            data: {
+              balance: newBalance,
+              status: newBalance <= 0 ? 'exhausted' : 'active',
+            },
+          });
+          totalPaidNok = Number((effectivePaidNok + deductAmount).toFixed(2));
+        }
+      }
+    }
+
+    // 3. Transition booking state if not yet confirmed
     const wasConfirmed = currentBooking.status === 'confirmed';
 
     if (!wasConfirmed) {
@@ -278,18 +314,18 @@ export async function confirmPaidVippsBookingAtomically(params: {
         where: { id: bookingId },
         data: {
           status: 'confirmed',
-          amountPaid: effectivePaidNok,
+          amountPaid: totalPaidNok,
           paymentRef: vippsRef,
         },
       });
     } else if (
-      (currentBooking.amountPaid || 0) < effectivePaidNok ||
+      (currentBooking.amountPaid || 0) < totalPaidNok ||
       !currentBooking.paymentRef
     ) {
       await tx.booking.update({
         where: { id: bookingId },
         data: {
-          amountPaid: effectivePaidNok,
+          amountPaid: totalPaidNok,
           paymentRef: vippsRef,
         },
       });

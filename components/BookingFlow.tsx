@@ -46,6 +46,9 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
     paymentType, setPaymentType, isSubmitting, bookingComplete,
     discountCodeInput, setDiscountCodeInput, appliedDiscount, validatingDiscount,
     discountError, discountMessage,
+    giftCardCodeInput, setGiftCardCodeInput, appliedGiftCard, validatingGiftCard,
+    giftCardError, giftCardMessage, handleApplyGiftCard, handleRemoveGiftCard,
+    giftCardDeduction, priceAfterDiscount,
     bookedTimes, loadingTimes, availableTimes, bookedDates,
     isVippsTest, pricePerPerson, rawTotalPrice, totalPrice, amountToPay,
     handleApplyDiscount, handleNext, handleBack, handleSubmit
@@ -691,7 +694,7 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                   <span className="text-zinc-300">{isEn ? "Total Price" : "Sum"}</span>
                   <div className="text-right">
                     <div className="text-sm text-zinc-500 line-through">
-                      {appliedDiscount && `${rawTotalPrice} NOK`}
+                      {(appliedDiscount || appliedGiftCard) && `${rawTotalPrice} NOK`}
                     </div>
                     <div className="font-medium text-white">
                       {pricePerPerson} NOK{" "}
@@ -699,11 +702,32 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                         {isVippsTest ? (isEn ? "total" : "totalt") : "per person"}
                       </span>
                     </div>
-                    <div className="text-sm text-zinc-400 mt-0.5">
+
+                    {appliedGiftCard && (
+                      <div className="text-xs text-emerald-400 mt-1 font-medium">
+                        {isEn
+                          ? `Gift card deduction: -${giftCardDeduction} NOK`
+                          : `Gavekort trukket: -${giftCardDeduction} kr`}
+                      </div>
+                    )}
+
+                    <div className="text-sm text-zinc-300 mt-1 font-semibold">
                       {isEn
-                        ? `Total: ${totalPrice} NOK (approx. €${toApproxEur(totalPrice)})`
-                        : `Total: ${totalPrice} NOK`}
+                        ? totalPrice === 0
+                          ? '0 NOK (Fully covered by gift card)'
+                          : `To pay: ${totalPrice} NOK (approx. €${toApproxEur(totalPrice)})`
+                        : totalPrice === 0
+                        ? '0 kr (Fullt dekket av gavekort)'
+                        : `Å betale: ${totalPrice} kr`}
                     </div>
+
+                    {appliedGiftCard && appliedGiftCard.balance > giftCardDeduction && (
+                      <div className="text-[11px] text-zinc-400 mt-0.5">
+                        {isEn
+                          ? `Remaining on card after booking: ${appliedGiftCard.balance - giftCardDeduction} NOK`
+                          : `Gjenstående saldo på gavekortet etter booking: ${appliedGiftCard.balance - giftCardDeduction} kr`}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -726,13 +750,70 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                     onClick={handleApplyDiscount}
                     disabled={!discountCodeInput.trim() || validatingDiscount}
                     variant="secondary"
-                    className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700"
+                    className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 cursor-pointer"
                   >
                     {validatingDiscount ? <Loader2 className="w-4 h-4 animate-spin" /> : isEn ? "Apply" : "Legg til"}
                   </Button>
                 </div>
                 {discountError && <p className="text-red-400 text-sm">{discountError}</p>}
                 {discountMessage && <p className="text-green-400 text-sm">{discountMessage}</p>}
+              </div>
+
+              {/* Gift Card Section */}
+              <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
+                <Label htmlFor="giftcard" className="text-zinc-300 flex items-center justify-between">
+                  <span>{isEn ? "Do you have a gift card?" : "Har du et gavekort?"}</span>
+                  {appliedGiftCard && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveGiftCard}
+                      className="text-xs text-red-400 hover:underline cursor-pointer"
+                    >
+                      {isEn ? "Remove card" : "Fjern gavekort"}
+                    </button>
+                  )}
+                </Label>
+                {!appliedGiftCard ? (
+                  <div className="flex space-x-2">
+                    <Input 
+                      id="giftcard"
+                      value={giftCardCodeInput}
+                      onChange={(e) => setGiftCardCodeInput(e.target.value.toUpperCase())}
+                      placeholder={isEn ? "e.g. KRS-7X29-M4PQ" : "f.eks. KRS-7X29-M4PQ"}
+                      className="bg-zinc-950 border-zinc-800 uppercase font-mono"
+                      disabled={validatingGiftCard}
+                    />
+                    <Button 
+                      onClick={handleApplyGiftCard}
+                      disabled={!giftCardCodeInput.trim() || validatingGiftCard}
+                      variant="secondary"
+                      className="bg-[#9C39FF] hover:bg-[#8A30E0] text-white border border-[#9C39FF]/50 cursor-pointer"
+                    >
+                      {validatingGiftCard ? <Loader2 className="w-4 h-4 animate-spin" /> : isEn ? "Redeem" : "Bruk"}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="bg-zinc-950/80 border border-emerald-500/30 rounded-xl p-4 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">
+                        {isEn ? "Applied Gift Card" : "Aktivt gavekort"}
+                      </div>
+                      <div className="text-base font-mono font-bold text-white tracking-wide">
+                        {appliedGiftCard.code}
+                      </div>
+                      <div className="text-xs text-zinc-400 mt-0.5">
+                        {isEn
+                          ? `Available balance: ${appliedGiftCard.balance} NOK`
+                          : `Tilgjengelig saldo: ${appliedGiftCard.balance} kr`}
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      -{giftCardDeduction} kr
+                    </span>
+                  </div>
+                )}
+                {giftCardError && <p className="text-red-400 text-sm">{giftCardError}</p>}
+                {giftCardMessage && !giftCardError && <p className="text-emerald-400 text-sm">{giftCardMessage}</p>}
               </div>
 
               <div className="bg-zinc-900/50 rounded-xl p-4 text-sm text-zinc-300 border border-zinc-800">

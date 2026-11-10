@@ -138,6 +138,7 @@ export default function Footer() {
                   <li><Link href="/en/experiences" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">VR Experiences</Link></li>
                   <li><Link href="/en/events" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Events & Groups</Link></li>
                   <li><Link href="/en/prices" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Prices</Link></li>
+                  <li><Link href="/gavekort" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Gift Cards</Link></li>
                   <li><Link href="/en/booking" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Book Now</Link></li>
                   <li><Link href="/en/faq" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">FAQ</Link></li>
                 </>
@@ -147,6 +148,7 @@ export default function Footer() {
                   <li><Link href="/vr-opplevelser" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">VR Opplevelser</Link></li>
                   <li><Link href="/arrangementer" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Arrangementer</Link></li>
                   <li><Link href="/priser" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Priser</Link></li>
+                  <li><Link href="/gavekort" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Gavekort</Link></li>
                   <li><Link href="/booking" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">Booking</Link></li>
                   <li><Link href="/faq" className="text-zinc-400 hover:text-[#9C39FF] text-sm transition-colors">FAQ</Link></li>
                 </>

@@ -14,6 +14,8 @@ import { WeeklySummaryEmail } from './WeeklySummaryEmail';
 import { NewsletterBroadcastEmail } from './NewsletterBroadcastEmail';
 import { ReviewRequestEmail } from './ReviewRequestEmail';
 import { AdminReviewRequestReceiptEmail } from './AdminReviewRequestReceiptEmail';
+import { GiftCardCustomerEmail } from './GiftCardCustomerEmail';
+import { AdminNewGiftCardEmail } from './AdminNewGiftCardEmail';
 
 export interface EmailTemplateDefinition {
   id: string;
@@ -452,6 +454,53 @@ export const EMAIL_TEMPLATES: EmailTemplateDefinition[] = [
       platform: 'both',
       language: 'no',
       adminEmail: 'post@krsvr.no',
+    },
+  },
+  {
+    id: 'gift-card-customer',
+    title: 'Gavekort til kjøper',
+    category: 'customer',
+    categoryLabel: 'Bekreftelser til kunder',
+    subject: 'Ditt gavekort fra KRS VR Arena (KRS-7X29-M4PQ)',
+    trigger: 'Sendes automatisk til kjøper umiddelbart etter at gavekortet er betalt med Vipps.',
+    filePath: 'components/emails/GiftCardCustomerEmail.tsx',
+    Component: GiftCardCustomerEmail,
+    mockProps: {
+      buyerName: 'Martin Hansen',
+      code: 'KRS-7X29-M4PQ',
+      initialAmount: 1580,
+      targetPersons: 4,
+      expiresAt: '10. november 2027',
+      recipientName: 'Jonas',
+      senderName: 'Martin & Therese',
+      greetingMessage: 'Gratulerer med dagen! Gleder oss til å utfordre deg i VR Escape Room!',
+      printUrl: 'https://krsvr.no/gavekort/print/KRS-7X29-M4PQ',
+      bookingUrl: 'https://krsvr.no/booking',
+      locale: 'no',
+    },
+  },
+  {
+    id: 'admin-new-gift-card',
+    title: 'Internt varsel om solgt gavekort',
+    category: 'internal',
+    categoryLabel: 'Interne varslinger',
+    subject: 'Nytt gavekort solgt: Martin Hansen (1 580 kr)',
+    trigger: 'Sendes til post@krsvr.no ved fullført kjøp av gavekort via Vipps.',
+    filePath: 'components/emails/AdminNewGiftCardEmail.tsx',
+    Component: AdminNewGiftCardEmail,
+    mockProps: {
+      buyerName: 'Martin Hansen',
+      buyerEmail: 'martin@example.com',
+      buyerPhone: '+47 900 00 000',
+      code: 'KRS-7X29-M4PQ',
+      initialAmount: 1580,
+      targetPersons: 4,
+      expiresAt: '10. november 2027',
+      recipientName: 'Jonas',
+      senderName: 'Martin & Therese',
+      greetingMessage: 'Gratulerer med dagen! Gleder oss til å utfordre deg i VR Escape Room!',
+      paymentRef: 'vipps-tx-sample-9988',
+      adminUrl: 'https://krsvr.no/admin?tab=giftcards',
     },
   },
 ];

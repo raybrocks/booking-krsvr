@@ -103,6 +103,15 @@ Prisene er oppgitt **ekskludert merverdiavgift (+ mva)**:
 - **Utdrikningslag:** Fra 450 NOK per person (approx. €38, varighet 1,5–3 timer).
 - **VR Bursdag / Barnebursdag:** Fra 375 NOK per person (approx. €32, 90 minutter totalopplevelse).
 
+### 3.4 Digitale Gavekort på VR-opplevelser
+- **Kjøps-URL:** https://www.krsvr.no/gavekort
+- **Struktur:** Kjøpes for et valgt antall personer (f.eks. 2 pers: 920 NOK, 3 pers: 1 185 NOK, 4 pers: 1 580 NOK, 6 pers: 2 310 NOK, 8 pers: 3 000 NOK) basert på arenaens trappetrinnspriser, eller tilpasset antall (1–10 personer).
+- **Gyldighetstid:** Nøyaktig 12 måneder fra kjøpsdato (hard utløpstid).
+- **Levering:** Sendes umiddelbart per e-post til kjøperen som et digitalt gavekort og utskriftsvennlig A4-brettekort (PDF) med unik kode (KRS-XXXX-YYYY), beløp og personlig hilsen.
+- **Innløsning i booking:** Mottaker taster inn koden under bestilling på https://www.krsvr.no/booking eller over disk i arenaen. Hvis gruppen som booker er større enn gavekortet dekker, betales kun differansen med Vipps. Hvis gruppen er mindre, forblir restbeløpet disponibelt på koden i 12 måneder.
+- **Kombinasjon med rabattkoder:** Kan kombineres med gyldige kampanje- og rabattkoder (rabattkoden reduserer prisen, og gavekortet dekker det resterende beløpet).
+- **Regnskap og MVA:** Flerbruks-kupong (0 % MVA ved salg som forskudd/kortsiktig gjeld, 12 % MVA beregnes og rapporteres ved faktisk innløsning i booking).
+
 ---
 
 ## 3B. International Visitors & Multilingual Support (EN / DE / NL)

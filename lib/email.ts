@@ -13,6 +13,8 @@ import { AdminNameListReminderEmail } from '@/components/emails/AdminNameListRem
 import { EmployeeInviteEmail } from '@/components/emails/EmployeeInviteEmail';
 import { ReviewRequestEmail } from '@/components/emails/ReviewRequestEmail';
 import { AdminReviewRequestReceiptEmail } from '@/components/emails/AdminReviewRequestReceiptEmail';
+import { GiftCardCustomerEmail } from '@/components/emails/GiftCardCustomerEmail';
+import { AdminNewGiftCardEmail } from '@/components/emails/AdminNewGiftCardEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -865,6 +867,108 @@ export async function sendReviewRequestEmail(
     return data;
   } catch (error) {
     console.error("Error sending review request email:", error);
+    return null;
+  }
+}
+
+export async function sendGiftCardCustomerEmail(to: string, giftCard: any) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Gift card email not sent.");
+    return null;
+  }
+
+  try {
+    const adminEmail = await getAdminEmail();
+    const expiryFormatted = giftCard.expiresAt instanceof Date
+      ? giftCard.expiresAt.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' })
+      : new Date(giftCard.expiresAt).toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const html = await render(
+      React.createElement(GiftCardCustomerEmail, {
+        buyerName: giftCard.buyerName,
+        code: giftCard.code,
+        initialAmount: giftCard.initialAmount,
+        targetPersons: giftCard.targetPersons,
+        expiresAt: expiryFormatted,
+        recipientName: giftCard.recipientName,
+        senderName: giftCard.senderName,
+        greetingMessage: giftCard.greetingMessage,
+        printUrl: `https://krsvr.no/gavekort/print/${giftCard.code}`,
+        bookingUrl: 'https://krsvr.no/booking',
+        locale: giftCard.locale || 'no',
+      })
+    );
+
+    const { data, error } = await resend.emails.send({
+      from: 'KRS VR Arena <booking@donotreply.krsvr.no>',
+      to,
+      replyTo: adminEmail,
+      subject: `Ditt gavekort fra KRS VR Arena (${giftCard.code})`,
+      html,
+    });
+
+    if (error) {
+      console.error("Resend error sending gift card email:", error);
+      return null;
+    }
+
+    addContactToNewsletter(to, giftCard.buyerName, '').catch((err) => {
+      console.error("Auto-sync contact to Resend failed in sendGiftCardCustomerEmail:", err);
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Failed to send gift card customer email:", error);
+    return null;
+  }
+}
+
+export async function sendAdminNewGiftCardEmail(giftCard: any) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not set. Admin gift card email not sent.");
+    return null;
+  }
+
+  try {
+    const adminEmail = await getAdminEmail();
+    const adminRecipients = Array.from(new Set(['post@krsvr.no', adminEmail]));
+    const expiryFormatted = giftCard.expiresAt instanceof Date
+      ? giftCard.expiresAt.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' })
+      : new Date(giftCard.expiresAt).toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const html = await render(
+      React.createElement(AdminNewGiftCardEmail, {
+        buyerName: giftCard.buyerName,
+        buyerEmail: giftCard.buyerEmail,
+        buyerPhone: giftCard.buyerPhone,
+        code: giftCard.code,
+        initialAmount: giftCard.initialAmount,
+        targetPersons: giftCard.targetPersons,
+        expiresAt: expiryFormatted,
+        recipientName: giftCard.recipientName,
+        senderName: giftCard.senderName,
+        greetingMessage: giftCard.greetingMessage,
+        paymentRef: giftCard.paymentRef,
+        adminUrl: 'https://krsvr.no/admin?tab=giftcards',
+      })
+    );
+
+    const { data, error } = await resend.emails.send({
+      from: 'KRS VR Arena Admin <booking@donotreply.krsvr.no>',
+      to: adminRecipients,
+      replyTo: giftCard.buyerEmail,
+      subject: `Nytt gavekort solgt: ${giftCard.buyerName} (${giftCard.initialAmount} kr)`,
+      html,
+    });
+
+    if (error) {
+      console.error("Resend error sending admin gift card email:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Failed to send admin gift card email:", error);
     return null;
   }
 }

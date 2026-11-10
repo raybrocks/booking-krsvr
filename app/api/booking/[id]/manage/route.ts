@@ -190,6 +190,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       data: { status: 'cancelled' }
     });
 
+    // Tilbakefør eventuell gavekortsaldo automatisk
+    try {
+      const { restoreGiftCardBalanceForBooking } = await import('@/lib/giftcard');
+      await restoreGiftCardBalanceForBooking(id);
+    } catch (gcErr) {
+      console.error("Failed to restore gift card balance on cancellation:", gcErr);
+    }
+
     // Send cancellation email
     await sendBookingCancellationEmail(booking.email, booking);
     await sendAdminBookingCancellationNotification(booking);

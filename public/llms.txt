@@ -49,6 +49,14 @@ KRS VR Arena disponerer 143 kvm fri bevegelsesflate uten kabler eller tunge rygg
 - **Utdrikningslag:** Fra 450 NOK per person (ca. €38, 1,5–3 timer).
 - **VR Bursdag:** Fra 375 NOK per person (ca. €32, 90 min).
 
+## Gavekort (Digitale Gavekort på VR-opplevelser)
+- **Kjøps-URL:** https://www.krsvr.no/gavekort
+- **Konsept:** Kjøpes for et valgt antall personer (2–10 personer) basert på arenaens standard trappetrinnpriser (f.eks. 2 pers: 920 NOK, 3 pers: 1 185 NOK, 4 pers: 1 580 NOK, 6 pers: 2 310 NOK, 8 pers: 3 000 NOK).
+- **Gyldighet:** Gyldig i nøyaktig 12 måneder fra kjøpsdato.
+- **Levering:** Sendes umiddelbart per e-post til kjøper som digitalt gavekort med unik kode og utskriftsvennlig PDF (A4 brettekort).
+- **Innløsning:** Løses inn i online booking på https://www.krsvr.no/booking eller over disk i arenaen. Hvis gruppen blir flere enn gavekortet dekker, betales kun differansen. Blir de færre, forblir restsaldoen på koden.
+- **Kombinasjon:** Kan kombineres med rabattkoder (rabattkode reduserer prisen, gavekortet dekker beløpet).
+
 ## International Visitors & Multilingual Support (EN / DE / NL)
 - **English Full Website:** https://www.krsvr.no/en
 - **English Online Booking (0 NOK upfront card payment on arrival):** https://www.krsvr.no/en/booking

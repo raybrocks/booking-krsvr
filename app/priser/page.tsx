@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Metadata } from "next";
-import { CheckCircle2, Clock, Info } from "lucide-react";
+import { CheckCircle2, Clock, Info, Gift } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Priser og prisoversikt for VR opplevelser",
@@ -57,6 +57,27 @@ export default function PriserPage() {
       </div>
 
       <div className="container mx-auto px-4 max-w-5xl">
+        {/* Gift Card Callout Banner */}
+        <div className="mb-10 bg-gradient-to-r from-purple-950/40 via-zinc-900/60 to-purple-950/40 border border-[#9C39FF]/30 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_30px_rgba(156,57,255,0.15)]">
+          <div className="flex items-center gap-4 text-center sm:text-left">
+            <div className="w-12 h-12 rounded-2xl bg-[#9C39FF]/20 border border-[#9C39FF]/40 flex items-center justify-center shrink-0 mx-auto sm:mx-0">
+              <Gift className="w-6 h-6 text-[#c084fc]" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Gi bort en opplevelse i gave</h3>
+              <p className="text-xs sm:text-sm text-zinc-300 mt-0.5">
+                Kjøp digitalt gavekort for 2–10 personer. 12 måneders gyldighet, umiddelbar levering til din e-post og enkel betaling med Vipps.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/gavekort"
+            className="shrink-0 px-6 py-3 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] hover:scale-105"
+          >
+            Kjøp gavekort nå
+          </Link>
+        </div>
+
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
           
           {/* Pricing Table */}
