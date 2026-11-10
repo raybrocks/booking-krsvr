@@ -228,6 +228,10 @@ export default function AdminDashboard() {
       if (tabParam && validTabs.includes(tabParam)) {
         setActiveTab(tabParam as any);
       }
+      const searchParam = params.get('search');
+      if (searchParam) {
+        setSearchQuery(searchParam);
+      }
     };
     syncTabFromUrl();
     window.addEventListener('popstate', syncTabFromUrl);

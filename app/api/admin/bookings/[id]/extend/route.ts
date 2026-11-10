@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendAdminPushNotification } from '@/lib/push';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -76,6 +77,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       where: { id: booking.id },
       data: { duration: newDuration }
     });
+
+    try {
+      await sendAdminPushNotification({
+        title: `Spilletid utvidet: ${booking.firstName} ${booking.lastName}`,
+        body: `Utvidet til ${newDuration} min (slot ${nextTime} sperret) · ${booking.date}`,
+        url: `/admin?search=${encodeURIComponent(booking.firstName)}`,
+        tag: `booking-extend-${booking.id}`,
+        bookingId: booking.id,
+      });
+    } catch (pushErr) {
+      console.error("Failed to send push notification on booking extend:", pushErr);
+    }
 
     return NextResponse.json({ success: true, newDuration });
   } catch (error: any) {

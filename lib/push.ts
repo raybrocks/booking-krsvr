@@ -100,3 +100,78 @@ export async function sendAdminPushNotification(payload: AdminPushPayload): Prom
 
   return { sent, failed, cleaned: deadIds.length };
 }
+
+export interface BookingChangePushOptions {
+  booking: any;
+  changes?: {
+    timeChanged?: boolean;
+    experienceChanged?: boolean;
+    playersChanged?: boolean;
+    namesUpdated?: boolean;
+    cancelled?: boolean;
+    oldDate?: string;
+    oldTime?: string;
+    oldPlayers?: number;
+    oldExperienceName?: string;
+  };
+  source?: 'customer' | 'admin';
+}
+
+/**
+ * Sends a specialized push notification when a booking is modified, rescheduled,
+ * cancelled, or when customer updates player names.
+ */
+export async function sendBookingChangePushNotification(options: BookingChangePushOptions) {
+  const { booking, changes, source = 'customer' } = options;
+  if (!booking) return null;
+
+  const fullName = `${booking.firstName || ''} ${booking.lastName || ''}`.trim() || 'Kunde';
+  const sourceLabel = source === 'customer' ? 'av kunde' : 'i admin';
+  const validNames = (Array.isArray(booking.playerNames) ? booking.playerNames : [])
+    .map((n: any) => String(n || '').trim())
+    .filter(Boolean);
+
+  let title = `Booking endret (${sourceLabel}): ${fullName}`;
+  let body = `${booking.date} kl. ${booking.time} · ${booking.players} pers`;
+  let tag = `booking-update-${booking.id}`;
+  let url = `/admin?search=${encodeURIComponent(booking.firstName || fullName)}`;
+
+  if (changes?.cancelled) {
+    title = `Booking kansellert: ${fullName}`;
+    body = `${booking.experience?.name || 'VR Opplevelse'} · ${booking.date} kl. ${booking.time} (${booking.players} pers · kansellert ${sourceLabel})`;
+    tag = `booking-cancel-${booking.id}`;
+    url = `/admin?tab=archive&search=${encodeURIComponent(booking.firstName || fullName)}`;
+  } else if (changes?.namesUpdated && !changes.timeChanged && !changes.playersChanged && !changes.experienceChanged) {
+    title = `Navneliste oppdatert: ${fullName}`;
+    const namePreview = validNames.length > 0
+      ? `: ${validNames.slice(0, 4).join(', ')}${validNames.length > 4 ? ` (+${validNames.length - 4})` : ''}`
+      : '';
+    body = `${validNames.length} av ${booking.players} deltakere registrert${namePreview} · ${booking.date} kl. ${booking.time}`;
+    tag = `booking-names-${booking.id}`;
+  } else if (changes?.playersChanged && !changes.timeChanged && !changes.experienceChanged) {
+    title = `Deltakerantall endret: ${fullName}`;
+    const oldP = changes.oldPlayers !== undefined ? `${changes.oldPlayers} ➔ ` : '';
+    body = `${oldP}${booking.players} pers${changes.namesUpdated ? ` (${validNames.length} navn registrert)` : ''} · ${booking.date} kl. ${booking.time}`;
+    tag = `booking-players-${booking.id}`;
+  } else if (changes?.timeChanged && !changes.experienceChanged) {
+    title = `Tidspunkt flyttet: ${fullName}`;
+    const oldInfo = changes.oldDate ? ` (før: ${changes.oldDate} kl. ${changes.oldTime})` : '';
+    body = `Ny tid: ${booking.date} kl. ${booking.time}${oldInfo} · ${booking.experience?.name || ''}`;
+    tag = `booking-time-${booking.id}`;
+  } else if (changes?.experienceChanged) {
+    title = `Opplevelse endret: ${fullName}`;
+    body = `${booking.experience?.name || booking.experienceId} · ${booking.date} kl. ${booking.time} (${booking.players} pers)`;
+    tag = `booking-exp-${booking.id}`;
+  } else if (changes?.namesUpdated) {
+    title = `Booking og navneliste oppdatert: ${fullName}`;
+    body = `${booking.players} pers (${validNames.length} navn registrert) · ${booking.date} kl. ${booking.time}`;
+  }
+
+  return sendAdminPushNotification({
+    title,
+    body,
+    url,
+    tag,
+    bookingId: booking.id,
+  });
+}

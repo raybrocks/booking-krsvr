@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendBookingCancellationEmail, sendBookingConfirmationEmail } from '@/lib/email';
+import { sendBookingChangePushNotification } from '@/lib/push';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -29,9 +30,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       data.playerNames = data.playerNames.map((n: any) => String(n || '').trim());
     }
 
+    const existingBooking = await prisma.booking.findUnique({
+      where: { id: id },
+      include: { experience: true }
+    });
+
     const updatedBooking = await prisma.booking.update({
       where: { id: id },
       data,
+      include: { experience: true }
     });
 
     // Cascade status and details to shadow bookings 
@@ -57,6 +64,44 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         { isUpdate: true }
       );
     }
+
+    // Dispatch push notification on admin booking update/cancellation
+    const isCancelled = Boolean(data.status === 'cancelled' && existingBooking?.status !== 'cancelled');
+    const timeChanged = Boolean(
+      (existingBooking && data.date && data.date !== existingBooking.date) ||
+      (existingBooking && data.time && data.time !== existingBooking.time)
+    );
+    const experienceChanged = Boolean(
+      existingBooking && data.experienceId && data.experienceId !== existingBooking.experienceId
+    );
+    const playersChanged = Boolean(
+      existingBooking && data.players !== undefined && data.players !== existingBooking.players
+    );
+    const oldNamesJson = JSON.stringify((existingBooking?.playerNames || []).map((n: any) => String(n || '').trim()));
+    const newNamesJson = JSON.stringify((updatedBooking?.playerNames || []).map((n: any) => String(n || '').trim()));
+    const namesUpdated = Boolean(oldNamesJson !== newNamesJson);
+
+    if (isCancelled || timeChanged || experienceChanged || playersChanged || namesUpdated) {
+      try {
+        await sendBookingChangePushNotification({
+          booking: updatedBooking,
+          changes: {
+            cancelled: isCancelled,
+            timeChanged,
+            experienceChanged,
+            playersChanged,
+            namesUpdated,
+            oldDate: existingBooking?.date,
+            oldTime: existingBooking?.time,
+            oldPlayers: existingBooking?.players,
+            oldExperienceName: existingBooking?.experience?.name,
+          },
+          source: 'admin',
+        });
+      } catch (pushErr) {
+        console.error("Failed to send admin push notification on booking edit:", pushErr);
+      }
+    }
     
     return NextResponse.json(updatedBooking);
   } catch (error) {
@@ -68,6 +113,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
+    const existingBooking = await prisma.booking.findUnique({
+      where: { id: id },
+      include: { experience: true }
+    });
+
     // Delete child bookings first
     await prisma.booking.deleteMany({
       where: { parentBookingId: id }
@@ -76,6 +126,18 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await prisma.booking.delete({
       where: { id: id },
     });
+
+    if (existingBooking) {
+      try {
+        await sendBookingChangePushNotification({
+          booking: { ...existingBooking, status: 'cancelled' },
+          changes: { cancelled: true },
+          source: 'admin',
+        });
+      } catch (pushErr) {
+        console.error("Failed to send admin push notification on booking delete:", pushErr);
+      }
+    }
     
     return NextResponse.json({ success: true });
   } catch (error) {

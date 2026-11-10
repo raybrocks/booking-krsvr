@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { differenceInHours } from 'date-fns';
 import { sendBookingCancellationEmail, sendAdminBookingUpdateNotification, sendAdminBookingCancellationNotification } from '@/lib/email';
+import { sendBookingChangePushNotification } from '@/lib/push';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -142,6 +143,16 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     
     await sendAdminBookingUpdateNotification(updated, changes);
 
+    try {
+      await sendBookingChangePushNotification({
+        booking: updated,
+        changes,
+        source: 'customer',
+      });
+    } catch (pushErr) {
+      console.error("Failed to send booking update push notification:", pushErr);
+    }
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Failed to update booking:", error);
@@ -158,7 +169,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   }
 
   try {
-    const booking = await prisma.booking.findUnique({ where: { id } });
+    const booking = await prisma.booking.findUnique({
+      where: { id },
+      include: { experience: true }
+    });
 
     if (!booking || booking.manageToken !== token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
@@ -179,6 +193,16 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     // Send cancellation email
     await sendBookingCancellationEmail(booking.email, booking);
     await sendAdminBookingCancellationNotification(booking);
+
+    try {
+      await sendBookingChangePushNotification({
+        booking: { ...booking, status: 'cancelled' },
+        changes: { cancelled: true },
+        source: 'customer',
+      });
+    } catch (pushErr) {
+      console.error("Failed to send booking cancellation push notification:", pushErr);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

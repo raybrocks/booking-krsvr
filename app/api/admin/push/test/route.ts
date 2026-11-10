@@ -7,7 +7,7 @@ export async function POST() {
   try {
     const result = await sendAdminPushNotification({
       title: 'KRS VR Arena – Testvarsel',
-      body: 'Push-varsler fungerer nå på denne enheten! Du vil motta varsel her ved nye bookinger og henvendelser.',
+      body: 'Push-varsler fungerer nå på denne enheten! Du vil motta varsel ved nye bookinger, henvendelser, endringer og oppdaterte navnelister.',
       url: '/admin',
       tag: `test-push-${Date.now()}`,
     });

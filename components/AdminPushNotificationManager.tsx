@@ -251,7 +251,7 @@ export default function AdminPushNotificationManager() {
               )}
             </h3>
             <p className="text-xs text-zinc-400 mt-0.5">
-              Motta øyeblikkelige varsler på låst skjerm når en ny booking gjennomføres eller en ny henvendelse mottas.
+              Motta øyeblikkelige varsler på låst skjerm ved nye bookinger, henvendelser, endringer og oppdaterte navnelister.
             </p>
           </div>
         </div>
