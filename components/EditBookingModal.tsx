@@ -697,7 +697,7 @@ export default function EditBookingModal({
                   {remainingPrice > 0 ? (booking.paymentType === 'terminal' ? "Betales i kortterminal ved ankomst" : "Betales ved oppmøte") : "Fullt betalt"}
                 </span>
 
-                {booking.paymentType === 'terminal' && remainingPrice > 0 && (
+                {['terminal', 'manual'].includes(booking.paymentType) && remainingPrice > 0 && booking.status !== 'cancelled' && (
                   <button
                     type="button"
                     onClick={async () => {
@@ -706,7 +706,16 @@ export default function EditBookingModal({
                         const res = await fetch(`/api/admin/bookings/${booking.id}/mark-paid`, { method: 'POST' });
                         const data = await res.json();
                         if (!res.ok) throw new Error(data.error || 'Feil ved registrering');
-                        setAmountPaid(totalPrice);
+                        const paidAmount = Number(data.booking?.amountPaid ?? booking.totalPrice ?? totalPrice);
+                        setAmountPaid(paidAmount);
+                        await onSave({
+                          ...booking,
+                          ...(data.booking || {}),
+                          amountPaid: paidAmount,
+                          status: data.booking?.status || 'confirmed',
+                          paymentType: data.booking?.paymentType || 'terminal',
+                          vippsStatus: 'TERMINAL_BETALT',
+                        });
                         toast.success("Markert som betalt i terminal!");
                       } catch (e: any) {
                         toast.error(e.message);

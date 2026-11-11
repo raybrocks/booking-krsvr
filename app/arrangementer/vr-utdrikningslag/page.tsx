@@ -87,17 +87,33 @@ export default function VrUtdrikningslagPage() {
           "name": "KRS VR Arena"
         },
         "category": "Bachelor and Bachelorette Parties",
-        "subjectOf": {
-          "@type": "WebPage",
-          "name": "VR Utdrikningslag hos KRS VR Arena – utdrikningslag.events",
-          "url": "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
-          "publisher": {
-            "@type": "Organization",
-            "name": "utdrikningslag.events",
-            "url": "https://utdrikningslag.events"
+        "subjectOf": [
+          {
+            "@type": "WebPage",
+            "name": "VR Utdrikningslag hos KRS VR Arena – utdrikningslag.events",
+            "url": "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
+            "publisher": {
+              "@type": "Organization",
+              "name": "utdrikningslag.events",
+              "url": "https://utdrikningslag.events"
+            }
+          },
+          {
+            "@type": "WebPage",
+            "name": "Utdrikningslag Kristiansand | VR Action – KRS VR Arena (Utdrikningslag.com)",
+            "description": "Offisiell presentasjon av KRS VR Arena for utdrikningslag i Kristiansand på Utdrikningslag.com.",
+            "url": "https://utdrikningslag.com/presentasjon/krs-vr-arena/",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Utdrikningslag.com",
+              "url": "https://utdrikningslag.com"
+            }
           }
-        },
-        "sameAs": "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
+        ],
+        "sameAs": [
+          "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
+          "https://utdrikningslag.com/presentasjon/krs-vr-arena/"
+        ],
         "offers": {
           "@type": "AggregateOffer",
           "lowPrice": 450,

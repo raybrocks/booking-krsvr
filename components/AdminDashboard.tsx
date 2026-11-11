@@ -374,7 +374,13 @@ export default function AdminDashboard() {
       toast.success(data.message || 'Booking markert som fullt betalt i arenaen!', { id: loadingToastId });
       setBookings(prev => prev.map(b => {
         if (b.id === bookingId) {
-          return { ...b, amountPaid: b.totalPrice, vippsStatus: 'TERMINAL_BETALT' };
+          return {
+            ...b,
+            amountPaid: data.booking?.amountPaid ?? b.totalPrice,
+            status: data.booking?.status || 'confirmed',
+            paymentType: data.booking?.paymentType || 'terminal',
+            vippsStatus: 'TERMINAL_BETALT',
+          };
         }
         return b;
       }));
@@ -1017,7 +1023,8 @@ export default function AdminDashboard() {
                             </div>
                           ) : booking.amountPaid > 0 ? (
                             <div className="text-zinc-400 text-[11px]">
-                              Innbetalt (Vipps): <span className="text-zinc-200 font-medium">{booking.amountPaid} NOK</span>
+                              {['vipps', 'reservation', 'full'].includes(booking.paymentType) ? 'Innbetalt (Vipps): ' : 'Innbetalt: '}
+                              <span className="text-zinc-200 font-medium">{booking.amountPaid} NOK</span>
                             </div>
                           ) : (
                             <div className="text-zinc-500 text-[11px] italic">
@@ -1070,7 +1077,7 @@ export default function AdminDashboard() {
                       })()}
 
                       {/* Handlingsknapp for Kortterminal i arena */}
-                      {booking.paymentType === 'terminal' && ((booking.totalPrice || 0) > (booking.amountPaid || 0)) && booking.status !== 'cancelled' && (
+                      {['terminal', 'manual'].includes(booking.paymentType) && ((booking.totalPrice || 0) > (booking.amountPaid || 0)) && booking.status !== 'cancelled' && (
                         <div className="mt-1">
                           <button 
                             onClick={() => handleMarkTerminalPaid(booking.id)} 

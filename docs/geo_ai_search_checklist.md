@@ -46,7 +46,7 @@ Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, ra
 | **dendagen.no** | Utenfor Topp 5M | ~18 | ✅ Omtale + `krsvr.no` | Ja (NAP) | Indeksert med kontaktinfo, e-post, tlf og beskrivelse av partylounge. |
 | **falio.no** | Utenfor Topp 5M | ~15 | ✅ Katalogoppføring | Nei | Henter registerdata fra Brønnøysund (`62.100`). |
 | **[utdrikningslag.events](https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena)** | Utenfor Topp 5M | ~25 | ✅ **Aktiv profil + indeksert** | 🔄 Venter sitering | Komplett profil med priser (fra 450 kr), bilder, innendørs og leadsskjema. Indeksert av Google/Gemini. |
-| **[utdrikningslag.com](https://www.utdrikningslag.com/)** | Utenfor Topp 5M | ~25 | 🔄 **Avtale inngått (03.11)** | 🔄 Under oppsett | Avtale inngått med Niclas Lanneteg. Gratis profilering i november måned, deretter aktiv avtale for desember og 2027. Skreddersydd tekst, bildepakke og org.opplysninger oversendt. Hovedkilde (#1) for AI på utdrikningslag-søk! |
+| **[utdrikningslag.com](https://utdrikningslag.com/presentasjon/krs-vr-arena/)** | Utenfor Topp 5M | ~25 | ✅ **Publisert & Live (11.11)** *(nofollow ut)* | 🔄 Venter indeksering | Live presentasjonsside ([krs-vr-arena](https://utdrikningslag.com/presentasjon/krs-vr-arena/)) + **#1 øverst på [`/kristiansand/`](https://utdrikningslag.com/kristiansand/)**! Riktig NAP, priser (fra 450 kr), 143 m², lounge/bar og pizza. Koblet via Schema.org `sameAs` & `subjectOf` (kompenserer for `nofollow`). Hovedkilde (#1) for AI på utdrikningslag-søk! |
 
 ---
 
@@ -202,14 +202,16 @@ Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uav
     - [x] **Schema.org toveis entitetskobling (`sameAs`):** Lagt inn `https://no.worldofescapes.com/companies/krs-vr-arena` i `sameAs` i `app/layout.tsx`, `components/LandingPage.tsx` og `app/vr-opplevelser/[[...slug]]/page.tsx`.
     - [x] **Granulær spill-entitetskobling (`sameAs` & `subjectOf`):** Samtlige 4 individuelle escape room-sider (`/vr-opplevelser/escape-room/[spill]`) og `ItemList` er beriket med direkte `sameAs`- og `subjectOf`-koblinger til sine respektive quest-URL-er på World of Escapes (*Prison Break*, *Mask of the Pharaoh*, *Abyss Vault*, *Parvous Box*) på både norsk og engelsk.
 
-- [x] **Utdrikningslag.com & Utdrikningslag.no:**
-  - **Status:** Avtale i boks 03.11.2026 med Niclas Lanneteg (Utdrikningslag.com / Highjump Event AS).
+- [x] **Utdrikningslag.com & Utdrikningslag.no (Publisert & Live 11.11.2026):**
+  - **Direkte profil-URL:** [Utdrikningslag Kristiansand | VR Action – KRS VR Arena på Utdrikningslag.com](https://utdrikningslag.com/presentasjon/krs-vr-arena/)
+  - **Plassering på Kristiansand-siden:** Ligger nå øverst (#1) i aktivitetslisten på [utdrikningslag.com/kristiansand/](https://utdrikningslag.com/kristiansand/).
+  - **Status:** Avtale inngått 03.11.2026 med Niclas Lanneteg (Utdrikningslag.com / Highjump Event AS). Publisert og live 11.11.2026.
   - **Vilkår:** Gratis profilering i november måned, fakturering for desember og 2027.
   - **Gjennomførte tiltak:**
     - [x] Organisasjonsopplysninger oversendt: `KRS VR ARENA AS` (Org.nr: `936 318 878 MVA`).
-    - [x] Bildepakke med høyoppløselige lenker levert.
-    - [x] Skreddersydd profiltekst oversendt, optimalisert for både jente- og guttegjenger, partylounge med storskjerm-spectator, forhåndsbestilt åpen bar og pizza.
-    - [ ] **Schema.org kobling:** Så snart profilen er live på `utdrikningslag.com`, legges URL inn i `sameAs` og `subjectOf` på `/arrangementer/vr-utdrikningslag`.
+    - [x] Bildepakke med høyoppløselige lenker levert og publisert.
+    - [x] Skreddersydd profiltekst publisert (143 m², opptil 10 samtidige / 4–64 totalt, fra 450 kr/pers, partylounge med storskjerm, forhåndsbestilt øl/cider/vin/bobler og pizza, forbud mot medbrakt, full NAP + SoMe + TripAdvisor).
+    - [x] **Schema.org toveis entitetskobling (Fullført 11.11.2026):** Lagt inn `https://utdrikningslag.com/presentasjon/krs-vr-arena/` i `sameAs` og `subjectOf` i `app/arrangementer/vr-utdrikningslag/page.tsx`, `app/layout.tsx` og `components/LandingPage.tsx`. (Viktig ettersom utgående lenke på Utdrikningslag.com har `rel="nofollow"`.)
 
 - [ ] **Teambuilding.no / Firmatur.no:**
   - Legg inn profil for teambuilding, kickoff og bedriftsarrangementer.

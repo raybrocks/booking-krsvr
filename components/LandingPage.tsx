@@ -126,6 +126,17 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
           "name": "WhereToEscape",
           "url": "https://www.wheretoescape.com"
         }
+      },
+      {
+        "@type": "WebPage",
+        "name": "Utdrikningslag Kristiansand | VR Action – KRS VR Arena (Utdrikningslag.com)",
+        "description": "Offisiell presentasjon og profil for KRS VR Arena som utdrikningslag-aktivitet i Kristiansand på Utdrikningslag.com.",
+        "url": "https://utdrikningslag.com/presentasjon/krs-vr-arena/",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Utdrikningslag.com",
+          "url": "https://utdrikningslag.com"
+        }
       }
     ],
     "sameAs": [
@@ -136,6 +147,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
       "https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800",
       "https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/",
       "https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena",
+      "https://utdrikningslag.com/presentasjon/krs-vr-arena/",
       "https://no.worldofescapes.com/companies/krs-vr-arena",
       "https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena",
       "https://www.instagram.com/krs.vr.arena",

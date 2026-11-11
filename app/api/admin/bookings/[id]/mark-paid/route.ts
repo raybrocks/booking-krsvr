@@ -16,14 +16,22 @@ export async function POST(
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
+    if (booking.paymentType === 'system') {
+      return NextResponse.json({ error: 'System block cannot be marked paid' }, { status: 400 });
+    }
+
     const totalPrice = booking.totalPrice || 0;
+    const nextPaymentType =
+      !booking.paymentType || booking.paymentType === 'manual'
+        ? 'terminal'
+        : booking.paymentType;
 
     const updated = await prisma.booking.update({
       where: { id },
       data: {
         amountPaid: totalPrice,
         status: 'confirmed',
-        paymentType: booking.paymentType || 'terminal',
+        paymentType: nextPaymentType,
       },
       include: { experience: true }
     });
