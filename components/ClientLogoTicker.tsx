@@ -109,6 +109,10 @@ export default function ClientLogoTicker({
               0% { transform: translate3d(0, 0, 0); }
               100% { transform: translate3d(-50%, 0, 0); }
             }
+            .krs-logo-ticker-mask {
+              -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+              mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+            }
             .krs-logo-ticker-track {
               display: flex;
               width: max-content;
@@ -119,6 +123,10 @@ export default function ClientLogoTicker({
               animation-play-state: paused;
             }
             @media (prefers-reduced-motion: reduce) {
+              .krs-logo-ticker-mask {
+                -webkit-mask-image: none;
+                mask-image: none;
+              }
               .krs-logo-ticker-track {
                 animation: none;
                 flex-wrap: wrap;
@@ -127,11 +135,8 @@ export default function ClientLogoTicker({
             }
           `}</style>
 
-          {/* Marquee Track with Soft Gradient Fade on Edges */}
-          <div className="relative w-full overflow-hidden py-3">
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 md:w-36 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 md:w-36 bg-gradient-to-l from-black via-black/80 to-transparent z-10" />
-
+          {/* Marquee Track with CSS Alpha Mask Edge Fade */}
+          <div className="krs-logo-ticker-mask relative w-full overflow-hidden py-3">
             <div className="krs-logo-ticker-track items-center gap-8 sm:gap-14 md:gap-20">
               {[...validClients, ...validClients].map((client, idx) => 
                 renderLogoItem(client, `ticker-${client.id}-${idx}`)
