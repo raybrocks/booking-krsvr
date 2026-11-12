@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 export interface EnrichedReceiptRecord {
   id: string;
   receiptId: string;
+  receiptNumber: number;
+  receiptCode: string;
   bookingId: string | null;
   giftCardId: string | null;
   orderType: string;
@@ -33,7 +35,10 @@ export interface EnrichedReceiptRecord {
 
 export interface DailyReceiptEntry {
   sequenceNo: number;
+  receiptNumberInt: number;
   receiptNumber: string;
+  settlementNumber: number;
+  settlementCode: string;
   id: string;
   osloDate: string;
   osloTime: string;
@@ -56,6 +61,8 @@ export interface DailyReceiptEntry {
 }
 
 export interface DailySettlementDay {
+  settlementNumber: number;
+  settlementCode: string;
   date: string;
   firstSequenceNo: number;
   lastSequenceNo: number;
@@ -129,11 +136,17 @@ export function formatOsloDateTime(dateInput: Date | string): { osloDate: string
 }
 
 /**
- * Mirrors the display receipt identifier used in TransactionsManager.
+ * Formats the unbroken sequential receipt number as KV-xxxx (e.g. KV-1001).
  */
-export function formatReceiptNumber(id: string, isRefund: boolean): string {
-  const prefix = id.substring(0, 8).toUpperCase();
-  return isRefund ? `KREDIT-${prefix}` : prefix;
+export function formatReceiptNumber(receiptNumber: number): string {
+  return `KV-${receiptNumber}`;
+}
+
+/**
+ * Formats the unbroken sequential daily settlement number as DO-xxx (e.g. DO-101).
+ */
+export function formatDailySettlementCode(settlementNumber: number): string {
+  return `DO-${settlementNumber}`;
 }
 
 /**
@@ -155,7 +168,7 @@ export async function getEnrichedAccountingReceipts(options?: {
         NOT: { paymentRef: { startsWith: 'terminal-' } },
         amount: { not: 0 },
       },
-      orderBy: [{ createdAt: order }, { id: order }],
+      orderBy: [{ receiptNumber: order }, { createdAt: order }, { id: order }],
       take: limit,
     }),
     prisma.booking.findMany({
@@ -197,6 +210,8 @@ export async function getEnrichedAccountingReceipts(options?: {
     return {
       id: r.id,
       receiptId: r.id,
+      receiptNumber: r.receiptNumber,
+      receiptCode: formatReceiptNumber(r.receiptNumber),
       bookingId: r.bookingId,
       giftCardId: r.giftCardId,
       orderType: r.orderType || (isGiftCard ? 'gift_card' : 'booking'),
@@ -235,6 +250,9 @@ export async function getEnrichedAccountingReceipts(options?: {
  */
 export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[]): DailySettlementReport {
   const sorted = [...receiptsAsc].sort((a, b) => {
+    if (a.receiptNumber !== b.receiptNumber) {
+      return a.receiptNumber - b.receiptNumber;
+    }
     const diff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     return diff !== 0 ? diff : a.id.localeCompare(b.id);
   });
@@ -250,10 +268,9 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
   let totalRevenueOtherVatBasis = 0;
   let totalOutgoingVat = 0;
 
-  sorted.forEach((r, idx) => {
-    const sequenceNo = idx + 1;
-    const isRefund = r.type === 'refund' || r.amount < 0 || r.status === 'REFUNDED';
-    const receiptNumber = formatReceiptNumber(r.id, isRefund);
+  sorted.forEach((r) => {
+    const receiptNumInt = r.receiptNumber;
+    const receiptNumber = formatReceiptNumber(receiptNumInt);
     const { osloDate, osloTime } = formatOsloDateTime(r.createdAt);
 
     const vatRatePercent = typeof r.vatRate === 'number' ? r.vatRate : 0;
@@ -281,8 +298,11 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
     const customerName = [r.firstName, r.lastName].filter(Boolean).join(' ').trim() || 'Kunde';
 
     const entry: DailyReceiptEntry = {
-      sequenceNo,
+      sequenceNo: receiptNumInt,
+      receiptNumberInt: receiptNumInt,
       receiptNumber,
+      settlementNumber: 0,
+      settlementCode: '',
       id: r.id,
       osloDate,
       osloTime,
@@ -307,9 +327,11 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
     const existing = dayMap.get(osloDate);
     if (!existing) {
       dayMap.set(osloDate, {
+        settlementNumber: 0,
+        settlementCode: '',
         date: osloDate,
-        firstSequenceNo: sequenceNo,
-        lastSequenceNo: sequenceNo,
+        firstSequenceNo: receiptNumInt,
+        lastSequenceNo: receiptNumInt,
         firstReceiptNumber: receiptNumber,
         lastReceiptNumber: receiptNumber,
         firstReceiptId: r.id,
@@ -329,7 +351,7 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
         receipts: [entry],
       });
     } else {
-      existing.lastSequenceNo = sequenceNo;
+      existing.lastSequenceNo = receiptNumInt;
       existing.lastReceiptNumber = receiptNumber;
       existing.lastReceiptId = r.id;
       existing.receiptCount += 1;
@@ -351,13 +373,27 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
     }
   });
 
-  const days = Array.from(dayMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+  // Kun dager med faktisk omsetnings-/bilagsaktivitet inkluderes og nummereres DO-101, DO-102, ...
+  const days = Array.from(dayMap.values())
+    .filter((d) => d.receiptCount > 0)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((day, idx) => {
+      const settlementNumber = 101 + idx;
+      const settlementCode = formatDailySettlementCode(settlementNumber);
+      day.settlementNumber = settlementNumber;
+      day.settlementCode = settlementCode;
+      day.receipts.forEach((entry) => {
+        entry.settlementNumber = settlementNumber;
+        entry.settlementCode = settlementCode;
+      });
+      return day;
+    });
 
   return {
     generatedAt: new Date().toISOString(),
     timezone: 'Europe/Oslo',
     schemaNote:
-      'Receipt.id er en CUID uten eget heltallsfelt i databasen; kronologisk sekvensnummer (#1..N) og kort-ID (første 8 tegn) brukes for ubrutt nummerserie.',
+      'Ubrutt fortløpende nummerserie fra PostgreSQL: kvitteringer nummereres KV-xxxx (start 1001) og dager med omsetningsaktivitet nummereres DO-xxx (start 101) kronologisk etter Europe/Oslo.',
     summary: {
       totalDays: days.length,
       totalReceipts: sorted.length,
@@ -402,36 +438,34 @@ function formatNokCsv(value: number): string {
  */
 export function generateDailySettlementCsv(report: DailySettlementReport): string {
   const header = [
+    'Dagsoppgjørsnr.',
     'Dato',
-    'Første nr (sekvens)',
-    'Siste nr (sekvens)',
-    'Første kvitterings-ID',
-    'Siste kvitterings-ID',
-    'Antall kvitteringer',
+    'Fra kvitteringsnr.',
+    'Til kvitteringsnr.',
     'Antall salg',
     'Antall refusjoner',
-    'Dagens brutto Vipps-salg inkl. MVA (NOK)',
+    'Antall bilag totalt',
+    'Dagens brutto salg inkl. MVA (NOK)',
     'Dagens refusjoner inkl. MVA (NOK)',
-    'Dagens netto omsetning inkl. MVA (NOK)',
+    'Dagens sum netto inkl. MVA (NOK)',
     'Omsetning 0 % MVA (NOK)',
     'Omsetning 25 % MVA (grunnlag) (NOK)',
     'Utgående MVA (NOK)',
     'Akkumulert brutto Vipps (NOK)',
-    'Akkumulert netto omsetning (NOK)',
+    'Akkumulert sum netto (NOK)',
   ]
     .map(escapeCsvCell)
     .join(';');
 
   const rows = report.days.map((d) =>
     [
+      d.settlementCode,
       d.date,
-      `#${d.firstSequenceNo}`,
-      `#${d.lastSequenceNo}`,
       d.firstReceiptNumber,
       d.lastReceiptNumber,
-      d.receiptCount,
       d.paymentCount,
       d.refundCount,
+      d.receiptCount,
       formatNokCsv(d.grossSales),
       formatNokCsv(d.refunds),
       formatNokCsv(d.netTurnover),
@@ -456,11 +490,12 @@ export function generateReceiptDetailsCsv(
   dateFilter?: string | null
 ): string {
   const header = [
+    'Dagsoppgjørsnr.',
     'Dato',
     'Klokkeslett (Europe/Oslo)',
-    'Sekvensnr',
-    'Kvitteringsnr',
-    'Full ID',
+    'Kvitteringsnummer',
+    'Løpenummer',
+    'System-ID',
     'Status',
     'Type',
     'Ordretype',
@@ -485,10 +520,11 @@ export function generateReceiptDetailsCsv(
   const rows = targetDays.flatMap((d) =>
     d.receipts.map((r) =>
       [
+        r.settlementCode,
         r.osloDate,
         r.osloTime,
-        `#${r.sequenceNo}`,
         r.receiptNumber,
+        r.receiptNumberInt,
         r.id,
         r.status,
         r.type,

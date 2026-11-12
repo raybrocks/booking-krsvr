@@ -132,6 +132,12 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
    - *Merk:* Navnet på kassaleverandøren (Superb) er kun til intern arkitekturforståelse og skal ikke eksponeres i offentlig frontend-kode eller commit-meldinger.
 3. **Ingen ordrebekreftelse før verifisert betaling:**
    - Ved Vipps-betaling i nettbutikken skal verken kunde-bekreftelse eller admin-varsel om betalt ordre sendes ut før `capturedAmount > 0` er bekreftet direkte mot Vipps API (i Vipps ePayment v1 forblir `state: "AUTHORIZED"` også etter capture, så `aggregate.capturedAmount.value` må alltid sjekkes).
+4. **Ubrutt fortløpende nummerserie på salgsdokumenter (`KV-xxxx`):**
+   - Alle salgsdokumenter (`Receipt`) skal ha et ubrutt, stigende heltall (`receiptNumber`, formatert `KV-xxxx`, start på `1001`) tildelt strengt kronologisk uten hull.
+5. **Ubrutt fortløpende nummerering på dagsoppgjørsrapporter (`DO-xxx`):**
+   - Alle dagsoppgjørsrapporter skal ha et ubrutt, stigende rapportnummer (`DO-xxx`, start på `101`) tildelt kronologisk kun for dager med omsetning/bilag, og alltid spesifisere dato, første og siste kvitteringsnummer (`KV-xxxx`), antall salg, dagens sum og akkumulert sum.
+6. **Uforanderlighet (Immutability) for bokførte bilag:**
+   - Eksisterende bokførte kvitteringer og dagsoppgjør er uforanderlige (immutable) – beløp, datoer, MVA-satser, Vipps-referanser og tildelte nummerserier skal aldri overskrives ved senere kodeendringer.
 
 # Leverandørkonfidensialitet og Interne Kilder
 1. **Ingen eksponering av leverandørnavn:** Navn på eksterne plattform- og spill-leverandører (som Spawnpoint) skal ALDRI nevnes eller avsløres i offentlig kildekode, frontend-komponenter, metadata, JSON-LD, sitemap, llms.txt eller commit-meldinger.

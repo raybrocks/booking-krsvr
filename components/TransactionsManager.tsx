@@ -1,9 +1,104 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Loader2, Receipt, Search, Printer, Download, CalendarDays, ChevronDown, ChevronRight } from "lucide-react";
+import { Loader2, Receipt, Search, Printer, Download, CalendarDays, ChevronDown, ChevronRight, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import VatSettingsControl from "./VatSettingsControl";
+
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatNok(value: number | string | null | undefined): string {
+  return Number(value || 0).toLocaleString("nb-NO", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function getReceiptDisplayCode(tx: any): string {
+  if (!tx) return "";
+  if (tx.receiptCode) return String(tx.receiptCode);
+  if (tx.receiptNumber) return `KV-${tx.receiptNumber}`;
+  return String(tx.id || "").substring(0, 8).toUpperCase();
+}
+
+function printHtmlDocument(title: string, bodyHtml: string, landscape = false) {
+  if (typeof document === "undefined") return;
+
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document;
+  if (!doc || !iframe.contentWindow) {
+    document.body.removeChild(iframe);
+    return;
+  }
+
+  doc.open();
+  doc.write(`<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(title)}</title>
+  <style>
+    @page { size: A4 ${landscape ? "landscape" : "portrait"}; margin: 12mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #111827;
+      margin: 0;
+      padding: 0;
+      font-size: 11px;
+      line-height: 1.45;
+      background: #ffffff;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    h1, h2, h3, p { margin: 0; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #111827; padding-bottom: 10px; margin-bottom: 14px; }
+    .header-title { font-size: 18px; font-weight: 700; letter-spacing: 0.02em; }
+    .header-sub { font-size: 11px; color: #4b5563; margin-top: 2px; }
+    .meta-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; padding: 10px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; }
+    .meta-label { font-size: 10px; text-transform: uppercase; color: #6b7280; font-weight: 600; }
+    .meta-value { font-size: 12px; font-weight: 700; margin-top: 2px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; font-size: 10px; text-transform: uppercase; color: #374151; font-weight: 700; }
+    .text-right { text-align: right; }
+    .font-bold { font-weight: 700; }
+    tfoot td { border-top: 2px solid #111827; border-bottom: none; background: #f9fafb; font-weight: 700; }
+    .footer-note { margin-top: 16px; padding-top: 8px; border-top: 1px dashed #d1d5db; font-size: 10px; color: #6b7280; display: flex; justify-content: space-between; }
+    .receipt-wrapper { max-width: 360px; margin: 0 auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
+  </style>
+</head>
+<body>${bodyHtml}</body>
+</html>`);
+  doc.close();
+
+  setTimeout(() => {
+    try {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+    } finally {
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 1000);
+    }
+  }, 150);
+}
 
 export default function TransactionsManager() {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -19,6 +114,7 @@ export default function TransactionsManager() {
   const [selectedTx, setSelectedTx] = useState<any>(null);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [loadingReceipt, setLoadingReceipt] = useState(false);
+  const [dailyPrintTarget, setDailyPrintTarget] = useState<{ mode: "all" } | { mode: "day"; day: any } | null>(null);
 
   const [refundingId, setRefundingId] = useState<string | null>(null);
 
@@ -145,14 +241,21 @@ export default function TransactionsManager() {
     setLoadingReceipt(false);
   };
 
-  const filteredTransactions = transactions.filter(t => 
-    t.id?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    t.bookingId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.paymentRef?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.companyName?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const filteredTransactions = transactions.filter((t) => {
+    if (!normalizedSearch) return true;
+    const receiptCode = getReceiptDisplayCode(t).toLowerCase();
+    return (
+      receiptCode.includes(normalizedSearch) ||
+      String(t.receiptNumber || "").includes(normalizedSearch) ||
+      t.id?.toLowerCase().includes(normalizedSearch) ||
+      t.bookingId?.toLowerCase().includes(normalizedSearch) ||
+      t.paymentRef?.toLowerCase().includes(normalizedSearch) ||
+      t.firstName?.toLowerCase().includes(normalizedSearch) ||
+      t.lastName?.toLowerCase().includes(normalizedSearch) ||
+      t.companyName?.toLowerCase().includes(normalizedSearch)
+    );
+  });
 
   const renderReceipt = () => {
     if (!selectedTx) return null;
@@ -201,7 +304,10 @@ export default function TransactionsManager() {
             </div>
             <div className="flex justify-between">
               <span>Kvitteringsnr:</span>
-              <span>{isRefund ? `KREDIT-${selectedTx.id.substring(0, 8).toUpperCase()}` : selectedTx.id.substring(0, 8).toUpperCase()}</span>
+              <span className="font-bold">
+                {getReceiptDisplayCode(selectedTx)}
+                {isRefund ? " (KREDIT)" : ""}
+              </span>
             </div>
             {selectedTx.paymentRef && (
               <div className="flex justify-between">
@@ -353,6 +459,16 @@ export default function TransactionsManager() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setDailyPrintTarget({ mode: "all" })}
+            disabled={!dailyReport?.days || dailyReport.days.length === 0}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 text-zinc-200 border border-zinc-700 rounded-lg text-xs font-medium transition-colors"
+            title="Vis og skriv ut / lagre samlet dagsoppgjørsoversikt (DO-101..DO-xxx) som PDF"
+          >
+            <Printer className="w-3.5 h-3.5 text-amber-400" />
+            Dagsoppgjør (PDF)
+          </button>
           <a
             href="/api/admin/receipts/daily-summary?format=csv"
             download
@@ -426,7 +542,7 @@ export default function TransactionsManager() {
                   </div>
                   <div className="text-[11px] text-zinc-300 mt-1">
                     {thresholdReceipt
-                      ? `Kvitt. #${thresholdReceipt.sequenceNo} (${thresholdReceipt.receiptNumber}) kl. ${thresholdReceipt.osloTime}`
+                      ? `Kvitt. ${thresholdReceipt.receiptNumber} (${thresholdReceipt.settlementCode}) kl. ${thresholdReceipt.osloTime}`
                       : `Akk. samlet: ${(thresholdDay.accumulatedTurnover + externalTurnoverNum).toLocaleString("nb-NO")} kr`}
                   </div>
                 </>
@@ -445,25 +561,26 @@ export default function TransactionsManager() {
 
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col w-full max-w-full">
             <div className="overflow-x-auto max-h-[70vh] rounded-2xl relative w-full">
-              <table className="w-full text-left text-sm whitespace-nowrap min-w-[1260px]">
+              <table className="w-full text-left text-sm whitespace-nowrap min-w-[1380px]">
                 <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">
                   <tr>
+                    <th className="px-4 py-3.5 font-medium">Dagsoppgjørsnr.</th>
                     <th className="px-4 py-3.5 font-medium">Dato (Europe/Oslo)</th>
-                    <th className="px-4 py-3.5 font-medium">Kvitteringsserie</th>
-                    <th className="px-4 py-3.5 font-medium text-right">Antall</th>
+                    <th className="px-4 py-3.5 font-medium">Fra – Til kvitteringsnr.</th>
+                    <th className="px-4 py-3.5 font-medium text-right">Antall salg</th>
                     <th className="px-4 py-3.5 font-medium text-right">Brutto inkl. MVA</th>
                     <th className="px-4 py-3.5 font-medium text-right">Omsetning 0 % MVA</th>
                     <th className="px-4 py-3.5 font-medium text-right">Omsetning 25 % MVA (grunnlag)</th>
                     <th className="px-4 py-3.5 font-medium text-right">Utgående MVA</th>
-                    <th className="px-4 py-3.5 font-medium text-right">Netto dag (inkl. MVA)</th>
-                    <th className="px-4 py-3.5 font-medium text-right">Akkumulert Vipps</th>
-                    <th className="px-4 py-3.5 font-medium text-right">Detaljer / CSV</th>
+                    <th className="px-4 py-3.5 font-medium text-right">Dagens sum (inkl. MVA)</th>
+                    <th className="px-4 py-3.5 font-medium text-right">Akkumulert sum</th>
+                    <th className="px-4 py-3.5 font-medium text-right">Detaljer / PDF / CSV</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/50">
                   {!dailyReport?.days || dailyReport.days.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="px-6 py-10 text-center text-zinc-500">
+                      <td colSpan={11} className="px-6 py-10 text-center text-zinc-500">
                         Ingen godkjente Vipps-kvitteringer funnet.
                       </td>
                     </tr>
@@ -490,6 +607,11 @@ export default function TransactionsManager() {
                                 ) : (
                                   <ChevronRight className="w-4 h-4 text-zinc-400" />
                                 )}
+                                <span className="font-bold text-white">{day.settlementCode || `DO-${day.settlementNumber}`}</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3.5 font-mono text-zinc-200">
+                              <div className="flex items-center gap-2">
                                 <span className="font-semibold">{day.date}</span>
                                 {isThresholdRow && (
                                   <span className="text-[10px] font-sans font-bold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -498,14 +620,14 @@ export default function TransactionsManager() {
                                 )}
                               </div>
                             </td>
-                            <td className="px-4 py-3.5 font-mono text-xs text-zinc-300">
+                            <td className="px-4 py-3.5 font-mono text-xs text-zinc-200">
                               <div>
-                                #{day.firstSequenceNo === day.lastSequenceNo ? day.firstSequenceNo : `${day.firstSequenceNo} – #${day.lastSequenceNo}`}
-                              </div>
-                              <div className="text-[11px] text-zinc-500">
                                 {day.firstReceiptNumber === day.lastReceiptNumber
                                   ? day.firstReceiptNumber
                                   : `${day.firstReceiptNumber} → ${day.lastReceiptNumber}`}
+                              </div>
+                              <div className="text-[11px] text-zinc-500">
+                                Løpenr. #{day.firstSequenceNo === day.lastSequenceNo ? day.firstSequenceNo : `${day.firstSequenceNo}–${day.lastSequenceNo}`}
                               </div>
                             </td>
                             <td className="px-4 py-3.5 text-right text-zinc-200">
@@ -550,13 +672,22 @@ export default function TransactionsManager() {
                               </div>
                             </td>
                             <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
-                              <div className="inline-flex items-center gap-2">
+                              <div className="inline-flex items-center gap-1.5">
                                 <button
                                   type="button"
                                   onClick={() => setExpandedDay(isExpanded ? null : day.date)}
                                   className="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded-md border border-zinc-700 transition-colors"
                                 >
                                   {isExpanded ? "Skjul" : `Kvitteringer (${day.receiptCount})`}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setDailyPrintTarget({ mode: "day", day })}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-amber-300 text-xs rounded-md border border-zinc-700 transition-colors"
+                                  title={`Vis og skriv ut / lagre ${day.settlementCode || day.date} som PDF`}
+                                >
+                                  <FileText className="w-3 h-3" />
+                                  PDF
                                 </button>
                                 <a
                                   href={`/api/admin/receipts/daily-summary?format=csv&date=${day.date}`}
@@ -573,16 +704,16 @@ export default function TransactionsManager() {
 
                           {isExpanded && (
                             <tr className="bg-zinc-950/80">
-                              <td colSpan={10} className="px-6 py-4">
+                              <td colSpan={11} className="px-6 py-4">
                                 <div className="text-xs font-medium text-zinc-400 mb-2">
-                                  Enkeltkvitteringer for {day.date} (tidssone Europe/Oslo):
+                                  Enkeltkvitteringer for {day.settlementCode || `DO-${day.settlementNumber}`} · {day.date} (tidssone Europe/Oslo):
                                 </div>
                                 <div className="border border-zinc-800 rounded-xl overflow-hidden">
                                   <table className="w-full text-left text-xs">
                                     <thead className="bg-zinc-900/90 text-zinc-400">
                                       <tr>
                                         <th className="px-3 py-2 font-medium">Klokkeslett</th>
-                                        <th className="px-3 py-2 font-medium">Sekvens & Kvitteringsnr</th>
+                                        <th className="px-3 py-2 font-medium">Kvitteringsnummer</th>
                                         <th className="px-3 py-2 font-medium">Kunde / Opplevelse</th>
                                         <th className="px-3 py-2 font-medium">Status</th>
                                         <th className="px-3 py-2 font-medium text-right">MVA</th>
@@ -610,8 +741,9 @@ export default function TransactionsManager() {
                                                 </span>
                                               )}
                                             </td>
-                                            <td className="px-3 py-2 font-mono text-zinc-300">
-                                              #{r.sequenceNo} · {r.receiptNumber}
+                                            <td className="px-3 py-2 font-mono text-white font-semibold">
+                                              {r.receiptNumber}
+                                              <span className="text-zinc-500 font-normal ml-1.5">#{r.sequenceNo}</span>
                                             </td>
                                             <td className="px-3 py-2 text-zinc-200">
                                               <span className="font-medium">{r.customerName}</span>
@@ -677,7 +809,7 @@ export default function TransactionsManager() {
                 {dailyReport?.days?.length > 0 && (
                   <tfoot className="bg-zinc-900/90 border-t border-zinc-700 text-xs font-semibold text-zinc-200">
                     <tr>
-                      <td className="px-4 py-3.5" colSpan={2}>Sum totalt ({dailyReport.summary.totalDays} dager)</td>
+                      <td className="px-4 py-3.5" colSpan={3}>Sum totalt ({dailyReport.summary.totalDays} dager)</td>
                       <td className="px-4 py-3.5 text-right">{dailyReport.summary.totalReceipts}</td>
                       <td className="px-4 py-3.5 text-right">{Number(dailyReport.summary.totalGrossSales || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
                       <td className="px-4 py-3.5 text-right font-mono">{Number(dailyReport.summary.totalRevenue0Vat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
@@ -700,7 +832,7 @@ export default function TransactionsManager() {
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
               <input
                 type="text"
-                placeholder="Søk etter navn, booking ref, kvitterings ID..."
+                placeholder="Søk etter kvitteringsnr (KV-1001), navn, booking ref..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-10 pr-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
@@ -710,17 +842,19 @@ export default function TransactionsManager() {
 
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col w-full max-w-full">
             <div className="overflow-x-auto max-h-[70vh] rounded-2xl relative w-full">
-              <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[1100px]">
+              <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[1160px]">
                 <colgroup>
+                  <col className="w-[12%]" />
+                  <col className="w-[15%]" />
                   <col className="w-[18%]" />
-                  <col className="w-[20%]" />
-                  <col className="w-[18%]" />
-                  <col className="w-[16%]" />
+                  <col className="w-[17%]" />
                   <col className="w-[14%]" />
-                  <col className="w-[14%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[12%]" />
                 </colgroup>
                 <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">
                   <tr>
+                    <th className="px-6 py-4 font-medium">Kvitteringsnr.</th>
                     <th className="px-6 py-4 font-medium">Dato</th>
                     <th className="px-6 py-4 font-medium">Kunde</th>
                     <th className="px-6 py-4 font-medium">Booking / Ref</th>
@@ -732,7 +866,7 @@ export default function TransactionsManager() {
                 <tbody className="divide-y divide-zinc-800/50">
                   {filteredTransactions.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">
+                      <td colSpan={7} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">
                         Ingen kvitteringer eller transaksjoner funnet.
                       </td>
                     </tr>
@@ -740,9 +874,14 @@ export default function TransactionsManager() {
                     filteredTransactions.map((tx) => {
                       const isRefund = tx.type === 'refund' || tx.amount < 0 || tx.status === 'REFUNDED';
                       const absAmount = Math.abs(tx.amount || 0);
+                      const receiptCode = getReceiptDisplayCode(tx);
 
                       return (
                         <tr key={tx.id} className="hover:bg-zinc-800/20 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="font-mono font-semibold text-white text-xs">{receiptCode}</div>
+                            <div className="text-[10px] font-mono text-zinc-500 mt-0.5">ID: {tx.id.substring(0, 8).toUpperCase()}</div>
+                          </td>
                           <td className="px-6 py-4 text-zinc-400 text-xs">
                             {tx.createdAtDate.toLocaleString("no-NO", { 
                               day: '2-digit', 
@@ -759,7 +898,6 @@ export default function TransactionsManager() {
                           </td>
                           <td className="px-6 py-4">
                             <div className="font-mono text-zinc-300 text-xs">{tx.bookingId || tx.paymentRef || 'N/A'}</div>
-                            <div className="text-[10px] text-zinc-500 mt-0.5">Kvitt. ID: {tx.id.substring(0, 8).toUpperCase()}</div>
                           </td>
                           <td className="px-6 py-4">
                             {isRefund ? (
@@ -858,14 +996,13 @@ export default function TransactionsManager() {
              </button>
              <button 
                 onClick={() => {
-                  // A simple print logic that targets the receipt content
                   const printContents = document.querySelector('.receipt-print-container')?.innerHTML;
                   if (printContents) {
-                    const originalContents = document.body.innerHTML;
-                    document.body.innerHTML = `<div class="bg-white text-black p-4">${printContents}</div>`;
-                    window.print();
-                    document.body.innerHTML = originalContents;
-                    window.location.reload(); // Quick reset after print hack
+                    printHtmlDocument(
+                      `Kvittering ${getReceiptDisplayCode(selectedTx)}`,
+                      `<div class="receipt-wrapper">${printContents}</div>`,
+                      false
+                    );
                   } else {
                     window.print();
                   }
@@ -874,6 +1011,222 @@ export default function TransactionsManager() {
              >
                <Printer className="w-4 h-4" /> Skriv ut
              </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(dailyPrintTarget)} onOpenChange={(open) => !open && setDailyPrintTarget(null)}>
+        <DialogContent className="max-w-5xl bg-zinc-100 p-0 overflow-hidden border-zinc-300 sm:rounded-xl text-zinc-900">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Dagsoppgjørsrapport</DialogTitle>
+            <DialogDescription>
+              Utskriftsvennlig dagsoppgjørsrapport for regnskap og arkivering (PDF).
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[82vh] overflow-y-auto bg-white p-8 daily-settlement-print-container">
+            {dailyPrintTarget?.mode === "day" ? (() => {
+              const day = dailyPrintTarget.day;
+              const code = day.settlementCode || `DO-${day.settlementNumber}`;
+              return (
+                <div className="space-y-5 text-zinc-900">
+                  <div className="header flex justify-between items-start border-b-2 border-zinc-900 pb-4">
+                    <div>
+                      <h2 className="header-title text-xl font-bold uppercase tracking-wide">
+                        Dagsoppgjør {code}
+                      </h2>
+                      <p className="header-sub text-xs text-zinc-600 mt-0.5">
+                        Krs VR Arena AS · Org.nr 936 318 878 · Nettbutikk (Vipps)
+                      </p>
+                    </div>
+                    <div className="text-right font-mono text-xs text-zinc-700">
+                      <div>Dato (Europe/Oslo): <strong>{day.date}</strong></div>
+                      <div>Tidspunkt utskrift: {new Date().toLocaleString("no-NO")}</div>
+                    </div>
+                  </div>
+
+                  <div className="meta-grid grid grid-cols-2 sm:grid-cols-4 gap-3 bg-zinc-50 border border-zinc-200 rounded-lg p-3">
+                    <div>
+                      <div className="meta-label text-[10px] uppercase text-zinc-500 font-semibold">Dagsoppgjørsnr.</div>
+                      <div className="meta-value font-mono font-bold text-sm mt-0.5">{code}</div>
+                    </div>
+                    <div>
+                      <div className="meta-label text-[10px] uppercase text-zinc-500 font-semibold">Kvitteringsserie</div>
+                      <div className="meta-value font-mono font-bold text-sm mt-0.5">
+                        {day.firstReceiptNumber === day.lastReceiptNumber
+                          ? day.firstReceiptNumber
+                          : `${day.firstReceiptNumber} – ${day.lastReceiptNumber}`}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="meta-label text-[10px] uppercase text-zinc-500 font-semibold">Antall bilag</div>
+                      <div className="meta-value font-bold text-sm mt-0.5">
+                        {day.receiptCount} ({day.paymentCount} salg / {day.refundCount} ref.)
+                      </div>
+                    </div>
+                    <div>
+                      <div className="meta-label text-[10px] uppercase text-zinc-500 font-semibold">Dagens sum / Akkumulert</div>
+                      <div className="meta-value font-mono font-bold text-sm mt-0.5">
+                        {formatNok(day.netTurnover)} kr / {formatNok(day.accumulatedTurnover)} kr
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3 text-xs border border-zinc-200 rounded-lg p-3 bg-white">
+                    <div>
+                      <span className="text-zinc-500">Omsetning 0 % MVA:</span>{" "}
+                      <strong className="font-mono">{formatNok(day.revenue0Vat)} kr</strong>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">Omsetning 25 % MVA (gr.l.):</span>{" "}
+                      <strong className="font-mono">{formatNok(day.revenue25VatBasis)} kr</strong>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">Utgående MVA:</span>{" "}
+                      <strong className="font-mono">{formatNok(day.outgoingVat)} kr</strong>
+                    </div>
+                  </div>
+
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-zinc-300 bg-zinc-100 text-zinc-700">
+                        <th className="py-2 px-2 text-left">Kvitteringsnr.</th>
+                        <th className="py-2 px-2 text-left">Klokkeslett</th>
+                        <th className="py-2 px-2 text-left">Kunde / Beskrivelse</th>
+                        <th className="py-2 px-2 text-left">Status</th>
+                        <th className="py-2 px-2 text-right">MVA %</th>
+                        <th className="py-2 px-2 text-right">Grunnlag</th>
+                        <th className="py-2 px-2 text-right">MVA</th>
+                        <th className="py-2 px-2 text-right">Beløp</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-200">
+                      {(day.receipts || []).map((r: any) => (
+                        <tr key={r.id}>
+                          <td className="py-2 px-2 font-mono font-semibold">{r.receiptNumber}</td>
+                          <td className="py-2 px-2 font-mono">{r.osloTime}</td>
+                          <td className="py-2 px-2">
+                            {r.customerName}
+                            {r.experienceName ? ` · ${r.experienceName}` : ""}
+                          </td>
+                          <td className="py-2 px-2">{r.status}</td>
+                          <td className="py-2 px-2 text-right font-mono">{Number(r.vatRatePercent || 0)} %</td>
+                          <td className="py-2 px-2 text-right font-mono">{formatNok(r.netAmount ?? r.amount)} kr</td>
+                          <td className="py-2 px-2 text-right font-mono">{formatNok(r.vatAmount || 0)} kr</td>
+                          <td className="py-2 px-2 text-right font-mono font-semibold">{formatNok(r.amount)} kr</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t-2 border-zinc-900 bg-zinc-50 font-bold">
+                        <td className="py-2 px-2" colSpan={5}>Sum {code} ({day.date})</td>
+                        <td className="py-2 px-2 text-right font-mono">
+                          {formatNok(Number(day.revenue0Vat || 0) + Number(day.revenue25VatBasis || 0))} kr
+                        </td>
+                        <td className="py-2 px-2 text-right font-mono">{formatNok(day.outgoingVat)} kr</td>
+                        <td className="py-2 px-2 text-right font-mono">{formatNok(day.netTurnover)} kr</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+
+                  <div className="footer-note text-[10px] text-zinc-500 border-t border-dashed border-zinc-300 pt-3 flex justify-between">
+                    <span>Ubrutt nummerserie · Kun godkjente Vipps-bilag i nettbutikk</span>
+                    <span>Akkumulert Vipps-omsetning t.o.m. {day.date}: {formatNok(day.accumulatedTurnover)} kr</span>
+                  </div>
+                </div>
+              );
+            })() : dailyPrintTarget?.mode === "all" && dailyReport ? (
+              <div className="space-y-4 text-zinc-900">
+                <div className="header flex justify-between items-start border-b-2 border-zinc-900 pb-4">
+                  <div>
+                    <h2 className="header-title text-xl font-bold uppercase tracking-wide">
+                      Samlet Dagsoppgjørsrapport
+                    </h2>
+                    <p className="header-sub text-xs text-zinc-600 mt-0.5">
+                      Krs VR Arena AS · Org.nr 936 318 878 · Nettbutikk (Vipps)
+                    </p>
+                  </div>
+                  <div className="text-right font-mono text-xs text-zinc-700">
+                    <div>Antall dager: <strong>{dailyReport.summary?.totalDays || 0}</strong></div>
+                    <div>Tidspunkt utskrift: {new Date().toLocaleString("no-NO")}</div>
+                  </div>
+                </div>
+
+                <table className="w-full text-[11px] border-collapse">
+                  <thead>
+                    <tr className="border-b border-zinc-300 bg-zinc-100 text-zinc-700">
+                      <th className="py-2 px-2 text-left">Dagsoppgjørsnr.</th>
+                      <th className="py-2 px-2 text-left">Dato</th>
+                      <th className="py-2 px-2 text-left">Fra kvitteringsnr.</th>
+                      <th className="py-2 px-2 text-left">Til kvitteringsnr.</th>
+                      <th className="py-2 px-2 text-right">Antall salg</th>
+                      <th className="py-2 px-2 text-right">Omsetning 0 %</th>
+                      <th className="py-2 px-2 text-right">Omsetning 25 % gr.l.</th>
+                      <th className="py-2 px-2 text-right">Utgående MVA</th>
+                      <th className="py-2 px-2 text-right">Dagens sum</th>
+                      <th className="py-2 px-2 text-right">Akkumulert sum</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-200">
+                    {(dailyReport.days || []).map((day: any) => (
+                      <tr key={day.date}>
+                        <td className="py-1.5 px-2 font-mono font-bold">{day.settlementCode || `DO-${day.settlementNumber}`}</td>
+                        <td className="py-1.5 px-2 font-mono">{day.date}</td>
+                        <td className="py-1.5 px-2 font-mono">{day.firstReceiptNumber}</td>
+                        <td className="py-1.5 px-2 font-mono">{day.lastReceiptNumber}</td>
+                        <td className="py-1.5 px-2 text-right">{day.receiptCount}</td>
+                        <td className="py-1.5 px-2 text-right font-mono">{formatNok(day.revenue0Vat)} kr</td>
+                        <td className="py-1.5 px-2 text-right font-mono">{formatNok(day.revenue25VatBasis)} kr</td>
+                        <td className="py-1.5 px-2 text-right font-mono">{formatNok(day.outgoingVat)} kr</td>
+                        <td className="py-1.5 px-2 text-right font-mono font-semibold">{formatNok(day.netTurnover)} kr</td>
+                        <td className="py-1.5 px-2 text-right font-mono font-bold">{formatNok(day.accumulatedTurnover)} kr</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-zinc-900 bg-zinc-50 font-bold">
+                      <td className="py-2 px-2" colSpan={4}>Sum totalt ({dailyReport.summary?.totalDays || 0} dager)</td>
+                      <td className="py-2 px-2 text-right">{dailyReport.summary?.totalReceipts || 0}</td>
+                      <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalRevenue0Vat)} kr</td>
+                      <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalRevenue25VatBasis)} kr</td>
+                      <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalOutgoingVat)} kr</td>
+                      <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalNetTurnover)} kr</td>
+                      <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalNetTurnover)} kr</td>
+                    </tr>
+                  </tfoot>
+                </table>
+
+                <div className="footer-note text-[10px] text-zinc-500 border-t border-dashed border-zinc-300 pt-3 flex justify-between">
+                  <span>Ubrutte serier for kvitteringer (KV-xxxx) og dagsoppgjør (DO-xxx) · Europe/Oslo</span>
+                  <span>Krs VR Arena AS · Org.nr 936 318 878</span>
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="p-4 bg-zinc-200 border-t border-zinc-300 flex justify-end gap-3 print:hidden">
+            <button
+              type="button"
+              onClick={() => setDailyPrintTarget(null)}
+              className="px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-300 rounded-lg transition-colors"
+            >
+              Lukk
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const printContents = document.querySelector(".daily-settlement-print-container")?.innerHTML;
+                if (!printContents) return;
+                const title =
+                  dailyPrintTarget?.mode === "day"
+                    ? `Dagsoppgjor_${dailyPrintTarget.day.settlementCode || dailyPrintTarget.day.date}_${dailyPrintTarget.day.date}`
+                    : "Dagsoppgjor_Samlet_Oversikt";
+                printHtmlDocument(title, printContents, dailyPrintTarget?.mode === "all");
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#9C39FF] text-white hover:bg-[#8A2BE2] rounded-lg transition-colors shadow-sm"
+            >
+              <Printer className="w-4 h-4" /> Skriv ut / Lagre PDF
+            </button>
           </div>
         </DialogContent>
       </Dialog>

@@ -107,6 +107,7 @@ model Booking {
 
 model Receipt {
   id                String    @id @default(cuid())
+  receiptNumber     Int       @unique @default(autoincrement())
   bookingId         String?
   giftCardId        String?
   orderType         String    @default("booking")
