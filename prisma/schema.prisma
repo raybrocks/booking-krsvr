@@ -111,6 +111,9 @@ model Receipt {
   giftCardId        String?
   orderType         String    @default("booking")
   amount            Float
+  vatRate           Int       @default(0)
+  vatAmount         Float     @default(0)
+  netAmount         Float?
   currency          String    @default("NOK")
   status            String
   paymentRef        String
@@ -118,6 +121,13 @@ model Receipt {
   
   giftCard          GiftCard? @relation(fields: [giftCardId], references: [id])
   createdAt         DateTime  @default(now())
+}
+
+model StoreSettings {
+  id              String   @id @default("default")
+  isVatRegistered Boolean  @default(false)
+  defaultVatRate  Int      @default(25)
+  updatedAt       DateTime @updatedAt
 }
 
 model GiftCard {

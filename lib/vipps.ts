@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { computeReceiptVat, getStoreSettings } from '@/lib/store-settings';
 
 export type NormalizedVippsStatus =
   | 'CREATED'
@@ -258,10 +259,17 @@ export async function confirmPaidVippsBookingAtomically(params: {
     });
 
     if (!existingCapturedReceipt) {
+      const storeSettings = await getStoreSettings(tx);
+      const effectiveVatRate = storeSettings.isVatRegistered ? storeSettings.defaultVatRate : 0;
+      const vatSplit = computeReceiptVat(capturedNok, effectiveVatRate);
+
       await tx.receipt.create({
         data: {
           bookingId,
           amount: capturedNok,
+          vatRate: vatSplit.vatRate,
+          vatAmount: vatSplit.vatAmount,
+          netAmount: vatSplit.netAmount,
           currency: 'NOK',
           status: 'CAPTURED',
           paymentRef: vippsRef,
@@ -456,22 +464,29 @@ export async function recordVippsRefundAtomically(params: {
 
     // If a payment was captured and then immediately refunded before a CAPTURED receipt was stored,
     // ensure the original CAPTURED sale voucher is also recorded so the ledger nets out accurately.
-    if (capturedOre > 0) {
-      const existingCaptured = await tx.receipt.findFirst({
-        where: { bookingId, status: 'CAPTURED', type: 'payment' },
+    let originalCapturedReceipt = await tx.receipt.findFirst({
+      where: { bookingId, status: 'CAPTURED', type: 'payment' },
+    });
+
+    if (capturedOre > 0 && !originalCapturedReceipt) {
+      const capturedAmountNok = Number((capturedOre / 100).toFixed(2));
+      const storeSettings = await getStoreSettings(tx);
+      const effectiveVatRate = storeSettings.isVatRegistered ? storeSettings.defaultVatRate : 0;
+      const capturedVatSplit = computeReceiptVat(capturedAmountNok, effectiveVatRate);
+
+      originalCapturedReceipt = await tx.receipt.create({
+        data: {
+          bookingId,
+          amount: capturedAmountNok,
+          vatRate: capturedVatSplit.vatRate,
+          vatAmount: capturedVatSplit.vatAmount,
+          netAmount: capturedVatSplit.netAmount,
+          currency: 'NOK',
+          status: 'CAPTURED',
+          paymentRef: vippsRef,
+          type: 'payment',
+        },
       });
-      if (!existingCaptured) {
-        await tx.receipt.create({
-          data: {
-            bookingId,
-            amount: Number((capturedOre / 100).toFixed(2)),
-            currency: 'NOK',
-            status: 'CAPTURED',
-            paymentRef: vippsRef,
-            type: 'payment',
-          },
-        });
-      }
     }
 
     const existingRefunds = await tx.receipt.findMany({
@@ -491,10 +506,21 @@ export async function recordVippsRefundAtomically(params: {
 
     let createdReceipt = null;
     if (deltaRefundNok >= 0.01) {
+      // Credit notes mirror the VAT rate of the original sale receipt so pre-VAT sales remain 0% VAT
+      let refundVatRate = originalCapturedReceipt?.vatRate;
+      if (refundVatRate === undefined) {
+        const fallbackSettings = await getStoreSettings(tx);
+        refundVatRate = fallbackSettings.isVatRegistered ? fallbackSettings.defaultVatRate : 0;
+      }
+      const refundVatSplit = computeReceiptVat(-deltaRefundNok, refundVatRate);
+
       createdReceipt = await tx.receipt.create({
         data: {
           bookingId,
           amount: -deltaRefundNok,
+          vatRate: refundVatSplit.vatRate,
+          vatAmount: refundVatSplit.vatAmount,
+          netAmount: refundVatSplit.netAmount,
           currency: 'NOK',
           status: 'REFUNDED',
           paymentRef: vippsRef,

@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { sendAdminPushNotification } from '@/lib/push';
+import { computeReceiptVat, getStoreSettings } from '@/lib/store-settings';
 
 /**
  * Generates an 8-character human-friendly uppercase code: KRS-XXXX-YYYY
@@ -125,11 +126,18 @@ export async function confirmPaidGiftCardAtomically(params: {
     });
 
     if (!existingReceipt) {
+      const storeSettings = await getStoreSettings(tx);
+      const effectiveVatRate = storeSettings.isVatRegistered ? storeSettings.defaultVatRate : 0;
+      const vatSplit = computeReceiptVat(capturedNok, effectiveVatRate);
+
       await tx.receipt.create({
         data: {
           giftCardId,
           orderType: 'gift_card',
           amount: capturedNok,
+          vatRate: vatSplit.vatRate,
+          vatAmount: vatSplit.vatAmount,
+          netAmount: vatSplit.netAmount,
           currency: 'NOK',
           status: 'CAPTURED',
           paymentRef: vippsRef,

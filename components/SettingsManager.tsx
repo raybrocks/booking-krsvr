@@ -8,6 +8,7 @@ import { nb } from "date-fns/locale";
 import DiscountCodesManager from "./DiscountCodesManager";
 import EmailPreviewClient from "./EmailPreviewClient";
 import AdminPushNotificationManager from "./AdminPushNotificationManager";
+import VatSettingsControl from "./VatSettingsControl";
 
 export default function SettingsManager() {
   const [activeSettingsTab, setActiveSettingsTab] = useState<"hours" | "general" | "push" | "discounts" | "emails">("hours");
@@ -646,6 +647,8 @@ export default function SettingsManager() {
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
             {activeSettingsTab === "general" && (
               <>
+                <VatSettingsControl />
+
                 <div className="mb-6 bg-red-950/20 border border-red-900/50 p-6 rounded-2xl">
           <div className="flex items-center justify-between">
             <div>
