@@ -21,6 +21,8 @@ export async function POST(
     }
 
     const totalPrice = booking.totalPrice || 0;
+    const giftCardUsed = Math.min(totalPrice, Number(booking.giftCardAmount || 0));
+    const terminalPaid = Math.max(0, totalPrice - giftCardUsed);
     const nextPaymentType =
       !booking.paymentType || booking.paymentType === 'manual'
         ? 'terminal'
@@ -45,7 +47,10 @@ export async function POST(
     return NextResponse.json({
       success: true,
       booking: updated,
-      message: `Booking markert som fullt betalt i arenaen (${totalPrice} NOK).`
+      message:
+        giftCardUsed > 0
+          ? `Registrert betalt i terminal (${terminalPaid} NOK) + gavekort (${giftCardUsed} NOK) = ${totalPrice} NOK.`
+          : `Booking markert som fullt betalt i arenaen (${totalPrice} NOK).`
     });
   } catch (error: any) {
     console.error('Error marking booking as paid:', error);

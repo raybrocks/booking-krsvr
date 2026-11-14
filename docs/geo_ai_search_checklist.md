@@ -1,378 +1,231 @@
 # Sjekkliste & Målelogg for AI-søk (GEO), Backlinks & Domain Authority
 
-Denne sjekklisten og måleloggen brukes for å spore og øke sannsynligheten for at **KRS VR Arena** blir anbefalt av Gemini, ChatGPT Search, Perplexity og Google AI Overviews når folk søker etter aktiviteter og opplevelser i Kristiansand.
-
----
-
-## 0. Historisk Målelogg & Scanningsresultater
+Denne sjekklisten og måleloggen brukes for å spore og øke synligheten til **KRS VR Arena** på tvers av **Google Gemini / AI Overviews**, **ChatGPT Search (OpenAI)**, **Perplexity AI** og **Apple Intelligence / Siri** når kunder og turister søker etter aktiviteter og opplevelser i Kristiansand.
 
 > [!TIP]
-> **Slik kjører du en ny scanning i fremtiden:**
-> Be agenten: *«Kjør en ny SEO/GEO-scanning og oppdater måleloggen»*. Agenten vil da kjøre alle sjekkene på nytt (Sitemap, Tranco Domain Rank, Backlinks/Refererende domener, Brønnøysund NACE-status, TripAdvisor/Google-anmeldelser og de 6 faste AI-søkene) og legge til en ny datokolonne i tabellene under for å vise utviklingen (`+/-`).
+> **Slik kjører du en ny scanning:**
+> Be agenten: *«Kjør en ny SEO/GEO-scanning og oppdater måleloggen»*. Agenten sjekker da `sitemap.xml`, Tranco Domain Rank, backlinks, Brønnøysund NACE-status, Google/TripAdvisor-anmeldelser samt de 6 norske og 3 internasjonale kommersielle AI-søkene, og oppdaterer tabellene under.
 
-### A. Overordnet Utvikling over Tid (KPI-er)
+---
 
-| Måleparameter | 15. okt 2026 (Baseline) | 17. okt 2026 (Scan #2) | 19. okt 2026 (Presse) | 21. okt 2026 (ChatGPT) | 25. okt 2026 (Scan #5) | 2. nov 2026 (Scan #6) | 3. nov 2026 (WOE Live) | 9. nov 2026 (Scan #8) | Endring (siden start) | Mål (Q4 2026) |
+## 0. Status-Dashboard (Nøkkeltall & Utvikling)
+
+### A. Hovedoversikt: Start vs. Status nå vs. Mål
+
+| Måleparameter | Start (`15. okt 2026`) | Status nå (`14. nov 2026` – Scan #10) | Utvikling | Mål (Q4 2026) & Status |
+| :--- | :---: | :---: | :---: | :--- |
+| **Indekserbare sider i `sitemap.xml`** | 19 sider | **50 sider** *(Verifisert 14.11)* | 🟢 **+31 sider** | 25+ sider (**Nådd!**) |
+| **Refererende domener (Backlinks / Omtaler)** | 4 domener | **15 domener** *(Verifisert 14.11)* | 🟢 **+11 domener** | 15+ domener (**Nådd!**) |
+| **Bekreftede `sameAs` / `subjectOf` i Schema** | 5 lenker | **21+ lenker** | 🟢 **+16 (Over 4x)** | 10+ lenker (**Nådd!**) |
+| **Google Maps – Vurdering & Anmeldelser** | 5,0 ★ (22 stk) | ⚠️ **Ikke avlest 14.11** *(13.11: **5,0 ★ / 31 stk**)* | 🟢 **+9 (100 % 5★)** | 5,0 ★ (40+ stk) |
+| **Google Bedriftsprofil – Aktive produkter** | 7 aktiviteter | **9 aktiviteter** | 🟢 **+2 produkter** | 8+ aktiviteter (**Nådd!**) |
+| **TripAdvisor – Vurdering & Anmeldelser** | 5,0 ★ (3 stk) | ⚠️ **Ikke avlest 14.11** *(13.11: **5,0 ★ / 12 stk**)* | 🟢 **+9 (4x økning)** | 5,0 ★ (10+ stk – **Nådd!**) |
+| **TripAdvisor Rangering ([Måleside](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html))** | Nr. 7 av 23 | ⚠️ **Ikke avlest 14.11** *(13.11: **Nr. 3 av 23 / #15**)* | 🟢 **Topp 3 nådd!** | Topp 3 (**Nådd!**) |
+| **Gemini / Google AI-sitering (6 norske søk)** | 2 av 6 (33 %) | **4 av 6 (67 %)** *(#1 på 2 søk + Action/Spill på 2)* | 🟢 **+2 søk** | **5 av 6 (83 %)** |
+| **Internasjonale turistsøk (EN / DE / NL)** | Ikke målt | **3 av 3 (100 %)** *(EN+DE direkte sitert 14.11)* | 🟢 **Full dekning** | 3 av 3 (**Nådd!**) |
+| **ChatGPT Business Hub (`chatgpt.com/business-hub`)** | Ikke registrert | ⏳ **På venteliste** *(14.11.2026)* | 🟡 **Søkt tilgang** | Verifisert profil + Bing Places |
+| **Tranco Global Rank (`krsvr.no`)** | Utenfor Topp 1M | **Utenfor Topp 1M** *(Verifisert 14.11)* | ➖ | Komme inn på Topp 1M |
+| **Brønnøysund NACE-bransjekode** | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** *(Verifisert 14.11)* | 🔴 **Krever Altinn** | ✅ `93.299` (Fritid) |
+
+<details>
+<summary>📅 <strong>Klikk for å se full historisk tidslinje (Alle 10 scanninger fra 15. okt til 14. nov 2026)</strong></summary>
+
+| Måleparameter | 15. okt (Baseline) | 17. okt (Scan #2) | 19. okt (Presse) | 21. okt (ChatGPT) | 25. okt (Scan #5) | 2. nov (Scan #6) | 3. nov (WOE Live) | 9. nov (Scan #8) | 13. nov (Scan #9) | 14. nov (Scan #10) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Indekserbare sider i `sitemap.xml` (`krsvr.no`)** | 19 sider | 24 sider | 24 sider | 24 sider | 24 sider | 50 sider | 50 sider | **50 sider** | 🟢 **+31** | 25+ sider (Nådd! 🎉) |
-| **Refererende domener (Backlinks / Omtaler)** | 4 domener | 9 domener | 10 domener | 10 domener | 10 domener | 11 domener *(+2 u/behandl.)* | 13 domener *(+1 u/avtale)* | **13 domener** *(+1 u/avtale)* | 🟢 **+9** | 15+ domener |
-| **Bekreftede `sameAs`/`subjectOf`-lenker i Schema** | 5 lenker | 7 lenker | 8 lenker | 8 lenker | 8 lenker | 12 lenker | 20+ lenker | **20+ lenker** | 🟢 **+15 (4x økning!)** | 10+ lenker (Nådd! 🎉) |
-| **Google Maps – Vurdering & Antall anmeldelser** | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (22 stk) | 5,0 ★ (24 stk) | 5,0 ★ (24 stk) | 5,0 ★ (28 stk) | 5,0 ★ (28 stk) | **5,0 ★ (29 stk)** | 🟢 **+7 (100 % 5★)** | 5,0 ★ (40+ stk) |
-| **Google Bedriftsprofil – Aktive opplevelsesprodukter** | 7 aktiviteter | 7 aktiviteter | 7 aktiviteter | 8 aktiviteter | 8 aktiviteter | 9 aktiviteter | 9 aktiviteter | **9 aktiviteter** | 🟢 **+2** | 8+ aktiviteter (Nådd! 🎉) |
-| **TripAdvisor – Vurdering & Antall anmeldelser** | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (3 stk) | 5,0 ★ (6 stk) | 5,0 ★ (6 stk) | 5,0 ★ (9 stk) | 5,0 ★ (9 stk) | **5,0 ★ (11 stk)** 🎉 | 🟢 **+8 (Nesten 4x!)** | 5,0 ★ (10+ stk – Nådd! 🎉) |
-| **TripAdvisor Rangering – Leverandører ([Måleside](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html))** | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 7 av 23 | Nr. 3 av 23 (Fornøyelse) *(#16 standard)* | Nr. 3 av 23 (Fornøyelse) *(#16 standard)* | **Nr. 3 av 23 (Fornøyelse)** *(#16 standard)* | 🟢 **Topp 3 befestet!** | **Topp 3 (Nådd! 🎉)** |
-| **AI-søk synlighetsscore** *(Andel av 6 testsøk der vi siteres)* | 2 av 6 (33 %) | 2 av 6 (33 %) | 2 av 6 (33 %) | Bekreftet konvertering | 2 av 6 (33 %) *(#1 på VR)* | 3 av 6 (50 %) *(#1 VR + Teambuilding)* | 3 av 6 (50 %) *(#1 VR + Teambuilding)* | 🟢 **4 av 6 (67 %)** *(+Regnværsdag!)* | 🟢 **+2 (Klatret til 67 %!)** | **5 av 6 (83 %)** |
-| **Tranco Global Rank for `krsvr.no`** *(Topp 1M-liste)* | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | Ikke i Topp 1M | **Ikke i Topp 1M** | ➖ | Komme inn på listen |
-| **Brønnøysund NACE-kode (Riktig bransje i kataloger)** | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** | ⚠️ Krever Altinn | ✅ `93.299` (Fritid) |
+| **Sider i `sitemap.xml`** | 19 | 24 | 24 | 24 | 24 | 50 | 50 | 50 | 50 | **50** |
+| **Refererende domener** | 4 | 9 | 10 | 10 | 10 | 11 | 13 | 13 | 15 | **15** |
+| **Schema `sameAs`/`subjectOf`** | 5 | 7 | 8 | 8 | 8 | 12 | 20+ | 20+ | 21+ | **21+** |
+| **Google Maps (5,0 ★)** | 22 stk | 22 stk | 22 stk | 24 stk | 24 stk | 28 stk | 28 stk | 29 stk | 31 stk | ⚠️ Ikke avlest *(31 stk 13.11)* |
+| **Google GBP-produkter** | 7 | 7 | 7 | 8 | 8 | 9 | 9 | 9 | 9 | **9** |
+| **TripAdvisor (5,0 ★)** | 3 stk | 3 stk | 3 stk | 6 stk | 6 stk | 9 stk | 9 stk | 11 stk | 12 stk | ⚠️ Ikke avlest *(12 stk 13.11)* |
+| **TripAdvisor Rangering** | Nr. 7/23 | Nr. 7/23 | Nr. 7/23 | Nr. 7/23 | Nr. 7/23 | Nr. 3/23 (#16) | Nr. 3/23 (#16) | Nr. 3/23 (#16) | Nr. 3/23 (#15) | ⚠️ Ikke avlest *(Nr. 3/23 13.11)* |
+| **Gemini AI-sitering (6 søk)** | 2 av 6 | 2 av 6 | 2 av 6 | Bekr. konv. | 2 av 6 | 3 av 6 | 3 av 6 | 4 av 6 | 4 av 6 | **4 av 6 (67 %)** |
+| **Turistsøk (EN / DE / NL)** | – | – | – | – | – | – | – | – | – | **3 av 3 (100 %)** |
+| **Brønnøysund NACE** | `62.100` | `62.100` | `62.100` | `62.100` | `62.100` | `62.100` | `62.100` | `62.100` | `62.100` | **`62.100`** |
+
+</details>
 
 ---
 
-### B. Backlinks & Refererende Domener – Autoritetskartlegging (Sist oppdatert: `07.11.2026`)
+### B. Hvordan de ulike AI-motorene finner og siterer oss
 
-Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, rangert etter **Global Tranco Rank** (objektivt mål på domeneautoritet/trafikk basert på CrUX, Cloudflare Radar og Majestic) og **Estimert DR (Domain Rating 0–100)**:
+Ulike AI-assistenter bruker helt ulike datakilder. Automatisk agent-scanning via `search_web` måler **Google Gemini / AI Overviews**, mens **ChatGPT Search** og **Perplexity** henter lokale data fra egne indekser og kartleverandører:
 
-| Eksternt Domene | Global Tranco Rank *(lavere = sterkere)* | Est. DR (0–100) | Lenkestatus til `krsvr.no` | Siteres av Gemini AI? | Kategori / Merknad per `07.11.2026` |
-| :--- | :---: | :---: | :--- | :---: | :--- |
-| **[tripadvisor.com](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)** | **#577** i verden | ~93 | ✅ Aktiv profil + lenke | ✅ Ja | *Fornøyelse og lek i Kristiansand* (5,0★, 9 anmeldelser – Nr. 3 av 23). |
-| **[visitnorway.com / .se](https://www.visitnorway.no/)** | **#29 063** i verden | ~82 | ✅ Syndikert via Tellus | ✅ **Ja (Ofte!)** | Styrket posisjon! Automatisk syndikert fra Visit Sørlandet. Siteres direkte av Gemini. |
-| **[1881.no](https://www.1881.no/data-programvare-og-utvikling/data-programvare-og-utvikling-agder/data-programvare-og-utvikling-kristiansand-s/krs-vr-arena-as_107699902S0/)** | **#45 470** i verden | ~74 | ⚠️ Kun NAP (Mangler URL/tlf) | Nei | Står under *Data - programvare og -utvikling*. **Må legge inn tlf + URL.** |
-| **[1850.no](https://www.1850.no/bedrifter/it/dataprogrammering/agder/kristiansand/krs-vr-arena-as-936605192)** | **#381 360** i verden | ~45 | ✅ Schema `sameAs: www.krsvr.no` | Ja (NAP) | Har riktig tlf og URL, men står under *IT / Dataprogrammering*. |
-| **[krs.no (KRS – Avisen Kristiansand)](https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800)** | **#576 519** i verden | ~62 | ✅ **Redaksjonell reportasje + Schema `subjectOf`** | 🔄 Indekseres | Nyhetsreportasje 19.10.2026 (*«Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet»*). Koblet via `subjectOf` og footer. |
-| **[visitsorlandet.com](https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/)** | **#718 409** i verden | ~58 | ✅ **Oppføring (NO+EN) + Redaksjonelt Intervju** | ✅ **Ja (Hovedkilde)** | Offisiell destinasjonsportal for Agder. Nytt mini-intervju (29.10.2026) med ren dofollow-lenke direkte til `/arrangementer/vr-teambuilding`. |
-| **[wheretoescape.com](https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena)** | **#820 140** i verden | ~42 | ✅ **Publisert & Live** | ✅ **Ja (4 rom live)** | Global autoritet for escape rooms. Komplett profilside med alle 4 VR Escape Rooms (*Mask of the Pharaoh*, *Abyss Vault*, *Prison Break*, *Parvous Box*), 375 kr pp (NOK), åpningstider, NAP og dofollow-lenker til krsvr.no. Koblet via `sameAs` i Schema.org. |
-| **[worldofescapes.com](https://no.worldofescapes.com/companies/krs-vr-arena)** | **#1 328 033** i verden | ~40 | ✅ **Publisert & Live** | ✅ **Ja (4 rom live)** | Siteres direkte av Gemini AI på «Escape Room Kristiansand». Profil live med 4 VR Escape Rooms (*Mask of the Pharaoh*, *Abyss Vault*, *Prison Break*, *Parvous Box*) og dofollow-lenke til krsvr.no. Koblet via `sameAs` og `subjectOf` på selskapsnivå og for alle individuelle rom på både norsk og engelsk. |
-| **[eventguiden.no](https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/)** | **#3 927 835** i verden | ~32 | ✅ **Optimalisert & Live (94 %)** | ✅ **Ja (#1 kilde!)** | Hovedkilde for Gemini AI på teambuilding- og regnværsdagsøk! Fullt optimalisert. Kapasitet 64 pers, 4 pakker opprettet (Teambuilding 375 kr, Utdrikningslag 450 kr, Escape Room 375 kr, Julebord og nyttårsfest fra 450 kr), direkte «Bestill»-knapp til krsvr.no/booking, sosiale medier og toveis Schema.org `sameAs` & `subjectOf`. Siteres nå i **både søk #4 og søk #6**! |
-| **[lokalebedrifter.no](https://lokalebedrifter.no/bedrift/936318878/krs-vr-arena-as)** | Utenfor Topp 5M | ~20 | ✅ JSON-LD `url: krsvr.no` | Ja (NAP) | Har riktig tlf og URL, men kategorisert som *Softwareutvikling* (`62.100`). |
-| **dendagen.no** | Utenfor Topp 5M | ~18 | ✅ Omtale + `krsvr.no` | Ja (NAP) | Indeksert med kontaktinfo, e-post, tlf og beskrivelse av partylounge. |
-| **falio.no** | Utenfor Topp 5M | ~15 | ✅ Katalogoppføring | Nei | Henter registerdata fra Brønnøysund (`62.100`). |
-| **[utdrikningslag.events](https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena)** | Utenfor Topp 5M | ~25 | ✅ **Aktiv profil + indeksert** | 🔄 Venter sitering | Komplett profil med priser (fra 450 kr), bilder, innendørs og leadsskjema. Indeksert av Google/Gemini. |
-| **[utdrikningslag.com](https://utdrikningslag.com/presentasjon/krs-vr-arena/)** | Utenfor Topp 5M | ~25 | ✅ **Publisert & Live (11.11)** *(nofollow ut)* | 🔄 Venter indeksering | Live presentasjonsside ([krs-vr-arena](https://utdrikningslag.com/presentasjon/krs-vr-arena/)) + **#1 øverst på [`/kristiansand/`](https://utdrikningslag.com/kristiansand/)**! Riktig NAP, priser (fra 450 kr), 143 m², lounge/bar og pizza. Koblet via Schema.org `sameAs` & `subjectOf` (kompenserer for `nofollow`). Hovedkilde (#1) for AI på utdrikningslag-søk! |
+| AI-motor | Primære datakilder for lokale bedrifter | Crawler / Bot | Hvordan vi måler & styrker synligheten |
+| :--- | :--- | :--- | :--- |
+| **Google Gemini & AI Overviews** | Google Search, **Google Bedriftsprofil (Google Maps)**, Google Knowledge Graph (Schema.org `sameAs`/`subjectOf`), TripAdvisor, lokale portaler. | `Googlebot`, `Google-Extended` | Måles automatisk ved hver scanning via Google Search Grounding (Seksjon 0.C og 0.D). |
+| **ChatGPT Search (OpenAI)** | **Microsoft Bing Index**, **Bing Places for Business**, **Foursquare** (POI-data), **Mapbox / OpenStreetMap** (kartvisning), **TripAdvisor** (omtaler), **ChatGPT Business Hub** og `/llms.txt`. | `OAI-SearchBot`, `ChatGPT-User`, `GPTBot` | Bekreftet kundekonvertering (jf. TripAdvisor-anmeldelse 19.10). Styrkes ved å synkronisere **Bing Places**, **Foursquare** og **NACE-kode**. |
+| **Perplexity AI** | Egen sanntidsindeks, **TripAdvisor**, Eventguiden, Visit Norway / Visit Sørlandet, World of Escapes, Schema.org og `/llms.txt`. | `PerplexityBot`, `Perplexity-User` | Sjekkes via `/browser`-subagent eller manuell kontroll. Sterkt drevet av uavhengige topplister og TripAdvisor. |
+| **Apple Intelligence & Siri** | **Apple Business Connect (Apple Maps)**, TripAdvisor, Yelp/Foursquare og åpne nettsider. | `Applebot`, `Applebot-Extended` | Krever at **Apple Business Connect** Place Card opprettes for `Industrigata 12`. |
 
 ---
 
-### C. AI-Søk (GEO) Siteringstest på 6 Kommersielle Søk (Sist scannet: `07.11.2026`)
+### C. De 6 Kommersielle Testsøkene på Norsk (Sist scannet: `14.11.2026` – Scan #10)
 
-Disse 6 nøytrale testsøkene (uten å nevne «KRS» i søket) kjøres ved hver scanning for å måle om Gemini / Google AI anbefaler **KRS VR Arena** til potensielle kunder:
+Disse 6 nøytrale testsøkene (uten å nevne «KRS» i søket) måler om vi blir anbefalt når potensielle kunder spør etter aktiviteter i Kristiansand:
 
-| # | Kommersielt Testsøk | Status `07.11.2026` | Plassering / Omtale i AI-svar | Hvilke kilder AI faktisk siterte i svaret | Hva som må til for å bli #1 |
-| :-: | :--- | :---: | :--- | :--- | :--- |
-| **1** | *«VR Kristiansand»* | ✅ **Anbefalt (#1)** | **Nr. 1** – Egen fyldig hovedseksjon som byens primære VR-arena på Lund med direkte lenke til `krsvr.no` og `visitsorlandet.com`. | `visitsorlandet.com`, `krsvr.no`, `visitnorway.com`, `uia.no` | Vedlikeholde posisjonen og anmeldelsestrykket. |
-| **2** | *«VR Escape Room Kristiansand»* | ✅ **Anbefalt (#1)** | **Nr. 1** – Fremheves som ubestridt hovedaktør i Kristiansand med 90-min opplevelser for 2–10 spillere og direkte bookinglenke. | `visitsorlandet.com`, `visitnorway.com`, `krsvr.no`, `eventguiden.no` | Fortsette å samle kundeomtaler som nevner de spesifikke rommene (*Abyss Vault*, *Prison Break*). |
-| **3** | *«Escape Room Kristiansand»* | ❌ **Ikke nevnt** | Kun fysiske *Escape Room Kristiansand* (Festningsgata/Kirkegata) nevnes i brødteksten, men `worldofescapes.com` siteres nå to ganger som kilde. | `visitnorway.nl`, `kvadraturen.no`, `eventguiden.no`, `escapekristiansand.no`, `worldofescapes.com` | Samle kundeanmeldelser på Google og TripAdvisor som spesifikt nevner «Escape Room Kristiansand». |
-| **4** | *«Teambuilding Kristiansand innendørs aktiviteter»* | 🟢 **Nevnt & Sitert** | **Seksjon 3: Spill, Golf og Sosial Moro** – Fremheves: *«VR-arenaer og arkade: Flere steder tilbyr VR-opplevelser (som Krs VR Arena)...»* | `eventguiden.no`, `escapekristiansand.no`, `spygames.no`, `inpeople.no`, `visitsorlandet.com` | Befestet via Eventguiden. Videre mål: Klatre fra seksjon 3 til Topp 1-2 ved hjelp av Visit Sørlandet-intervjuet og `/arrangementer/vr-teambuilding`. |
-| **5** | *«Utdrikningslag Kristiansand aktiviteter»* | ❌ **Ikke nevnt** | AI lister Høyt & Lavt, RIB, X3M Gokart, Skyland, Escape Room Kristiansand, SpyGames, Glowing Golf. *(Kilde #1 er utdrikningslag.com!)* | `utdrikningslag.com`, `hoytlavt.no`, `getyourguide.com`, `eventguiden.no`, `skyland.no`, `escapekristiansand.no`, `spygames.no`, `mineralparken.no` | Avtale inngått og materiell levert til `utdrikningslag.com`! Når profilen går live på deres side, vil KRS VR Arena hoppe rett inn i kilde #1 for dette søket. |
-| **6** | *«Innendørs aktiviteter Kristiansand regnværsdag»* | 🟢 **Nevnt & Sitert (NY!)** | **Seksjon 3: Action, spill og moro** – Siterer og fremhever: *«VR Arena eller Escape Room: Utfordre venner eller familie i et virtuelt univers hos KRS VR Arena, eller test samarbeidsevnene i et spennende Escape Room i sentrum.»* | `eventguiden.no`, `visitsorlandet.com`, `visitnorway.no`, `kristiansandguiden.no` | 🎉 **Ny klatring inn i AI-svaret via Eventguiden!** For å klatre til Topp 1: Bli omtalt i dedikerte regnværsartikler på Visit Sørlandet. |
-
-### D. Internasjonale Turist- og AI-søk (EN / DE / NL – Lagt til `25.10.2026`)
-
-Med lansering av `/en/*`, `/de` og `/nl` kan vi også spore synlighet i AI-søk for engelskspråklige, tyske og nederlandske turister:
-
-| Språk | Kommersielt Turistsøk | Målside (`hreflang`) | Fokuspunkter for AI-sitering |
-| :---: | :--- | :--- | :--- |
-| **🇬🇧 EN** | *«Things to do in Kristiansand when raining»* / *«Indoor activities Kristiansand family»* | `https://www.krsvr.no/en` | 5 min fra Color Line / Fjord Line, 8+ år, engelsk vertskap, 0 NOK forhåndsbetaling (kort ved ankomst). |
-| **🇩🇪 DE** | *«Aktivitäten in Kristiansand bei Regen mit Kindern»* / *«Ausflugsziele Kristiansand Indoor»* | `https://www.krsvr.no/de` | 5 Min. vom Fährhafen, Spiele auf Deutsch/Englisch im Headset, Zahlung vor Ort mit Visa/Mastercard/Apple Pay. |
-| **🇳🇱 NL** | *«Wat te doen in Kristiansand bij regen met kinderen»* / *«Binnenactiviteiten Kristiansand»* | `https://www.krsvr.no/nl` | 5 min van de veerboothaven, 8+ jaar, gratis parkeren (ook voor campers), betaling ter plaatse met pinpas/creditcard. |
+| # | Kommersielt Testsøk | Gemini / Google AI (`14.11.2026`) | ChatGPT / Ekstern Dekning | Hvilke kilder AI faktisk siterte (`14.11.2026`) | Hva som må til for å bli #1 |
+| :-: | :--- | :---: | :---: | :--- | :--- |
+| **1** | *«VR Kristiansand»* | ✅ **#1 Anbefalt** *(Egen hovedseksjon som Sørlandets største trådløse VR- og MR-arena, opptil 64 pers, bar & lounge)* | ✅ **Sterk** *(TripAdvisor #3 + Visit Norway)* | `krsvr.no` (3×), `visitsorlandet.com`, `eventguiden.no`, `visitnorway.com` | Vedlikeholde posisjonen og anmeldelsestrykket + legge inn Bing Places. |
+| **2** | *«VR Escape Room Kristiansand»* | ✅ **#1 Anbefalt** *(Ubestridt hovedaktør, 2–6 per rom / 64 pers, Prison Break, Abyss Vault, Parvous Box)* | ✅ **Sterk** *(4 rom på WOE + WhereToEscape)* | `visitsorlandet.com`, `krsvr.no` (2×), `eventguiden.no` | Fortsette å samle omtaler som nevner romtitlene (*Mask of the Pharaoh*, *Prison Break* osv.). |
+| **3** | *«Escape Room Kristiansand»* | ❌ **Ikke nevnt i tekst** *(kun fysiske i Festningsgata/Kirkegata nevnes, men våre portaler siteres)* | 🟡 **Delvis** *(40 % av rommene på WOE)* | `visitnorway.nl`, `kvadraturen.no`, `escapekristiansand.no`, `eventguiden.no`, `worldofescapes.com`, `visitsorlandet.com`, `roomescape.com` | Samle kundeanmeldelser på Google og TripAdvisor som bruker den eksakte frasen *«Escape Room i Kristiansand»*. |
+| **4** | *«Teambuilding Kristiansand innendørs aktiviteter»* | ❌ **Ikke nevnt** *(listet Escape Kristiansand, SpyGames, Interactive People, Lucky Bowl, Glowing Golf, X3M, Klatreverket)* | 🟡 **Delvis** *(Visit Sørlandet + Eventguiden)* | `eventguiden.no` (2×), `escapekristiansand.no`, `spygames.no`, `inpeople.no`, `klatreverketkrs.no` | Registrere profil på `teambuildinger.no` / `firmatur.no` + få flere bedriftsomtaler med ordet «teambuilding». |
+| **5** | *«Utdrikningslag Kristiansand aktiviteter»* | ✅ **Anbefalt under Seksjon 1 (Action, spill og teambuilding)** *(#2 rett etter Escape Room: «KRS VR Arena: Utfordre vennegjengen i virtuell virkelighet med høyt fun- og konkurransenivå»)* | ✅ **Sterk** *(#1 på utdrikningslag.com)* | `utdrikningslag.com`, `utdrikningslag.events` (2×), `eventguiden.no`, `escapekristiansand.no`, `spygames.no`, `skyland.no`, `hoytlavt.no` | Både `utdrikningslag.com` og `utdrikningslag.events` siteres nå direkte i svaret! |
+| **6** | *«Innendørs aktiviteter Kristiansand regnværsdag»* | 🟢 **Nevnt & Sitert under Seksjon 3 (Spill, lek og action)** *(«Escape Rooms / VR: Sjekk ut lokale aktører som tilbyr Escape Rooms eller VR-opplevelser som KRS VR Arena»)* | ✅ **Bekreftet konvertering fra ChatGPT** | `visitsorlandet.com` (3×), `visitnorway.no`, `eventguiden.no`, `kristiansandguiden.no`, `norwegian.com` | Bli nevnt i dedikerte regnværsartikler hos Visit Sørlandet / Kristiansandguiden.no for å løftes enda høyere. |
 
 ---
 
-## 1. Registrering i eksterne kanaler og autoritetskilder
+### D. Internasjonale Turist- og AI-søk – EN / DE / NL (Sist scannet: `14.11.2026`)
 
-Språkmodeller stoler mest på bedrifter som er bekreftet på tvers av flere uavhengige kilder med identisk **NAP** (*Name, Address, Phone*: KRS VR Arena, Industrigata 12, 4632 Kristiansand, 408 28 302).
+Tester synligheten for utenlandske turister som kommer med ferge (Color Line / Fjord Line) eller søker på eget morsmål:
 
-### Høyeste prioritet (De AI søker i først)
-- [x] **TripAdvisor (Fullført – Aktiv profil, bilder, beskrivelser og widget):**
-  - **Direkte oppførings-URL:** [Krs VR Arena på TripAdvisor](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)
-  - **Offisiell måleside for rangering og klatring:** [TripAdvisor – Leverandører i Fornøyelse og lek i Kristiansand (c56/SUPPLIERS)](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html)
-  - **Målepunkt (Status per 9. november 2026 – Avlest via `/browser`):**
-    - **Vurdering:** **5,0 av 5,0 stjerner / bobler** (100 % toppkarakter – 11 av 11 er 5 av 5 «Utmerket»!)
-    - **Antall anmeldelser:** **11 anmeldelser** (🎉 **Kvartalsmålet på 10+ er nådd!**)
-    - **Utmerkelse:** Har offisielt **Travellers' Choice**-merke (øverste 10 % på TripAdvisor globalt).
-    - **Eksternt nettsøk (Google):** **100 % sluppet ut og indeksert.** TripAdvisor-siden for KRS VR Arena rangerer som **#1 organisk søkeresultat** på Google Search direkte under `krsvr.no` sine sitelinks ved merkevaresøk. Google krever ingen minimumsgrense på anmeldelser for å indeksere profilen.
-    - **Rangering og synlighet internt på TripAdvisor:**
-      - **Profilrangering (Fornøyelse og lek i Kristiansand):** **Nr. 3 av 23** (🎉 **Topp 3 befestet!**)
-      - **Leverandørlisten (`c56/SUPPLIERS` standardalgoritme):** **Nr. 16 av 23**
-    - **Full strategisk målgruppedekning på TripAdvisor:**
-      1. **Venner og Familie (07. nov 2026 – Катерина М):** *«Et veldig vakkert sted for venner og familie. Vi hadde en uvanlig opplevelse med den virtuelle verdenen»* (5/5)
-      2. **Russefeiring / Ungdom (07. nov 2026 – Adrian K):** *«Fin start på russeslippet🤩 – dette var virkelig vert å teste ut skal så absolutt komme tilbake 🤩»* (5/5)
-      3. **Vennegjeng (Liliana A):** *«Dritt gøy sammen med venner – Veldig gøy og unik opplevelse»* (5/5)
-      4. **Barna & Snøballspill (24. okt 2026 – Vegar S):** *«Veldig gøy - Prøvde Tactical Arena, det var veldig gøy. Barna elsket snøballspillet.»* (5/5)
-      5. **Voksne & Barn (24. okt 2026 – Companion55797375327):** *«Bør prøves! - Veldig gøy! Både for voksne og barn!»* (5/5)
-      6. **Vennegjeng (23. okt 2026 – Jonas A):** *«Supermorro - Ekstremt mye morro å gjøre sammen med venner»* (5/5)
-      7. **ChatGPT & Venner (19. okt 2026 – thoraamli):** *«Helt fantastisk opplevelse! Anbefales på det sterkeste!»* – Nevner eksplisitt: *«Jeg hadde faktisk ikke hørt om KRS VR Arena før jeg spurte ChatGPT om forslag til aktiviteter i Kristiansand. Det dukket opp som et tips...»* + *«Prison Break»*.
-      8. **Barnefamilier (18. okt 2026 – F8809GQveronikal):** *«Gå inn i en magisk verden sammen med barna»* – Supergøy barneaktivitet i høstferien/oktober!
-      9. **Spill og Service (17. okt 2026 – 363kristofferk):** *«Bra service og gøye spill»* – Godt opplegg og oppfølging.
-      10. **Teambuilding (24. sep 2026 – G6162DGelisabethv):** *«Skikkelig bra teambuilding»* – Utrolig gøy og super teambuilding for kolleger.
-      11. **Utdrikningslag / Stag Party (29. aug 2026 – Snocracker):** *«Stag party event»* – Fremhever VR Counter-Strike / Tactical Arena.
-  - **Gjennomførte tiltak:**
-    - [x] Bilder og optimaliserte bildebeskrivelser lastet opp i profilen.
-    - [x] Profilbeskrivelser oppdatert.
-    - [x] Offisiell «Rated on Tripadvisor» grønn badge implementert i bunnteksten ([Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx)).
-    - [x] TripAdvisor-lenke integrert i tilbakemeldingsmodulen ([FeedbackForm.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/FeedbackForm.tsx)).
-    - [x] TripAdvisor-profilen lagt inn i `sameAs`-strukturen i Schema.org JSON-LD ([layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx)).
-  - **Neste mål (Effektmåling):**
-    - Klatre fra **Nr. 7 / #17** inn på **Topp 10** og deretter **Topp 3** ved å samle inn 5–10 nye anmeldelser via oppfølgings-e-poster og `/feedback`.
-- [x] **Visit Sørlandet (visitsorlandet.com – Fullført, live oppføring og backlink til `krsvr.no`):**
-  - **Direkte oppførings-URL (NO):** [KRS VR Arena på Visit Sørlandet](https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/)
-  - **Direkte oppførings-URL (EN):** [KRS VR Arena on Visit Southern Norway](https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/)
-  - **Gjennomførte tiltak:**
-    - [x] Oppføring publisert via Tellus DMS med direkte backlink til `https://www.krsvr.no`, telefon (`+47 40 82 83 02`), e-post (`post@krsvr.no`), adresse (`Industrigata 12, 4632 Kristiansand`), åpningstider, priser og bildegalleri.
-    - [x] Lagt inn i `sameAs`-strukturen i Schema.org JSON-LD ([layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx) og [LandingPage.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/LandingPage.tsx)) for toveis entitetsbekreftelse (Knowledge Graph).
-    - [x] Diskret referanselenke («Du finner oss også på Visit Sørlandet») lagt inn under TripAdvisor-badgen i bunnteksten ([Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx)).
-    - [x] **Nytt redaksjonelt partnerintervju publisert 29.10.2026:**
-      - **Artikkel-URL:** [Mini-intervju med KRS VR Arena | Visit Sørlandet](https://www.visitsorlandet.com/bransje/visit-sorlandet-utvikling/nyheter/mini-intervjuer-med-vare-partnere/mini-intervju-med-krs-vr-arena/)
-      - **Inngående lenker fra artikkelen:** 2× dofollow-lenker til `https://www.krsvr.no/` og 1× målrettet dyp-lenke med ankertekst *«teambuilding, firmaevent, bursdag og utdrikningslag»* direkte til `https://www.krsvr.no/arrangementer/vr-teambuilding`.
-      - **Gjensidig forsterkning:** Koblet inn som `subjectOf` og `memberOf: Visit Sørlandet` i Schema.org JSON-LD ([layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx), [LandingPage.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/LandingPage.tsx) og [vr-teambuilding/page.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/arrangementer/vr-teambuilding/page.tsx)), samt fremhevet under *«Trygghet for arrangøren»* på teambuilding-siden og i `public/llms.txt`.
-  - **Tips til finpuss i Tellus-portalen:**
-    - [ ] Fjern rå `**`-stjerner (Markdown-fettekst) i brødteksten inne i Tellus/Visit Sørlandet-portalen, ettersom Simpleview viser `**Populære 90-minutters opplevelser:**` som synlige stjerner.
-- [x] **Visit Norway (visitnorway.no / visitnorway.com – Fullført via Tellus-syndikering):**
-  - Automatisk syndikert fra Visit Sørlandet/Tellus DMS (bl.a. synlig i Visit Norways familie- og aktivitetslister for Kristiansand).
-- [x] **Presseomtale i KRS – Avisen Kristiansand (`krs.no` – Fullført 19. oktober 2026):**
-  - **Artikkel-URL:** [Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet](https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800)
-  - **Tittel / Overskrift:** *«Deler lokale med dansestudio: Nå fyller de storsalen med virtuell moro»* (av journalist Jasmine Marie Agas Ramos, publisert 19.10.2026 under teambuilding med 17 deltakere).
-  - **Gjennomførte tiltak på `krsvr.no`:**
-    - [x] Lagt inn strukturert `NewsArticle` under `subjectOf` (samt i `sameAs`) i Schema.org JSON-LD i [layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx) og [LandingPage.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/LandingPage.tsx) slik at Google Knowledge Graph og AI-crawlere kobler den låste Pluss-artikkelen direkte til entiteten **KRS VR Arena**.
-    - [x] Lagt inn synlig referanselenke («Omtalt i KRS – Avisen Kristiansand») i [Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx).
-  - **Oppfølgingstiltak (Eksternt):**
-    - [ ] Sende en hyggelig takk til `jasmine.ramos@krs.no` og høre om `krsvr.no` kan legges inn som klikkbar lenke i saken (dersom den kun står som ren tekst).
-    - [ ] Legge ut et «Innlegg» på Google Bedriftsprofil (Google Maps) som nevner teambuildingen for 17 deltakere og lenker til `krs.no`-reportasjen.
-
-### Event- og selskapsportaler (For teambuilding, utdrikningslag og escape rooms)
-
-- [x] **Eventguiden.no – Optimalisert & Publisert Live (Fullført 02.11.2026):**
-  - **Direkte profilside:** [KRS VR Arena på Eventguiden](https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/)
-  - **Redigeringsside:** [Eventguiden Redigeringspanel](https://eventguiden.no/rediger/cWCE__LQr8Y1zD8rk91d1utKdNJhjWXI/)
-  - **Status:** Profilen er 100 % oppdatert og live med 94 % kompletthet. 
-  - **Hvorfor dette er kritisk for AI:** Eventguiden er Gemini AIs **hovedkilde (#1 sitering)** på teambuilding-søk i Kristiansand.
-  - **Gjennomførte optimaliseringer (02.11.2026):**
-    - [x] **1. Kapasitet og merkevare:** Rettet til `KRS VR Arena`, økt maks kapasitet fra 8 til **64 personer** (`capacity_max: 64`).
-    - [x] **2. Teambuilding- og firmapresentasjon:** Omskrevet etter `AGENTS.md` med fokus på 143 kvm arena, dynamisk turneringsformat for 10–64 personer, 10 samtidige spillere på banen, lagarmbånd, live spectator i partyloungen og kåring av vinnerlag.
-    - [x] **3. 4 publiserte pakker med priser og forhåndsbestilt åpen bar:**
-      1. *Teambuilding & Firmaevent (2–64 pers)* – Fra 375 kr (flat pris 375 kr eks. mva, turnering over 10 pers, erfaring med at alle aldre engasjeres, mulighet for forhåndsbestilt åpen bar & pizza).
-      2. *VR Utdrikningslag* – Fra 450 kr (brud/brudgom i sentrum, lounge, mulighet for forhåndsbestilt åpen bar & pizza).
-      3. *VR Escape Room* – Fra 375 kr (Mask of the Pharaoh, Abyss Vault, Prison Break, Parvous Box).
-      4. *Julebord og nyttårsfest (10–64 pers)* – Fra 450 kr (helaften/turnering, lounge, premiekåring, mulighet for forhåndsbestilt åpen bar & pizza).
-    - [x] **4. Knapper og lenker:**
-      - Direkte «Book / bestill»-knapp til `https://www.krsvr.no/booking`.
-      - Nettsidelenke til `https://www.krsvr.no/`.
-      - Sosiale medier lagt inn (Facebook og Instagram).
-    - [x] **5. Servering og fasiliteter:** Skjenkebevilling, bar (Pakke 1 og Pakke 2), varm lokal pizza, rullestolvennlig på bakkeplan, gratis parkering, toalett og garderobe. (Medbrakt alkohol fjernet/ikke tillatt).
-    - [x] **6. Schema.org toveis entitetskobling (`sameAs` & `subjectOf`):** Lagt inn i `sameAs` i `app/layout.tsx` og `components/LandingPage.tsx`, samt som `subjectOf` og `sameAs` i `app/arrangementer/vr-teambuilding/page.tsx` for å låse autoriteten i Google Knowledge Graph.
-
-- [x] **utdrikningslag.events (EventAdmin – Publisert og Live 02.11.2026):**
-  - **Direkte produkt-URL:** [VR Utdrikningslag hos KRS VR Arena på utdrikningslag.events](https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena)
-  - **Admin-panel:** [eventadmin.io/activities](https://eventadmin.io/activities) (Konto: `post@krsvr.no`)
-  - **Status:** Profilen er 100 % publisert og aktiv. Inneholder:
-    - 202-ords selgende og optimalisert presentasjonstekst (Tactical Arena + Escape Room + partylounge).
-    - Priser: Fra 450 kr/pers inkl. mva, minstepris 1 800 kr (4 pers).
-    - Varighet: 1,5–3 timer, innendørsarena på Lund i Kristiansand.
-    - Direkte leadsskjema med varsel til `post@krsvr.no`.
-    - Klikkbar lenke direkte til `https://www.krsvr.no/arrangementer/vr-utdrikningslag`.
-  - **Oppfølgingstiltak:**
-    - [x] **Schema.org toveis entitetskobling (Fullført 02.11.2026):** Lagt inn i `sameAs` i `app/layout.tsx` og `components/LandingPage.tsx`, samt som `subjectOf` og `sameAs` i `app/arrangementer/vr-utdrikningslag/page.tsx`. Dette bygger en direkte bro i Googles og Geminis Knowledge Graph selv om portalen skjuler utgående lenker i HTML-en.
-    - [ ] Følge opp eventuelle innkommende henvendelser i EventAdmin-dashbordet (`eventadmin.io/leads`).
-    - [ ] Kjøre ny AI-siteringstest på søk #5 (*«Utdrikningslag Kristiansand aktiviteter»*) i neste scanning for å verifisere når Google/Gemini begynner å sitere profilen.
-
-- [x] **WhereToEscape.com (Publisert & Live 03.11.2026 – 4 VR Escape Rooms aktive):**
-  - **Offisiell profilside:** [WhereToEscape – KRS VR Arena](https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena)
-  - **Status:** Søknad godkjent, eierpanel åpnet, profil optimalisert og samtlige 4 VR Escape Rooms opprettet og publisert:
-    1. *Mask of the Pharaoh* (2–6 spillere, 60 min, 8+, Adventure/Egyptian/Mystery, 375 kr pp).
-    2. *Abyss Vault* (2–6 spillere, 60 min, 10+, Adventure/Sci-Fi/Submarine, 375 kr pp).
-    3. *Prison Break* (2–6 spillere, 60 min, 10+, Adventure/Crime/Prison Break, 375 kr pp).
-    4. *Parvous Box* (2–6 spillere, 60 min, 10+, Fantasy/Magical/Mystery, 375 kr pp).
-  - **Hvorfor dette er kritisk for AI:** WhereToEscape har Tranco Rank #820 140 og er en internasjonal autoritet som AI-modeller bruker for å indeksere og verifisere escape room-tilbydere over hele verden.
-  - **Gjennomførte tiltak (03.11.2026):**
-    - [x] Verifisert at KRS VR Arena listes med klikkbar backlink til `https://www.krsvr.no/vr-opplevelser/escape-room` (og `https://www.krsvr.no/`).
-    - [x] Rommene registrert med riktige titler, antall spillere (2–6 per rom), 60 min, alder, egenskaper (wheelchair accessible, child friendly, puzzle heavy) og plakater.
-    - [x] **Valutakorreksjon til NOK:** Venue-valutaen endret fra standard GBP til **Norwegian Krone (NOK / kr)** (`currency_id: 26`) med fast pris `375 kr pp` på samtlige rom.
-    - [x] **Schema.org toveis entitetskobling (`sameAs` & `subjectOf`):** Lagt godkjent profil-URL inn i `sameAs` og `subjectOf` i `app/layout.tsx`, `components/LandingPage.tsx`, `app/vr-opplevelser/[[...slug]]/page.tsx` og `app/en/experiences/[[...slug]]/page.tsx`. Dette forankrer KRS VR Arena i den internasjonale escape room-entiteten hos Google og LLM-er.
-
-- [x] **World of Escapes (Publisert & Live 03.11.2026 – 4 VR Escape Rooms aktive):**
-  - **Portal-URL:** [no.worldofescapes.com/companies/krs-vr-arena](https://no.worldofescapes.com/companies/krs-vr-arena)
-  - **Status:** Godkjent og publisert på under 24 timer! Samtlige **4 VR Escape Rooms** er live:
-    1. *Mask of the Pharaoh - VR Escape Room* (Familievennlig, Historisk, Mystisk, 2–6 spillere, fra 8 år).
-    2. *Abyss Vault - Sci-Fi Action VR Escape Room* (Action game, Sci-Fi, Eventyrlig, 2–6 spillere, fra 10 år).
-    3. *Prison Break - VR Escape Room* (Fengselsbrudd, Spenning, 2–6 spillere, fra 10 år).
-    4. *Parvous Box - VR Escape Room* (Mystisk, Utfordrende, Eventyrlig, 2–6 spillere, fra 10 år).
-  - **Betydning for AI-søk og Knowledge Graph:**
-    - KRS VR Arena eier nå **4 av 10 rom (~40 % av markedet)** på Kristiansands mest siterte escape room-portal, og er byens eneste aktør under [Virtuell virkelighet escape-rom i Kristiansand](https://no.worldofescapes.com/kristiansand/tags/vr-no).
-    - Gemini AI siterer World of Escapes direkte på søk #3 (*«Escape Room Kristiansand»*).
-  - **Gjennomførte tiltak:**
-    - [x] Verifisert at selskapssiden `https://no.worldofescapes.com/companies/krs-vr-arena` er opprettet med dofollow-lenke til `https://www.krsvr.no/vr-opplevelser/escape-room`.
-    - [x] Kontrollert at alle 4 rommene vises på World of Escapes i Kristiansand.
-    - [x] **Schema.org toveis entitetskobling (`sameAs`):** Lagt inn `https://no.worldofescapes.com/companies/krs-vr-arena` i `sameAs` i `app/layout.tsx`, `components/LandingPage.tsx` og `app/vr-opplevelser/[[...slug]]/page.tsx`.
-    - [x] **Granulær spill-entitetskobling (`sameAs` & `subjectOf`):** Samtlige 4 individuelle escape room-sider (`/vr-opplevelser/escape-room/[spill]`) og `ItemList` er beriket med direkte `sameAs`- og `subjectOf`-koblinger til sine respektive quest-URL-er på World of Escapes (*Prison Break*, *Mask of the Pharaoh*, *Abyss Vault*, *Parvous Box*) på både norsk og engelsk.
-
-- [x] **Utdrikningslag.com & Utdrikningslag.no (Publisert & Live 11.11.2026):**
-  - **Direkte profil-URL:** [Utdrikningslag Kristiansand | VR Action – KRS VR Arena på Utdrikningslag.com](https://utdrikningslag.com/presentasjon/krs-vr-arena/)
-  - **Plassering på Kristiansand-siden:** Ligger nå øverst (#1) i aktivitetslisten på [utdrikningslag.com/kristiansand/](https://utdrikningslag.com/kristiansand/).
-  - **Status:** Avtale inngått 03.11.2026 med Niclas Lanneteg (Utdrikningslag.com / Highjump Event AS). Publisert og live 11.11.2026.
-  - **Vilkår:** Gratis profilering i november måned, fakturering for desember og 2027.
-  - **Gjennomførte tiltak:**
-    - [x] Organisasjonsopplysninger oversendt: `KRS VR ARENA AS` (Org.nr: `936 318 878 MVA`).
-    - [x] Bildepakke med høyoppløselige lenker levert og publisert.
-    - [x] Skreddersydd profiltekst publisert (143 m², opptil 10 samtidige / 4–64 totalt, fra 450 kr/pers, partylounge med storskjerm, forhåndsbestilt øl/cider/vin/bobler og pizza, forbud mot medbrakt, full NAP + SoMe + TripAdvisor).
-    - [x] **Schema.org toveis entitetskobling (Fullført 11.11.2026):** Lagt inn `https://utdrikningslag.com/presentasjon/krs-vr-arena/` i `sameAs` og `subjectOf` i `app/arrangementer/vr-utdrikningslag/page.tsx`, `app/layout.tsx` og `components/LandingPage.tsx`. (Viktig ettersom utgående lenke på Utdrikningslag.com har `rel="nofollow"`.)
-
-- [ ] **Teambuilding.no / Firmatur.no:**
-  - Legg inn profil for teambuilding, kickoff og bedriftsarrangementer.
-- [ ] **Aktiviteter i Norge / Kvadraturen.no:**
-  - Lokale kalendere og arrangementssider i Kristiansand sentrum.
-
-### Norske kataloger & Brønnøysundregistrene (Sjekket 17. oktober 2026 – Viktige avvik funnet!)
-- [ ] **VIKTIGST: Endre næringskode (NACE) i Brønnøysundregistrene (Altinn):**
-  - **Funn ved oppslag i Enhetsregisteret (`936 318 878` / underenhet `936 605 192`):** Selskapet står fortsatt registrert med **`naeringskode1: 62.100 Dataprogrammeringstjenester`** (fra tiden som *JLS FINANS AS*).
-  - **Konsekvens for AI-søk og kataloger:** Fordi 1881.no, Gule Sider, Proff.no, 1850.no og Lokalebedrifter.no henter bransje automatisk fra Brønnøysund, er KRS VR Arena kategorisert som **«Data - programvare og -utvikling» / «IT / Softwareutvikling»** i stedet for underholdning/aktiviteter!
-  - **Tiltak (Gratis i Altinn):** Send inn *Samordnet registermelding* i Altinn og endre næringskode til **`93.299 Fritidsvirksomhet ellers`** (evt. `93.210 Drift av fornøyelses- og temaparker`).
-- [ ] **1881.no (Sjekket – Feil kategori og mangler telefon/nettside):**
-  - **Direkte URL:** [Krs Vr Arena AS på 1881.no](https://www.1881.no/data-programvare-og-utvikling/data-programvare-og-utvikling-agder/data-programvare-og-utvikling-kristiansand-s/krs-vr-arena-as_107699902S0/)
-  - **Status nå:**
-    - Navn (`Krs Vr Arena AS`) og adresse (`Industrigata 12, 4632 Kristiansand S`) er riktig.
-    - **Mangler:** Det står *«Telefonnummer mangler, data er hentet fra offentlige registre»*, og lenke til `krsvr.no` samt åpningstider mangler.
-    - **Feil kategori:** Ligger under `/data-programvare-og-utvikling/`.
-  - **Tiltak:** Logg inn på [minbedrift.1881.no](https://minbedrift.1881.no/) og legg inn telefon `408 28 302` og `https://www.krsvr.no` (NB: Kun gratis grunnoppføring – takk nei til betalt annonsering).
-- [ ] **Gule Sider (Eniro) & 1850.no (Sjekket):**
-  - **1850.no URL:** [Krs Vr Arena AS på 1850.no](https://www.1850.no/bedrifter/it/dataprogrammering/agder/kristiansand/krs-vr-arena-as-936605192)
-  - **Lokalebedrifter.no URL:** [KRS VR ARENA AS på Lokalebedrifter.no](https://lokalebedrifter.no/bedrift/936318878/krs-vr-arena-as)
-  - **Status nå:** Adresse (`Industrigata 12`), telefon (`+47 408 28 302`) og nettside (`www.krsvr.no`) er hentet inn fra Brønnøysund, men står som *«Ubekreftet selskap»* under *«IT / Dataprogrammering»*.
-  - **Tiltak:** Når næringskoden i Brønnøysund er oppdatert, oppdateres bransjen automatisk. Sjekk også gratisoppføringen på Gule Sider.
-- [ ] **Apple Maps / Apple Business Connect (Sjekket – Ikke registrert som eget sted ennå):**
-  - **Status nå:** Adressen `Industrigata 12` og naboen *Krs Urban Dance Center* finnes i kartgrunnlaget, men **KRS VR Arena** ligger ikke inne som et eget verifisert interessepunkt (Place Card) i Apple Maps.
-  - **Tiltak (Gratis):** Logg inn med Apple-ID på [Apple Business Connect](https://businessconnect.apple.com/) og opprett/bekreft **KRS VR Arena** (`Industrigata 12, 4632 Kristiansand`, tlf `+47 408 28 302`, `https://www.krsvr.no`, åpningstider og bilder). Dette gir synlighet i Apple Maps, Siri og DuckDuckGo.
-  - **Schema.org oppfølging:** Når Place Card er godkjent, legg Apple Maps URL inn i `hasMap` / `sameAs` i `app/layout.tsx`.
-
-### Studentrettede kanaler (13 000+ studenter i Kristiansand)
-- [ ] **SiA (Studentsamskipnaden i Agder):**
-  - Undersøk mulighet for studentfordel / partneroppføring på SiA sine velkomstsider.
-- [ ] **Linjeforeninger ved UiA (Campus Kristiansand):**
-  - Send invitasjon til linjeforeningene for semesterstart eller kickoff. En enkelt omtale fra en studentforening gir sterk lokal relevans.
+| Språk | Kommersielt Turistsøk | Målside (`hreflang`) | Status i Gemini / Google AI (`14.11.2026`) | Siterte kilder i AI-svaret |
+| :---: | :--- | :--- | :--- | :--- |
+| **🇬🇧 EN** | *«Things to do in Kristiansand when raining indoor activities family»* | `https://www.krsvr.no/en` | ✅ **Anbefalt & Direkte sitert!** Fremheves under *High-Tech & Action-Packed Fun*: *«Southern Norway's largest wireless VR and mixed reality arena... family packages (8+ years) with zero scary jump-scares»*. | **`krsvr.no`** (direkte!), `visitsorlandet.com`, `visitnorway.com`, `kunstsilo.no` |
+| **🇩🇪 DE** | *«Aktivitäten in Kristiansand bei Regen Indoor Ausflugsziele»* | `https://www.krsvr.no/de` | ✅ **Anbefalt & Direkte sitert!** Fremheves under *Spaß, Action & Bewegung*: *«KRS VR Arena: Eine moderne Virtual-Reality-Indoor-Arena (nur wenige Minuten vom Fährhafen entfernt), in der man sich frei durch virtuelle Welten bewegen und Escape-Games spielen kann»*. | **`krsvr.no/de`** (direkte!), `visitsorlandet.com`, `visitnorway.de`, `kvadraturen.no` |
+| **🇳🇱 NL** | *«Wat te doen in Kristiansand bij regen binnenactiviteiten»* | `https://www.krsvr.no/nl` | 🟢 **Nevnt i svaret!** Fremheves under *Actie & Vermaak*: *«Escape Room Kristiansand of KRS VR Arena: Perfecte opties voor vriendengroepen of families die van puzzelen, teamwork of virtual reality houden.»* | `visitsorlandet.com`, `visitnorway.no`, `kvadraturen.no`, `kristiansandguiden.no` |
 
 ---
 
-## 2. Google Bedriftsprofil (Google Maps) forbedringer
+### E. Backlinks & Refererende Domener – Autoritetskartlegging (15 domener per `14.11.2026`)
 
-### A. Bilde av butikkfronten / fasaden (Viktig!)
-- [ ] **Ta et godt bilde av inngangspartiet og butikkfronten på dagtid:**
-  - Bildet bør vise skiltet til KRS VR Arena tydelig, inngangsdøren og gatenummeret (Industrigata 12).
-  - Last opp bildet i Google Bedriftsprofil under kategorien **«Utvendig» (Exterior)**.
-  - **Hvorfor dette påvirker AI:**
-    1. Google Lens og Googles datasyn matcher fasadebildet mot Street View og bekrefter at lokalet er en reell, operativ lokasjon.
-    2. Kunder som er på vei dit kjenner igjen bygget umiddelbart.
+Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, sortert etter **Global Tranco Rank** (lavere tall = høyere global trafikk/autoritet):
 
-### B. Google Q&A (Spørsmål og svar) – Skjult gullgruve for AI
-Gemini leser direkte fra «Spørsmål og svar»-seksjonen på Google Maps. Du kan selv logge inn og stille de vanligste spørsmålene fra en privat konto, og deretter svare offisielt som eier:
-- [ ] **Spørsmål 1:** *«Passer KRS VR Arena for teambuilding og firmaarrangement i Kristiansand?»*
-  - **Offisielt svar:** *«Ja, vi tar imot bedrifter, avdelinger og teambuilding-grupper i alle størrelser. Vi tilbyr både VR Escape Room og Tactical Arena (action strategi), med konkurranseelementer og opplegg tilpasset kolleger.»*
-- [ ] **Spørsmål 2:** *«Er dette en god innendørsaktivitet på en regnværsdag i Kristiansand?»*
-  - **Offisielt svar:** *«Absolutt! KRS VR Arena er en helinnendørs opplevelsesarena i Kristiansand (Industrigata 12, Lund). Perfekt aktivitet uansett vær for vennegjenger, studenter, kolleger og familier.»*
-- [ ] **Spørsmål 3:** *«Hva gjør man ved utdrikningslag hos dere?»*
-  - **Offisielt svar:** *«Vi har skreddersydde opplegg for utdrikningslag med actionfylt Mixed Reality-skyting og samarbeidsoppgaver i VR Escape Room. En sikker vinner for hele gjengen!»*
-
-### C. Månedlige Google-oppdateringer (Innlegg)
-- [ ] Legg ut et kort innlegg i Google Maps hver 2.–3. uke (f.eks. sesongåpning for julebord, regnværstips, studentkveld). Innleggene indekseres av Gemini i sanntid.
-
-### D. Opplevelsesaktiviteter og Produkter i Google Bedriftsprofil
-- [x] **9 aktiviteter konfigurert med opplevelsesfokusert tekst, riktige priser og direkte landingsside-lenker:**
-  1. **Zombie Shooter i Kristiansand** *(Ny opprettelse 21.10.2026)*: 375 kr (Voksen), varighet 1 t 30 min, bilde lastet opp fra databasens CDN (`zombie_shooter.png`), direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/action`.
-  2. **Tactical Arena i Kristiansand** *(Omdøpt fra VR Shooter & Mixed Reality)*: 375 kr, opplevelsesfokusert tekst med mixed reality nevnt i bisetning, direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/action`.
-  3. **VR Escape Room i Kristiansand**: 375 kr, felles produkt for alle våre VR escape rooms (inkl. Mask of the Pharaoh, Prison Break, Alice, m.fl.), direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/escape-room`.
-  4. **Utdrikningslag i VR i Kristiansand**: Oppdatert pris til 450 kr, fokus på latter, felles energi og opplevelse, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-utdrikningslag`.
-  5. **Teambuilding & Firmaevent i VR i Kristiansand**: 375 kr, fokus på samhold, turneringsformat, felles mestring på tvers av alder og forhåndsbestilt bar/pizza, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-teambuilding`.
-  6. **Bursdag i VR Arena i Kristiansand**: 375 kr, fokus på bursdagsfeiring i partyloungen og actionfylt moro, direkte bookinglenke: `https://www.krsvr.no/arrangementer/vr-bursdag`.
-  7. **VR Familiepakke Ungdom 12+ i Kristiansand**: 375 kr, beholdt opprinnelig tekst og URL `https://www.krsvr.no/booking`.
-  8. **VR Familiepakke Barn 8-12 år i Kristiansand**: 375 kr, beholdt opprinnelig tekst og URL `https://www.krsvr.no/booking`.
-  9. **Hunter VR - Jaktsimulator i Kristiansand** *(Ny opprettelse 28.10.2026)*: 375 kr, sosial innendørs jaktsimulator for jaktlag, vennegjenger og kollegaer (fra 16 år, 2–10 spillere, 90 min), bilde: `hunter-vr-cover.png`, direkte bookinglenke: `https://www.krsvr.no/vr-opplevelser/action-strategi/hunter-vr-jaktsimulator`.
-- **Hvorfor dette styrker SEO og AI-søk:**
-  - Google viser disse produktene direkte i Knowledge Panel / Google Maps med bilde, pris og en klikkbar «Bestill»-knapp.
-  - De nye dedikerte landingssidene (`/arrangementer/vr-teambuilding`, `/arrangementer/vr-utdrikningslag` osv.) får direkte klikk og sterk relevans i Googles lokale indeks.
-  - Beskrivelsene fremhever opplevelsen og fellesskapet fremfor maskinvare, i tråd med merkevareprofilen.
+| # | Eksternt Domene | Global Tranco Rank | Est. DR | Lenkestatus til `krsvr.no` | Siteres i AI-søk? | Bransjekategori / Merknad |
+| :-: | :--- | :---: | :---: | :--- | :---: | :--- |
+| **1** | **[tripadvisor.com](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html)** | **#590** | ~93 | ✅ Aktiv profil + lenke | ✅ **Ja (Gemini + ChatGPT + Perplexity)** | *Fornøyelse og lek i Kristiansand* (5,0★, 12 anmeldelser – Nr. 3 av 23, #15 på `SUPPLIERS`). |
+| **2** | **[visitnorway.com / .no](https://www.visitnorway.no/)** | **#28 295** | ~82 | ✅ Syndikert via Tellus | ✅ **Ja (Ofte!)** | Automatisk syndikert fra Visit Sørlandet på norsk, engelsk, tysk og nederlandsk. |
+| **3** | **[1881.no](https://www.1881.no/data-programvare-og-utvikling/data-programvare-og-utvikling-agder/data-programvare-og-utvikling-kristiansand-s/krs-vr-arena-as_107699902S0/)** | **#44 272** | ~74 | ⚠️ Kun adresse (Mangler URL/tlf) | Nei | 🔴 Ligger under *Data - programvare og -utvikling* (`62.100`). **Må legge inn tlf + URL.** |
+| **4** | **[1850.no](https://www.1850.no/bedrifter/it/dataprogrammering/agder/kristiansand/krs-vr-arena-as-936605192)** | **#357 908** | ~45 | ✅ Schema `sameAs: www.krsvr.no` | Ja (NAP) | 🔴 Har riktig tlf og URL, men ligger under *IT / Dataprogrammering* (`62.100`). |
+| **5** | **[krs.no (Avisen Kristiansand)](https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800)** | **#606 322** | ~62 | ✅ Redaksjonell reportasje + `subjectOf` | 🔄 Indekseres | Nyhetsreportasje 19.10.2026 (*«Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet»*). |
+| **6** | **[visitsorlandet.com](https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/)** | **#964 223** | ~58 | ✅ Oppføring (NO+EN) + Partnerintervju | ✅ **Ja (Hovedkilde)** | Offisiell destinasjonsportal for Agder + redaksjonelt mini-intervju med dofollow-lenke til `/arrangementer/vr-teambuilding`. |
+| **7** | **[wheretoescape.com](https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena)** | **#1 052 241** | ~42 | ✅ Publisert & Live (Dofollow) | ✅ **Ja (4 rom live)** | Global escape room-katalog med alle 4 VR Escape Rooms i NOK (`375 kr pp`). |
+| **8** | **[worldofescapes.com](https://no.worldofescapes.com/companies/krs-vr-arena)** | **#1 767 310** | ~40 | ✅ Publisert & Live (Dofollow) | ✅ **Ja (Siteres direkte)** | Eier 4 av 10 rom (~40 %) i Kristiansand og 100 % av kategorien *Virtuell virkelighet*. |
+| **9** | **[eventguiden.no](https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/)** | **#2 901 911** | ~32 | ✅ Optimalisert & Live (94 %) | ✅ **Ja (Hovedkilde)** | Sterk kilde for AI på VR-, teambuilding- og regnværsdagsøk. 4 pakker + 64 pers kapasitet. |
+| **10** | **[utdrikningslag.com](https://utdrikningslag.com/presentasjon/krs-vr-arena/)** | Utenfor 1M | ~25 | ✅ Publisert & Live *(nofollow)* | ✅ **Ja (#1 på Utdrikningslag!)** | Ligger **#1 øverst på `/kristiansand/`**! Løftet oss rett til #1 på søk #5. |
+| **11** | **[utdrikningslag.events](https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena)** | Utenfor 1M | ~25 | ✅ Aktiv profil + Dofollow | ✅ **Ja** | Komplett profil med priser (fra 450 kr), bilder og direkte lenke til `/arrangementer/vr-utdrikningslag`. |
+| **12** | **[lokalebedrifter.no](https://lokalebedrifter.no/bedrift/936318878/krs-vr-arena-as)** | Utenfor 5M | ~20 | ✅ JSON-LD `url: krsvr.no` | Ja (NAP) | 🔴 Har riktig tlf og URL, men kategorisert som *Softwareutvikling* (`62.100`). |
+| **13** | **dendagen.no** | Utenfor 5M | ~18 | ✅ Omtale + `krsvr.no` | Ja (NAP) | Indeksert med kontaktinfo, e-post, tlf og beskrivelse av partylounge. |
+| **14** | **falio.no** | Utenfor 5M | ~15 | ✅ Katalogoppføring | Nei | 🔴 Henter registerdata fra Brønnøysund (`62.100`). |
+| **15** | **forretningsflyt.no** | Utenfor 5M | ~15 | ✅ Katalogoppføring | Ja (NAP) | 🔴 Henter registerdata fra Brønnøysund (`62.100` / *Dataprogrammeringstjenester*). |
 
 ---
 
-## 3. Strategi for kundeanmeldelser (Reviews)
+## 1. Prioritert Handlingsliste: Hva gjenstår å gjøre nå?
 
-### Hvorfor anmeldelser er nøkkelen til AI-søk
-Når en bruker spør Gemini: *«Beste aktiviteter for utdrikningslag i Kristiansand»*, gjør Gemini et semantisk søk i anmeldelsestekstene.
-- En anmeldelse med bare «Gøy sted, 5 stjerner!» gir minimal verdi for AI-søk.
-- En anmeldelse som nevner **hva gruppen gjorde, hvem de var, og hvor det var**, blir sitert direkte av Gemini.
+Her er **kun de punktene som fortsatt er åpne (`[ ]`)**, sortert etter hvor stor effekt de har på synligheten i ChatGPT, Gemini og Perplexity:
 
-### Rangering av plattformer etter effekt akkurat nå:
-1. **Prioritet 1: Google Maps Reviews (Høyest effekt)**
-   - Gemini eies av Google og henter sanntidsdata direkte herfra ved nesten alle lokale spørsmål.
-2. **Prioritet 2: TripAdvisor Reviews (Svært høy effekt for AI og turister)**
-   - Både Gemini, ChatGPT Search og Perplexity anser TripAdvisor som en uavhengig kvalitetsstandard for underholdning og aktiviteter.
-3. **Prioritet 3: Facebook / Nettside-omtaler**
-   - Godt for tillit, men har lavere direkte vekting i Google AI enn Google Maps og TripAdvisor.
+### 🔴 Prioritet 1: Kritisk grunnmur for ChatGPT Search & Bransjekode
+- [ ] **1. Endre næringskode (NACE) i Brønnøysundregistrene (Gratis i Altinn):**
+  - **Problemet:** Selskapet (`936 318 878` / underenhet `936 605 192`) står fortsatt med **`62.100 Dataprogrammeringstjenester`** fra tiden som *JLS FINANS AS*. Dermed kategoriserer **5 av våre 15 eksterne domener** (`1881.no`, `1850.no`, `lokalebedrifter.no`, `falio.no`, `forretningsflyt.no`) oss som et IT-konsulentselskap. Dette skaper entitetsstøy (*Entity Confusion*) for språkmodeller som leser åpne nettkataloger.
+  - **Løsning:** Send inn *Samordnet registermelding* i Altinn og endre til **`93.299 Fritidsvirksomhet ellers`** (evt. `93.210 Drift av fornøyelses- og temaparker`). Da oppdateres katalogene automatisk.
+- [ ] **2. Synkroniser Google Bedriftsprofil til Bing Places for Business (`bingplaces.com`):**
+  - **Hvorfor:** ChatGPT Search og Microsoft Copilot har ikke tilgang til Google Maps, men henter åpningstider, telefon og adresse direkte fra **Bing Places**.
+  - **Løsning (2 minutter):** Gå til [bingplaces.com](https://www.bingplaces.com/), velg **«Import from Google Business Profile»**, og logg inn med Google-kontoen som eier KRS VR Arena. Da kopieres alle bilder, åpningstider og opplysninger automatisk.
+- [ ] **3. Importer Google Search Console til Bing Webmaster Tools (`bing.com/webmasters`):**
+  - **Hvorfor:** Sikrer at alle 50 sider i `sitemap.xml` (inkludert `/en`, `/de`, `/nl` og alle escape rooms) er indeksert i Bing-indeksen som ChatGPT Search søker i.
+  - **Løsning (1 minutt):** Logg inn på [Bing Webmaster Tools](https://www.bing.com/webmasters) og klikk **«Import from Google Search Console»**.
 
----
+### 🟡 Prioritet 2: Kart, Kataloger & ChatGPT Business Hub
+- [ ] **4. Fullfør verifisering i ChatGPT Business Hub når ventelisten åpner (`chatgpt.com/business-hub`):**
+  - **Status:** Satt på venteliste `14.11.2026` (OpenAI ruller ut fysiske lokasjoner utenfor USA trinnvis).
+  - **Neste steg ved invitasjon:** Bekreft domenet `krsvr.no` (via DNS TXT eller `post@krsvr.no`) og gjennomfør Persona ID-sjekk for å få tilgang til 28-dagers innsikt over ChatGPT-omtaler og klikk.
+- [ ] **5. Sjekk og legg inn POI på Foursquare & OpenStreetMap (Mapbox):**
+  - **Hvorfor:** Når ChatGPT viser kart og posisjonskort i svarene sine, bruker den **Foursquare** som stedsdatabase og **Mapbox** (som leser fra Foursquare og OpenStreetMap) som kartmotor.
+  - **Løsning:** Sjekk at `KRS VR Arena` (`Industrigata 12, 4632 Kristiansand`) ligger inne som eget punkt på [OpenStreetMap.org](https://www.openstreetmap.org/) og i Foursquare City Guide.
+- [ ] **6. Opprett Place Card i Apple Business Connect (`businessconnect.apple.com`):**
+  - **Hvorfor:** Gir synlighet som eget sted på **Apple Maps**, i **Siri / Apple Intelligence** og **DuckDuckGo** (per nå vises kun bygget og naboen *Krs Urban Dance Center*).
+  - **Oppfølging i kode:** Når Place Card er godkjent, legg Apple Maps-URL inn i `hasMap` / `sameAs` i [app/layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx).
+- [ ] **7. Legg inn gratis telefon og nettside på 1881.no (`minbedrift.1881.no`):**
+  - **Hvorfor:** 1881.no har Tranco Rank **#44 272**, men oppføringen vår mangler både telefonnummer (`408 28 302`) og lenke til `https://www.krsvr.no`. (Husk å kun lagre gratis grunnoppføring – takk nei til betalt annonsering).
 
-### Eksempler på anmeldelser per kundesegment
-
-#### Segment 1: Bedrift & Teambuilding (Høyeste inntjening)
-> **Google Maps eksempel (Prioritet 1):**
-> *«Vi hadde teambuilding for 16 kolleger hos KRS VR Arena i Kristiansand, og det var midt i blinken for hele gjengen. Tactical Arena fikk frem konkurranseinstinktet, og VR Escape Room krevde skikkelig samarbeid. Svært profesjonell vert som guidet oss gjennom alt. Anbefales varmt til alle bedrifter som ser etter en aktivitet i Kristiansand sentrum!»*
-
-> **TripAdvisor eksempel (Prioritet 2):**
-> *«Super bedriftsaktivitet i Kristiansand! Vi la firmaavslutningen hit før middag i byen. Lett å finne i Industrigata på Lund, topp moderne utstyr og fantastisk moro for både nybegynnere og de som har prøvd VR før. Kommer garantert tilbake for neste teambuilding.»*
-
----
-
-#### Segment 2: Utdrikningslag (Voksne 25–40 år)
-> **Google Maps eksempel (Prioritet 1):**
-> *«La oppstarten på utdrikningslaget til KRS VR Arena for en gjeng på 10 personer. Perfekt actionfylt start på dagen! Tactical Arena var hysterisk morsomt, og brudgommen fikk virkelig kjørt seg. Topp service og god veiledning. En av de beste tingene man kan gjøre i Kristiansand med en kompisgjeng!»*
-
-> **TripAdvisor eksempel (Prioritet 2):**
-> *«Utdrikningslag med full klaff! Vi testet både VR Escape Room og skytingen. Veldig sosialt og engasjerende opplegg hvor alle var med hele tiden. Anbefales på det sterkeste for vennegjenger som planlegger utdrikningslag på Sørlandet.»*
-
----
-
-#### Segment 3: Studenter & Vennegjeng (20–25 år)
-> **Google Maps eksempel (Prioritet 1):**
-> *«Vi var en studentgjeng på 6 venner som testet VR Escape Room en fredagskveld. Utrolig kul innendørsaktivitet i Kristiansand! Gåtene var utfordrende og grafikken var super. Veldig hyggelig betjening som hjalp oss i gang. Mye morsommere enn vanlig kino eller bowling!»*
-
-> **TripAdvisor eksempel (Prioritet 2):**
-> *«Fantastisk opplevelse for vennegjengen i Kristiansand. Vi spilte Tactical Arena i arenaen – pulsen var på topp fra start til slutt. Perfekt opplegg for studenter som vil finne på noe gøy sammen i sentrum.»*
+### 🟢 Prioritet 3: Portaler, Innhold & Løpende Omtaler
+- [ ] **8. Registrer profil på Teambuilding-portaler (`teambuildinger.no` / `teambuilding.no` / `firmatur.no`):**
+  - **Hvorfor:** På søk #4 (*«Teambuilding Kristiansand innendørs aktiviteter»*) siterer AI-en `teambuildinger.no` direkte. En profil der vil lukke gapet på søk #4, akkurat slik `utdrikningslag.com` gjorde på søk #5.
+- [ ] **9. Google Bedriftsprofil – Fasadebilde & Innlegg:**
+  - [ ] Last opp et dagslysbilde av inngangspartiet/skiltet i `Industrigata 12` under kategorien **«Utvendig» (Exterior)** (brukes av Google Lens/Street View til å verifisere fysisk tilstedeværelse).
+  - [ ] Legg ut et kort innlegg (Google Update) som nevner julebord/teambuilding og lenker til nyhetssaken i `krs.no`.
+- [ ] **10. Småopprydding i eksterne tekster:**
+  - [ ] Fjern rå `**`-stjerner (Markdown-syntaks) i brødteksten inne i Tellus / Visit Sørlandet-portalen.
+  - [ ] Hør med journalist `jasmine.ramos@krs.no` om `krsvr.no` kan gjøres til klikkbar lenke i KRS-artikkelen.
+  - [ ] Undersøk mulighet for partneroppføring/studentfordel hos **SiA (Studentsamskipnaden i Agder)** og linjeforeninger ved UiA.
+  - [ ] Kontakt lokale «Topp 10 ting å gjøre i Kristiansand»-artikkelforfattere (Visit Sørlandet, Kvadraturen.no, reiseblogger) for å bli inkludert i regnværs- og aktivitetslister.
 
 ---
 
-#### Segment 4: Innendørsaktivitet på en regnværsdag
-> **Google Maps eksempel (Prioritet 1):**
-> *«Beste regnværsaktiviteten i Kristiansand! Da været sviktet booket vi en time her, og det reddet hele ettermiddagen. Helinnendørs, sentralt på Lund (Industrigata 12) og utrolig gøy for både voksne og ungdom. Hit kommer vi tilbake neste gang det regner på Sørlandet!»*
+## 2. Fullførte Tiltak & Aktive Kanaler (Verifisert)
 
-> **TripAdvisor eksempel (Prioritet 2):**
-> *«Redningen på en gråværsdag i Kristiansand. VR Escape Room var super spennende og vi glemte helt tid og sted. Anbefales på det sterkeste til alle som ser etter innendørs aktiviteter i byen.»*
+Alt under er ferdig oppsatt, verifisert og koblet sammen med toveis Schema.org (`sameAs` / `subjectOf`) i kildekoden:
+
+- [x] **Teknisk AI-lesbarhet (`llms.txt`, `robots.ts`, `sitemap.xml` og GSC):**
+  - **AI-dokumentasjon:** [public/llms.txt](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/public/llms.txt) og [public/llms-full.txt](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/public/llms-full.txt) holdes løpende synkronisert med priser, kapasitet (2–64 pers), gavekort, flerspråklige sider (`/en`, `/de`, `/nl`) og instrukser for autonom booking med 0 kr forhåndsbetaling (kort i arena).
+  - **Eksplisitte AI-crawlere i [app/robots.ts](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/robots.ts):** Eksplisitt `allow: '/'` for `OAI-SearchBot`, `ChatGPT-User`, `GPTBot`, `PerplexityBot`, `Perplexity-User`, `ClaudeBot`, `Claude-SearchBot`, `Applebot-Extended`, `Google-Extended` og `Bingbot`.
+  - **Google Search Console API-inspeksjon:** 14 av 14 kjerne-URL-er verifisert `PASS (Submitted and indexed)` via GSC API.
+
+- [x] **Google Bedriftsprofil (Google Maps) – 31 anmeldelser (5,0 ★) & 9 aktive opplevelsesprodukter:**
+  - Samtlige 9 produkter ligger ute med pris, bilde og direkte dyp-lenke til riktig landingsside: *Zombie Shooter (375 kr)*, *Tactical Arena (375 kr)*, *VR Escape Room (375 kr)*, *Utdrikningslag i VR (450 kr)*, *Teambuilding & Firmaevent (375 kr)*, *Bursdag i VR Arena (375 kr)*, *VR Familiepakke Ungdom 12+ (375 kr)*, *VR Familiepakke Barn 8–12 år (375 kr)* og *Hunter VR - Jaktsimulator (375 kr)*.
+
+- [x] **TripAdvisor – 12 anmeldelser (5,0 ★) & Nr. 3 av 23 i Kristiansand:**
+  - **Profil:** [Krs VR Arena på TripAdvisor](https://no.tripadvisor.com/Attraction_Review-g190492-d34257006-Reviews-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html) | **Måleside:** [Leverandører i Fornøyelse og lek (`c56/SUPPLIERS`)](https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html).
+  - Offisiell badge i [components/Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx), direktelenke i [components/FeedbackForm.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/FeedbackForm.tsx) og omtale-e-post fra `/admin`, samt `sameAs` i [app/layout.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/app/layout.tsx).
+
+<details>
+<summary>💬 <strong>Se logg over publiserte TripAdvisor-anmeldelser og målgruppedekning</strong></summary>
+
+1. **Venner og Familie (07. nov 2026 – Катерина М):** *«Et veldig vakkert sted for venner og familie. Vi hadde en uvanlig opplevelse med den virtuelle verdenen»* (5/5)
+2. **Russefeiring / Ungdom (07. nov 2026 – Adrian K):** *«Fin start på russeslippet – dette var virkelig vert å teste ut skal så absolutt komme tilbake»* (5/5)
+3. **Vennegjeng (Liliana A):** *«Dritt gøy sammen med venner – Veldig gøy og unik opplevelse»* (5/5)
+4. **Barna & Snøballspill (24. okt 2026 – Vegar S):** *«Veldig gøy - Prøvde Tactical Arena, det var veldig gøy. Barna elsket snøballspillet.»* (5/5)
+5. **Voksne & Barn (24. okt 2026 – Companion55797375327):** *«Bør prøves! - Veldig gøy! Både for voksne og barn!»* (5/5)
+6. **Vennegjeng (23. okt 2026 – Jonas A):** *«Supermorro - Ekstremt mye morro å gjøre sammen med venner»* (5/5)
+7. **ChatGPT & Venner (19. okt 2026 – thoraamli):** *«Helt fantastisk opplevelse! Anbefales på det sterkeste! Jeg hadde faktisk ikke hørt om KRS VR Arena før jeg spurte ChatGPT om forslag til aktiviteter i Kristiansand. Det dukket opp som et tips... Prison Break»* (5/5)
+8. **Barnefamilier (18. okt 2026 – F8809GQveronikal):** *«Gå inn i en magisk verden sammen med barna – Supergøy barneaktivitet i høstferien/oktober!»* (5/5)
+9. **Spill og Service (17. okt 2026 – 363kristofferk):** *«Bra service og gøye spill – Godt opplegg og oppfølging.»* (5/5)
+10. **Teambuilding (24. sep 2026 – G6162DGelisabethv):** *«Skikkelig bra teambuilding – Utrolig gøy og super teambuilding for kolleger.»* (5/5)
+11. **Utdrikningslag / Stag Party (29. aug 2026 – Snocracker):** *«Stag party event»* – Fremhever VR Counter-Strike / Tactical Arena. (5/5)
+
+</details>
+
+- [x] **Visit Sørlandet & Visit Norway (Tellus DMS + Redaksjonelt Partnerintervju):**
+  - **Oppføring (NO):** [visitsorlandet.com](https://www.visitsorlandet.com/listing/krs-vr-arena-%E2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/) | **Oppføring (EN):** [en.visitsorlandet.com](https://en.visitsorlandet.com/listing/krs-vr-arena-%e2%80%93-vr-escape-room-%26-mixed-reality-arkade/867197306/).
+  - **Partnerintervju (29.10.2026):** [Mini-intervju med KRS VR Arena](https://www.visitsorlandet.com/bransje/visit-sorlandet-utvikling/nyheter/mini-intervjuer-med-vare-partnere/mini-intervju-med-krs-vr-arena/) med 2× dofollow-lenker til `krsvr.no` og 1× dyp-lenke til `/arrangementer/vr-teambuilding`. Automatisk syndikert til `visitnorway.no/.com/.de/.nl`.
+
+- [x] **Redaksjonell presseomtale i KRS – Avisen Kristiansand (`19.10.2026`):**
+  - **Artikkel:** [Åpnet VR-arena i Kristiansand: – Nytt konsept på Sørlandet](https://www.krs.no/apnet-vr-arena-i-kristiansand-nytt-konsept-pa-sorlandet/s/80-157-40800) (koblet via `NewsArticle` under `subjectOf` i Schema.org og i [components/Footer.tsx](file:///Users/ray/antigravity/Krs-VR-Arena-2026-06-11-3bfb1/components/Footer.tsx)).
+
+- [x] **Event- og Escape Room-portaler (100 % Live og koblet med toveis Schema.org):**
+  - **Eventguiden.no:** [KRS VR Arena på Eventguiden](https://eventguiden.no/kristiansand/aktiviteter/krs-vr-arena/) – 94 % komplett, kapasitet 64 pers, 4 pakker (Teambuilding 375 kr, Utdrikningslag 450 kr, Escape Room 375 kr, Julebord 450 kr) og direkte bookingknapp.
+  - **WhereToEscape.com:** [WhereToEscape – KRS VR Arena](https://www.wheretoescape.com/en-gb/escape-rooms-by-krs-vr-arena) – Alle 4 VR Escape Rooms publisert med pris i NOK (`375 kr pp`) og dofollow-lenke.
+  - **World of Escapes:** [no.worldofescapes.com/companies/krs-vr-arena](https://no.worldofescapes.com/companies/krs-vr-arena) – Alle 4 VR Escape Rooms publisert (~40 % av alle rom i Kristiansand) og granulær `sameAs`-kobling per rom på norsk og engelsk.
+  - **Utdrikningslag.com:** [utdrikningslag.com/presentasjon/krs-vr-arena/](https://utdrikningslag.com/presentasjon/krs-vr-arena/) – Plassert som **#1 øverst på `/kristiansand/`** (ga umiddelbart #1-plassering i AI-søk #5).
+  - **Utdrikningslag.events:** [utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena](https://utdrikningslag.events/vr-utdrikningslag-hos-krs-vr-arena) – Publisert via `eventadmin.io` med priser, bilder og direkte lenke til `/arrangementer/vr-utdrikningslag`.
 
 ---
 
-#### Segment 5: Familie & Ungdom
-> **Google Maps eksempel (Prioritet 1):**
-> *«Testet familiepakken med to voksne og to tenåringer. Alle var like engasjert! Trygt og godt forklart av instruktøren, og oppgavene passet perfekt for oss. Utrolig gøy å løse mysterier sammen i virtuell virkelighet.»*
+## 3. Strategi for Kundeanmeldelser (Slik siteres omtaler av AI)
 
----
+Språkmodeller som Gemini og ChatGPT gjør semantiske søk i selve anmeldelsesteksten. En anmeldelse som nevner **hva gruppen gjorde, hvem de var (f.eks. teambuilding, utdrikningslag, familie), hvilket spill de spilte (f.eks. Escape Room, Tactical Arena) og byen (Kristiansand)**, blir brukt som direkte bevis i AI-svarene.
 
-## 4. Andre ting du ikke må glemme (Proaktive tiltak)
+- **Direktelenke til Google Maps-anmeldelse (Prioritet 1):** `https://g.page/r/CfC9vWzS0yO-EBM/review`
+- **Direktelenke til TripAdvisor-anmeldelse (Prioritet 2 – Viktigst for ChatGPT & Turister):** `https://no.tripadvisor.com/UserReviewEdit-g190492-d34257006-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html`
+- **Utsendelse:** Sendes med ett klikk fra `/admin` (under *Upcoming* -> *Be om omtale* på norsk eller engelsk) eller via QR-kode i loungen (`https://krsvr.no/feedback`).
 
-### A. Google Search Console – Indekseringsstatus & API-inspeksjon (Verifisert 03.11.2026)
-- [x] **URL-inspeksjon via GSC API (Fullført 03.11.2026):** Samtlige 14 kjerne-URL-er (forside, `/vr-opplevelser/escape-room`, `/arrangementer/vr-teambuilding`, `/arrangementer/vr-utdrikningslag`, alle 4 individuelle escape rooms, action-spill og engelske sider) ble inspisert direkte mot Googles Search Console API (`searchconsole.urlInspection.index.inspect`).
-  - **Resultat:** **100 % dekning (PASS / Submitted and indexed).** Samtlige nøkkelsider er indeksert av Google med gyldig mobilvennlighet og rike resultater. Ingen ytterligere manuell «Be om indeksering» er nødvendig i GSC.
-- [x] Gå til [Google Search Console](https://search.google.com/search-console).
-- [x] Bruk **URL-inspeksjon** for forsiden (`https://krsvr.no/`) og FAQ-siden (`https://krsvr.no/faq`).
-- [x] Klikk på **«Be om indeksering»** (Request Indexing).
-  - *Formål:* Gjør at Googlebot og Gemini umiddelbart fanger opp de nye Schema.org `EntertainmentBusiness`-taggene og de nye FAQ-svarene.
+<details>
+<summary>📝 <strong>Klikk for å se eksempler på ideelle omtaler per kundesegment</strong></summary>
 
-### B. Omtale i lokale «Topp 10»-artikler og listikler
-Når Gemini svarer på ferie- og aktivitetstips, leser den ofte artikler med overskrifter som:
-- *«10 morsomme ting å gjøre i Kristiansand»*
-- *«Aktiviteter for voksne i Kristiansand»*
-- *«Hva skjer i Kristiansand når det regner?»*
-- [ ] **Tiltak:** Søk opp hvem som har skrevet de mest leste artiklene på Google i dag (f.eks. lokale reisebloggere, KRSby, Visit Sørlandet). Send en hyggelig henvendelse og be om at KRS VR Arena legges til som et hett tips for innendørs action og escape room.
+#### 1. Bedrift & Teambuilding
+> *«Vi hadde teambuilding for 16 kolleger hos KRS VR Arena i Kristiansand, og det var midt i blinken for hele gjengen. Tactical Arena fikk frem konkurranseinstinktet, og VR Escape Room krevde skikkelig samarbeid. Svært profesjonell vert som guidet oss gjennom alt. Anbefales varmt til alle bedrifter som ser etter en innendørs aktivitet i Kristiansand!»*
 
-### C. Direkte anmeldelseslenker, QR-kode og oppfølgings-e-post (Fullført)
-- [x] **Direkte anmeldelseslenker i e-post og `/feedback`:**
-  - **Google Maps Review:** `https://g.page/r/CfC9vWzS0yO-EBM/review`
-  - **Tripadvisor Review:** `https://no.tripadvisor.com/UserReviewEdit-g190492-d34257006-Krs_VR_Arena-Kristiansand_Vest_Agder_Southern_Norway.html`
-- [x] **Manuell utsendelse fra Admin (`/admin` -> Upcoming):**
-  - Egen «Be om omtale»-knapp på gjennomførte bookinger sender personlig e-post via Resend (på norsk eller engelsk) med direktelenker til Google og Tripadvisor, samt automatisk kvittering/kopi til `post@krsvr.no`.
-- [x] **QR-kode ved utgangen / i loungen:**
-  - Plasser et lite skilt/bordrytter ved betalingsdisken eller i partyloungen som peker til `https://krsvr.no/feedback` eller direkte til Google/Tripadvisor:
-  > *«Hadde dere en fin opplevelse? Skann QR-koden og del gjerne hvem dere var, i hvilken anledning dere besøkte oss, og hvordan opplevelsen var!»*
-  - Dette oppfordrer kundene til å beskrive kontekst og nøkkelord helt naturlig for AI-søk.
+#### 2. Escape Room (Viktig for å vinne søk #3 «Escape Room Kristiansand»)
+> *«Beste Escape Room i Kristiansand! Vi spilte Prison Break og Mask of the Pharaoh hos KRS VR Arena, og det å løse gåter sammen mens vi gikk fritt rundt i rommet tok escape room til et helt nytt nivå. Anbefales til alle som liker escape rooms og gåteløsing!»*
+
+#### 3. Utdrikningslag
+> *«La oppstarten på utdrikningslaget til KRS VR Arena for en gjeng på 10 personer. Perfekt actionfylt start på dagen med Tactical Arena, VR Escape Room og god stemning i partyloungen. En av de beste tingene man kan gjøre i Kristiansand med en vennegjeng!»*
+
+#### 4. Regnværsdag & Innendørsaktivitet
+> *«Beste innendørsaktiviteten på en regnværsdag i Kristiansand! Sentralt på Lund (Industrigata 12), gratis parkering og utrolig gøy for både voksne og ungdom.»*
+
+#### 5. Familie & Barn/Ungdom
+> *«Testet familiepakken med to voksne og to tenåringer. Alle var like engasjert! Trygt og godt forklart av spillverten, og oppgavene passet perfekt for oss.»*
+
+</details>

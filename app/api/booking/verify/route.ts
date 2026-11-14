@@ -22,9 +22,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
+    const netDueOnline = Math.max(0, (booking.totalPrice || 0) - (booking.giftCardAmount || 0));
     const requiresVippsPayment =
       ['vipps', 'full', 'reservation'].includes(booking.paymentType) &&
-      (booking.totalPrice || 0) > 0;
+      netDueOnline > 0;
 
     // 1. Non-Vipps bookings (Pay on arrival in arena / 0 NOK free bookings)
     if (!requiresVippsPayment) {
@@ -32,10 +33,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, booking });
       }
 
-      if (booking.paymentType === 'terminal' || (booking.totalPrice || 0) === 0) {
+      if (booking.paymentType === 'terminal' || netDueOnline === 0) {
+        const preservedPaid = Math.max(0, Number(booking.amountPaid || 0));
         const transition = await prisma.booking.updateMany({
           where: { id: booking.id, status: { not: 'confirmed' } },
-          data: { status: 'confirmed', amountPaid: 0 },
+          data: { status: 'confirmed', amountPaid: preservedPaid },
         });
 
         const updatedBooking = await prisma.booking.findUnique({

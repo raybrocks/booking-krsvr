@@ -14,6 +14,9 @@ export interface AdminNewBookingEmailProps {
   totalPrice: number;
   amountPaid: number;
   paymentType?: string;
+  discountCode?: string | null;
+  giftCardCode?: string | null;
+  giftCardAmount?: number;
   bookingType?: string;
   companyName?: string;
   internalNotes?: string;
@@ -32,6 +35,9 @@ export const AdminNewBookingEmail: React.FC<AdminNewBookingEmailProps> = ({
   totalPrice,
   amountPaid,
   paymentType,
+  discountCode,
+  giftCardCode,
+  giftCardAmount,
   bookingType,
   companyName,
   internalNotes,
@@ -66,6 +72,18 @@ export const AdminNewBookingEmail: React.FC<AdminNewBookingEmailProps> = ({
           )}
         </Text>
         <Text style={detailRowStyle}><strong>Totalpris / Betalt:</strong> NOK {totalPrice} / NOK {amountPaid}</Text>
+        {discountCode && (
+          <Text style={detailRowStyle}>
+            <strong>Rabattkode brukt:</strong>{' '}
+            <span style={{ color: '#7c3aed', fontWeight: 'bold' }}>{discountCode}</span>
+          </Text>
+        )}
+        {giftCardCode && (
+          <Text style={detailRowStyle}>
+            <strong>Gavekort brukt:</strong> {giftCardCode}
+            {giftCardAmount && giftCardAmount > 0 ? ` (-NOK ${giftCardAmount})` : ''}
+          </Text>
+        )}
         {internalNotes && (
           <Text style={detailRowStyle}><strong>Notat:</strong> <em>{internalNotes}</em></Text>
         )}

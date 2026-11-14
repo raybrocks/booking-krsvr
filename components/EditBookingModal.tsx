@@ -18,9 +18,11 @@ import {
   Tag,
   Lock,
   Copy,
-  Check
+  Check,
+  Gift
 } from "lucide-react";
 import { toast } from "sonner";
+import RedeemBookingGiftCardModal from "./RedeemBookingGiftCardModal";
 
 export interface ExperienceItem {
   id: string;
@@ -129,6 +131,9 @@ export default function EditBookingModal({
   // Price & Payment State
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [amountPaid, setAmountPaid] = useState<number>(0);
+  const [giftCardCode, setGiftCardCode] = useState<string>("");
+  const [giftCardAmount, setGiftCardAmount] = useState<number>(0);
+  const [showRedeemGiftCardModal, setShowRedeemGiftCardModal] = useState(false);
 
   // Email Notification State
   const [sendConfirmation, setSendConfirmation] = useState(true);
@@ -166,6 +171,8 @@ export default function EditBookingModal({
 
       setTotalPrice(Number(booking.totalPrice) || 0);
       setAmountPaid(Number(booking.amountPaid) || 0);
+      setGiftCardCode(booking.giftCardCode || "");
+      setGiftCardAmount(Number(booking.giftCardAmount) || 0);
 
       setSendConfirmation(true);
       setCustomEmailText("");
@@ -224,7 +231,9 @@ export default function EditBookingModal({
     toast.success(`Totalpris satt til ${calculated} NOK (${perPerson} kr/pers)`);
   };
 
-  const remainingPrice = Math.max(0, totalPrice - amountPaid);
+  const effectiveGiftCardUsed = giftCardCode.trim() ? Math.min(totalPrice, Math.max(0, Number(giftCardAmount) || 0)) : 0;
+  const settledAmount = Math.max(amountPaid, effectiveGiftCardUsed);
+  const remainingPrice = Math.max(0, totalPrice - settledAmount);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -254,6 +263,8 @@ export default function EditBookingModal({
         players: Number(players) || 1,
         playerNames: playerNames.map((n) => n.trim()),
         totalPrice: Number(totalPrice) || 0,
+        giftCardCode: giftCardCode.trim() ? giftCardCode.trim().toUpperCase() : null,
+        giftCardAmount: giftCardCode.trim() ? Math.max(0, Number(giftCardAmount) || 0) : 0,
         sendConfirmation,
         customEmailText: showCustomEmailInput ? customEmailText.trim() : "",
       };
@@ -671,7 +682,11 @@ export default function EditBookingModal({
                 <div className="w-full bg-zinc-950/80 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm font-bold text-emerald-400 flex items-center justify-between">
                   <span>{amountPaid} NOK</span>
                   <span className="text-[10px] text-zinc-500 font-normal">
-                    {amountPaid > 0 ? "Vipps / Kort" : "0 NOK"}
+                    {effectiveGiftCardUsed > 0
+                      ? `Gavekort ${effectiveGiftCardUsed} + ${Math.max(0, amountPaid - effectiveGiftCardUsed)}`
+                      : amountPaid > 0
+                      ? "Vipps / Kort"
+                      : "0 NOK"}
                   </span>
                 </div>
                 <span className="text-[10px] text-zinc-500 mt-1 block">
@@ -701,7 +716,7 @@ export default function EditBookingModal({
                   <button
                     type="button"
                     onClick={async () => {
-                      if (!confirm("Bekreft at kunden har betalt i kortterminalen.")) return;
+                      if (!confirm(`Bekreft at kunden har betalt ${remainingPrice} NOK i kortterminalen.`)) return;
                       try {
                         const res = await fetch(`/api/admin/bookings/${booking.id}/mark-paid`, { method: 'POST' });
                         const data = await res.json();
@@ -716,7 +731,7 @@ export default function EditBookingModal({
                           paymentType: data.booking?.paymentType || 'terminal',
                           vippsStatus: 'TERMINAL_BETALT',
                         });
-                        toast.success("Markert som betalt i terminal!");
+                        toast.success(data.message || "Markert som betalt i terminal!");
                       } catch (e: any) {
                         toast.error(e.message);
                       }
@@ -726,6 +741,46 @@ export default function EditBookingModal({
                     ✓ Registrer betalt i terminal ({remainingPrice} NOK)
                   </button>
                 )}
+
+                {remainingPrice > 0 && booking.status !== 'cancelled' && (
+                  <button
+                    type="button"
+                    onClick={() => setShowRedeemGiftCardModal(true)}
+                    className="mt-2 w-full py-1.5 px-3 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-medium transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Gift className="w-3.5 h-3.5" />
+                    Trekk gavekort direkte
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Gavekortkobling (hvis gavekort ble brukt eller skal registreres) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-950/50 p-3.5 rounded-xl border border-zinc-800/80">
+              <div>
+                <label className="block text-xs font-medium text-zinc-400 mb-1">
+                  Gavekortkode (valgfritt)
+                </label>
+                <input
+                  type="text"
+                  value={giftCardCode}
+                  onChange={(e) => setGiftCardCode(e.target.value.toUpperCase())}
+                  placeholder="F.eks. KRS-C956-B7K5"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-[#9C39FF]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-400 mb-1">
+                  Gavekortbeløp brukt (NOK)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={giftCardAmount}
+                  onChange={(e) => setGiftCardAmount(Math.max(0, Number(e.target.value) || 0))}
+                  placeholder="0"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-[#9C39FF]"
+                />
               </div>
             </div>
           </div>
@@ -823,6 +878,24 @@ export default function EditBookingModal({
           </div>
         </form>
       </div>
+
+      <RedeemBookingGiftCardModal
+        booking={{
+          ...booking,
+          totalPrice,
+          amountPaid,
+          giftCardCode,
+          giftCardAmount,
+        }}
+        isOpen={showRedeemGiftCardModal}
+        onClose={() => setShowRedeemGiftCardModal(false)}
+        onRedeemed={async (updated) => {
+          setGiftCardCode(updated.giftCardCode || "");
+          setGiftCardAmount(Number(updated.giftCardAmount) || 0);
+          setAmountPaid(Number(updated.amountPaid) || 0);
+          await onSave(updated);
+        }}
+      />
     </div>
   );
 }

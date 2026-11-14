@@ -742,11 +742,18 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                     id="discount"
                     value={discountCodeInput}
                     onChange={(e) => setDiscountCodeInput(e.target.value)}
-                    placeholder={isEn ? "Enter code" : "Skriv inn kode"}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleApplyDiscount();
+                      }
+                    }}
+                    placeholder={isEn ? "Enter promo or gift card code" : "Skriv inn rabatt- eller gavekortkode"}
                     className="bg-zinc-950 border-zinc-800"
                     disabled={validatingDiscount}
                   />
                   <Button 
+                    type="button"
                     onClick={handleApplyDiscount}
                     disabled={!discountCodeInput.trim() || validatingDiscount}
                     variant="secondary"
@@ -779,11 +786,18 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                       id="giftcard"
                       value={giftCardCodeInput}
                       onChange={(e) => setGiftCardCodeInput(e.target.value.toUpperCase())}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleApplyGiftCard();
+                        }
+                      }}
                       placeholder={isEn ? "e.g. KRS-7X29-M4PQ" : "f.eks. KRS-7X29-M4PQ"}
                       className="bg-zinc-950 border-zinc-800 uppercase font-mono"
                       disabled={validatingGiftCard}
                     />
                     <Button 
+                      type="button"
                       onClick={handleApplyGiftCard}
                       disabled={!giftCardCodeInput.trim() || validatingGiftCard}
                       variant="secondary"
@@ -962,8 +976,18 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     {isEn ? "Processing..." : "Behandler..."}
                   </>
+                ) : amountToPay === 0 && totalPrice === 0 ? (
+                  isEn
+                    ? appliedGiftCard
+                      ? "Confirm Booking (Covered by Gift Card)"
+                      : "Confirm Booking (0 NOK)"
+                    : appliedGiftCard
+                    ? "Bekreft booking (Dekket av gavekort)"
+                    : "Bekreft booking (0 NOK)"
                 ) : paymentType === 'terminal' ? (
-                  isEn ? "Confirm Booking (Pay at Venue)" : "Bekreft booking (Betal i arenaen)"
+                  isEn
+                    ? `Confirm Booking (${totalPrice} NOK at Venue)`
+                    : `Bekreft booking (${totalPrice} NOK i arenaen)`
                 ) : (
                   isEn ? `Pay ${amountToPay} NOK with Vipps` : `Betal ${amountToPay} NOK med Vipps`
                 )}

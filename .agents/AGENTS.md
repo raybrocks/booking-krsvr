@@ -28,13 +28,14 @@ Når du gjør endringer i kildekoden, spesielt for metadata, JSON-LD og semantik
 4. **Visuelt design:** Ikke gjør store visuelle endringer i UI eller tekster for SEO-ens skyld. Endringer bør gjøres "under the hood" der det er mulig (metadata, aria-labels, json-ld).
 5. **Kontekstuell bruk:** Innarbeid ord naturlig. Ikke fyll siden med overdreven "keyword stuffing". Fokus er på lokal tilstedeværelse på Lund i Kristiansand (`Industrigata 12, 4632 Kristiansand`, GPS: `58.152302, 8.025888`) og å formidle opplevelsestypene tydelig til AI og søkemotorer.
 6. **SEO/GEO-scanning og historisk målelogg (`docs/geo_ai_search_checklist.md`):**
-   Når brukeren ber om en ny SEO/GEO-scanning, skal agenten sjekke og oppdatere tabellene i `docs/geo_ai_search_checklist.md` med en ny datokolonne for:
+   Når brukeren ber om en ny SEO/GEO-scanning, skal agenten sjekke og oppdatere både hovedoversikten (`Status nå`) og den nedfellbare historiske tidslinjen i Seksjon 0.A, samt tabellene i Seksjon 0.C–0.E i `docs/geo_ai_search_checklist.md` for:
    - Antall sider i `https://www.krsvr.no/sitemap.xml`
    - Refererende domener (`"krsvr.no" -site:krsvr.no` og `"Krs VR Arena" -site:krsvr.no`) + Tranco Domain Rank (`https://tranco-list.eu/api/ranks/domain/<domene>`)
    - Brønnøysund NACE-bransjekode (`https://data.brreg.no/enhetsregisteret/api/enheter/936318878`)
    - Vurdering og antall anmeldelser på Google Maps og TripAdvisor
    - TripAdvisor-rangering målt spesifikt på leverandørsiden for lek og moro i Kristiansand: `https://no.tripadvisor.com/Attractions-g190492-Activities-c56-a_attractionType.SUPPLIERS-Kristiansand_Vest_Agder_Southern_Norway.html`
-   - De 6 faste nøytrale kommersielle AI-søkene i Seksjon 0.C.
+   - De 6 faste nøytrale kommersielle AI-søkene på norsk i Seksjon 0.C **og** de 3 internasjonale turistsøkene (EN / DE / NL) i Seksjon 0.D.
+   - **Skille tydelig mellom AI-motorer:** `search_web` måler **Google Gemini / AI Overviews** (via Search Grounding). Agenten skal ikke blande dette sammen med ChatGPT Search (som bruker Bing Places, Foursquare, Mapbox og TripAdvisor) eller Perplexity, men oppgi tydelig hvilken AI-motor som er målt.
    - **Håndtering av bot-beskyttelse og fallback til `/browser`:**
      Dersom vanlige skript eller HTTP-kall stoppes av bot-filter (DataDome, Cloudflare, CAPTCHA e.l.) ved innhenting av anmeldelser og rangering (f.eks. på TripAdvisor eller Google Maps), **SKAL** agenten automatisk sende ut en `/browser`-subagent for å forsøke å navigere og lese av de reelle tallene.
      Dersom heller ikke `/browser`-subagenten lykkes med å hente ut tallene, skal agenten **aldri** gjette eller videreføre forrige målings tall i det stille. Målingen skal da eksplisitt flagges i rapporten som *«⚠️ Ikke avlest (blokkert av bot-filter)»*, og agenten skal be brukeren om manuell bekreftelse.

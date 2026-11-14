@@ -218,9 +218,7 @@ export async function redeemGiftCard(params: {
     throw new Error('Deduction amount must be greater than 0');
   }
 
-  const runner = tx || prisma;
-
-  return runner.$transaction(async (t: any) => {
+  const run = async (t: any) => {
     await t.$queryRaw`SELECT id FROM "GiftCard" WHERE id = ${giftCardId} FOR UPDATE`;
 
     const card = await t.giftCard.findUnique({ where: { id: giftCardId } });
@@ -254,7 +252,9 @@ export async function redeemGiftCard(params: {
     });
 
     return { redemption, card: updatedCard };
-  });
+  };
+
+  return tx ? run(tx) : prisma.$transaction(run);
 }
 
 /**

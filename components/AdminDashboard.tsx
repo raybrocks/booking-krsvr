@@ -16,6 +16,7 @@ import ClientsManager from "./ClientsManager";
 import EditBookingModal from "./EditBookingModal";
 import ReviewRequestModal from "./ReviewRequestModal";
 import AdminGiftCardsTab from "./AdminGiftCardsTab";
+import RedeemBookingGiftCardModal from "./RedeemBookingGiftCardModal";
 
 const playDing = () => {
   try {
@@ -97,6 +98,7 @@ export default function AdminDashboard() {
   const [pricingTiers, setPricingTiers] = useState<Record<string, number> | undefined>(undefined);
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [reviewModalBooking, setReviewModalBooking] = useState<any | null>(null);
+  const [redeemGiftCardBooking, setRedeemGiftCardBooking] = useState<any | null>(null);
   const [resendingEmailId, setResendingEmailId] = useState<string | null>(null);
   const [copiedBookingId, setCopiedBookingId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -563,6 +565,7 @@ export default function AdminDashboard() {
           booking.id,
           booking.paymentRef,
           booking.discountCode,
+          booking.giftCardCode,
           experienceTitle,
           playersString,
         ]
@@ -611,17 +614,564 @@ export default function AdminDashboard() {
     );
   }
 
+  const getBookingPaymentBreakdown = (booking: any) => {
+    const totalPrice = Number(booking.totalPrice || 0);
+    const amountPaid = Number(booking.amountPaid || 0);
+    const giftCardUsed =
+      booking.giftCardCode && Number(booking.giftCardAmount || 0) > 0
+        ? Math.min(totalPrice, Number(booking.giftCardAmount || 0))
+        : 0;
+    const status = (booking.vippsStatus || '').toUpperCase();
+    const isRefunded = status === 'REFUNDED' || status.includes('REFUND');
+    const isCancelled = booking.status === 'cancelled';
+    const isPending = booking.status === 'pending';
+    const isTerminal = booking.paymentType === 'terminal' || booking.paymentType === 'manual';
+    const isSystem =
+      booking.bookingType === 'system' ||
+      booking.email?.includes('system@sperret') ||
+      booking.firstName === 'Sperret';
+
+    const settledTotal = Math.max(amountPaid, giftCardUsed);
+    const remaining = Math.max(0, totalPrice - settledTotal);
+    const directPaid = Math.max(0, amountPaid - giftCardUsed);
+    const vippsPaid = !isTerminal && !isRefunded && !isCancelled ? directPaid : 0;
+    const terminalPaid = isTerminal && !isRefunded && !isCancelled ? directPaid : 0;
+
+    return {
+      totalPrice,
+      amountPaid,
+      giftCardUsed,
+      vippsPaid,
+      terminalPaid,
+      remaining,
+      settledTotal,
+      status,
+      isRefunded,
+      isCancelled,
+      isPending,
+      isTerminal,
+      isSystem,
+    };
+  };
+
+  const renderTodaySummary = (todayBookings: any[]) => {
+    const active = todayBookings.filter((b) => {
+      const p = getBookingPaymentBreakdown(b);
+      return !p.isCancelled && !p.isSystem;
+    });
+
+    if (active.length === 0) return null;
+
+    let totalValue = 0;
+    let totalPlayers = 0;
+    let totalVipps = 0;
+    let totalGiftCard = 0;
+    let totalTerminal = 0;
+    let totalRemaining = 0;
+    let vippsCount = 0;
+    let giftCardCount = 0;
+    let terminalCount = 0;
+
+    active.forEach((b) => {
+      const p = getBookingPaymentBreakdown(b);
+      totalValue += p.totalPrice;
+      totalPlayers += Number(b.players || 0);
+      totalVipps += p.vippsPaid;
+      totalGiftCard += p.giftCardUsed;
+      totalTerminal += p.terminalPaid;
+      totalRemaining += p.remaining;
+      if (p.vippsPaid > 0) vippsCount += 1;
+      if (p.giftCardUsed > 0) giftCardCount += 1;
+      if (p.terminalPaid > 0) terminalCount += 1;
+    });
+
+    const fmt = (n: number) => `${Math.round(n).toLocaleString('nb-NO')} kr`;
+
+    return (
+      <div className="mb-4 grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
+          <div className="text-[11px] font-medium text-zinc-400">Dagens omsetning</div>
+          <div className="text-lg sm:text-xl font-semibold text-white mt-0.5 tabular-nums">{fmt(totalValue)}</div>
+          <div className="text-[11px] text-zinc-500 mt-0.5">
+            {active.length} {active.length === 1 ? 'booking' : 'bookinger'} · {totalPlayers} spillere
+          </div>
+        </div>
+
+        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
+          <div className="text-[11px] font-medium text-zinc-400">Vipps (nett)</div>
+          <div className="text-lg sm:text-xl font-semibold text-emerald-400 mt-0.5 tabular-nums">{fmt(totalVipps)}</div>
+          <div className="text-[11px] text-zinc-500 mt-0.5">
+            {vippsCount} {vippsCount === 1 ? 'booking' : 'bookinger'}
+          </div>
+        </div>
+
+        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
+          <div className="text-[11px] font-medium text-zinc-400">Gavekort innløst</div>
+          <div className="text-lg sm:text-xl font-semibold text-amber-300 mt-0.5 tabular-nums">{fmt(totalGiftCard)}</div>
+          <div className="text-[11px] text-zinc-500 mt-0.5">
+            {giftCardCount} {giftCardCount === 1 ? 'booking' : 'bookinger'}
+          </div>
+        </div>
+
+        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
+          <div className="text-[11px] font-medium text-zinc-400">Kortterminal (arena)</div>
+          <div className="text-lg sm:text-xl font-semibold text-purple-300 mt-0.5 tabular-nums">{fmt(totalTerminal)}</div>
+          <div className="text-[11px] text-zinc-500 mt-0.5">
+            {terminalCount} {terminalCount === 1 ? 'betaling' : 'betalinger'}
+            {totalRemaining > 0 && (
+              <span className="text-amber-400 font-medium"> · {fmt(totalRemaining)} gjenstår</span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPaymentDetails = (booking: any) => {
+    const {
+      totalPrice,
+      amountPaid,
+      giftCardUsed,
+      vippsPaid,
+      terminalPaid,
+      remaining,
+      status,
+      isRefunded,
+      isPending,
+      isTerminal,
+    } = getBookingPaymentBreakdown(booking);
+
+    const isAuthorizedUncaptured =
+      (status === 'AUTHORIZED' || status.includes('RESERVED')) && status !== 'CAPTURED';
+    const isCancelledUnpaid = booking.status === 'cancelled' && amountPaid === 0 && giftCardUsed === 0;
+    const nowMs = new Date(currentTime).getTime();
+    const createdMs = booking.createdAt ? new Date(booking.createdAt).getTime() : nowMs;
+    const isPendingExpired = isPending && nowMs - createdMs > 15 * 60 * 1000;
+    const isFree = totalPrice === 0 && booking.status === 'confirmed';
+    const isFullySettled = !isPending && remaining === 0 && totalPrice > 0 && status !== 'EXPIRED' && status !== 'ABORTED';
+
+    let badgeLabel = `GJENSTÅR: ${remaining} NOK`;
+    let badgeSub = 'ubetalt';
+    let badgeClass = 'bg-red-500/15 text-red-300 border-red-500/40';
+    let subClass = 'text-red-400';
+
+    if (isRefunded) {
+      badgeSub = 'refundert';
+      badgeLabel = 'REFUNDERT (VIPPS)';
+      badgeClass = 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+      subClass = 'text-blue-400';
+    } else if (isCancelledUnpaid) {
+      badgeSub = 'ikke betalt';
+      badgeLabel = 'AVBRUTT / UTLØPT (0 KR)';
+      badgeClass = 'bg-zinc-800 text-zinc-400 border-zinc-700/60';
+      subClass = 'text-zinc-400';
+    } else if (isAuthorizedUncaptured) {
+      badgeSub = 'reservert i vipps';
+      badgeLabel = 'RESERVERT (MÅ TREKKES)';
+      badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+      subClass = 'text-amber-400';
+    } else if (isPending) {
+      if (isPendingExpired) {
+        badgeSub = 'ikke betalt';
+        badgeLabel = 'UTLØPT (IKKE BETALT)';
+        badgeClass = 'bg-red-500/15 text-red-300 border-red-500/30';
+        subClass = 'text-red-400';
+      } else {
+        badgeSub = 'venter på vipps';
+        badgeLabel = 'VENTER PÅ BETALING';
+        badgeClass = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
+        subClass = 'text-yellow-400';
+      }
+    } else if (isFree) {
+      badgeSub = 'gratis';
+      badgeLabel = '0 KR';
+      badgeClass = 'bg-zinc-800 text-zinc-400 border-zinc-700/50';
+      subClass = 'text-zinc-400';
+    } else if (isFullySettled) {
+      if (giftCardUsed > 0 && terminalPaid > 0) {
+        badgeSub = 'gavekort + terminal';
+        badgeLabel = 'GAVEKORT + TERMINAL';
+      } else if (giftCardUsed > 0 && vippsPaid > 0) {
+        badgeSub = 'gavekort + vipps';
+        badgeLabel = 'GAVEKORT + VIPPS';
+      } else if (giftCardUsed >= totalPrice) {
+        badgeSub = 'gavekort';
+        badgeLabel = 'BETALT MED GAVEKORT';
+      } else if (isTerminal) {
+        badgeSub = 'betalt (terminal)';
+        badgeLabel = 'OPPGJORT (TERMINAL)';
+      } else {
+        badgeSub = 'betalt (vipps)';
+        badgeLabel = 'OPPGJORT (VIPPS)';
+      }
+      badgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+      subClass = 'text-emerald-400';
+    } else if (isTerminal) {
+      badgeSub = giftCardUsed > 0 ? 'delbetalt med gavekort' : 'betales i arena';
+      badgeLabel = `BETALES I ARENA: ${remaining} NOK`;
+      badgeClass = 'bg-purple-500/20 text-purple-300 border-purple-500/40';
+      subClass = 'text-purple-400';
+    } else if (amountPaid > 0 || giftCardUsed > 0) {
+      badgeSub = 'delbetalt';
+      badgeLabel = `GJENSTÅR: ${remaining} NOK`;
+      badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+      subClass = 'text-amber-400';
+    }
+
+    const canCaptureOrCancel = isAuthorizedUncaptured;
+    const canRefund =
+      ['vipps', 'reservation', 'full'].includes(booking.paymentType) &&
+      vippsPaid > 0 &&
+      status === 'CAPTURED' &&
+      !isPending;
+    const canMarkTerminalPaid =
+      isTerminal && remaining > 0 && booking.status !== 'cancelled';
+
+    return (
+      <div className="flex flex-col gap-1.5 min-w-0">
+        <div className="flex flex-col gap-1">
+          <span className={`${subClass} font-medium text-xs`}>{badgeSub}</span>
+          <span
+            className={`text-[10.5px] font-bold uppercase px-2 py-0.5 rounded-md inline-flex items-center border shadow-sm w-fit max-w-full whitespace-normal leading-tight ${badgeClass}`}
+          >
+            {badgeLabel}
+          </span>
+        </div>
+
+        {isPending ? (
+          <div className="text-xs font-medium">
+            {isPendingExpired ? (
+              <span className="text-zinc-500 text-[11px]">Ingen betaling mottatt (0 NOK)</span>
+            ) : (
+              <span className="text-amber-400">Venter på betaling fra kunde</span>
+            )}
+          </div>
+        ) : (
+          <div className="text-xs space-y-0.5">
+            <div className="text-zinc-200 font-medium">Totalt: {totalPrice} NOK</div>
+            {giftCardUsed > 0 && (
+              <div className="text-amber-300 text-[11px] font-medium">
+                Gavekort: {giftCardUsed} NOK
+              </div>
+            )}
+            {terminalPaid > 0 && (
+              <div className="text-zinc-300 text-[11px]">
+                Kortterminal: <span className="text-purple-300 font-medium">{terminalPaid} NOK</span>
+              </div>
+            )}
+            {vippsPaid > 0 && (
+              <div className="text-zinc-300 text-[11px]">
+                Vipps: <span className="text-emerald-300 font-medium">{vippsPaid} NOK</span>
+              </div>
+            )}
+            {isTerminal && remaining > 0 && (
+              <div className="text-zinc-400 text-[11px]">
+                Gjenstår i arena: <span className="text-purple-300 font-medium">{remaining} NOK</span>
+              </div>
+            )}
+            {!isTerminal && vippsPaid === 0 && giftCardUsed === 0 && remaining > 0 && (
+              <div className="text-zinc-500 text-[11px] italic">Innbetalt: 0 NOK</div>
+            )}
+          </div>
+        )}
+
+        {(booking.discountCode || booking.giftCardCode) && (
+          <div className="flex flex-wrap gap-1 mt-0.5">
+            {booking.discountCode && (
+              <span
+                className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/30 w-fit max-w-full"
+                title={`Rabattkode brukt: ${booking.discountCode}`}
+              >
+                Rabattkode: <span className="font-mono">{booking.discountCode}</span>
+              </span>
+            )}
+            {booking.giftCardCode && (
+              <span
+                className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 w-fit max-w-full"
+                title={`Gavekort brukt: ${booking.giftCardCode}${booking.giftCardAmount ? ` (${booking.giftCardAmount} NOK)` : ''}`}
+              >
+                Gavekort: <span className="font-mono">{booking.giftCardCode}</span>
+              </span>
+            )}
+          </div>
+        )}
+
+        {(canCaptureOrCancel || canRefund) && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {canCaptureOrCancel && (
+              <>
+                <button
+                  onClick={() => handleVippsAction(booking.id, 'capture', booking.totalPrice)}
+                  className="text-[11px] bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-2 py-0.5 rounded transition-colors whitespace-nowrap"
+                >
+                  Complete (Capture)
+                </button>
+                <button
+                  onClick={() => handleVippsAction(booking.id, 'cancel')}
+                  className="text-[11px] bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-0.5 rounded transition-colors whitespace-nowrap"
+                >
+                  Frigi (Avbryt)
+                </button>
+              </>
+            )}
+
+            {canRefund && (
+              <button
+                onClick={() => {
+                  const defaultAmt = vippsPaid || booking.totalPrice || 0;
+                  const amt = prompt(
+                    `Hvor mye ønsker du å refundere til ${booking.firstName} ${booking.lastName} via Vipps? (i NOK)\n\nKunden vil automatisk motta en refusjonskvittering på e-post.`,
+                    String(defaultAmt)
+                  );
+                  if (amt && !isNaN(Number(amt.replace(',', '.'))) && Number(amt.replace(',', '.')) > 0) {
+                    handleVippsAction(booking.id, 'refund', Number(amt.replace(',', '.')));
+                  }
+                }}
+                className="text-[11px] bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium"
+                title="Refunder via Vipps og send refusjonskvittering på e-post"
+              >
+                Refunder (Vipps)
+              </button>
+            )}
+          </div>
+        )}
+
+        {(canMarkTerminalPaid || (remaining > 0 && booking.status !== 'cancelled' && booking.bookingType !== 'system' && !booking.email?.includes('system@sperret'))) && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {canMarkTerminalPaid && (
+              <button
+                onClick={() => handleMarkTerminalPaid(booking.id)}
+                className="text-[11px] bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium"
+                title="Registrer at kunden har betalt restbeløpet i kortterminalen"
+              >
+                ✓ Registrer betalt ({remaining} kr)
+              </button>
+            )}
+            {remaining > 0 && booking.status !== 'cancelled' && booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') && (
+              <button
+                onClick={() => setRedeemGiftCardBooking(booking)}
+                className="text-[11px] bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium inline-flex items-center gap-1"
+                title="Trekk hele eller deler av beløpet med gavekort"
+              >
+                <Gift className="w-3 h-3" />
+                Trekk gavekort
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderBookingActions = (booking: any) => {
+    const now = new Date(currentTime);
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const isEligibleForReview =
+      booking.status !== 'cancelled' &&
+      booking.bookingType !== 'system' &&
+      !booking.email?.includes('system@sperret') &&
+      booking.date <= todayStr;
+    const hasSentReview = !!booking.reviewEmailSentAt;
+    const platformLabel =
+      booking.reviewEmailType === 'tripadvisor'
+        ? 'TripAdvisor'
+        : booking.reviewEmailType === 'google'
+        ? 'Google'
+        : 'Begge';
+
+    return (
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <button
+          onClick={() => setEditingBooking(booking)}
+          className="text-xs text-purple-300 hover:text-white bg-[#9C39FF]/15 hover:bg-[#9C39FF]/30 border border-[#9C39FF]/30 px-2.5 py-1.5 rounded-lg transition-colors font-medium inline-flex items-center gap-1 shadow-sm"
+          title="Rediger opplevelse, deltakere, navneliste, tidspunkt og kundedetaljer"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          <span>Rediger</span>
+        </button>
+
+        <button
+          onClick={() => handleResendConfirmation(booking)}
+          disabled={resendingEmailId === booking.id || !booking.email || booking.email.includes('system@sperret')}
+          className="text-xs text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800 border border-zinc-700/60 p-1.5 rounded-lg transition-colors inline-flex items-center gap-1 disabled:opacity-30"
+          title={booking.email ? `Send bestillingsbekreftelse på nytt til ${booking.email}` : 'Mangler e-post'}
+        >
+          {resendingEmailId === booking.id ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+          ) : (
+            <Mail className="w-3.5 h-3.5" />
+          )}
+        </button>
+
+        {isEligibleForReview && (
+          <button
+            onClick={() => setReviewModalBooking(booking)}
+            className={`text-xs px-2 py-1.5 rounded-lg border transition-all inline-flex items-center gap-1 font-medium ${
+              hasSentReview
+                ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
+            }`}
+            title={
+              hasSentReview
+                ? `Omtale sendt (${platformLabel}) ${booking.reviewEmailSentAt ? new Intl.DateTimeFormat('no-NO', { dateStyle: 'short' }).format(new Date(booking.reviewEmailSentAt)) : ''}. Klikk for å se eller sende på nytt.`
+                : 'Send forespørsel om omtale (TripAdvisor / Google Reviews)'
+            }
+          >
+            <Star
+              className={`w-3.5 h-3.5 ${
+                hasSentReview ? 'fill-emerald-400 text-emerald-400' : 'fill-amber-300/30 text-amber-300'
+              }`}
+            />
+            <span className="hidden xl:inline">
+              {hasSentReview ? `Sendt (${platformLabel})` : 'Be om omtale'}
+            </span>
+          </button>
+        )}
+
+        <select
+          value={booking.status}
+          onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
+          className={`text-xs font-medium px-2.5 py-1.5 rounded-lg border focus:outline-none appearance-none cursor-pointer ${
+            booking.status === 'confirmed'
+              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+              : booking.status === 'pending'
+              ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+              : 'bg-red-500/10 text-red-400 border-red-500/20'
+          }`}
+        >
+          <option value="pending" className="bg-zinc-900 text-amber-400">
+            Pending
+          </option>
+          <option value="confirmed" className="bg-zinc-900 text-emerald-400">
+            Confirmed
+          </option>
+          <option value="cancelled" className="bg-zinc-900 text-red-400">
+            Cancelled
+          </option>
+        </select>
+
+        {booking.status !== 'cancelled' && (
+          <button
+            onClick={() => updateBookingStatus(booking.id, 'cancelled')}
+            className="text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors"
+            title="Cancel Booking"
+          >
+            <XCircle className="w-4 h-4" />
+          </button>
+        )}
+        <button
+          onClick={() => deleteBooking(booking.id)}
+          className="text-xs text-zinc-500 hover:text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors ml-1"
+          title="Permanently Delete Booking"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  };
+
   const renderBookingsTable = (tableBookings: any[], title?: string) => (
     <div className="mb-8 last:mb-0" key={title || 'table'}>
       {title && <h2 className="text-xl font-medium mb-4 text-zinc-200">{title}</h2>}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col w-full max-w-full">
+      {title === 'Today' && renderTodaySummary(tableBookings)}
+
+      {/* Mobil-kortvisning (< lg) */}
+      <div className="lg:hidden space-y-3">
+        {tableBookings.length === 0 ? (
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center text-zinc-500 text-sm">
+            No bookings yet.
+          </div>
+        ) : (
+          tableBookings.map((booking) => {
+            const now = new Date(currentTime).getTime();
+            const createdAt = booking.createdAt ? new Date(booking.createdAt).getTime() : now;
+            const isExpired = booking.status === 'pending' && now - createdAt > 15 * 60 * 1000;
+            const validNames = (booking.playerNames || []).filter((n: string) => n && n.trim() !== '');
+
+            return (
+              <div
+                key={`mobile-${booking.id}`}
+                className={`rounded-2xl border p-4 space-y-3 ${
+                  isExpired ? 'bg-red-950/10 border-red-900/30 opacity-75' : 'bg-zinc-900/60 border-zinc-800'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="flex items-center gap-2 text-xs text-zinc-400 font-mono">
+                      <span>{formatDateShort(booking.date)}</span>
+                      <span>·</span>
+                      <span className="text-white font-semibold">{getBookingTimeRange(booking.time, booking.duration)}</span>
+                      <span className="text-zinc-500">({booking.duration || 90}m)</span>
+                    </div>
+                    <div
+                      className="text-base font-medium text-white mt-1 cursor-pointer"
+                      onClick={() => setEditingBooking(booking)}
+                    >
+                      {experiencesMap[booking.experienceId] || booking.experienceId}
+                      <span className="text-xs text-zinc-400 font-normal ml-2">
+                        ({booking.players} {booking.players === 1 ? 'spiller' : 'spillere'})
+                      </span>
+                    </div>
+                  </div>
+                  {booking.bookingType === 'corporate' && booking.companyName && (
+                    <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0">
+                      Bedrift
+                    </span>
+                  )}
+                </div>
+
+                <div className="text-sm">
+                  <div className="font-medium text-zinc-200">
+                    {booking.companyName
+                      ? `${booking.companyName} (${booking.firstName} ${booking.lastName})`
+                      : `${booking.firstName} ${booking.lastName}`}
+                  </div>
+                  {booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') && (
+                    <div className="text-xs text-zinc-400 mt-0.5 break-all">
+                      {booking.phone} · {booking.email}
+                    </div>
+                  )}
+                  {validNames.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {validNames.map((name: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className="bg-zinc-800 text-zinc-300 text-[10px] px-1.5 py-0.5 rounded border border-zinc-700/50"
+                        >
+                          {name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {booking.internalNotes && (
+                    <div className="mt-2 text-xs text-zinc-400 bg-zinc-950/60 p-2 rounded-lg border border-zinc-800 italic">
+                      {booking.internalNotes}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-xl p-3">
+                  {renderPaymentDetails(booking)}
+                </div>
+
+                <div className="pt-1 flex items-center justify-between gap-2 flex-wrap border-t border-zinc-800/70">
+                  {renderBookingActions(booking)}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop-tabell (>= lg) */}
+      <div className="hidden lg:flex bg-zinc-900/50 border border-zinc-800 rounded-2xl flex-col w-full max-w-full">
         <div className="overflow-x-auto max-h-[70vh] rounded-2xl relative w-full">
-          <table className="w-full text-left text-sm whitespace-nowrap table-fixed min-w-[950px]">
+          <table className="w-full text-left text-sm table-fixed min-w-[1000px]">
             <colgroup>
               <col className="w-[11%]" />
-              <col className="w-[18%]" />
-              <col className="w-[26%]" />
-              <col className="w-[18%]" />
+              <col className="w-[17%]" />
+              <col className="w-[24%]" />
+              <col className="w-[21%]" />
               <col className="w-[10%]" />
               <col className="w-[17%]" />
             </colgroup>
@@ -630,13 +1180,13 @@ export default function AdminDashboard() {
                 <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[11%]" onClick={() => handleSort('dateTime')}>
                   Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('experienceId')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[17%]" onClick={() => handleSort('experienceId')}>
                   Experience {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[26%]" onClick={() => handleSort('customer')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[24%]" onClick={() => handleSort('customer')}>
                   Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[18%]" onClick={() => handleSort('totalPrice')}>
+                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[21%]" onClick={() => handleSort('totalPrice')}>
                   Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[10%]" onClick={() => handleSort('createdAt')}>
@@ -855,242 +1405,10 @@ export default function AdminDashboard() {
                        </button>
                     )}
                   </td>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4">
-                    <div className="flex flex-col gap-1.5">
-                      {/* Handlingsorientert betalingsmerke */}
-                      <div>
-                        {(() => {
-                          const totalPrice = booking.totalPrice || 0;
-                          const amountPaid = booking.amountPaid || 0;
-                          const remaining = Math.max(0, totalPrice - amountPaid);
-                          const status = (booking.vippsStatus || '').toUpperCase();
-                          const isRefunded = status === 'REFUNDED' || status.includes('REFUND');
-                          const isAuthorizedUncaptured =
-                            (status === 'AUTHORIZED' || status.includes('RESERVED')) &&
-                            status !== 'CAPTURED';
-                          const isTerminal = booking.paymentType === 'terminal';
-                          const isCancelledUnpaid =
-                            booking.status === 'cancelled' && amountPaid === 0;
-                          const isPendingBooking = booking.status === 'pending';
-                          const nowMs = new Date(currentTime).getTime();
-                          const createdMs = booking.createdAt
-                            ? new Date(booking.createdAt).getTime()
-                            : nowMs;
-                          const isPendingExpired =
-                            isPendingBooking && nowMs - createdMs > 15 * 60 * 1000;
-                          const isFree = totalPrice === 0 && booking.status === 'confirmed';
-                          const isFullyPaid =
-                            !isPendingBooking &&
-                            amountPaid >= totalPrice &&
-                            totalPrice > 0 &&
-                            status !== 'EXPIRED' &&
-                            status !== 'ABORTED';
-
-                          if (isRefunded) {
-                            return (
-                              <div className="flex flex-col gap-1">
-                                <span className="text-blue-400 font-medium text-xs">refundert</span>
-                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-sm w-fit">
-                                  REFUNDERT (VIPPS)
-                                </span>
-                              </div>
-                            );
-                          }
-                          if (isCancelledUnpaid) {
-                            return (
-                              <div className="flex flex-col gap-1">
-                                <span className="text-zinc-400 font-medium text-xs">ikke betalt</span>
-                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-zinc-800 text-zinc-400 border border-zinc-700/60 shadow-sm w-fit">
-                                  AVBRUTT / UTLØPT (0 KR)
-                                </span>
-                              </div>
-                            );
-                          }
-                          if (isTerminal) {
-                            if (amountPaid >= totalPrice && totalPrice > 0) {
-                              return (
-                                <div className="flex flex-col gap-1">
-                                  <span className="text-emerald-400 font-medium text-xs">betalt (terminal)</span>
-                                  <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm w-fit">
-                                    FULLT OPPGJORT (TERMINAL)
-                                  </span>
-                                </div>
-                              );
-                            }
-                            return (
-                              <div className="flex flex-col gap-1">
-                                <span className="text-purple-400 font-medium text-xs">betales i arena</span>
-                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm w-fit">
-                                  BETALES I ARENA: {remaining} NOK
-                                </span>
-                              </div>
-                            );
-                          }
-                          if (isAuthorizedUncaptured) {
-                            return (
-                              <div className="flex flex-col gap-1">
-                                <span className="text-amber-400 font-medium text-xs">reservert i vipps</span>
-                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm w-fit">
-                                  RESERVERT (MÅ TREKKES)
-                                </span>
-                              </div>
-                            );
-                          }
-                          if (isPendingBooking) {
-                            if (isPendingExpired) {
-                              return (
-                                <div className="flex flex-col gap-1">
-                                  <span className="text-red-400 font-medium text-xs">ikke betalt</span>
-                                  <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-red-500/15 text-red-300 border border-red-500/30 shadow-sm w-fit">
-                                    UTLØPT (IKKE BETALT)
-                                  </span>
-                                </div>
-                              );
-                            }
-                            return (
-                              <div className="flex flex-col gap-1">
-                                <span className="text-yellow-400 font-medium text-xs">venter på vipps</span>
-                                <span className="text-[11px] font-medium uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 shadow-sm w-fit">
-                                  VENTER PÅ BETALING
-                                </span>
-                              </div>
-                            );
-                          }
-                          if (isFree) {
-                            return (
-                              <div className="flex flex-col gap-1">
-                                <span className="text-zinc-400 font-medium text-xs">gratis</span>
-                                <span className="text-[11px] font-medium uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-zinc-800 text-zinc-400 border border-zinc-700/50 shadow-sm w-fit">
-                                  0 KR
-                                </span>
-                              </div>
-                            );
-                          }
-                          if (isFullyPaid) {
-                            return (
-                              <div className="flex flex-col gap-1">
-                                <span className="text-emerald-400 font-medium text-xs">betalt</span>
-                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm w-fit">
-                                  FULLT OPPGJORT
-                                </span>
-                              </div>
-                            );
-                          }
-                          if (!isPendingBooking && amountPaid > 0 && remaining > 0) {
-                            return (
-                              <div className="flex flex-col gap-1">
-                                <span className="text-amber-400 font-medium text-xs">delbetalt</span>
-                                <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm w-fit">
-                                  GJENSTÅR: {remaining} NOK
-                                </span>
-                              </div>
-                            );
-                          }
-                          return (
-                            <div className="flex flex-col gap-1">
-                              <span className="text-red-400 font-medium text-xs">ubetalt</span>
-                              <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md inline-flex items-center bg-red-500/15 text-red-300 border border-red-500/40 shadow-sm w-fit">
-                                GJENSTÅR: {remaining} NOK
-                              </span>
-                            </div>
-                          );
-                        })()}
-                      </div>
-
-                      {/* Tydelig spesifikasjon av hva som er betalt og hva som gjenstår */}
-                      {booking.status === 'pending' ? (
-                        <div className="text-xs font-medium">
-                          {(() => {
-                            const now = new Date(currentTime).getTime();
-                            const createdAt = booking.createdAt ? new Date(booking.createdAt).getTime() : now;
-                            const isExpired = (now - createdAt) > 15 * 60 * 1000;
-                            return isExpired ? (
-                              <span className="text-zinc-500 text-[11px]">Ingen betaling mottatt (0 NOK)</span>
-                            ) : (
-                              <span className="text-amber-400">Venter på betaling fra kunde</span>
-                            );
-                          })()}
-                        </div>
-                      ) : (
-                        <div className="text-xs space-y-0.5">
-                          <div className="text-zinc-200 font-medium">
-                            Totalt: {booking.totalPrice || 0} NOK
-                          </div>
-                          {booking.paymentType === 'terminal' ? (
-                            <div className="text-zinc-400 text-[11px]">
-                              Betaling: <span className="text-purple-300 font-medium">Kortterminal i arena</span>
-                              {booking.amountPaid > 0 && <span className="text-zinc-200"> ({booking.amountPaid} NOK innbetalt)</span>}
-                            </div>
-                          ) : booking.amountPaid > 0 ? (
-                            <div className="text-zinc-400 text-[11px]">
-                              {['vipps', 'reservation', 'full'].includes(booking.paymentType) ? 'Innbetalt (Vipps): ' : 'Innbetalt: '}
-                              <span className="text-zinc-200 font-medium">{booking.amountPaid} NOK</span>
-                            </div>
-                          ) : (
-                            <div className="text-zinc-500 text-[11px] italic">
-                              Innbetalt: 0 NOK
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Handlingsknapper for Vipps (Capture, Frigi, Refunder) */}
-                      {(() => {
-                        const vStatus = (booking.vippsStatus || '').toUpperCase();
-                        const canCaptureOrCancel =
-                          (vStatus === 'AUTHORIZED' || vStatus.includes('RESERVED')) &&
-                          vStatus !== 'CAPTURED';
-                        const canRefund =
-                          ['vipps', 'reservation', 'full'].includes(booking.paymentType) &&
-                          (booking.amountPaid || 0) > 0 &&
-                          vStatus === 'CAPTURED' &&
-                          booking.status !== 'pending';
-
-                        if (!canCaptureOrCancel && !canRefund) return null;
-
-                        return (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {canCaptureOrCancel && (
-                              <>
-                                <button onClick={() => handleVippsAction(booking.id, 'capture', booking.totalPrice)} className="text-[11px] bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-2 py-0.5 rounded transition-colors whitespace-nowrap">
-                                  Complete (Capture)
-                                </button>
-                                <button onClick={() => handleVippsAction(booking.id, 'cancel')} className="text-[11px] bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-0.5 rounded transition-colors whitespace-nowrap">
-                                  Frigi (Avbryt)
-                                </button>
-                              </>
-                            )}
-
-                            {canRefund && (
-                              <button onClick={() => {
-                                const defaultAmt = booking.amountPaid || booking.totalPrice || 0;
-                                const amt = prompt(`Hvor mye ønsker du å refundere til ${booking.firstName} ${booking.lastName} via Vipps? (i NOK)\n\nKunden vil automatisk motta en refusjonskvittering på e-post.`, String(defaultAmt));
-                                if (amt && !isNaN(Number(amt.replace(',', '.'))) && Number(amt.replace(',', '.')) > 0) {
-                                  handleVippsAction(booking.id, 'refund', Number(amt.replace(',', '.')));
-                                }
-                              }} className="text-[11px] bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium" title="Refunder via Vipps og send refusjonskvittering på e-post">
-                                Refunder (Vipps)
-                              </button>
-                            )}
-                          </div>
-                        );
-                      })()}
-
-                      {/* Handlingsknapp for Kortterminal i arena */}
-                      {['terminal', 'manual'].includes(booking.paymentType) && ((booking.totalPrice || 0) > (booking.amountPaid || 0)) && booking.status !== 'cancelled' && (
-                        <div className="mt-1">
-                          <button 
-                            onClick={() => handleMarkTerminalPaid(booking.id)} 
-                            className="text-[11px] bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium" 
-                            title="Registrer at kunden har betalt i kortterminalen"
-                          >
-                            ✓ Registrer betalt i terminal
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 align-top whitespace-normal">
+                    {renderPaymentDetails(booking)}
                   </td>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 text-xs text-zinc-400">
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 text-xs text-zinc-400 align-top whitespace-nowrap">
                     {booking.createdAt ? (
                       <div>
                         <div>{new Intl.DateTimeFormat("no-NO", { dateStyle: "short" }).format(new Date(booking.createdAt))}</div>
@@ -1098,100 +1416,8 @@ export default function AdminDashboard() {
                       </div>
                     ) : "N/A"}
                   </td>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <button
-                        onClick={() => setEditingBooking(booking)}
-                        className="text-xs text-purple-300 hover:text-white bg-[#9C39FF]/15 hover:bg-[#9C39FF]/30 border border-[#9C39FF]/30 px-2.5 py-1.5 rounded-lg transition-colors font-medium inline-flex items-center gap-1 shadow-sm"
-                        title="Rediger opplevelse, deltakere, navneliste, tidspunkt og kundedetaljer"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                        <span>Rediger</span>
-                      </button>
-
-                      <button
-                        onClick={() => handleResendConfirmation(booking)}
-                        disabled={resendingEmailId === booking.id || !booking.email || booking.email.includes('system@sperret')}
-                        className="text-xs text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800 border border-zinc-700/60 p-1.5 rounded-lg transition-colors inline-flex items-center gap-1 disabled:opacity-30"
-                        title={booking.email ? `Send bestillingsbekreftelse på nytt til ${booking.email}` : "Mangler e-post"}
-                      >
-                        {resendingEmailId === booking.id ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
-                        ) : (
-                          <Mail className="w-3.5 h-3.5" />
-                        )}
-                      </button>
-
-                      {/* Be om omtale (TripAdvisor / Google Reviews) */}
-                      {(() => {
-                        const now = new Date(currentTime);
-                        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-                        const isEligible = booking.status !== 'cancelled' && 
-                          booking.bookingType !== 'system' && 
-                          !booking.email?.includes('system@sperret') &&
-                          booking.date <= todayStr;
-
-                        if (!isEligible) return null;
-
-                        const hasSent = !!booking.reviewEmailSentAt;
-                        const platformLabel = booking.reviewEmailType === 'tripadvisor' ? 'TripAdvisor' : booking.reviewEmailType === 'google' ? 'Google' : 'Begge';
-
-                        return (
-                          <button
-                            onClick={() => setReviewModalBooking(booking)}
-                            className={`text-xs px-2 py-1.5 rounded-lg border transition-all inline-flex items-center gap-1 font-medium ${
-                              hasSent
-                                ? "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                                : "bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30"
-                            }`}
-                            title={
-                              hasSent
-                                ? `Omtale sendt (${platformLabel}) ${booking.reviewEmailSentAt ? new Intl.DateTimeFormat("no-NO", { dateStyle: "short" }).format(new Date(booking.reviewEmailSentAt)) : ""}. Klikk for å se eller sende på nytt.`
-                                : "Send forespørsel om omtale (TripAdvisor / Google Reviews)"
-                            }
-                          >
-                            <Star className={`w-3.5 h-3.5 ${hasSent ? "fill-emerald-400 text-emerald-400" : "fill-amber-300/30 text-amber-300"}`} />
-                            <span className="hidden xl:inline">
-                              {hasSent ? `Sendt (${platformLabel})` : "Be om omtale"}
-                            </span>
-                          </button>
-                        );
-                      })()}
-
-                      <select
-                        value={booking.status}
-                        onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
-                        className={`text-xs font-medium px-2.5 py-1.5 rounded-lg border focus:outline-none appearance-none cursor-pointer ${
-                          booking.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                          booking.status === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                          'bg-red-500/10 text-red-400 border-red-500/20'
-                        }`}
-                      >
-                        <option value="pending" className="bg-zinc-900 text-amber-400">Pending</option>
-                        <option value="confirmed" className="bg-zinc-900 text-emerald-400">Confirmed</option>
-                        <option value="cancelled" className="bg-zinc-900 text-red-400">Cancelled</option>
-                      </select>
-                      
-                      {booking.status !== 'cancelled' && (
-                        <button
-                          onClick={() => {
-                            // TODO: Add email alert integration here later
-                            updateBookingStatus(booking.id, 'cancelled');
-                          }}
-                          className="text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors"
-                          title="Cancel Booking"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => deleteBooking(booking.id)}
-                        className="text-xs text-zinc-500 hover:text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors ml-1"
-                        title="Permanently Delete Booking"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 align-top">
+                    {renderBookingActions(booking)}
                   </td>
                 </tr>
                 );
@@ -1329,19 +1555,22 @@ export default function AdminDashboard() {
             <div className="flex-1 w-full min-w-0">
               <input
                 type="text"
-                placeholder="Søk navn, bedrift, e-post, tlf, notater..."
+                placeholder="Søk navn, bedrift, e-post, tlf, kode..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
               />
             </div>
             <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full sm:w-auto max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
-              />
+              <label className="w-full sm:w-auto flex items-center justify-between gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-white focus-within:border-[#9C39FF]">
+                <span className="text-xs text-zinc-400 shrink-0">Dato:</span>
+                <input
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="bg-transparent text-sm text-white focus:outline-none min-w-0"
+                />
+              </label>
               {activeTab === "archive" && (
                 <select
                   value={statusFilter}
@@ -1440,6 +1669,18 @@ export default function AdminDashboard() {
         isOpen={!!reviewModalBooking}
         onClose={() => setReviewModalBooking(null)}
         onSent={(updated) => {
+          setBookings((prev) =>
+            prev.map((b) => (b.id === updated.id ? { ...b, ...updated } : b))
+          );
+        }}
+      />
+
+      {/* Redeem Gift Card Modal */}
+      <RedeemBookingGiftCardModal
+        booking={redeemGiftCardBooking}
+        isOpen={!!redeemGiftCardBooking}
+        onClose={() => setRedeemGiftCardBooking(null)}
+        onRedeemed={(updated) => {
           setBookings((prev) =>
             prev.map((b) => (b.id === updated.id ? { ...b, ...updated } : b))
           );

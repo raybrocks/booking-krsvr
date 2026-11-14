@@ -21,14 +21,13 @@ export async function POST(req: Request) {
 
     // SECURITY GUARD: confirm-zero is ONLY allowed for Pay-at-Venue (`terminal`),
     // full gift card coverage, or genuine 0 NOK bookings (e.g. 100% discount code).
-    const isGiftCardCovered = Boolean(
-      booking.giftCardCode &&
-      (booking.giftCardAmount || 0) > 0 &&
-      (booking.giftCardAmount || 0) >= (booking.totalPrice || 0)
-    );
+    const giftCardAmount = Math.max(0, Number(booking.giftCardAmount || 0));
+    const totalPrice = Math.max(0, Number(booking.totalPrice || 0));
+    const hasGiftCard = Boolean(booking.giftCardCode && giftCardAmount > 0);
+    const isGiftCardCovered = Boolean(hasGiftCard && giftCardAmount >= totalPrice);
 
     const isZeroUpfrontAllowed =
-      booking.paymentType === 'terminal' || (booking.totalPrice || 0) === 0 || isGiftCardCovered;
+      booking.paymentType === 'terminal' || totalPrice === 0 || isGiftCardCovered;
 
     if (!isZeroUpfrontAllowed) {
       return NextResponse.json(
@@ -37,34 +36,43 @@ export async function POST(req: Request) {
       );
     }
 
-    // Hvis bookingen er dekket av et gavekort, trekk fra saldoen atomisk
+    // Hvis bookingen bruker gavekort (enten 100% dekning eller delbetaling ved kortterminal),
+    // trekk gavekortbeløpet atomisk nå så saldo og gjenstående beløp stemmer umiddelbart.
     let effectiveAmountPaid = 0;
-    if (isGiftCardCovered && booking.giftCardCode) {
+    if (hasGiftCard && booking.giftCardCode) {
+      const redeemAmount = Math.min(totalPrice, giftCardAmount);
       const { redeemGiftCard } = await import('@/lib/giftcard');
       const giftCard = await prisma.giftCard.findUnique({
         where: { code: booking.giftCardCode.toUpperCase().trim() },
       });
 
-      if (!giftCard || giftCard.status !== 'active' || giftCard.balance < (booking.giftCardAmount || 0)) {
-        return NextResponse.json(
-          { error: 'Gavekortet er ikke lenger gyldig eller har utilstrekkelig saldo.' },
-          { status: 400 }
-        );
-      }
-
-      const existingRedemption = await prisma.giftCardRedemption.findFirst({
-        where: { bookingId, giftCardId: giftCard.id },
-      });
+      const existingRedemption = giftCard
+        ? await prisma.giftCardRedemption.findFirst({
+            where: { bookingId, giftCardId: giftCard.id },
+          })
+        : null;
 
       if (!existingRedemption) {
+        if (!giftCard || giftCard.status !== 'active' || giftCard.balance < redeemAmount) {
+          return NextResponse.json(
+            { error: 'Gavekortet er ikke lenger gyldig eller har utilstrekkelig saldo.' },
+            { status: 400 }
+          );
+        }
+
+        const remainder = Math.max(0, totalPrice - redeemAmount);
         await redeemGiftCard({
           giftCardId: giftCard.id,
-          amount: booking.giftCardAmount || 0,
+          amount: redeemAmount,
           bookingId,
           channel: 'web_booking',
+          note:
+            remainder > 0 && booking.paymentType === 'terminal'
+              ? `Delbetaling med gavekort (gjenstår ${remainder} kr i arenaen)`
+              : undefined,
         });
       }
-      effectiveAmountPaid = booking.giftCardAmount || 0;
+      effectiveAmountPaid = redeemAmount;
     }
 
     // Atomic state transition so concurrent calls / refreshes never send duplicate emails

@@ -13,6 +13,9 @@ export interface BookingConfirmationEmailProps {
   totalPrice: number;
   amountPaid: number;
   paymentType?: string;
+  discountCode?: string | null;
+  giftCardCode?: string | null;
+  giftCardAmount?: number;
   manageUrl: string;
   customText?: string;
   adminEmail?: string;
@@ -30,6 +33,9 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
   totalPrice,
   amountPaid,
   paymentType,
+  discountCode,
+  giftCardCode,
+  giftCardAmount,
   manageUrl,
   customText,
   adminEmail = 'post@krsvr.no',
@@ -37,7 +43,11 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
   locale = 'no',
 }) => {
   const isEn = locale === 'en';
-  const remainingAmount = totalPrice - amountPaid;
+  const giftCardUsed = Math.min(totalPrice, Number(giftCardAmount || 0));
+  const settledAmount = Math.max(amountPaid, giftCardUsed);
+  const remainingAmount = Math.max(0, totalPrice - settledAmount);
+  const isPaidWithGiftCardOnly = giftCardUsed >= totalPrice && totalPrice > 0;
+  const isTerminalPayment = !isPaidWithGiftCardOnly && (paymentType === 'terminal' || (settledAmount === 0 && totalPrice > 0));
 
   return (
     <EmailLayout 
@@ -130,24 +140,56 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
       <Section style={detailsTableStyle}>
         <Text style={detailRowStyle}>
           <strong>{isEn ? 'Payment method:' : 'Betalingsmåte:'}</strong>{' '}
-          {paymentType === 'terminal' || (amountPaid === 0 && totalPrice > 0)
+          {isPaidWithGiftCardOnly
             ? isEn
+              ? 'Gift Card'
+              : 'Gavekort'
+            : isTerminalPayment
+            ? giftCardUsed > 0
+              ? isEn
+                ? 'Gift Card + Pay remainder on arrival (card terminal)'
+                : 'Gavekort + restbeløp i arenaen (kortterminal)'
+              : isEn
               ? 'Pay on arrival in the arena (card terminal)'
               : 'Betales i arenaen (kortterminal)'
+            : giftCardUsed > 0
+            ? isEn
+              ? 'Gift Card + Vipps'
+              : 'Gavekort + Vipps'
             : 'Vipps'}
         </Text>
+        {discountCode && (
+          <Text style={detailRowStyle}>
+            <strong>{isEn ? 'Discount code:' : 'Rabattkode:'}</strong> {discountCode}
+          </Text>
+        )}
+        {giftCardCode && (
+          <Text style={detailRowStyle}>
+            <strong>{isEn ? 'Gift card used:' : 'Gavekort brukt:'}</strong> {giftCardCode}
+            {giftCardAmount && giftCardAmount > 0 ? ` (-NOK ${giftCardAmount})` : ''}
+          </Text>
+        )}
         <Text style={detailRowStyle}>
           <strong>{isEn ? 'Total price:' : 'Totalpris:'}</strong> NOK {totalPrice}
           {isEn && totalPrice > 0 ? ` (approx. €${toApproxEur(totalPrice)})` : ''}
         </Text>
         <Text style={detailRowStyle}>
-          <strong>{isEn ? 'Paid online:' : 'Betalt på nett:'}</strong> NOK {amountPaid}
+          <strong>
+            {giftCardUsed > 0
+              ? isEn
+                ? 'Settled online / gift card:'
+                : 'Oppgjort på nett / gavekort:'
+              : isEn
+              ? 'Paid online:'
+              : 'Betalt på nett:'}
+          </strong>{' '}
+          NOK {settledAmount}
         </Text>
         <Text style={detailRowStyle}>
           <strong>{isEn ? 'Remaining balance:' : 'Gjenstående beløp:'}</strong> NOK {remainingAmount}
           {isEn && remainingAmount > 0 ? ` (approx. €${toApproxEur(remainingAmount)})` : ''}{' '}
           {remainingAmount > 0
-            ? paymentType === 'terminal' || amountPaid === 0
+            ? paymentType === 'terminal' || settledAmount === 0 || giftCardUsed > 0
               ? isEn
                 ? '(paid by card terminal upon arrival)'
                 : '(betales i kortterminal ved ankomst)'

@@ -15,12 +15,32 @@ import { MetadataRoute } from 'next';
  * oppdateres tilsvarende for å holde AI-agenter synkronisert!
  */
 export default function robots(): MetadataRoute.Robots {
+  const disallowedPaths = ['/admin/', '/dev/', '/vr-opplevelser/vipps-test'];
+
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/admin/', '/dev/', '/vr-opplevelser/vipps-test'],
-    },
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: disallowedPaths,
+      },
+      {
+        userAgent: [
+          'OAI-SearchBot',
+          'ChatGPT-User',
+          'GPTBot',
+          'PerplexityBot',
+          'Perplexity-User',
+          'ClaudeBot',
+          'Claude-SearchBot',
+          'Applebot-Extended',
+          'Google-Extended',
+          'Bingbot',
+        ],
+        allow: ['/llms.txt', '/llms-full.txt', '/'],
+        disallow: disallowedPaths,
+      },
+    ],
     sitemap: 'https://www.krsvr.no/sitemap.xml',
   };
 }

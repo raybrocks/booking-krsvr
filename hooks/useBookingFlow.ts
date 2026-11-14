@@ -242,7 +242,8 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
   const amountToPay = isVippsTest ? 2 : (paymentType === "vipps" ? totalPrice : 0);
 
   const handleApplyDiscount = async () => {
-    if (!discountCodeInput.trim()) return;
+    const code = discountCodeInput.trim();
+    if (!code) return;
     setValidatingDiscount(true);
     setDiscountError("");
     setDiscountMessage("");
@@ -250,10 +251,32 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
       const res = await fetch("/api/discount-codes/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: discountCodeInput.trim() }),
+        body: JSON.stringify({ code }),
       });
       const data = await res.json();
       if (!res.ok) {
+        // Hvis kunden skrev inn et gavekort i rabattkode-feltet, gjenkjenn det sømløst!
+        try {
+          const gcRes = await fetch("/api/gift-cards/validate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: code.toUpperCase() }),
+          });
+          const gcData = await gcRes.json();
+          if (gcRes.ok && gcData.isValid && gcData.giftCard) {
+            setAppliedGiftCard(gcData.giftCard);
+            setGiftCardError("");
+            setGiftCardMessage(
+              isEn
+                ? `Gift card recognized & applied! Balance: ${gcData.giftCard.balance} NOK`
+                : `Gavekort gjenkjent og lagt til! Saldo: ${gcData.giftCard.balance} kr`
+            );
+            setDiscountCodeInput("");
+            setDiscountError("");
+            return;
+          }
+        } catch {}
+
         setDiscountError(data.error || (isEn ? "Invalid discount code" : "Ugyldig rabattkode"));
         setAppliedDiscount(null);
       } else {
@@ -273,7 +296,8 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
   };
 
   const handleApplyGiftCard = async () => {
-    if (!giftCardCodeInput.trim()) return;
+    const code = giftCardCodeInput.trim();
+    if (!code) return;
     setValidatingGiftCard(true);
     setGiftCardError("");
     setGiftCardMessage("");
@@ -281,10 +305,32 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
       const res = await fetch("/api/gift-cards/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: giftCardCodeInput.trim() }),
+        body: JSON.stringify({ code }),
       });
       const data = await res.json();
       if (!res.ok || !data.isValid) {
+        // Hvis kunden skrev inn en vanlig rabattkode i gavekort-feltet, gjenkjenn den automatisk
+        try {
+          const discRes = await fetch("/api/discount-codes/validate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code }),
+          });
+          const discData = await discRes.json();
+          if (discRes.ok && discData?.code) {
+            setAppliedDiscount(discData);
+            setDiscountError("");
+            setDiscountMessage(
+              isEn
+                ? `Discount code applied! (-${discData.type === 'percentage' ? discData.discount + '%' : discData.discount + ' NOK'})`
+                : `Rabattkode gjenkjent og lagt til! (-${discData.type === 'percentage' ? discData.discount + '%' : discData.discount + ' kr'})`
+            );
+            setGiftCardCodeInput("");
+            setGiftCardError("");
+            return;
+          }
+        } catch {}
+
         setGiftCardError(data.error || (isEn ? "Invalid gift card" : "Ugyldig gavekortkode"));
         setAppliedGiftCard(null);
       } else {

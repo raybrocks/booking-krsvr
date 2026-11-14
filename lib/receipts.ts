@@ -31,6 +31,9 @@ export interface EnrichedReceiptRecord {
   paymentType: 'vipps';
   date: string;
   time: string;
+  discountCode: string | null;
+  giftCardCode: string | null;
+  giftCardAmount: number;
 }
 
 export interface DailyReceiptEntry {
@@ -56,6 +59,7 @@ export interface DailyReceiptEntry {
   customerName: string;
   companyName: string;
   experienceName: string;
+  discountCode: string | null;
   runningGrossSales: number;
   runningNetTurnover: number;
 }
@@ -240,6 +244,9 @@ export async function getEnrichedAccountingReceipts(options?: {
       paymentType: 'vipps',
       date: isGiftCard ? (gc?.createdAt ? new Date(gc.createdAt).toISOString().split('T')[0] : '') : b?.date || '',
       time: isGiftCard ? 'Nettbutikk' : b?.time || '',
+      discountCode: isGiftCard ? null : b?.discountCode || null,
+      giftCardCode: isGiftCard ? gc?.code || null : b?.giftCardCode || null,
+      giftCardAmount: isGiftCard ? 0 : Number(b?.giftCardAmount || 0),
     };
   });
 }
@@ -320,6 +327,7 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
       customerName,
       companyName: r.companyName || '',
       experienceName: r.experienceName || 'VR Opplevelse',
+      discountCode: r.discountCode || null,
       runningGrossSales: runningGross,
       runningNetTurnover: runningNet,
     };

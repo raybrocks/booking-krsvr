@@ -253,7 +253,9 @@ export default function TransactionsManager() {
       t.paymentRef?.toLowerCase().includes(normalizedSearch) ||
       t.firstName?.toLowerCase().includes(normalizedSearch) ||
       t.lastName?.toLowerCase().includes(normalizedSearch) ||
-      t.companyName?.toLowerCase().includes(normalizedSearch)
+      t.companyName?.toLowerCase().includes(normalizedSearch) ||
+      t.discountCode?.toLowerCase().includes(normalizedSearch) ||
+      t.giftCardCode?.toLowerCase().includes(normalizedSearch)
     );
   });
 
@@ -381,6 +383,23 @@ export default function TransactionsManager() {
                <span>Betalingsform:</span>
                <span className="font-bold capitalize">{betalingsform}</span>
              </div>
+             {(selectedBooking?.discountCode || selectedTx.discountCode) && (
+               <div className="flex justify-between">
+                 <span>Rabattkode:</span>
+                 <span className="font-bold">{selectedBooking?.discountCode || selectedTx.discountCode}</span>
+               </div>
+             )}
+             {(selectedBooking?.giftCardCode || selectedTx.giftCardCode) && (
+               <div className="flex justify-between">
+                 <span>Gavekort:</span>
+                 <span className="font-bold">
+                   {selectedBooking?.giftCardCode || selectedTx.giftCardCode}
+                   {(selectedBooking?.giftCardAmount || selectedTx.giftCardAmount) > 0
+                     ? ` (-${selectedBooking?.giftCardAmount || selectedTx.giftCardAmount} kr)`
+                     : ''}
+                 </span>
+               </div>
+             )}
             <div className="flex justify-between">
                <span>Status:</span>
                <span className="font-bold">
@@ -749,6 +768,11 @@ export default function TransactionsManager() {
                                               <span className="font-medium">{r.customerName}</span>
                                               {r.companyName ? ` (${r.companyName})` : ""}
                                               <span className="text-zinc-500"> · {r.experienceName}</span>
+                                              {r.discountCode && (
+                                                <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/30 font-mono text-[10px] font-semibold">
+                                                  {r.discountCode}
+                                                </span>
+                                              )}
                                             </td>
                                             <td className="px-3 py-2">
                                               <span
@@ -898,6 +922,20 @@ export default function TransactionsManager() {
                           </td>
                           <td className="px-6 py-4">
                             <div className="font-mono text-zinc-300 text-xs">{tx.bookingId || tx.paymentRef || 'N/A'}</div>
+                            {(tx.discountCode || tx.giftCardCode) && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {tx.discountCode && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/30 font-mono text-[10px] font-semibold">
+                                    Rabattkode: {tx.discountCode}
+                                  </span>
+                                )}
+                                {tx.giftCardCode && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-semibold">
+                                    Gavekort: {tx.giftCardCode}
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </td>
                           <td className="px-6 py-4">
                             {isRefund ? (

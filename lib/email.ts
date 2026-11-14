@@ -56,7 +56,7 @@ export async function sendBookingConfirmationEmail(
   }
 
   const adminEmail = await getAdminEmail();
-  let { id, manageToken, firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId, paymentType, locale } = bookingDetails;
+  let { id, manageToken, firstName, lastName, date, time, players, totalPrice, amountPaid, experienceId, paymentType, discountCode, giftCardCode, giftCardAmount, locale } = bookingDetails;
   const isEn = locale === 'en';
   
   if (!manageToken && id) {
@@ -106,6 +106,9 @@ export async function sendBookingConfirmationEmail(
         totalPrice: Number(totalPrice) || 0,
         amountPaid: Number(amountPaid) || 0,
         paymentType,
+        discountCode: discountCode || null,
+        giftCardCode: giftCardCode || null,
+        giftCardAmount: Number(giftCardAmount) || 0,
         manageUrl,
         customText,
         adminEmail,
@@ -313,7 +316,7 @@ export async function sendRefundReceiptEmail(
 export async function sendAdminNewBookingNotification(bookingDetails: any) {
   if (!process.env.RESEND_API_KEY) return null;
   const adminEmail = await getAdminEmail();
-  const { firstName, lastName, email, phone, date, time, players, totalPrice, amountPaid, paymentType, bookingType, companyName, internalNotes, experienceId } = bookingDetails;
+  const { firstName, lastName, email, phone, date, time, players, totalPrice, amountPaid, paymentType, discountCode, giftCardCode, giftCardAmount, bookingType, companyName, internalNotes, experienceId } = bookingDetails;
   
   let experienceTitle = "VR Experience";
   if (experienceId) {
@@ -339,6 +342,9 @@ export async function sendAdminNewBookingNotification(bookingDetails: any) {
         totalPrice: Number(totalPrice) || 0,
         amountPaid: Number(amountPaid) || 0,
         paymentType,
+        discountCode: discountCode || null,
+        giftCardCode: giftCardCode || null,
+        giftCardAmount: Number(giftCardAmount) || 0,
         bookingType,
         companyName,
         internalNotes,
@@ -347,11 +353,12 @@ export async function sendAdminNewBookingNotification(bookingDetails: any) {
     );
 
     const subjectPrefix = isTerminal ? 'Ny booking (Kortterminal - ubetalt)' : 'Ny booking registrert';
+    const discountSuffix = discountCode ? ` [Rabattkode: ${discountCode}]` : '';
 
     const { data, error } = await resend.emails.send({
       from: 'KRS VR Arena Admin <booking@donotreply.krsvr.no>',
       to: adminEmail,
-      subject: `${subjectPrefix}: ${date} kl ${time} - ${firstName} ${lastName}`,
+      subject: `${subjectPrefix}: ${date} kl ${time} - ${firstName} ${lastName}${discountSuffix}`,
       html,
     });
     
