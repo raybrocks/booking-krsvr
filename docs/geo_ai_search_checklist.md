@@ -25,7 +25,7 @@ Denne sjekklisten og måleloggen brukes for å spore og øke synligheten til **K
 | **Internasjonale turistsøk (EN / DE / NL)** | Ikke målt | **3 av 3 (100 %)** *(EN+DE direkte sitert 14.11)* | 🟢 **Full dekning** | 3 av 3 (**Nådd!**) |
 | **ChatGPT Business Hub (`chatgpt.com/business-hub`)** | Ikke registrert | ⏳ **På venteliste** *(14.11.2026)* | 🟡 **Søkt tilgang** | Verifisert profil + Bing Places |
 | **Tranco Global Rank (`krsvr.no`)** | Utenfor Topp 1M | **Utenfor Topp 1M** *(Verifisert 14.11)* | ➖ | Komme inn på Topp 1M |
-| **Brønnøysund NACE-bransjekode** | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** *(Verifisert 14.11)* | 🔴 **Krever Altinn** | ✅ `93.299` (Fritid) |
+| **Brønnøysund NACE-bransjekode** | ❌ `62.100` (IT) | ❌ **`62.100` (IT)** *(Verifisert 14.11)* | 🔴 **Krever Altinn** | ✅ `93.291` (Opplevelsesaktiviteter) |
 
 <details>
 <summary>📅 <strong>Klikk for å se full historisk tidslinje (Alle 10 scanninger fra 15. okt til 14. nov 2026)</strong></summary>
@@ -116,9 +116,15 @@ Tabellen viser alle eksterne domener som omtaler eller lenker til `krsvr.no`, so
 Her er **kun de punktene som fortsatt er åpne (`[ ]`)**, sortert etter hvor stor effekt de har på synligheten i ChatGPT, Gemini og Perplexity:
 
 ### 🔴 Prioritet 1: Kritisk grunnmur for ChatGPT Search & Bransjekode
-- [ ] **1. Endre næringskode (NACE) i Brønnøysundregistrene (Gratis i Altinn):**
-  - **Problemet:** Selskapet (`936 318 878` / underenhet `936 605 192`) står fortsatt med **`62.100 Dataprogrammeringstjenester`** fra tiden som *JLS FINANS AS*. Dermed kategoriserer **5 av våre 15 eksterne domener** (`1881.no`, `1850.no`, `lokalebedrifter.no`, `falio.no`, `forretningsflyt.no`) oss som et IT-konsulentselskap. Dette skaper entitetsstøy (*Entity Confusion*) for språkmodeller som leser åpne nettkataloger.
-  - **Løsning:** Send inn *Samordnet registermelding* i Altinn og endre til **`93.299 Fritidsvirksomhet ellers`** (evt. `93.210 Drift av fornøyelses- og temaparker`). Da oppdateres katalogene automatisk.
+- [ ] **1. Endre næringskode (NACE) og legg inn telefonnummer i Brønnøysundregistrene (Gratis – 3 min):**
+  - **Problemet:** Selskapet (`936 318 878` / underenhet `936 605 192`) står med **`62.100 Dataprogrammeringstjenester`** fordi dagens aktivitetstekst starter med *«Utvikle... digital teknologi»*, og `telefon` står helt blankt i Enhetsregisteret. Dermed kategoriserer **5 av våre 15 eksterne domener** (`1881.no`, `1850.no`, `lokalebedrifter.no`, `falio.no`, `forretningsflyt.no`) oss som et IT-konsulentselskap.
+  - **Riktig bransjekode:** **`93.291 Opplevelsesaktiviteter`** (nøyaktig samme kode som både *VR Games AS* i Oslo og *Escape Kristiansand AS* er registrert under).
+  - **Direktelenke:** [Start Samordnet registermelding hos Brønnøysundregistrene](https://www.brreg.no/bedrift/samordnet-registermelding/) (logg inn med BankID og velg org.nr. `936 318 878`).
+  - **Trinn 1 (Kontaktinfo):** Legg inn telefonnummer **`408 28 302`** under adresse/kontaktinformasjon (løser manglende telefon på 1881.no og i katalogene automatisk).
+  - **Trinn 2 (Virksomhetens aktivitet – lim inn på både hovedenhet og underenhet, 0 kr gebyr):**
+    ```text
+    Tilby opplevelsesaktiviteter og VR-spill (escape rooms og Tactical Arena) for familier, turister og bedrifter, herunder teambuilding, firmaevent, utdrikningslag, bursdag og julebord (93.291 Opplevelsesaktiviteter).
+    ```
 - [ ] **2. Synkroniser Google Bedriftsprofil til Bing Places for Business (`bingplaces.com`):**
   - **Hvorfor:** ChatGPT Search og Microsoft Copilot har ikke tilgang til Google Maps, men henter åpningstider, telefon og adresse direkte fra **Bing Places**.
   - **Løsning (2 minutter):** Gå til [bingplaces.com](https://www.bingplaces.com/), velg **«Import from Google Business Profile»**, og logg inn med Google-kontoen som eier KRS VR Arena. Da kopieres alle bilder, åpningstider og opplysninger automatisk.
