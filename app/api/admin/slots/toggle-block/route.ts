@@ -16,15 +16,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'At least one time slot is required' }, { status: 400 });
     }
 
-    // Get default experience ID for the system booking relation
-    const defaultExp = await prisma.experience.findFirst({
-      where: { isActive: true },
-      orderBy: { order: 'asc' }
+    // Ensure a dedicated non-game system experience exists for manually blocked slots
+    // (so blocked slots are never assigned to Abyss Vault or any active game)
+    const SYSTEM_BLOCK_EXPERIENCE_ID = 'system-slot-block';
+    await prisma.experience.upsert({
+      where: { id: SYSTEM_BLOCK_EXPERIENCE_ID },
+      update: {
+        name: 'Manuelt sperret',
+        type: 'System',
+        isActive: false,
+      },
+      create: {
+        id: SYSTEM_BLOCK_EXPERIENCE_ID,
+        name: 'Manuelt sperret',
+        shortDescription: 'Systemreservert tidsblokk for manuelt sperrede tidspunkt',
+        type: 'System',
+        isActive: false,
+        maxPlayers: 0,
+      },
     });
-
-    if (!defaultExp) {
-      return NextResponse.json({ error: 'No active experience found to attach booking' }, { status: 400 });
-    }
 
     const results: any[] = [];
 
@@ -40,8 +50,20 @@ export async function POST(req: NextRequest) {
 
         if (existing) {
           if (existing.status === 'cancelled' || existing.status === 'terminated') {
-            // Delete cancelled to allow creating clean system block
-            await prisma.booking.delete({ where: { id: existing.id } });
+            const hasFinancialHistory = await prisma.receipt.findFirst({
+              where: {
+                bookingId: existing.id,
+                status: { in: ['CAPTURED', 'REFUNDED'] },
+              },
+            });
+            if (hasFinancialHistory || (existing.amountPaid || 0) > 0) {
+              await prisma.booking.update({
+                where: { id: existing.id },
+                data: { time: `${existing.time} (kansellert-${existing.id.slice(-4)})` },
+              });
+            } else {
+              await prisma.booking.delete({ where: { id: existing.id } });
+            }
           } else if (existing.bookingType !== 'system' && !existing.email?.includes('system@sperret')) {
             // Real customer booking exists
             results.push({ time: t, status: 'already_customer_booked', bookingId: existing.id });
@@ -55,7 +77,7 @@ export async function POST(req: NextRequest) {
 
         const newBlock = await prisma.booking.create({
           data: {
-            experienceId: defaultExp.id,
+            experienceId: SYSTEM_BLOCK_EXPERIENCE_ID,
             date,
             time: t,
             players: 0,

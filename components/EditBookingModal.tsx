@@ -472,7 +472,7 @@ export default function EditBookingModal({
                     <option value="arrangement" className="bg-zinc-900 font-medium">Arrangement</option>
                   </optgroup>
                   <optgroup label="Spill & Aktiviteter">
-                    {experiences.filter(exp => !["teambuilding", "bursdag", "utdrikningslag", "julebord", "vr-on-site", "arrangement"].includes(exp.id)).map((exp) => (
+                    {experiences.filter(exp => exp.type !== "System" && !["teambuilding", "bursdag", "utdrikningslag", "julebord", "vr-on-site", "arrangement", "system-slot-block"].includes(exp.id)).map((exp) => (
                       <option key={exp.id} value={exp.id} className="bg-zinc-900">
                         {exp.title || exp.name || exp.id} {exp.maxPlayers ? `(Maks ${exp.maxPlayers} pers)` : ""}
                       </option>

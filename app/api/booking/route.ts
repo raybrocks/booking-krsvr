@@ -6,6 +6,24 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
 
+    // Reject booking if the timeslot is manually blocked by admin/system (regardless of experienceId)
+    const activeSystemBlock = await prisma.booking.findFirst({
+      where: {
+        date: data.date,
+        time: data.time,
+        status: { notIn: ['cancelled', 'terminated', 'CANCELLED', 'TERMINATED'] },
+        OR: [
+          { bookingType: 'system' },
+          { email: 'system@sperret' },
+          { experienceId: 'system-slot-block' },
+        ],
+      },
+    });
+
+    if (activeSystemBlock) {
+      return NextResponse.json({ error: 'Time slot is blocked.' }, { status: 409 });
+    }
+
     // Check availability before creating (Prisma's @@unique constraint will also catch it)
     const existing = await prisma.booking.findUnique({
       where: {

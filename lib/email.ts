@@ -553,6 +553,8 @@ export interface WeeklySummaryReportData {
     totalPlayers: number;
     avgGroupSize: number | string;
     vippsPaid: number;
+    terminalPaid?: number;
+    giftCardUsed?: number;
     expectedCash: number;
     totalEstimatedRevenue: number;
     cancelledCount: number;
@@ -563,6 +565,8 @@ export interface WeeklySummaryReportData {
     bookingCount: number;
     totalPlayers: number;
     vippsPaid: number;
+    terminalPaid?: number;
+    giftCardUsed?: number;
     expectedCash: number;
     totalEstimatedRevenue: number;
     bookings: Array<{
@@ -580,6 +584,10 @@ export interface WeeklySummaryReportData {
       paymentType: string;
       totalPrice: number;
       amountPaid: number;
+      remainingCash?: number;
+      discountCode?: string | null;
+      giftCardCode?: string | null;
+      giftCardAmount?: number;
       staffName?: string;
       staffId?: string;
     }>;
@@ -615,16 +623,30 @@ export async function sendWeeklyAdminSummary(
     .join('');
 
   const upcomingRowsHtml = (upcomingWeek.bookings || [])
-    .map((b) => `
+    .map((b) => {
+      const remaining = typeof b.remainingCash === 'number'
+        ? b.remainingCash
+        : Math.max(0, (b.totalPrice || 0) - Math.max(b.amountPaid || 0, b.giftCardAmount || 0));
+      const statusBadge = remaining === 0
+        ? `<span style="color: #059669; font-weight: 600;">Betalt</span>`
+        : `<span style="color: #b45309; font-weight: 600;">Gjenstår ${remaining.toLocaleString('no-NO')} kr</span>`;
+      const extras = [
+        b.discountCode ? `Rabatt: ${b.discountCode}` : '',
+        b.giftCardCode ? `Gavekort: ${b.giftCardCode}` : '',
+      ].filter(Boolean).join(' &bull; ');
+
+      return `
       <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px;">
         <div style="font-weight: 600; font-size: 14px; color: #111827;">
           ${b.dateNice} kl. ${b.time} &bull; ${b.experienceName}
         </div>
         <div style="font-size: 13px; color: #4b5563; margin-top: 4px;">
-          ${b.firstName} ${b.lastName} (${b.players} pers) &bull; ${b.phone} &bull; <span style="color: #7c3aed;">${b.paymentType}</span>
+          ${b.firstName} ${b.lastName} (${b.players} pers) &bull; ${b.phone} &bull; <span style="color: #7c3aed;">${b.paymentType}</span> &bull; ${statusBadge}
         </div>
+        ${extras ? `<div style="font-size: 12px; color: #6b7280; margin-top: 3px;">${extras}</div>` : ''}
       </div>
-    `).join('');
+    `;
+    }).join('');
 
   const html = `
     <!DOCTYPE html>
@@ -642,9 +664,11 @@ export async function sendWeeklyAdminSummary(
           <h2 style="font-size: 15px; font-weight: 600; color: #111827; margin: 24px 0 8px 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px;">Forrige uke (${pastWeek.periodLabel})</h2>
           <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; font-size: 13.5px; color: #374151;">
             <p style="margin: 4px 0;"><strong>Gjennomførte bookinger:</strong> ${pastWeek.completedBookingsCount} (${pastWeek.totalPlayers} spillere)</p>
-            <p style="margin: 4px 0;"><strong>Estimert totalomsetning:</strong> NOK ${pastWeek.totalEstimatedRevenue.toLocaleString('no-NO')}</p>
-            <p style="margin: 4px 0;"><strong>Hvorav Vipps / Forhåndsbetalt:</strong> NOK ${pastWeek.vippsPaid.toLocaleString('no-NO')}</p>
-            <p style="margin: 4px 0;"><strong>Hvorav Forventet oppmøte/faktura:</strong> NOK ${pastWeek.expectedCash.toLocaleString('no-NO')}</p>
+            <p style="margin: 4px 0;"><strong>Total bookingverdi:</strong> NOK ${pastWeek.totalEstimatedRevenue.toLocaleString('no-NO')}</p>
+            <p style="margin: 4px 0;"><strong>Hvorav Vipps (nettbutikk):</strong> NOK ${pastWeek.vippsPaid.toLocaleString('no-NO')}</p>
+            <p style="margin: 4px 0;"><strong>Hvorav Kortterminal / Oppgjør i arena:</strong> NOK ${(pastWeek.terminalPaid || 0).toLocaleString('no-NO')}</p>
+            ${(pastWeek.giftCardUsed || 0) > 0 ? `<p style="margin: 4px 0;"><strong>Hvorav Innløst gavekort:</strong> NOK ${(pastWeek.giftCardUsed || 0).toLocaleString('no-NO')}</p>` : ''}
+            <p style="margin: 4px 0;"><strong>Hvorav Utestående / Ubetalt:</strong> NOK ${pastWeek.expectedCash.toLocaleString('no-NO')}</p>
           </div>
 
           ${experienceListHtml ? `
@@ -653,7 +677,12 @@ export async function sendWeeklyAdminSummary(
           ` : ''}
 
           <h2 style="font-size: 15px; font-weight: 600; color: #111827; margin: 24px 0 8px 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px;">Kommende uke (${upcomingWeek.periodLabel})</h2>
-          <p style="font-size: 13.5px; color: #4b5563; margin-bottom: 12px;"><strong>${upcomingWeek.bookingCount} bookinger</strong> planlagt (${upcomingWeek.totalPlayers} spillere).</p>
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; font-size: 13.5px; color: #374151;">
+            <p style="margin: 3px 0;"><strong>Planlagte bookinger:</strong> ${upcomingWeek.bookingCount} (${upcomingWeek.totalPlayers} spillere)</p>
+            <p style="margin: 3px 0;"><strong>Estimert bookingverdi:</strong> NOK ${upcomingWeek.totalEstimatedRevenue.toLocaleString('no-NO')}</p>
+            <p style="margin: 3px 0;"><strong>Allerede oppgjort (Vipps / gavekort / terminal):</strong> NOK ${(upcomingWeek.vippsPaid + (upcomingWeek.giftCardUsed || 0) + (upcomingWeek.terminalPaid || 0)).toLocaleString('no-NO')}</p>
+            <p style="margin: 3px 0;"><strong>Forventet ved oppmøte / faktura:</strong> NOK ${upcomingWeek.expectedCash.toLocaleString('no-NO')}</p>
+          </div>
           ${upcomingRowsHtml || '<p style="font-size: 13px; color: #9ca3af; font-style: italic;">Ingen bookinger registrert for kommende uke enda.</p>'}
 
           <div style="text-align: center; margin-top: 28px;">

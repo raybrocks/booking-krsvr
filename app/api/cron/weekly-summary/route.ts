@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendWeeklyAdminSummary, WeeklySummaryReportData } from '@/lib/email';
-import { startOfDay, endOfDay, subDays, addDays, format } from 'date-fns';
+import { getBookingPaymentBreakdown, isSystemBlockedBooking } from '@/lib/booking-utils';
+import { subDays, addDays, format, parseISO } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
 export async function GET(req: Request) {
@@ -9,33 +10,50 @@ export async function GET(req: Request) {
     // 1. Verify Vercel Cron Request
     const authHeader = req.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
-    
+
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // 2. Calculate Date Ranges (Past 7 full days and Upcoming 7 days)
-    const today = new Date();
-    const pastWeekStart = startOfDay(subDays(today, 7));
-    const pastWeekEnd = endOfDay(subDays(today, 1));
-    
-    const upcomingWeekStart = startOfDay(today);
-    const upcomingWeekEnd = endOfDay(addDays(today, 6));
+    // 2. Calculate Date Ranges in Europe/Oslo timezone using YYYY-MM-DD strings
+    const todayOsloStr = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Oslo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
 
-    const periodLabelPast = `${format(pastWeekStart, 'd. MMMM', { locale: nb })} – ${format(pastWeekEnd, 'd. MMMM', { locale: nb })}`;
-    const periodLabelUpcoming = `${format(upcomingWeekStart, 'd. MMMM', { locale: nb })} – ${format(upcomingWeekEnd, 'd. MMMM', { locale: nb })}`;
+    const todayOsloDate = parseISO(`${todayOsloStr}T12:00:00Z`);
+    const pastWeekStartDate = subDays(todayOsloDate, 7);
+    const pastWeekEndDate = subDays(todayOsloDate, 1);
+    const upcomingWeekStartDate = todayOsloDate;
+    const upcomingWeekEndDate = addDays(todayOsloDate, 6);
+
+    const pastStartStr = format(pastWeekStartDate, 'yyyy-MM-dd');
+    const pastEndStr = format(pastWeekEndDate, 'yyyy-MM-dd');
+    const upcomingStartStr = format(upcomingWeekStartDate, 'yyyy-MM-dd');
+    const upcomingEndStr = format(upcomingWeekEndDate, 'yyyy-MM-dd');
+
+    const periodLabelPast = `${format(pastWeekStartDate, 'd. MMMM', { locale: nb })} – ${format(pastWeekEndDate, 'd. MMMM', { locale: nb })}`;
+    const periodLabelUpcoming = `${format(upcomingWeekStartDate, 'd. MMMM', { locale: nb })} – ${format(upcomingWeekEndDate, 'd. MMMM', { locale: nb })}`;
 
     // 3. Fetch Bookings for past and upcoming ranges
     const allBookings = await prisma.booking.findMany({
       where: {
-        status: { in: ['confirmed', 'paid', 'cancelled'] }
+        date: {
+          gte: pastStartStr,
+          lte: upcomingEndStr,
+        },
+        status: { in: ['confirmed', 'paid', 'completed', 'cancelled'] },
       },
       include: {
-        experience: true
-      }
+        experience: true,
+      },
     });
 
     let pastVippsPaid = 0;
+    let pastTerminalPaid = 0;
+    let pastGiftCardUsed = 0;
     let pastExpectedCash = 0;
     let pastCompletedCount = 0;
     let pastTotalPlayers = 0;
@@ -44,44 +62,48 @@ export async function GET(req: Request) {
 
     const rawUpcoming: any[] = [];
     let upcomingVippsPaid = 0;
+    let upcomingTerminalPaid = 0;
+    let upcomingGiftCardUsed = 0;
     let upcomingExpectedCash = 0;
     let upcomingTotalPlayers = 0;
 
     allBookings.forEach((b: any) => {
       try {
         if (!b.date) return;
-        
-        // Skip auto-generated shadow bookings
-        if (b.internalNotes && b.internalNotes.includes('Auto-generert tids-blokk')) {
+
+        // Skip system blocks (manually blocked slots and auto-generated shadow blocks)
+        if (isSystemBlockedBooking(b)) {
           return;
         }
-        
-        const bookingDate = new Date(b.date);
-        const totalPrice = b.totalPrice || 0;
-        const amountPaid = b.amountPaid || 0;
-        const remaining = Math.max(0, totalPrice - amountPaid);
+
+        const p = getBookingPaymentBreakdown(b);
         const players = b.players || 0;
         const expName = b.experience?.name || 'VR Opplevelse';
 
-        // Past week stats
-        if (bookingDate >= pastWeekStart && bookingDate <= pastWeekEnd) {
+        // Past week stats (YYYY-MM-DD range in Europe/Oslo)
+        if (b.date >= pastStartStr && b.date <= pastEndStr) {
           if (b.status === 'cancelled') {
             pastCancelledCount++;
           } else {
             pastCompletedCount++;
             pastTotalPlayers += players;
-            pastVippsPaid += amountPaid;
-            pastExpectedCash += remaining;
+            pastVippsPaid += p.vippsPaid;
+            pastTerminalPaid += p.terminalPaid;
+            pastGiftCardUsed += p.giftCardUsed;
+            pastExpectedCash += p.remaining;
             pastExpCounts[expName] = (pastExpCounts[expName] || 0) + 1;
           }
         }
 
-        // Upcoming week list (active confirmed/paid bookings)
-        if (bookingDate >= upcomingWeekStart && bookingDate <= upcomingWeekEnd && b.status !== 'cancelled') {
+        // Upcoming week list (active confirmed/paid/completed bookings)
+        if (b.date >= upcomingStartStr && b.date <= upcomingEndStr && b.status !== 'cancelled') {
           upcomingTotalPlayers += players;
-          upcomingVippsPaid += amountPaid;
-          upcomingExpectedCash += remaining;
+          upcomingVippsPaid += p.vippsPaid;
+          upcomingTerminalPaid += p.terminalPaid;
+          upcomingGiftCardUsed += p.giftCardUsed;
+          upcomingExpectedCash += p.remaining;
 
+          const bookingDate = parseISO(`${b.date}T12:00:00Z`);
           const niceDate = format(bookingDate, 'EEEE d. MMMM', { locale: nb });
           rawUpcoming.push({
             id: b.id,
@@ -95,17 +117,20 @@ export async function GET(req: Request) {
             phone: b.phone || '',
             players,
             experienceName: expName,
-            totalPrice,
-            amountPaid,
-            remainingCash: remaining,
+            totalPrice: p.totalPrice,
+            amountPaid: p.amountPaid,
+            giftCardCode: b.giftCardCode || null,
+            giftCardAmount: p.giftCardUsed,
+            discountCode: b.discountCode || null,
+            remainingCash: p.remaining,
             paymentType: b.paymentType || 'vipps',
             internalNotes: b.internalNotes || '',
             companyName: b.companyName || '',
-            bookingType: b.bookingType || 'private'
+            bookingType: b.bookingType || 'private',
           });
         }
       } catch (e) {
-        console.error("Error parsing booking for weekly stats:", e);
+        console.error('Error parsing booking for weekly stats:', e);
       }
     });
 
@@ -122,8 +147,8 @@ export async function GET(req: Request) {
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
 
-    const pastAvgGroupSize = pastCompletedCount > 0 
-      ? (pastTotalPlayers / pastCompletedCount).toFixed(1) 
+    const pastAvgGroupSize = pastCompletedCount > 0
+      ? (pastTotalPlayers / pastCompletedCount).toFixed(1)
       : '0';
 
     const reportData: WeeklySummaryReportData = {
@@ -133,20 +158,24 @@ export async function GET(req: Request) {
         totalPlayers: pastTotalPlayers,
         avgGroupSize: pastAvgGroupSize,
         vippsPaid: pastVippsPaid,
+        terminalPaid: pastTerminalPaid,
+        giftCardUsed: pastGiftCardUsed,
         expectedCash: pastExpectedCash,
-        totalEstimatedRevenue: pastVippsPaid + pastExpectedCash,
+        totalEstimatedRevenue: pastVippsPaid + pastTerminalPaid + pastGiftCardUsed + pastExpectedCash,
         cancelledCount: pastCancelledCount,
-        popularExperiences
+        popularExperiences,
       },
       upcomingWeek: {
         periodLabel: periodLabelUpcoming,
         bookingCount: rawUpcoming.length,
         totalPlayers: upcomingTotalPlayers,
         vippsPaid: upcomingVippsPaid,
+        terminalPaid: upcomingTerminalPaid,
+        giftCardUsed: upcomingGiftCardUsed,
         expectedCash: upcomingExpectedCash,
-        totalEstimatedRevenue: upcomingVippsPaid + upcomingExpectedCash,
-        bookings: rawUpcoming
-      }
+        totalEstimatedRevenue: upcomingVippsPaid + upcomingTerminalPaid + upcomingGiftCardUsed + upcomingExpectedCash,
+        bookings: rawUpcoming,
+      },
     };
 
     // 4. Send the Email

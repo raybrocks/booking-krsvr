@@ -17,6 +17,7 @@ import EditBookingModal from "./EditBookingModal";
 import ReviewRequestModal from "./ReviewRequestModal";
 import AdminGiftCardsTab from "./AdminGiftCardsTab";
 import RedeemBookingGiftCardModal from "./RedeemBookingGiftCardModal";
+import { getBookingPaymentBreakdown } from "@/lib/booking-utils";
 
 const playDing = () => {
   try {
@@ -613,46 +614,6 @@ export default function AdminDashboard() {
       </div>
     );
   }
-
-  const getBookingPaymentBreakdown = (booking: any) => {
-    const totalPrice = Number(booking.totalPrice || 0);
-    const amountPaid = Number(booking.amountPaid || 0);
-    const giftCardUsed =
-      booking.giftCardCode && Number(booking.giftCardAmount || 0) > 0
-        ? Math.min(totalPrice, Number(booking.giftCardAmount || 0))
-        : 0;
-    const status = (booking.vippsStatus || '').toUpperCase();
-    const isRefunded = status === 'REFUNDED' || status.includes('REFUND');
-    const isCancelled = booking.status === 'cancelled';
-    const isPending = booking.status === 'pending';
-    const isTerminal = booking.paymentType === 'terminal' || booking.paymentType === 'manual';
-    const isSystem =
-      booking.bookingType === 'system' ||
-      booking.email?.includes('system@sperret') ||
-      booking.firstName === 'Sperret';
-
-    const settledTotal = Math.max(amountPaid, giftCardUsed);
-    const remaining = Math.max(0, totalPrice - settledTotal);
-    const directPaid = Math.max(0, amountPaid - giftCardUsed);
-    const vippsPaid = !isTerminal && !isRefunded && !isCancelled ? directPaid : 0;
-    const terminalPaid = isTerminal && !isRefunded && !isCancelled ? directPaid : 0;
-
-    return {
-      totalPrice,
-      amountPaid,
-      giftCardUsed,
-      vippsPaid,
-      terminalPaid,
-      remaining,
-      settledTotal,
-      status,
-      isRefunded,
-      isCancelled,
-      isPending,
-      isTerminal,
-      isSystem,
-    };
-  };
 
   const renderTodaySummary = (todayBookings: any[]) => {
     const active = todayBookings.filter((b) => {
