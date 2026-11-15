@@ -664,11 +664,12 @@ export async function sendWeeklyAdminSummary(
           <h2 style="font-size: 15px; font-weight: 600; color: #111827; margin: 24px 0 8px 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px;">Forrige uke (${pastWeek.periodLabel})</h2>
           <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; font-size: 13.5px; color: #374151;">
             <p style="margin: 4px 0;"><strong>Gjennomførte bookinger:</strong> ${pastWeek.completedBookingsCount} (${pastWeek.totalPlayers} spillere)</p>
-            <p style="margin: 4px 0;"><strong>Total bookingverdi:</strong> NOK ${pastWeek.totalEstimatedRevenue.toLocaleString('no-NO')}</p>
+            <p style="margin: 4px 0;"><strong>Estimert total bookingverdi (ca.):</strong> NOK ${pastWeek.totalEstimatedRevenue.toLocaleString('no-NO')}</p>
             <p style="margin: 4px 0;"><strong>Hvorav Vipps (nettbutikk):</strong> NOK ${pastWeek.vippsPaid.toLocaleString('no-NO')}</p>
-            <p style="margin: 4px 0;"><strong>Hvorav Kortterminal / Oppgjør i arena:</strong> NOK ${(pastWeek.terminalPaid || 0).toLocaleString('no-NO')}</p>
-            ${(pastWeek.giftCardUsed || 0) > 0 ? `<p style="margin: 4px 0;"><strong>Hvorav Innløst gavekort:</strong> NOK ${(pastWeek.giftCardUsed || 0).toLocaleString('no-NO')}</p>` : ''}
-            <p style="margin: 4px 0;"><strong>Hvorav Utestående / Ubetalt:</strong> NOK ${pastWeek.expectedCash.toLocaleString('no-NO')}</p>
+            <p style="margin: 4px 0;"><strong>Hvorav antatt oppgjør i arena / kortterminal (ca.):</strong> NOK ${(pastWeek.terminalPaid || 0).toLocaleString('no-NO')}</p>
+            ${(pastWeek.giftCardUsed || 0) > 0 ? `<p style="margin: 4px 0;"><strong>Hvorav innløst gavekort:</strong> NOK ${(pastWeek.giftCardUsed || 0).toLocaleString('no-NO')}</p>` : ''}
+            <p style="margin: 4px 0;"><strong>Hvorav utestående / ikke markert oppgjort:</strong> NOK ${pastWeek.expectedCash.toLocaleString('no-NO')}</p>
+            <p style="margin: 8px 0 0 0; font-size: 12px; color: #6b7280; line-height: 1.4;">Merk: Tall utenom Vipps-nettbutikk er estimater ut fra registrerte bookinger. Faktisk innslag i kassa kan avvike ved f.eks. endret antall oppmøtte, rabatter eller justeringer på stedet.</p>
           </div>
 
           ${experienceListHtml ? `
@@ -679,9 +680,9 @@ export async function sendWeeklyAdminSummary(
           <h2 style="font-size: 15px; font-weight: 600; color: #111827; margin: 24px 0 8px 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px;">Kommende uke (${upcomingWeek.periodLabel})</h2>
           <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; font-size: 13.5px; color: #374151;">
             <p style="margin: 3px 0;"><strong>Planlagte bookinger:</strong> ${upcomingWeek.bookingCount} (${upcomingWeek.totalPlayers} spillere)</p>
-            <p style="margin: 3px 0;"><strong>Estimert bookingverdi:</strong> NOK ${upcomingWeek.totalEstimatedRevenue.toLocaleString('no-NO')}</p>
-            <p style="margin: 3px 0;"><strong>Allerede oppgjort (Vipps / gavekort / terminal):</strong> NOK ${(upcomingWeek.vippsPaid + (upcomingWeek.giftCardUsed || 0) + (upcomingWeek.terminalPaid || 0)).toLocaleString('no-NO')}</p>
-            <p style="margin: 3px 0;"><strong>Forventet ved oppmøte / faktura:</strong> NOK ${upcomingWeek.expectedCash.toLocaleString('no-NO')}</p>
+            <p style="margin: 3px 0;"><strong>Estimert bookingverdi (ca.):</strong> NOK ${upcomingWeek.totalEstimatedRevenue.toLocaleString('no-NO')}</p>
+            <p style="margin: 3px 0;"><strong>Allerede forhåndsbetalt / registrert (Vipps / gavekort):</strong> NOK ${(upcomingWeek.vippsPaid + (upcomingWeek.giftCardUsed || 0) + (upcomingWeek.terminalPaid || 0)).toLocaleString('no-NO')}</p>
+            <p style="margin: 3px 0;"><strong>Antatt gjenværende ved oppmøte / faktura (ca.):</strong> NOK ${upcomingWeek.expectedCash.toLocaleString('no-NO')}</p>
           </div>
           ${upcomingRowsHtml || '<p style="font-size: 13px; color: #9ca3af; font-style: italic;">Ingen bookinger registrert for kommende uke enda.</p>'}
 
