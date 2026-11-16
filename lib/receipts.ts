@@ -123,16 +123,54 @@ export const VIPPS_FEE_FIXED_NOK = 1;
 export const VIPPS_FEE_ACCOUNT_NOTE =
   'Bank og kortgebyrer føres mot KTO 7770 Bank- og kortgebyrer.';
 
+/**
+ * Exact Vipps settlement fee overrides for the first 5 historical "Vipps Handlekurv"
+ * transactions (KV-1001..KV-1005, 1.75% fee rate) from the official Vipps settlement report.
+ */
+const VIPPS_HANDLEKURV_FEE_BY_REF: Record<string, number> = {
+  '13022956342': 4.38, // KV-1001 · 2026-03-07 19:18:31 · 250,00 kr -> netto 245,62 kr
+  '13022958017': 4.38, // KV-1002 · 2026-03-07 19:18:48 · 250,00 kr -> netto 245,62 kr
+  '13022960912': 4.38, // KV-1003 · 2026-03-07 19:19:14 · 250,00 kr -> netto 245,62 kr
+  '13022961941': 4.38, // KV-1004 · 2026-03-07 19:19:36 · 250,00 kr -> netto 245,62 kr
+  '13241689256': 13.13, // KV-1005 · 2026-04-11 15:51:30 · 750,00 kr -> netto 736,87 kr
+};
+
+const VIPPS_HANDLEKURV_FEE_BY_RECEIPT_NO: Record<number, number> = {
+  1001: 4.38,
+  1002: 4.38,
+  1003: 4.38,
+  1004: 4.38,
+  1005: 13.13,
+};
+
 function roundOre(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
 /**
- * Calculates Vipps transaction fee (2.99% + 1 NOK) per captured payment receipt.
- * Refunds carry 0 NOK additional fee (Vipps retains the original sale fee).
+ * Calculates Vipps transaction fee per captured payment receipt:
+ * - First 5 historical "Vipps Handlekurv" receipts (KV-1001..KV-1005) use exact settlement report fees (1.75%).
+ * - Subsequent Vipps ePayment receipts use 2.99% + 1 NOK.
+ * - Refunds carry 0 NOK additional fee (Vipps retains the original sale fee).
  */
-export function computeVippsFee(amountNok: number, status: string, type: string): number {
+export function computeVippsFee(
+  amountNok: number,
+  status: string,
+  type: string,
+  paymentRef?: string | null,
+  receiptNumberInt?: number | null
+): number {
   if (status === 'CAPTURED' && type === 'payment' && amountNok > 0) {
+    const cleanRef = (paymentRef || '').trim();
+    if (cleanRef && VIPPS_HANDLEKURV_FEE_BY_REF[cleanRef] !== undefined) {
+      return VIPPS_HANDLEKURV_FEE_BY_REF[cleanRef];
+    }
+    if (
+      typeof receiptNumberInt === 'number' &&
+      VIPPS_HANDLEKURV_FEE_BY_RECEIPT_NO[receiptNumberInt] !== undefined
+    ) {
+      return VIPPS_HANDLEKURV_FEE_BY_RECEIPT_NO[receiptNumberInt];
+    }
     return roundOre(amountNok * VIPPS_FEE_PERCENT + VIPPS_FEE_FIXED_NOK);
   }
   return 0;
@@ -309,7 +347,13 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
     const vatAmount = roundOre(typeof r.vatAmount === 'number' ? r.vatAmount : 0);
     const netAmount =
       typeof r.netAmount === 'number' ? roundOre(r.netAmount) : roundOre(r.amount - vatAmount);
-    const vippsFee = computeVippsFee(roundOre(r.amount), r.status, r.type);
+    const vippsFee = computeVippsFee(
+      roundOre(r.amount),
+      r.status,
+      r.type,
+      r.paymentRef,
+      receiptNumInt
+    );
 
     const rev0 = vatRatePercent === 0 ? netAmount : 0;
     const rev12 = vatRatePercent === 12 ? netAmount : 0;
