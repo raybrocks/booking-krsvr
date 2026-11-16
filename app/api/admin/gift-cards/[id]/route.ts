@@ -53,11 +53,30 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
-    const { status } = await req.json();
+    const body = await req.json();
+    const data: Record<string, any> = {};
+
+    if (typeof body.status === 'string') {
+      data.status = body.status;
+    }
+
+    if (body.paymentType === 'goodwill' || body.paymentType === 'manual') {
+      const existing = await prisma.giftCard.findUnique({ where: { id } });
+      if (!existing) {
+        return NextResponse.json({ error: 'Gavekort ikke funnet' }, { status: 404 });
+      }
+      if (existing.paymentType === 'vipps') {
+        return NextResponse.json(
+          { error: 'Kan ikke endre betalingstype på et Vipps-solgt gavekort' },
+          { status: 400 }
+        );
+      }
+      data.paymentType = body.paymentType;
+    }
 
     const updated = await prisma.giftCard.update({
       where: { id },
-      data: { status },
+      data,
     });
 
     return NextResponse.json(updated);

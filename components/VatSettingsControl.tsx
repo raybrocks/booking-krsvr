@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Loader2, ShieldCheck, Percent } from "lucide-react";
+import { Loader2, ShieldCheck, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 
 export interface StoreSettingsState {
   id: string;
   isVatRegistered: boolean;
   defaultVatRate: number;
+  vatThresholdPassedDate?: string | null;
+  voucherEmail?: string | null;
   updatedAt?: string;
 }
 
@@ -16,12 +18,28 @@ interface VatSettingsControlProps {
   onUpdated?: (settings: StoreSettingsState) => void;
 }
 
+function getTodayOsloIso(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Oslo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function formatNorwegianDate(isoDate?: string | null): string {
+  if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return "";
+  const [y, m, d] = isoDate.split("-");
+  return `${d}.${m}.${y}`;
+}
+
 export default function VatSettingsControl({
   compact = false,
   onUpdated,
 }: VatSettingsControlProps) {
   const [storeSettings, setStoreSettings] = useState<StoreSettingsState | null>(null);
-  const [vatRateInput, setVatRateInput] = useState<string>("25");
+  const [thresholdDateInput, setThresholdDateInput] = useState<string>("2026-09-04");
+  const [vatRateInput, setVatRateInput] = useState<string>("12");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -34,7 +52,8 @@ export default function VatSettingsControl({
           const data: StoreSettingsState = await res.json();
           if (active) {
             setStoreSettings(data);
-            setVatRateInput(String(data.defaultVatRate ?? 25));
+            setThresholdDateInput(data.vatThresholdPassedDate ?? "");
+            setVatRateInput(String(data.defaultVatRate ?? 12));
           }
         }
       } catch (err) {
@@ -50,7 +69,7 @@ export default function VatSettingsControl({
   }, []);
 
   const persistUpdate = async (payload: {
-    isVatRegistered?: boolean;
+    vatThresholdPassedDate?: string | null;
     defaultVatRate?: number;
   }) => {
     setSaving(true);
@@ -60,19 +79,20 @@ export default function VatSettingsControl({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data: StoreSettingsState & { error?: string } = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Kunne ikke oppdatere MVA-innstilling");
       }
       setStoreSettings(data);
-      setVatRateInput(String(data.defaultVatRate ?? 25));
+      setThresholdDateInput(data.vatThresholdPassedDate ?? "");
+      setVatRateInput(String(data.defaultVatRate ?? 12));
       onUpdated?.(data);
 
-      if (payload.isVatRegistered !== undefined) {
+      if (payload.vatThresholdPassedDate !== undefined) {
         toast.success(
-          data.isVatRegistered
-            ? `MVA-registrering er nå PÅ (${data.defaultVatRate} % på nye kvitteringer)`
-            : "MVA-registrering er nå AV (0 % på nye kvitteringer)"
+          data.vatThresholdPassedDate
+            ? `MVA-grensedato lagret (${formatNorwegianDate(data.vatThresholdPassedDate)})`
+            : "MVA-grensedato nullstilt (0 % MVA aktiv)"
         );
       } else {
         toast.success(`Standard MVA-sats oppdatert til ${data.defaultVatRate} %`);
@@ -84,15 +104,18 @@ export default function VatSettingsControl({
     }
   };
 
-  const handleToggle = async (nextVal: boolean) => {
-    const rate = storeSettings?.defaultVatRate ?? 25;
-    const confirmed = window.confirm(
-      nextVal
-        ? `Vil du skru PÅ global MVA-registrering?\n\nFra og med neste gjennomførte Vipps-betaling vil nye kvitteringer få ${rate} % MVA og «936 318 878 MVA».\n\nEksisterende historiske kvitteringer i databasen forblir helt uendret på 0 % MVA.`
-        : `Vil du skru AV global MVA-registrering?\n\nNye kvitteringer vil føres med 0 % MVA uten MVA-spesifikasjon. Eksisterende historiske kvitteringer forblir uendret.`
-    );
-    if (!confirmed) return;
-    await persistUpdate({ isVatRegistered: nextVal });
+  const handleSaveDate = async () => {
+    const trimmed = thresholdDateInput.trim();
+    if (trimmed && !/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      toast.error("Velg en gyldig dato");
+      return;
+    }
+    await persistUpdate({ vatThresholdPassedDate: trimmed || null });
+  };
+
+  const handleClearDate = async () => {
+    setThresholdDateInput("");
+    await persistUpdate({ vatThresholdPassedDate: null });
   };
 
   const handleSaveRate = async () => {
@@ -113,8 +136,25 @@ export default function VatSettingsControl({
     );
   }
 
-  const isRegistered = Boolean(storeSettings?.isVatRegistered);
-  const currentRate = storeSettings?.defaultVatRate ?? 25;
+  const savedDate = storeSettings?.vatThresholdPassedDate ?? "";
+  const todayIso = getTodayOsloIso();
+  const isRegistered = Boolean(savedDate && todayIso >= savedDate);
+  const isScheduledFuture = Boolean(savedDate && todayIso < savedDate);
+  const currentRate = storeSettings?.defaultVatRate ?? 12;
+  const formattedSavedDate = formatNorwegianDate(savedDate);
+  const dateDirty = thresholdDateInput.trim() !== savedDate;
+
+  const badgeClass = isRegistered
+    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+    : isScheduledFuture
+    ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+    : "bg-zinc-800 text-zinc-300 border-zinc-700";
+
+  const statusLabel = isRegistered
+    ? `AKTIV · Passert ${formattedSavedDate} (${currentRate} % MVA)`
+    : isScheduledFuture
+    ? `PLANLAGT · Fra ${formattedSavedDate} (${currentRate} % MVA)`
+    : "IKKE PASSERT · 0 % MVA";
 
   if (compact) {
     return (
@@ -122,6 +162,8 @@ export default function VatSettingsControl({
         className={`border rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 ${
           isRegistered
             ? "bg-emerald-950/20 border-emerald-500/30"
+            : isScheduledFuture
+            ? "bg-amber-950/15 border-amber-500/30"
             : "bg-zinc-900/60 border-zinc-800"
         }`}
       >
@@ -130,49 +172,45 @@ export default function VatSettingsControl({
             className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
               isRegistered
                 ? "bg-emerald-500/15 text-emerald-400"
+                : isScheduledFuture
+                ? "bg-amber-500/15 text-amber-400"
                 : "bg-zinc-800 text-zinc-400"
             }`}
           >
-            <Percent className="w-4 h-4" />
+            <CalendarDays className="w-4 h-4" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-semibold text-white">
-                Global MVA-bryter
+                MVA-grense (50 000 kr)
               </span>
-              <span
-                className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded border ${
-                  isRegistered
-                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                    : "bg-zinc-800 text-zinc-300 border-zinc-700"
-                }`}
-              >
-                {isRegistered
-                  ? `PÅ · ${currentRate} % MVA (Org.nr 936 318 878 MVA)`
-                  : "AV · 0 % MVA (Ikke MVA-registrert)"}
+              <span className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded border ${badgeClass}`}>
+                {statusLabel}
               </span>
             </div>
             <p className="text-xs text-zinc-400 mt-1">
-              Gjelder kun nye Vipps-kvitteringer etter aktivering. Historiske kvitteringer i databasen forblir uendret.
+              Datoen styrer automatisk fra og med hvilken dag {currentRate} % MVA gjelder. Eksisterende historiske bilag i databasen forblir urørt.
             </p>
           </div>
         </div>
 
-        <label className="inline-flex items-center gap-2.5 cursor-pointer shrink-0">
-          <span className="text-xs font-medium text-zinc-300">
-            {saving ? "Lagrer..." : isRegistered ? "MVA aktivert" : "MVA avslått"}
-          </span>
-          <div className="relative w-12 h-6 shrink-0">
-            <input
-              type="checkbox"
-              className="sr-only peer"
-              disabled={saving}
-              checked={isRegistered}
-              onChange={(e) => handleToggle(e.target.checked)}
-            />
-            <div className="w-12 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-          </div>
-        </label>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <input
+            type="date"
+            aria-label="Dato MVA-grense på 50 000 kr passeres"
+            value={thresholdDateInput}
+            onChange={(e) => setThresholdDateInput(e.target.value)}
+            className="bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#9C39FF]"
+          />
+          <button
+            type="button"
+            onClick={handleSaveDate}
+            disabled={saving || !dateDirty}
+            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-white border border-zinc-700 disabled:opacity-50 transition-colors"
+          >
+            {saving ? "Lagrer..." : "Lagre dato"}
+          </button>
+        </div>
       </div>
     );
   }
@@ -182,45 +220,72 @@ export default function VatSettingsControl({
       className={`mb-6 border p-6 rounded-2xl transition-colors ${
         isRegistered
           ? "bg-emerald-950/15 border-emerald-800/50"
+          : isScheduledFuture
+          ? "bg-amber-950/15 border-amber-700/40"
           : "bg-zinc-950/60 border-zinc-800"
       }`}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2.5">
             <ShieldCheck
               className={`w-5 h-5 ${
-                isRegistered ? "text-emerald-400" : "text-zinc-400"
+                isRegistered
+                  ? "text-emerald-400"
+                  : isScheduledFuture
+                  ? "text-amber-400"
+                  : "text-zinc-400"
               }`}
             />
             <h3 className="text-lg font-medium text-white">
-              MVA-registrering (Merverdiavgiftsregisteret)
+              MVA-registrering (50 000 kr-grensen)
             </h3>
-            <span
-              className={`text-xs font-bold uppercase px-2.5 py-0.5 rounded-md border ${
-                isRegistered
-                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                  : "bg-zinc-800 text-zinc-300 border-zinc-700"
-              }`}
-            >
-              {isRegistered ? `PÅ (${currentRate} % MVA)` : "AV (0 % MVA)"}
+            <span className={`text-xs font-bold uppercase px-2.5 py-0.5 rounded-md border ${badgeClass}`}>
+              {statusLabel}
             </span>
           </div>
           <p className="text-sm text-zinc-400">
-            Skru denne bryteren PÅ så snart Krs VR Arena AS er registrert i Merverdiavgiftsregisteret (over 50 000 kr). Nye Vipps-kvitteringer vil da automatisk beregne {currentRate} % utgående MVA og vise «936 318 878 MVA». Eksisterende kvitteringer forblir helt urørt.
+            Legg inn datoen da grensen på 50 000 kr blir eller ble passert. Fra og med denne datoen beregnes nye kvitteringer automatisk med {currentRate} % MVA (lav sats for opplevelser) og «936 318 878 MVA». Eksisterende kvitteringer i databasen forblir uendret.
           </p>
         </div>
 
-        <label className="relative inline-flex items-center cursor-pointer ml-0 sm:ml-4 shrink-0">
-          <input
-            type="checkbox"
-            className="sr-only peer"
-            disabled={saving}
-            checked={isRegistered}
-            onChange={(e) => handleToggle(e.target.checked)}
-          />
-          <div className="w-14 h-7 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
-        </label>
+        <div className="flex flex-wrap items-end gap-3 pt-1">
+          <div>
+            <label
+              htmlFor="vat-threshold-date-input"
+              className="block text-xs font-medium text-zinc-400 mb-1.5"
+            >
+              Dato MVA-grense (50 000 kr) blir / er passert:
+            </label>
+            <input
+              id="vat-threshold-date-input"
+              type="date"
+              value={thresholdDateInput}
+              onChange={(e) => setThresholdDateInput(e.target.value)}
+              className="bg-zinc-950 border border-zinc-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSaveDate}
+            disabled={saving || !dateDirty}
+            className="px-4 py-2 rounded-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-sm font-medium text-white disabled:opacity-50 transition-colors"
+          >
+            {saving ? "Lagrer..." : "Lagre dato"}
+          </button>
+
+          {savedDate && (
+            <button
+              type="button"
+              onClick={handleClearDate}
+              disabled={saving}
+              className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-medium text-zinc-300 border border-zinc-700 disabled:opacity-50 transition-colors"
+            >
+              Nullstill
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-zinc-800/80 flex flex-wrap items-center gap-3">
@@ -228,7 +293,7 @@ export default function VatSettingsControl({
           htmlFor="default-vat-rate-input"
           className="text-xs font-medium text-zinc-400"
         >
-          Standard MVA-sats ved registrering (%):
+          MVA-sats for opplevelser (%):
         </label>
         <input
           id="default-vat-rate-input"

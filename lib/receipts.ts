@@ -50,6 +50,7 @@ export interface DailyReceiptEntry {
   netAmount: number;
   vatRatePercent: number;
   vatAmount: number;
+  vippsFee: number;
   status: string;
   type: string;
   orderType: string;
@@ -81,9 +82,12 @@ export interface DailySettlementDay {
   refunds: number;
   netTurnover: number;
   revenue0Vat: number;
+  revenue12VatBasis: number;
   revenue25VatBasis: number;
   revenueOtherVatBasis: number;
   outgoingVat: number;
+  vippsFee: number;
+  estimatedVippsPayout: number;
   accumulatedGrossSales: number;
   accumulatedTurnover: number;
   receipts: DailyReceiptEntry[];
@@ -102,17 +106,36 @@ export interface DailySettlementReport {
     totalRefundsAmount: number;
     totalNetTurnover: number;
     totalRevenue0Vat: number;
+    totalRevenue12VatBasis: number;
     totalRevenue25VatBasis: number;
     totalRevenueOtherVatBasis: number;
     totalOutgoingVat: number;
+    totalVippsFee: number;
+    totalEstimatedVippsPayout: number;
     firstDate: string | null;
     lastDate: string | null;
   };
   days: DailySettlementDay[];
 }
 
+export const VIPPS_FEE_PERCENT = 0.0299;
+export const VIPPS_FEE_FIXED_NOK = 1;
+export const VIPPS_FEE_ACCOUNT_NOTE =
+  'Bank og kortgebyrer føres mot KTO 7770 Bank- og kortgebyrer.';
+
 function roundOre(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+/**
+ * Calculates Vipps transaction fee (2.99% + 1 NOK) per captured payment receipt.
+ * Refunds carry 0 NOK additional fee (Vipps retains the original sale fee).
+ */
+export function computeVippsFee(amountNok: number, status: string, type: string): number {
+  if (status === 'CAPTURED' && type === 'payment' && amountNok > 0) {
+    return roundOre(amountNok * VIPPS_FEE_PERCENT + VIPPS_FEE_FIXED_NOK);
+  }
+  return 0;
 }
 
 /**
@@ -271,9 +294,11 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
   let totalRefunds = 0;
   let totalRefundsAmount = 0;
   let totalRevenue0Vat = 0;
+  let totalRevenue12VatBasis = 0;
   let totalRevenue25VatBasis = 0;
   let totalRevenueOtherVatBasis = 0;
   let totalOutgoingVat = 0;
+  let totalVippsFee = 0;
 
   sorted.forEach((r) => {
     const receiptNumInt = r.receiptNumber;
@@ -284,10 +309,12 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
     const vatAmount = roundOre(typeof r.vatAmount === 'number' ? r.vatAmount : 0);
     const netAmount =
       typeof r.netAmount === 'number' ? roundOre(r.netAmount) : roundOre(r.amount - vatAmount);
+    const vippsFee = computeVippsFee(roundOre(r.amount), r.status, r.type);
 
     const rev0 = vatRatePercent === 0 ? netAmount : 0;
+    const rev12 = vatRatePercent === 12 ? netAmount : 0;
     const rev25 = vatRatePercent === 25 ? netAmount : 0;
-    const revOther = vatRatePercent > 0 && vatRatePercent !== 25 ? netAmount : 0;
+    const revOther = vatRatePercent > 0 && vatRatePercent !== 12 && vatRatePercent !== 25 ? netAmount : 0;
 
     if (r.amount > 0) {
       runningGross = roundOre(runningGross + r.amount);
@@ -298,9 +325,11 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
     }
     runningNet = roundOre(runningNet + r.amount);
     totalRevenue0Vat = roundOre(totalRevenue0Vat + rev0);
+    totalRevenue12VatBasis = roundOre(totalRevenue12VatBasis + rev12);
     totalRevenue25VatBasis = roundOre(totalRevenue25VatBasis + rev25);
     totalRevenueOtherVatBasis = roundOre(totalRevenueOtherVatBasis + revOther);
     totalOutgoingVat = roundOre(totalOutgoingVat + vatAmount);
+    totalVippsFee = roundOre(totalVippsFee + vippsFee);
 
     const customerName = [r.firstName, r.lastName].filter(Boolean).join(' ').trim() || 'Kunde';
 
@@ -318,6 +347,7 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
       netAmount,
       vatRatePercent,
       vatAmount,
+      vippsFee,
       status: r.status,
       type: r.type,
       orderType: r.orderType,
@@ -351,9 +381,12 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
         refunds: r.amount < 0 ? roundOre(r.amount) : 0,
         netTurnover: roundOre(r.amount),
         revenue0Vat: rev0,
+        revenue12VatBasis: rev12,
         revenue25VatBasis: rev25,
         revenueOtherVatBasis: revOther,
         outgoingVat: vatAmount,
+        vippsFee,
+        estimatedVippsPayout: roundOre(r.amount - vippsFee),
         accumulatedGrossSales: runningGross,
         accumulatedTurnover: runningNet,
         receipts: [entry],
@@ -372,9 +405,12 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
       }
       existing.netTurnover = roundOre(existing.netTurnover + r.amount);
       existing.revenue0Vat = roundOre(existing.revenue0Vat + rev0);
+      existing.revenue12VatBasis = roundOre(existing.revenue12VatBasis + rev12);
       existing.revenue25VatBasis = roundOre(existing.revenue25VatBasis + rev25);
       existing.revenueOtherVatBasis = roundOre(existing.revenueOtherVatBasis + revOther);
       existing.outgoingVat = roundOre(existing.outgoingVat + vatAmount);
+      existing.vippsFee = roundOre(existing.vippsFee + vippsFee);
+      existing.estimatedVippsPayout = roundOre(existing.netTurnover - existing.vippsFee);
       existing.accumulatedGrossSales = runningGross;
       existing.accumulatedTurnover = runningNet;
       existing.receipts.push(entry);
@@ -411,9 +447,12 @@ export function buildDailySettlementReport(receiptsAsc: EnrichedReceiptRecord[])
       totalRefundsAmount,
       totalNetTurnover: runningNet,
       totalRevenue0Vat,
+      totalRevenue12VatBasis,
       totalRevenue25VatBasis,
       totalRevenueOtherVatBasis,
       totalOutgoingVat,
+      totalVippsFee,
+      totalEstimatedVippsPayout: roundOre(runningNet - totalVippsFee),
       firstDate: days.length > 0 ? days[0].date : null,
       lastDate: days.length > 0 ? days[days.length - 1].date : null,
     },
@@ -457,8 +496,12 @@ export function generateDailySettlementCsv(report: DailySettlementReport): strin
     'Dagens refusjoner inkl. MVA (NOK)',
     'Dagens sum netto inkl. MVA (NOK)',
     'Omsetning 0 % MVA (NOK)',
+    'Omsetning 12 % MVA (grunnlag) (NOK)',
     'Omsetning 25 % MVA (grunnlag) (NOK)',
+    'Omsetning annen MVA (grunnlag) (NOK)',
     'Utgående MVA (NOK)',
+    'Vipps-gebyr KTO 7770 (NOK)',
+    'Estimert nettoutbetaling Vipps (NOK)',
     'Akkumulert brutto Vipps (NOK)',
     'Akkumulert sum netto (NOK)',
   ]
@@ -478,8 +521,12 @@ export function generateDailySettlementCsv(report: DailySettlementReport): strin
       formatNokCsv(d.refunds),
       formatNokCsv(d.netTurnover),
       formatNokCsv(d.revenue0Vat),
+      formatNokCsv(d.revenue12VatBasis),
       formatNokCsv(d.revenue25VatBasis),
+      formatNokCsv(d.revenueOtherVatBasis),
       formatNokCsv(d.outgoingVat),
+      formatNokCsv(d.vippsFee),
+      formatNokCsv(d.estimatedVippsPayout),
       formatNokCsv(d.accumulatedGrossSales),
       formatNokCsv(d.accumulatedTurnover),
     ]
@@ -515,6 +562,7 @@ export function generateReceiptDetailsCsv(
     'Grunnlag eks. MVA (NOK)',
     'MVA-sats (%)',
     'Utgående MVA (NOK)',
+    'Vipps-gebyr KTO 7770 (NOK)',
     'Akkumulert brutto Vipps (NOK)',
     'Akkumulert netto Vipps (NOK)',
   ]
@@ -545,6 +593,7 @@ export function generateReceiptDetailsCsv(
         formatNokCsv(r.netAmount),
         r.vatRatePercent,
         formatNokCsv(r.vatAmount),
+        formatNokCsv(r.vippsFee),
         formatNokCsv(r.runningGrossSales),
         formatNokCsv(r.runningNetTurnover),
       ]

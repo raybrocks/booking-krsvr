@@ -529,7 +529,10 @@ export default function TransactionsManager() {
                 {Number(dailyReport?.summary?.totalNetTurnover || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
               <div className="text-[11px] text-zinc-500 mt-1">
-                0 % MVA: {Number(dailyReport?.summary?.totalRevenue0Vat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · 25 % gr.l.: {Number(dailyReport?.summary?.totalRevenue25VatBasis || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · MVA: {Number(dailyReport?.summary?.totalOutgoingVat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
+                0 % MVA: {Number(dailyReport?.summary?.totalRevenue0Vat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · 12 % gr.l.: {Number(dailyReport?.summary?.totalRevenue12VatBasis || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · MVA: {Number(dailyReport?.summary?.totalOutgoingVat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
+              </div>
+              <div className="text-[11px] text-zinc-400 mt-1 pt-1 border-t border-zinc-800/80">
+                Støtte KTO 7770 (Vipps-gebyr): {Number(dailyReport?.summary?.totalVippsFee || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · Est. utbet.: {Number(dailyReport?.summary?.totalEstimatedVippsPayout || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
             </div>
 
@@ -589,9 +592,10 @@ export default function TransactionsManager() {
                     <th className="px-4 py-3.5 font-medium text-right">Antall salg</th>
                     <th className="px-4 py-3.5 font-medium text-right">Brutto inkl. MVA</th>
                     <th className="px-4 py-3.5 font-medium text-right">Omsetning 0 % MVA</th>
-                    <th className="px-4 py-3.5 font-medium text-right">Omsetning 25 % MVA (grunnlag)</th>
+                    <th className="px-4 py-3.5 font-medium text-right">MVA-pliktig gr.l. (12 % / mva)</th>
                     <th className="px-4 py-3.5 font-medium text-right">Utgående MVA</th>
                     <th className="px-4 py-3.5 font-medium text-right">Dagens sum (inkl. MVA)</th>
+                    <th className="px-4 py-3.5 font-medium text-right">Vipps-gebyr (KTO 7770)</th>
                     <th className="px-4 py-3.5 font-medium text-right">Akkumulert sum</th>
                     <th className="px-4 py-3.5 font-medium text-right">Detaljer / PDF / CSV</th>
                   </tr>
@@ -599,7 +603,7 @@ export default function TransactionsManager() {
                 <tbody className="divide-y divide-zinc-800/50">
                   {!dailyReport?.days || dailyReport.days.length === 0 ? (
                     <tr>
-                      <td colSpan={11} className="px-6 py-10 text-center text-zinc-500">
+                      <td colSpan={12} className="px-6 py-10 text-center text-zinc-500">
                         Ingen godkjente Vipps-kvitteringer funnet.
                       </td>
                     </tr>
@@ -669,13 +673,17 @@ export default function TransactionsManager() {
                               {Number(day.revenue0Vat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
                             </td>
                             <td className="px-4 py-3.5 text-right font-mono text-zinc-200">
-                              {Number(day.revenue25VatBasis || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
+                              {Number((day.revenue12VatBasis || 0) + (day.revenue25VatBasis || 0) + (day.revenueOtherVatBasis || 0)).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
                             </td>
                             <td className="px-4 py-3.5 text-right font-mono text-amber-300 font-semibold">
                               {Number(day.outgoingVat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
                             </td>
                             <td className={`px-4 py-3.5 text-right font-semibold ${day.netTurnover < 0 ? "text-red-400" : "text-emerald-400"}`}>
                               {Number(day.netTurnover).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
+                            </td>
+                            <td className="px-4 py-3.5 text-right font-mono text-zinc-300">
+                              <div>{Number(day.vippsFee || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</div>
+                              <div className="text-[10px] text-zinc-500">Est. utbet: {Number(day.estimatedVippsPayout ?? day.netTurnover).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</div>
                             </td>
                             <td className="px-4 py-3.5 text-right">
                               <div className="font-bold text-white">
@@ -723,7 +731,7 @@ export default function TransactionsManager() {
 
                           {isExpanded && (
                             <tr className="bg-zinc-950/80">
-                              <td colSpan={11} className="px-6 py-4">
+                              <td colSpan={12} className="px-6 py-4">
                                 <div className="text-xs font-medium text-zinc-400 mb-2">
                                   Enkeltkvitteringer for {day.settlementCode || `DO-${day.settlementNumber}`} · {day.date} (tidssone Europe/Oslo):
                                 </div>
@@ -739,6 +747,7 @@ export default function TransactionsManager() {
                                         <th className="px-3 py-2 font-medium text-right">Grunnlag</th>
                                         <th className="px-3 py-2 font-medium text-right">Utg. MVA</th>
                                         <th className="px-3 py-2 font-medium text-right">Beløp inkl. MVA</th>
+                                        <th className="px-3 py-2 font-medium text-right">Gebyr (7770)</th>
                                         <th className="px-3 py-2 font-medium text-right">Akkumulert etter</th>
                                         <th className="px-3 py-2 font-medium text-right">Vis</th>
                                       </tr>
@@ -797,6 +806,9 @@ export default function TransactionsManager() {
                                             <td className={`px-3 py-2 text-right font-mono font-semibold ${r.amount < 0 ? "text-red-400" : "text-emerald-400"}`}>
                                               {Number(r.amount).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
                                             </td>
+                                            <td className="px-3 py-2 text-right font-mono text-zinc-400">
+                                              {Number(r.vippsFee || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
+                                            </td>
                                             <td className="px-3 py-2 text-right font-mono text-zinc-200">
                                               {Number(r.runningNetTurnover).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
                                               {externalTurnoverNum > 0 && (
@@ -821,6 +833,12 @@ export default function TransactionsManager() {
                                       })}
                                     </tbody>
                                   </table>
+                                </div>
+                                <div className="mt-2 text-[11px] text-zinc-400 flex flex-wrap justify-between gap-2">
+                                  <span>Støttelinje (påvirker ikke brutto/netto salg): Bank og kortgebyrer føres mot KTO 7770 Bank- og kortgebyrer (2,99 % + 1 kr per salg).</span>
+                                  <span className="font-mono text-zinc-300">
+                                    Dagens gebyr: {Number(day.vippsFee || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · Est. utbetaling: {Number(day.estimatedVippsPayout ?? day.netTurnover).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
+                                  </span>
                                 </div>
                               </td>
                             </tr>
@@ -1116,12 +1134,28 @@ export default function TransactionsManager() {
                       <strong className="font-mono">{formatNok(day.revenue0Vat)} kr</strong>
                     </div>
                     <div>
-                      <span className="text-zinc-500">Omsetning 25 % MVA (gr.l.):</span>{" "}
-                      <strong className="font-mono">{formatNok(day.revenue25VatBasis)} kr</strong>
+                      <span className="text-zinc-500">MVA-pliktig gr.l. (12 % / mva):</span>{" "}
+                      <strong className="font-mono">{formatNok(Number(day.revenue12VatBasis || 0) + Number(day.revenue25VatBasis || 0) + Number(day.revenueOtherVatBasis || 0))} kr</strong>
                     </div>
                     <div>
                       <span className="text-zinc-500">Utgående MVA:</span>{" "}
                       <strong className="font-mono">{formatNok(day.outgoingVat)} kr</strong>
+                    </div>
+                  </div>
+
+                  <div className="border border-zinc-300 rounded-lg p-3 bg-zinc-50 text-xs space-y-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span>
+                        <strong>Støttelinje – Vipps-gebyrer (2,99 % + 1 kr per betaling):</strong>{" "}
+                        <span className="font-mono font-bold">{formatNok(day.vippsFee || 0)} kr</span>
+                      </span>
+                      <span>
+                        <span className="text-zinc-600">Forventet netto utbetaling fra Vipps:</span>{" "}
+                        <strong className="font-mono">{formatNok(day.estimatedVippsPayout ?? day.netTurnover)} kr</strong>
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-zinc-600">
+                      Bank og kortgebyrer føres mot KTO 7770 Bank- og kortgebyrer. Gebyret påvirker ikke brutto salg eller netto salg.
                     </div>
                   </div>
 
@@ -1136,6 +1170,7 @@ export default function TransactionsManager() {
                         <th className="py-2 px-2 text-right">Grunnlag</th>
                         <th className="py-2 px-2 text-right">MVA</th>
                         <th className="py-2 px-2 text-right">Beløp</th>
+                        <th className="py-2 px-2 text-right">Gebyr (7770)</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-200">
@@ -1152,6 +1187,7 @@ export default function TransactionsManager() {
                           <td className="py-2 px-2 text-right font-mono">{formatNok(r.netAmount ?? r.amount)} kr</td>
                           <td className="py-2 px-2 text-right font-mono">{formatNok(r.vatAmount || 0)} kr</td>
                           <td className="py-2 px-2 text-right font-mono font-semibold">{formatNok(r.amount)} kr</td>
+                          <td className="py-2 px-2 text-right font-mono text-zinc-600">{formatNok(r.vippsFee || 0)} kr</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1159,10 +1195,11 @@ export default function TransactionsManager() {
                       <tr className="border-t-2 border-zinc-900 bg-zinc-50 font-bold">
                         <td className="py-2 px-2" colSpan={5}>Sum {code} ({day.date})</td>
                         <td className="py-2 px-2 text-right font-mono">
-                          {formatNok(Number(day.revenue0Vat || 0) + Number(day.revenue25VatBasis || 0))} kr
+                          {formatNok(Number(day.revenue0Vat || 0) + Number(day.revenue12VatBasis || 0) + Number(day.revenue25VatBasis || 0) + Number(day.revenueOtherVatBasis || 0))} kr
                         </td>
                         <td className="py-2 px-2 text-right font-mono">{formatNok(day.outgoingVat)} kr</td>
                         <td className="py-2 px-2 text-right font-mono">{formatNok(day.netTurnover)} kr</td>
+                        <td className="py-2 px-2 text-right font-mono text-zinc-700">{formatNok(day.vippsFee || 0)} kr</td>
                       </tr>
                     </tfoot>
                   </table>
@@ -1199,9 +1236,10 @@ export default function TransactionsManager() {
                       <th className="py-2 px-2 text-left">Til kvitteringsnr.</th>
                       <th className="py-2 px-2 text-right">Antall salg</th>
                       <th className="py-2 px-2 text-right">Omsetning 0 %</th>
-                      <th className="py-2 px-2 text-right">Omsetning 25 % gr.l.</th>
+                      <th className="py-2 px-2 text-right">MVA-pliktig gr.l.</th>
                       <th className="py-2 px-2 text-right">Utgående MVA</th>
                       <th className="py-2 px-2 text-right">Dagens sum</th>
+                      <th className="py-2 px-2 text-right">Gebyr (7770)</th>
                       <th className="py-2 px-2 text-right">Akkumulert sum</th>
                     </tr>
                   </thead>
@@ -1214,9 +1252,10 @@ export default function TransactionsManager() {
                         <td className="py-1.5 px-2 font-mono">{day.lastReceiptNumber}</td>
                         <td className="py-1.5 px-2 text-right">{day.receiptCount}</td>
                         <td className="py-1.5 px-2 text-right font-mono">{formatNok(day.revenue0Vat)} kr</td>
-                        <td className="py-1.5 px-2 text-right font-mono">{formatNok(day.revenue25VatBasis)} kr</td>
+                        <td className="py-1.5 px-2 text-right font-mono">{formatNok(Number(day.revenue12VatBasis || 0) + Number(day.revenue25VatBasis || 0) + Number(day.revenueOtherVatBasis || 0))} kr</td>
                         <td className="py-1.5 px-2 text-right font-mono">{formatNok(day.outgoingVat)} kr</td>
                         <td className="py-1.5 px-2 text-right font-mono font-semibold">{formatNok(day.netTurnover)} kr</td>
+                        <td className="py-1.5 px-2 text-right font-mono text-zinc-600">{formatNok(day.vippsFee || 0)} kr</td>
                         <td className="py-1.5 px-2 text-right font-mono font-bold">{formatNok(day.accumulatedTurnover)} kr</td>
                       </tr>
                     ))}
@@ -1226,13 +1265,25 @@ export default function TransactionsManager() {
                       <td className="py-2 px-2" colSpan={4}>Sum totalt ({dailyReport.summary?.totalDays || 0} dager)</td>
                       <td className="py-2 px-2 text-right">{dailyReport.summary?.totalReceipts || 0}</td>
                       <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalRevenue0Vat)} kr</td>
-                      <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalRevenue25VatBasis)} kr</td>
+                      <td className="py-2 px-2 text-right font-mono">
+                        {formatNok(Number(dailyReport.summary?.totalRevenue12VatBasis || 0) + Number(dailyReport.summary?.totalRevenue25VatBasis || 0) + Number(dailyReport.summary?.totalRevenueOtherVatBasis || 0))} kr
+                      </td>
                       <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalOutgoingVat)} kr</td>
                       <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalNetTurnover)} kr</td>
+                      <td className="py-2 px-2 text-right font-mono text-zinc-700">{formatNok(dailyReport.summary?.totalVippsFee || 0)} kr</td>
                       <td className="py-2 px-2 text-right font-mono">{formatNok(dailyReport.summary?.totalNetTurnover)} kr</td>
                     </tr>
                   </tfoot>
                 </table>
+
+                <div className="border border-zinc-300 rounded-lg p-3 bg-zinc-50 text-xs flex flex-wrap justify-between gap-2">
+                  <span>
+                    <strong>Støttelinje (påvirker ikke brutto eller netto salg):</strong> Bank og kortgebyrer føres mot KTO 7770 Bank- og kortgebyrer (2,99 % + 1 kr per salg).
+                  </span>
+                  <span className="font-mono">
+                    Sum gebyrer: <strong>{formatNok(dailyReport.summary?.totalVippsFee || 0)} kr</strong> · Est. nettoutbetaling Vipps: <strong>{formatNok(dailyReport.summary?.totalEstimatedVippsPayout ?? dailyReport.summary?.totalNetTurnover ?? 0)} kr</strong>
+                  </span>
+                </div>
 
                 <div className="footer-note text-[10px] text-zinc-500 border-t border-dashed border-zinc-300 pt-3 flex justify-between">
                   <span>Ubrutte serier for kvitteringer (KV-xxxx) og dagsoppgjør (DO-xxx) · Europe/Oslo</span>

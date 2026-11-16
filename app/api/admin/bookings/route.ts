@@ -10,6 +10,13 @@ export async function GET(req: NextRequest) {
         include: {
           experience: {
             select: { name: true }
+          },
+          giftCardRedemptions: {
+            include: {
+              giftCard: {
+                select: { code: true, paymentType: true }
+              }
+            }
           }
         }
       }),

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { computeReceiptVat, getStoreSettings } from '@/lib/store-settings';
+import { computeReceiptVat, getStoreSettings, resolveEffectiveVatRate } from '@/lib/store-settings';
 
 export type NormalizedVippsStatus =
   | 'CREATED'
@@ -260,7 +260,7 @@ export async function confirmPaidVippsBookingAtomically(params: {
 
     if (!existingCapturedReceipt) {
       const storeSettings = await getStoreSettings(tx);
-      const effectiveVatRate = storeSettings.isVatRegistered ? storeSettings.defaultVatRate : 0;
+      const effectiveVatRate = resolveEffectiveVatRate(storeSettings);
       const vatSplit = computeReceiptVat(capturedNok, effectiveVatRate);
 
       await tx.receipt.create({
@@ -471,7 +471,7 @@ export async function recordVippsRefundAtomically(params: {
     if (capturedOre > 0 && !originalCapturedReceipt) {
       const capturedAmountNok = Number((capturedOre / 100).toFixed(2));
       const storeSettings = await getStoreSettings(tx);
-      const effectiveVatRate = storeSettings.isVatRegistered ? storeSettings.defaultVatRate : 0;
+      const effectiveVatRate = resolveEffectiveVatRate(storeSettings);
       const capturedVatSplit = computeReceiptVat(capturedAmountNok, effectiveVatRate);
 
       originalCapturedReceipt = await tx.receipt.create({
@@ -510,7 +510,7 @@ export async function recordVippsRefundAtomically(params: {
       let refundVatRate = originalCapturedReceipt?.vatRate;
       if (refundVatRate === undefined) {
         const fallbackSettings = await getStoreSettings(tx);
-        refundVatRate = fallbackSettings.isVatRegistered ? fallbackSettings.defaultVatRate : 0;
+        refundVatRate = resolveEffectiveVatRate(fallbackSettings);
       }
       const refundVatSplit = computeReceiptVat(-deltaRefundNok, refundVatRate);
 

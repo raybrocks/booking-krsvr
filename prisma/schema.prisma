@@ -125,10 +125,12 @@ model Receipt {
 }
 
 model StoreSettings {
-  id              String   @id @default("default")
-  isVatRegistered Boolean  @default(false)
-  defaultVatRate  Int      @default(25)
-  updatedAt       DateTime @updatedAt
+  id                     String   @id @default("default")
+  isVatRegistered        Boolean  @default(false)
+  defaultVatRate         Int      @default(12)
+  vatThresholdPassedDate String?  @default("2026-09-04")
+  voucherEmail           String?  @default("krs-vr-arena-as@bilag.fiken.no")
+  updatedAt              DateTime @updatedAt
 }
 
 model GiftCard {
@@ -149,7 +151,7 @@ model GiftCard {
   senderName      String?
   greetingMessage String?
   
-  paymentType     String               @default("vipps") // 'vipps' | 'manual'
+  paymentType     String               @default("vipps") // 'vipps' | 'manual' | 'goodwill'
   paymentRef      String?
   isPaid          Boolean              @default(false)
   paidAt          DateTime?

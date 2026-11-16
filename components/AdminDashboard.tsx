@@ -627,22 +627,26 @@ export default function AdminDashboard() {
     let totalPlayers = 0;
     let totalVipps = 0;
     let totalGiftCard = 0;
+    let totalGoodwillGiftCard = 0;
     let totalTerminal = 0;
     let totalRemaining = 0;
     let vippsCount = 0;
     let giftCardCount = 0;
+    let goodwillCount = 0;
     let terminalCount = 0;
 
     active.forEach((b) => {
       const p = getBookingPaymentBreakdown(b);
-      totalValue += p.totalPrice;
+      totalValue += p.netRevenue;
       totalPlayers += Number(b.players || 0);
       totalVipps += p.vippsPaid;
-      totalGiftCard += p.giftCardUsed;
+      totalGiftCard += p.paidGiftCardUsed;
+      totalGoodwillGiftCard += p.goodwillGiftCardUsed;
       totalTerminal += p.terminalPaid;
       totalRemaining += p.remaining;
       if (p.vippsPaid > 0) vippsCount += 1;
-      if (p.giftCardUsed > 0) giftCardCount += 1;
+      if (p.paidGiftCardUsed > 0) giftCardCount += 1;
+      if (p.goodwillGiftCardUsed > 0) goodwillCount += 1;
       if (p.terminalPaid > 0) terminalCount += 1;
     });
 
@@ -655,6 +659,9 @@ export default function AdminDashboard() {
           <div className="text-lg sm:text-xl font-semibold text-white mt-0.5 tabular-nums">{fmt(totalValue)}</div>
           <div className="text-[11px] text-zinc-500 mt-0.5">
             {active.length} {active.length === 1 ? 'booking' : 'bookinger'} · {totalPlayers} spillere
+            {totalGoodwillGiftCard > 0 && (
+              <span className="text-zinc-400"> · ekskl. {fmt(totalGoodwillGiftCard)} goodwill</span>
+            )}
           </div>
         </div>
 
@@ -667,10 +674,13 @@ export default function AdminDashboard() {
         </div>
 
         <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
-          <div className="text-[11px] font-medium text-zinc-400">Gavekort innløst</div>
+          <div className="text-[11px] font-medium text-zinc-400">Gavekort innløst (solgt)</div>
           <div className="text-lg sm:text-xl font-semibold text-amber-300 mt-0.5 tabular-nums">{fmt(totalGiftCard)}</div>
           <div className="text-[11px] text-zinc-500 mt-0.5">
             {giftCardCount} {giftCardCount === 1 ? 'booking' : 'bookinger'}
+            {totalGoodwillGiftCard > 0 && (
+              <span className="text-sky-400"> · +{fmt(totalGoodwillGiftCard)} goodwill ({goodwillCount})</span>
+            )}
           </div>
         </div>
 
@@ -691,8 +701,11 @@ export default function AdminDashboard() {
   const renderPaymentDetails = (booking: any) => {
     const {
       totalPrice,
+      netRevenue,
       amountPaid,
       giftCardUsed,
+      paidGiftCardUsed,
+      goodwillGiftCardUsed,
       vippsPaid,
       terminalPaid,
       remaining,
@@ -809,10 +822,20 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <div className="text-xs space-y-0.5">
-            <div className="text-zinc-200 font-medium">Totalt: {totalPrice} NOK</div>
-            {giftCardUsed > 0 && (
+            <div className="text-zinc-200 font-medium">
+              Totalt: {totalPrice} NOK
+              {goodwillGiftCardUsed > 0 && (
+                <span className="text-zinc-400 font-normal"> (omsetning: {netRevenue} NOK)</span>
+              )}
+            </div>
+            {paidGiftCardUsed > 0 && (
               <div className="text-amber-300 text-[11px] font-medium">
-                Gavekort: {giftCardUsed} NOK
+                Gavekort: {paidGiftCardUsed} NOK
+              </div>
+            )}
+            {goodwillGiftCardUsed > 0 && (
+              <div className="text-sky-300 text-[11px] font-medium">
+                Goodwill-gavekort (0 kr oms.): {goodwillGiftCardUsed} NOK
               </div>
             )}
             {terminalPaid > 0 && (

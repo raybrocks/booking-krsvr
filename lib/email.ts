@@ -555,6 +555,7 @@ export interface WeeklySummaryReportData {
     vippsPaid: number;
     terminalPaid?: number;
     giftCardUsed?: number;
+    goodwillUsed?: number;
     expectedCash: number;
     totalEstimatedRevenue: number;
     cancelledCount: number;
@@ -567,6 +568,7 @@ export interface WeeklySummaryReportData {
     vippsPaid: number;
     terminalPaid?: number;
     giftCardUsed?: number;
+    goodwillUsed?: number;
     expectedCash: number;
     totalEstimatedRevenue: number;
     bookings: Array<{
@@ -667,7 +669,8 @@ export async function sendWeeklyAdminSummary(
             <p style="margin: 4px 0;"><strong>Estimert total bookingverdi (ca.):</strong> NOK ${pastWeek.totalEstimatedRevenue.toLocaleString('no-NO')}</p>
             <p style="margin: 4px 0;"><strong>Hvorav Vipps (nettbutikk):</strong> NOK ${pastWeek.vippsPaid.toLocaleString('no-NO')}</p>
             <p style="margin: 4px 0;"><strong>Hvorav antatt oppgjør i arena / kortterminal (ca.):</strong> NOK ${(pastWeek.terminalPaid || 0).toLocaleString('no-NO')}</p>
-            ${(pastWeek.giftCardUsed || 0) > 0 ? `<p style="margin: 4px 0;"><strong>Hvorav innløst gavekort:</strong> NOK ${(pastWeek.giftCardUsed || 0).toLocaleString('no-NO')}</p>` : ''}
+            ${(pastWeek.giftCardUsed || 0) > 0 ? `<p style="margin: 4px 0;"><strong>Hvorav innløst gavekort (solgt):</strong> NOK ${(pastWeek.giftCardUsed || 0).toLocaleString('no-NO')}</p>` : ''}
+            ${(pastWeek.goodwillUsed || 0) > 0 ? `<p style="margin: 4px 0; color: #6b7280;"><strong>Goodwill / kompensasjon benyttet (0 kr omsetning):</strong> NOK ${(pastWeek.goodwillUsed || 0).toLocaleString('no-NO')}</p>` : ''}
             <p style="margin: 4px 0;"><strong>Hvorav utestående / ikke markert oppgjort:</strong> NOK ${pastWeek.expectedCash.toLocaleString('no-NO')}</p>
             <p style="margin: 8px 0 0 0; font-size: 12px; color: #6b7280; line-height: 1.4;">Merk: Tall utenom Vipps-nettbutikk er estimater ut fra registrerte bookinger. Faktisk innslag i kassa kan avvike ved f.eks. endret antall oppmøtte, rabatter eller justeringer på stedet.</p>
           </div>

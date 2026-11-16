@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getStoreSettings, updateStoreSettings } from '@/lib/store-settings';
+import { getStoreSettings, isValidIsoDate, updateStoreSettings } from '@/lib/store-settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,14 +20,22 @@ async function handleUpdate(req: NextRequest) {
   try {
     const body = await req.json();
 
-    if (
-      body.isVatRegistered !== undefined &&
-      typeof body.isVatRegistered !== 'boolean'
-    ) {
-      return NextResponse.json(
-        { error: 'isVatRegistered må være en boolsk verdi (true/false)' },
-        { status: 400 }
-      );
+    if (body.vatThresholdPassedDate !== undefined) {
+      if (body.vatThresholdPassedDate !== null && typeof body.vatThresholdPassedDate !== 'string') {
+        return NextResponse.json(
+          { error: 'vatThresholdPassedDate må være en datostreng (YYYY-MM-DD) eller null' },
+          { status: 400 }
+        );
+      }
+      if (typeof body.vatThresholdPassedDate === 'string') {
+        const trimmedDate = body.vatThresholdPassedDate.trim();
+        if (trimmedDate.length > 0 && !isValidIsoDate(trimmedDate)) {
+          return NextResponse.json(
+            { error: 'Ugyldig dato for passert MVA-grense (bruk ÅÅÅÅ-MM-DD)' },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     if (body.defaultVatRate !== undefined) {
@@ -40,7 +48,29 @@ async function handleUpdate(req: NextRequest) {
       }
     }
 
-    if (body.isVatRegistered === undefined && body.defaultVatRate === undefined) {
+    if (body.voucherEmail !== undefined) {
+      if (body.voucherEmail !== null && typeof body.voucherEmail !== 'string') {
+        return NextResponse.json(
+          { error: 'voucherEmail må være en tekststreng eller null' },
+          { status: 400 }
+        );
+      }
+      if (typeof body.voucherEmail === 'string') {
+        const trimmed = body.voucherEmail.trim();
+        if (trimmed.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+          return NextResponse.json(
+            { error: 'Ugyldig e-postadresse for bilag' },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
+    if (
+      body.vatThresholdPassedDate === undefined &&
+      body.defaultVatRate === undefined &&
+      body.voucherEmail === undefined
+    ) {
       return NextResponse.json(
         { error: 'Ingen gyldige innstillingsfelt oppgitt' },
         { status: 400 }
@@ -48,9 +78,10 @@ async function handleUpdate(req: NextRequest) {
     }
 
     const updated = await updateStoreSettings({
-      isVatRegistered: body.isVatRegistered,
+      vatThresholdPassedDate: body.vatThresholdPassedDate,
       defaultVatRate:
         body.defaultVatRate !== undefined ? Number(body.defaultVatRate) : undefined,
+      voucherEmail: body.voucherEmail,
     });
 
     return NextResponse.json(updated);

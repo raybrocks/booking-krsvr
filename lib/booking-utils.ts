@@ -1,7 +1,10 @@
 export interface BookingPaymentBreakdown {
   totalPrice: number;
+  netRevenue: number;
   amountPaid: number;
   giftCardUsed: number;
+  paidGiftCardUsed: number;
+  goodwillGiftCardUsed: number;
   vippsPaid: number;
   terminalPaid: number;
   remaining: number;
@@ -43,6 +46,11 @@ export function getBookingPaymentBreakdown(booking: {
   amountPaid?: number | null;
   giftCardCode?: string | null;
   giftCardAmount?: number | null;
+  goodwillGiftCardAmount?: number | null;
+  giftCardRedemptions?: Array<{
+    amount?: number | null;
+    giftCard?: { paymentType?: string | null } | null;
+  }> | null;
   vippsStatus?: string | null;
   status?: string | null;
   paymentType?: string | null;
@@ -58,6 +66,22 @@ export function getBookingPaymentBreakdown(booking: {
   const amountPaid = Number(booking.amountPaid || 0);
   const rawGiftCard = Number(booking.giftCardAmount || 0);
   const giftCardUsed = rawGiftCard > 0 ? Math.min(totalPrice, rawGiftCard) : 0;
+
+  let rawGoodwill = 0;
+  if (typeof booking.goodwillGiftCardAmount === 'number') {
+    rawGoodwill = Math.max(0, booking.goodwillGiftCardAmount);
+  } else if (Array.isArray(booking.giftCardRedemptions) && booking.giftCardRedemptions.length > 0) {
+    rawGoodwill = booking.giftCardRedemptions.reduce((sum, r) => {
+      if (r?.giftCard?.paymentType === 'goodwill') {
+        return sum + Math.max(0, Number(r.amount || 0));
+      }
+      return sum;
+    }, 0);
+  }
+
+  const goodwillGiftCardUsed = Math.min(giftCardUsed, rawGoodwill);
+  const paidGiftCardUsed = Math.max(0, giftCardUsed - goodwillGiftCardUsed);
+  const netRevenue = Math.max(0, totalPrice - goodwillGiftCardUsed);
 
   const status = (booking.vippsStatus || '').toUpperCase();
   const isRefunded = status === 'REFUNDED' || status.includes('REFUND');
@@ -78,8 +102,11 @@ export function getBookingPaymentBreakdown(booking: {
 
   return {
     totalPrice,
+    netRevenue,
     amountPaid,
     giftCardUsed,
+    paidGiftCardUsed,
+    goodwillGiftCardUsed,
     vippsPaid,
     terminalPaid,
     remaining,

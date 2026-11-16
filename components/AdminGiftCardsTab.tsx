@@ -22,6 +22,7 @@ export default function AdminGiftCardsTab() {
   const [redeemLoading, setRedeemLoading] = useState<boolean>(false);
 
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [createPaymentType, setCreatePaymentType] = useState<'goodwill' | 'manual'>('goodwill');
   const [createPersons, setCreatePersons] = useState<number>(4);
   const [createCustomAmount, setCreateCustomAmount] = useState<string>('');
   const [createBuyerName, setCreateBuyerName] = useState<string>('');
@@ -129,14 +130,19 @@ export default function AdminGiftCardsTab() {
           senderName: createSenderName.trim() || undefined,
           greetingMessage: createGreeting.trim() || undefined,
           note: createNote.trim() || undefined,
-          paymentType: 'manual',
+          paymentType: createPaymentType,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Kunne ikke opprette gavekort');
 
-      toast.success(`Gavekort ${data.code} ble opprettet!`);
+      toast.success(
+        createPaymentType === 'goodwill'
+          ? `Goodwill-gavekort ${data.code} opprettet (0 kr omsetning)!`
+          : `Gavekort ${data.code} ble opprettet!`
+      );
       setShowCreateModal(false);
+      setCreatePaymentType('goodwill');
       setCreateBuyerName('');
       setCreateBuyerEmail('');
       setCreateBuyerPhone('');
@@ -153,25 +159,84 @@ export default function AdminGiftCardsTab() {
     }
   };
 
+  const handleToggleGoodwill = async (card: any) => {
+    const nextType = card.paymentType === 'goodwill' ? 'manual' : 'goodwill';
+    try {
+      const res = await fetch(`/api/admin/gift-cards/${card.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentType: nextType }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Kunne ikke oppdatere type');
+      toast.success(
+        nextType === 'goodwill'
+          ? `${card.code} satt til Goodwill (0 kr omsetning)`
+          : `${card.code} satt til Manuelt salg`
+      );
+      fetchGiftCards();
+    } catch (err: any) {
+      toast.error(err.message || 'Kunne ikke oppdatere gavekorttype');
+    }
+  };
+
   // KPIs
   const kpis = useMemo(() => {
     let activeCount = 0;
+    let activeGoodwillCount = 0;
     let outstandingBalance = 0;
+    let outstandingGoodwillBalance = 0;
     let totalRedeemed = 0;
+    let totalGoodwillRedeemed = 0;
     let totalPurchased = 0;
+    let soldCardCount = 0;
+    let goodwillTotalIssued = 0;
+    let goodwillCardCount = 0;
 
     giftCards.forEach((card) => {
+      if (card.status === 'pending_payment' || card.status === 'cancelled') return;
+
+      const isGoodwill = card.paymentType === 'goodwill';
+
       if (card.status === 'active') {
         activeCount++;
-        outstandingBalance += card.balance || 0;
+        if (isGoodwill) {
+          activeGoodwillCount++;
+          outstandingGoodwillBalance += card.balance || 0;
+        } else {
+          outstandingBalance += card.balance || 0;
+        }
       }
-      totalPurchased += card.initialAmount || 0;
+
+      if (isGoodwill) {
+        goodwillCardCount++;
+        goodwillTotalIssued += card.initialAmount || 0;
+      } else {
+        soldCardCount++;
+        totalPurchased += card.initialAmount || 0;
+      }
+
       (card.redemptions || []).forEach((r: any) => {
-        totalRedeemed += r.amount || 0;
+        if (isGoodwill) {
+          totalGoodwillRedeemed += r.amount || 0;
+        } else {
+          totalRedeemed += r.amount || 0;
+        }
       });
     });
 
-    return { activeCount, outstandingBalance, totalRedeemed, totalPurchased };
+    return {
+      activeCount,
+      activeGoodwillCount,
+      outstandingBalance,
+      outstandingGoodwillBalance,
+      totalRedeemed,
+      totalGoodwillRedeemed,
+      totalPurchased,
+      soldCardCount,
+      goodwillTotalIssued,
+      goodwillCardCount,
+    };
   }, [giftCards]);
 
   // Filtered Cards
@@ -232,22 +297,38 @@ export default function AdminGiftCardsTab() {
         <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
           <span className="text-xs text-zinc-400 block font-medium">Aktive gavekort</span>
           <span className="text-2xl font-black text-white mt-1 block">{kpis.activeCount} stk</span>
-          <span className="text-[11px] text-emerald-400 mt-0.5 block">Klare for booking</span>
+          <span className="text-[11px] text-emerald-400 mt-0.5 block">
+            Klare for booking
+            {kpis.activeGoodwillCount > 0 ? ` (${kpis.activeGoodwillCount} goodwill)` : ''}
+          </span>
         </div>
         <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
-          <span className="text-xs text-zinc-400 block font-medium">Utestående saldo</span>
+          <span className="text-xs text-zinc-400 block font-medium">Utestående saldo (solgte)</span>
           <span className="text-2xl font-black text-[#c084fc] mt-1 block">{kpis.outstandingBalance.toLocaleString('no-NO')} kr</span>
-          <span className="text-[11px] text-zinc-400 mt-0.5 block">Kortsiktig kundeforpliktelse</span>
+          <span className="text-[11px] text-zinc-400 mt-0.5 block">
+            {kpis.outstandingGoodwillBalance > 0
+              ? `+ ${kpis.outstandingGoodwillBalance.toLocaleString('no-NO')} kr på goodwill-kort`
+              : 'Kortsiktig kundeforpliktelse'}
+          </span>
         </div>
         <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
-          <span className="text-xs text-zinc-400 block font-medium">Totalt innløst</span>
+          <span className="text-xs text-zinc-400 block font-medium">Innløst (solgte kort)</span>
           <span className="text-2xl font-black text-emerald-400 mt-1 block">{kpis.totalRedeemed.toLocaleString('no-NO')} kr</span>
-          <span className="text-[11px] text-zinc-400 mt-0.5 block">Brukt i opplevelser</span>
+          <span className="text-[11px] text-zinc-400 mt-0.5 block">
+            {kpis.totalGoodwillRedeemed > 0
+              ? `+ ${kpis.totalGoodwillRedeemed.toLocaleString('no-NO')} kr goodwill (0 kr oms.)`
+              : 'Brukt i opplevelser'}
+          </span>
         </div>
         <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
           <span className="text-xs text-zinc-400 block font-medium">Totalt salg</span>
           <span className="text-2xl font-black text-white mt-1 block">{kpis.totalPurchased.toLocaleString('no-NO')} kr</span>
-          <span className="text-[11px] text-zinc-400 mt-0.5 block">{giftCards.length} utstedte kort</span>
+          <span className="text-[11px] text-zinc-400 mt-0.5 block">
+            {kpis.soldCardCount} solgte kort
+            {kpis.goodwillCardCount > 0
+              ? ` · ${kpis.goodwillCardCount} goodwill (${kpis.goodwillTotalIssued.toLocaleString('no-NO')} kr, 0 kr oms.)`
+              : ''}
+          </span>
         </div>
       </div>
 
@@ -353,6 +434,21 @@ export default function AdminGiftCardsTab() {
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         <div className="font-semibold text-white">{card.initialAmount} kr</div>
                         <div className="text-xs text-zinc-400">{card.targetPersons} personer</div>
+                        <div className="mt-1">
+                          {card.paymentType === 'goodwill' ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                              Goodwill · 0 kr omsetning
+                            </span>
+                          ) : card.paymentType === 'vipps' ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                              Vipps-salg
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                              Manuelt salg
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Remaining Balance */}
@@ -416,6 +512,20 @@ export default function AdminGiftCardsTab() {
                               className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-emerald-400 transition-colors cursor-pointer"
                             >
                               <CreditCard size={15} />
+                            </button>
+                          )}
+
+                          {card.paymentType !== 'vipps' && (
+                            <button
+                              onClick={() => handleToggleGoodwill(card)}
+                              title={
+                                card.paymentType === 'goodwill'
+                                  ? 'Endre til Manuelt salg'
+                                  : 'Merk som Goodwill (0 kr omsetning)'
+                              }
+                              className="px-2 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[11px] font-medium text-zinc-300 border border-zinc-700 transition-colors cursor-pointer"
+                            >
+                              {card.paymentType === 'goodwill' ? 'Til salg' : 'Til goodwill'}
                             </button>
                           )}
 
@@ -544,6 +654,40 @@ export default function AdminGiftCardsTab() {
             </p>
 
             <form onSubmit={handleCreateGiftCard} className="space-y-4">
+              <div>
+                <label className="block text-xs text-zinc-300 mb-1.5 font-medium">Type gavekort *</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setCreatePaymentType('goodwill')}
+                    className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
+                      createPaymentType === 'goodwill'
+                        ? 'bg-sky-950/30 border-sky-500/60 text-white'
+                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                    }`}
+                  >
+                    <div className="text-xs font-bold text-sky-300">Goodwill / Kompensasjon</div>
+                    <div className="text-[11px] text-zinc-400 mt-0.5">
+                      0 kr omsetning (påvirker ikke salgsstatistikk)
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCreatePaymentType('manual')}
+                    className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
+                      createPaymentType === 'manual'
+                        ? 'bg-purple-950/30 border-purple-500/60 text-white'
+                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                    }`}
+                  >
+                    <div className="text-xs font-bold text-purple-300">Manuelt salg (Faktura / Kasse)</div>
+                    <div className="text-[11px] text-zinc-400 mt-0.5">
+                      Betalt utenom Vipps (inngår i salgsstatistikk)
+                    </div>
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-zinc-300 mb-1 font-medium">Antall personer</label>

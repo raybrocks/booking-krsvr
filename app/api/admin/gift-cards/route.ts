@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
     const code = generateGiftCardCode();
     const expiresAt = new Date();
     expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+    const normalizedPaymentType = paymentType === 'goodwill' ? 'goodwill' : 'manual';
 
     const giftCard = await prisma.giftCard.create({
       data: {
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
         recipientName: recipientName ? recipientName.trim() : null,
         senderName: senderName ? senderName.trim() : null,
         greetingMessage: greetingMessage ? greetingMessage.trim() : (note ? `Manuelt opprettet: ${note}` : null),
-        paymentType,
+        paymentType: normalizedPaymentType,
       },
       include: {
         redemptions: true,

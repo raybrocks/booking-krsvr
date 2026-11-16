@@ -48,12 +48,20 @@ export async function GET(req: Request) {
       },
       include: {
         experience: true,
+        giftCardRedemptions: {
+          include: {
+            giftCard: {
+              select: { code: true, paymentType: true },
+            },
+          },
+        },
       },
     });
 
     let pastVippsPaid = 0;
     let pastTerminalPaid = 0;
     let pastGiftCardUsed = 0;
+    let pastGoodwillUsed = 0;
     let pastExpectedCash = 0;
     let pastCompletedCount = 0;
     let pastTotalPlayers = 0;
@@ -64,6 +72,7 @@ export async function GET(req: Request) {
     let upcomingVippsPaid = 0;
     let upcomingTerminalPaid = 0;
     let upcomingGiftCardUsed = 0;
+    let upcomingGoodwillUsed = 0;
     let upcomingExpectedCash = 0;
     let upcomingTotalPlayers = 0;
 
@@ -89,7 +98,8 @@ export async function GET(req: Request) {
             pastTotalPlayers += players;
             pastVippsPaid += p.vippsPaid;
             pastTerminalPaid += p.terminalPaid;
-            pastGiftCardUsed += p.giftCardUsed;
+            pastGiftCardUsed += p.paidGiftCardUsed;
+            pastGoodwillUsed += p.goodwillGiftCardUsed;
             pastExpectedCash += p.remaining;
             pastExpCounts[expName] = (pastExpCounts[expName] || 0) + 1;
           }
@@ -100,7 +110,8 @@ export async function GET(req: Request) {
           upcomingTotalPlayers += players;
           upcomingVippsPaid += p.vippsPaid;
           upcomingTerminalPaid += p.terminalPaid;
-          upcomingGiftCardUsed += p.giftCardUsed;
+          upcomingGiftCardUsed += p.paidGiftCardUsed;
+          upcomingGoodwillUsed += p.goodwillGiftCardUsed;
           upcomingExpectedCash += p.remaining;
 
           const bookingDate = parseISO(`${b.date}T12:00:00Z`);
@@ -160,6 +171,7 @@ export async function GET(req: Request) {
         vippsPaid: pastVippsPaid,
         terminalPaid: pastTerminalPaid,
         giftCardUsed: pastGiftCardUsed,
+        goodwillUsed: pastGoodwillUsed,
         expectedCash: pastExpectedCash,
         totalEstimatedRevenue: pastVippsPaid + pastTerminalPaid + pastGiftCardUsed + pastExpectedCash,
         cancelledCount: pastCancelledCount,
@@ -172,6 +184,7 @@ export async function GET(req: Request) {
         vippsPaid: upcomingVippsPaid,
         terminalPaid: upcomingTerminalPaid,
         giftCardUsed: upcomingGiftCardUsed,
+        goodwillUsed: upcomingGoodwillUsed,
         expectedCash: upcomingExpectedCash,
         totalEstimatedRevenue: upcomingVippsPaid + upcomingTerminalPaid + upcomingGiftCardUsed + upcomingExpectedCash,
         bookings: rawUpcoming,

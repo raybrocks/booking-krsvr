@@ -13,6 +13,9 @@ import VatSettingsControl from "./VatSettingsControl";
 export default function SettingsManager() {
   const [activeSettingsTab, setActiveSettingsTab] = useState<"hours" | "general" | "push" | "discounts" | "emails">("hours");
   const [settings, setSettings] = useState<any>(null);
+  const [voucherEmail, setVoucherEmail] = useState<string>("krs-vr-arena-as@bilag.fiken.no");
+  const [savedVoucherEmail, setSavedVoucherEmail] = useState<string>("krs-vr-arena-as@bilag.fiken.no");
+  const [savingVoucherEmail, setSavingVoucherEmail] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [newOverrideDate, setNewOverrideDate] = useState("");
@@ -80,9 +83,12 @@ export default function SettingsManager() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch('/api/settings');
-        if (res.ok) {
-          const data = await res.json();
+        const [generalRes, adminRes] = await Promise.all([
+          fetch('/api/settings'),
+          fetch('/api/admin/settings?t=' + Date.now()),
+        ]);
+        if (generalRes.ok) {
+          const data = await generalRes.json();
           if (data.general) {
             setSettings({
               ...data.general,
@@ -103,6 +109,12 @@ export default function SettingsManager() {
             });
           }
         }
+        if (adminRes.ok) {
+          const adminData = await adminRes.json();
+          const email = adminData.voucherEmail ?? "";
+          setVoucherEmail(email);
+          setSavedVoucherEmail(email);
+        }
       } catch (err) {
         console.error("Failed to load settings from API", err);
       }
@@ -111,6 +123,34 @@ export default function SettingsManager() {
     };
     fetchSettings();
   }, [fetchBookingsForDates]);
+
+  const saveVoucherEmail = async (suppressToast: boolean = false): Promise<boolean> => {
+    setSavingVoucherEmail(true);
+    try {
+      const trimmed = voucherEmail.trim();
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voucherEmail: trimmed || null }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Kunne ikke lagre bilags-e-post");
+      }
+      const persisted = data.voucherEmail ?? "";
+      setVoucherEmail(persisted);
+      setSavedVoucherEmail(persisted);
+      if (!suppressToast) {
+        toast.success("E-postadresse for bilag lagret!");
+      }
+      return true;
+    } catch (error: any) {
+      toast.error(error?.message || "Kunne ikke lagre bilags-e-post");
+      return false;
+    } finally {
+      setSavingVoucherEmail(false);
+    }
+  };
 
   const handleSave = async (explicitSettings?: any, suppressToast: boolean = false) => {
     setSaving(true);
@@ -139,6 +179,13 @@ export default function SettingsManager() {
       
       if (!res.ok) {
         throw new Error("Failed to save settings");
+      }
+
+      if (!explicitSettings && voucherEmail.trim() !== savedVoucherEmail.trim()) {
+        const ok = await saveVoucherEmail(true);
+        if (!ok) {
+          return false;
+        }
       }
       
       setSettings(settingsToSave);
@@ -694,6 +741,29 @@ export default function SettingsManager() {
             placeholder="admin@example.com"
             className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
           />
+        </div>
+
+        <div className="mb-6">
+          <label htmlFor="voucher-email-input" className="block text-sm font-medium text-zinc-300 mb-2">E-postadresse for bilag (regnskap / dagsoppgjør)</label>
+          <p className="text-zinc-500 text-xs mb-2">E-postadresse som bilag og dagsoppgjør skal sendes til (for eksempel Fiken bilagsinnboks).</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              id="voucher-email-input"
+              type="email"
+              value={voucherEmail}
+              onChange={(e) => setVoucherEmail(e.target.value)}
+              placeholder="krs-vr-arena-as@bilag.fiken.no"
+              className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
+            />
+            <button
+              type="button"
+              onClick={() => saveVoucherEmail(false)}
+              disabled={savingVoucherEmail || voucherEmail.trim() === savedVoucherEmail.trim()}
+              className="px-4 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm font-medium text-white border border-zinc-700 disabled:opacity-50 transition-colors shrink-0"
+            >
+              {savingVoucherEmail ? "Lagrer..." : "Lagre bilags-e-post"}
+            </button>
+          </div>
         </div>
 
         <div className="mb-6">
