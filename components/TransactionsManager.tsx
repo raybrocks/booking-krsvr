@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { Loader2, Receipt, Search, Printer, Download, CalendarDays, ChevronDown, ChevronRight, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import VatSettingsControl from "./VatSettingsControl";
 
 function escapeHtml(value: unknown): string {
   return String(value ?? "")
@@ -105,7 +104,6 @@ export default function TransactionsManager() {
   const [dailyReport, setDailyReport] = useState<any | null>(null);
   const [viewMode, setViewMode] = useState<"receipts" | "daily">("receipts");
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
-  const [externalTurnover, setExternalTurnover] = useState<string>("0");
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [experiencesMap, setExperiencesMap] = useState<Record<string, string>>({});
@@ -424,17 +422,6 @@ export default function TransactionsManager() {
     );
   }
 
-  const externalTurnoverNum = Math.max(0, Number(String(externalTurnover).replace(",", ".")) || 0);
-  const mvaThreshold = 50000;
-  const thresholdDay = (dailyReport?.days || []).find(
-    (d: any) => d.accumulatedTurnover + externalTurnoverNum >= mvaThreshold
-  );
-  const thresholdReceipt = thresholdDay
-    ? (thresholdDay.receipts || []).find(
-        (r: any) => r.runningNetTurnover + externalTurnoverNum >= mvaThreshold
-      )
-    : null;
-
   return (
     <div className="space-y-4">
       <div className="bg-[#9C39FF]/10 border border-[#9C39FF]/20 p-4 rounded-xl text-sm text-zinc-300 flex items-start gap-3">
@@ -445,8 +432,6 @@ export default function TransactionsManager() {
           Her finner du kun bokføringspliktige <strong>salgskvitteringer</strong> og <strong>kreditnotaer</strong> fra faktiske Vipps-betalinger i nettbutikken. Kjøp betalt fysisk i kasse/kortterminal ved oppmøte bokføres direkte i kassasystemet etter kassasystemloven og skal ikke dobbeltføres her.
         </p>
       </div>
-
-      <VatSettingsControl compact />
 
       {/* View Mode Tabs & CSV Exports */}
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -473,7 +458,7 @@ export default function TransactionsManager() {
             }`}
           >
             <CalendarDays className="w-4 h-4" />
-            Dagsoppgjør & MVA-grense ({dailyReport?.days?.length || 0} dager)
+            Dagsoppgjør ({dailyReport?.days?.length || 0} dager)
           </button>
         </div>
 
@@ -511,8 +496,8 @@ export default function TransactionsManager() {
 
       {viewMode === "daily" ? (
         <div className="space-y-4">
-          {/* Summary KPI & MVA 50 000 NOK Helper */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          {/* Summary KPI */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
               <div className="text-xs text-zinc-400">Brutto Vipps-salg ({dailyReport?.summary?.totalPayments || 0} salg)</div>
               <div className="text-xl font-bold text-white mt-1">
@@ -531,53 +516,16 @@ export default function TransactionsManager() {
               <div className="text-[11px] text-zinc-500 mt-1">
                 0 % MVA: {Number(dailyReport?.summary?.totalRevenue0Vat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · 12 % gr.l.: {Number(dailyReport?.summary?.totalRevenue12VatBasis || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · MVA: {Number(dailyReport?.summary?.totalOutgoingVat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
-              <div className="text-[11px] text-zinc-400 mt-1 pt-1 border-t border-zinc-800/80">
-                Støtte KTO 7770 (Vipps-gebyr): {Number(dailyReport?.summary?.totalVippsFee || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · Est. utbet.: {Number(dailyReport?.summary?.totalEstimatedVippsPayout || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
-              </div>
             </div>
 
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-              <label htmlFor="external-turnover-input" className="block text-xs text-zinc-400">
-                Annen omsetning (faktura + kasse, kr)
-              </label>
-              <input
-                id="external-turnover-input"
-                type="number"
-                min="0"
-                step="any"
-                value={externalTurnover}
-                onChange={(e) => setExternalTurnover(e.target.value)}
-                className="mt-1.5 w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-white focus:outline-none focus:border-[#9C39FF]"
-                placeholder="0"
-              />
-              <div className="text-[11px] text-zinc-500 mt-1">
-                Valgfri hjelpesum for å markere dagen 50 000 kr passeres
+              <div className="text-xs text-zinc-400">Vipps-gebyrer (Støtte KTO 7770)</div>
+              <div className="text-xl font-bold text-zinc-200 mt-1">
+                {Number(dailyReport?.summary?.totalVippsFee || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
-            </div>
-
-            <div className={`border rounded-xl p-4 ${thresholdDay ? "bg-amber-500/10 border-amber-500/30" : "bg-zinc-900/50 border-zinc-800"}`}>
-              <div className="text-xs text-zinc-400">MVA-grense (50 000 kr)</div>
-              {thresholdDay ? (
-                <>
-                  <div className="text-lg font-bold text-amber-300 mt-1">
-                    Passert {thresholdDay.date}
-                  </div>
-                  <div className="text-[11px] text-zinc-300 mt-1">
-                    {thresholdReceipt
-                      ? `Kvitt. ${thresholdReceipt.receiptNumber} (${thresholdReceipt.settlementCode}) kl. ${thresholdReceipt.osloTime}`
-                      : `Akk. samlet: ${(thresholdDay.accumulatedTurnover + externalTurnoverNum).toLocaleString("nb-NO")} kr`}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="text-lg font-bold text-zinc-200 mt-1">
-                    Ikke passert ennå
-                  </div>
-                  <div className="text-[11px] text-zinc-400 mt-1">
-                    Gjenstår til 50 000 kr: {Math.max(0, mvaThreshold - ((dailyReport?.summary?.totalNetTurnover || 0) + externalTurnoverNum)).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
-                  </div>
-                </>
-              )}
+              <div className="text-[11px] text-zinc-500 mt-1">
+                Estimert nettoutbetaling fra Vipps: {Number(dailyReport?.summary?.totalEstimatedVippsPayout || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
+              </div>
             </div>
           </div>
 
@@ -610,18 +558,12 @@ export default function TransactionsManager() {
                   ) : (
                     dailyReport.days.map((day: any) => {
                       const isExpanded = expandedDay === day.date;
-                      const isThresholdRow = thresholdDay?.date === day.date;
-                      const combinedAcc = day.accumulatedTurnover + externalTurnoverNum;
 
                       return (
                         <React.Fragment key={day.date}>
                           <tr
                             onClick={() => setExpandedDay(isExpanded ? null : day.date)}
-                            className={`cursor-pointer transition-colors ${
-                              isThresholdRow
-                                ? "bg-amber-500/10 hover:bg-amber-500/15"
-                                : "hover:bg-zinc-800/30"
-                            }`}
+                            className="cursor-pointer transition-colors hover:bg-zinc-800/30"
                           >
                             <td className="px-4 py-3.5 font-mono text-zinc-200">
                               <div className="flex items-center gap-2">
@@ -634,14 +576,7 @@ export default function TransactionsManager() {
                               </div>
                             </td>
                             <td className="px-4 py-3.5 font-mono text-zinc-200">
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">{day.date}</span>
-                                {isThresholdRow && (
-                                  <span className="text-[10px] font-sans font-bold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                                    MVA 50k passert
-                                  </span>
-                                )}
-                              </div>
+                              <span className="font-semibold">{day.date}</span>
                             </td>
                             <td className="px-4 py-3.5 font-mono text-xs text-zinc-200">
                               <div>
@@ -691,11 +626,6 @@ export default function TransactionsManager() {
                               </div>
                               <div className="text-[11px] text-zinc-500">
                                 Brutto: {Number(day.accumulatedGrossSales).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
-                                {externalTurnoverNum > 0 && (
-                                  <span className="text-amber-300 ml-1">
-                                    · Samlet: {combinedAcc.toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
-                                  </span>
-                                )}
                               </div>
                             </td>
                             <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
@@ -754,20 +684,14 @@ export default function TransactionsManager() {
                                     </thead>
                                     <tbody className="divide-y divide-zinc-800/60">
                                       {(day.receipts || []).map((r: any) => {
-                                        const isThreshRec = thresholdReceipt?.id === r.id;
                                         const matchedTx = transactions.find((t) => t.id === r.id);
                                         return (
                                           <tr
                                             key={r.id}
-                                            className={isThreshRec ? "bg-amber-500/15" : "hover:bg-zinc-900/40"}
+                                            className="hover:bg-zinc-900/40"
                                           >
                                             <td className="px-3 py-2 font-mono text-zinc-200">
                                               {r.osloTime}
-                                              {isThreshRec && (
-                                                <span className="ml-2 text-[10px] font-sans font-bold px-1.5 py-0.5 rounded bg-amber-500/25 text-amber-300">
-                                                  50k her
-                                                </span>
-                                              )}
                                             </td>
                                             <td className="px-3 py-2 font-mono text-white font-semibold">
                                               {r.receiptNumber}
@@ -811,11 +735,6 @@ export default function TransactionsManager() {
                                             </td>
                                             <td className="px-3 py-2 text-right font-mono text-zinc-200">
                                               {Number(r.runningNetTurnover).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
-                                              {externalTurnoverNum > 0 && (
-                                                <span className="text-amber-300 ml-1">
-                                                  ({(r.runningNetTurnover + externalTurnoverNum).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                                                </span>
-                                              )}
                                             </td>
                                             <td className="px-3 py-2 text-right">
                                               {matchedTx && (
