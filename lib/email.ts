@@ -1013,4 +1013,88 @@ export async function sendAdminNewGiftCardEmail(giftCard: any) {
   }
 }
 
+export async function sendDailySettlementVoucherEmail(params: {
+  to: string;
+  day: {
+    settlementCode: string;
+    date: string;
+    firstReceiptNumber: string;
+    lastReceiptNumber: string;
+    receiptCount: number;
+    paymentCount: number;
+    refundCount: number;
+    grossSales: number;
+    refunds: number;
+    netTurnover: number;
+    revenue0Vat: number;
+    revenue12VatBasis: number;
+    revenue25VatBasis: number;
+    revenueOtherVatBasis: number;
+    outgoingVat: number;
+    vippsFee: number;
+    estimatedVippsPayout: number;
+  };
+  pdfBuffer: Buffer;
+}): Promise<{ id: string | null; error: string | null }> {
+  if (!process.env.RESEND_API_KEY) {
+    return { id: null, error: 'RESEND_API_KEY is not set' };
+  }
+
+  const { to, day, pdfBuffer } = params;
+  const filename = `Dagsoppgjor_${day.settlementCode}_${day.date}.pdf`;
+  const fmt = (n: number) =>
+    Number(n || 0).toLocaleString('nb-NO', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  const taxableBasis =
+    Number(day.revenue12VatBasis || 0) +
+    Number(day.revenue25VatBasis || 0) +
+    Number(day.revenueOtherVatBasis || 0);
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111827; max-width: 600px; line-height: 1.5;">
+      <h2 style="margin: 0 0 8px 0; font-size: 18px;">Vipps Dagsoppgjør ${day.settlementCode} (${day.date})</h2>
+      <p style="margin: 0 0 12px 0; font-size: 13px; color: #4b5563;">
+        Krs VR Arena AS · Org.nr 936 318 878${day.outgoingVat > 0 || taxableBasis > 0 ? ' MVA' : ''} · Betalingsløsning: VIPPS (Nettbutikk)
+      </p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px;">
+        <tr><td style="padding: 4px 0; color: #4b5563;">Kvitteringsserie:</td><td style="padding: 4px 0; text-align: right; font-weight: 600;">${day.firstReceiptNumber} – ${day.lastReceiptNumber} (${day.receiptCount} bilag)</td></tr>
+        <tr><td style="padding: 4px 0; color: #4b5563;">Brutto salg / Refusjon:</td><td style="padding: 4px 0; text-align: right;">${fmt(day.grossSales)} kr / ${fmt(day.refunds)} kr</td></tr>
+        <tr><td style="padding: 4px 0; color: #4b5563;">Omsetning 0 % MVA:</td><td style="padding: 4px 0; text-align: right;">${fmt(day.revenue0Vat)} kr</td></tr>
+        <tr><td style="padding: 4px 0; color: #4b5563;">MVA-pliktig grunnlag (12 %):</td><td style="padding: 4px 0; text-align: right;">${fmt(taxableBasis)} kr</td></tr>
+        <tr><td style="padding: 4px 0; color: #4b5563;">Utgående MVA:</td><td style="padding: 4px 0; text-align: right;">${fmt(day.outgoingVat)} kr</td></tr>
+        <tr style="border-top: 1px solid #d1d5db;"><td style="padding: 6px 0; font-weight: 700;">Dagens sum netto (inkl. MVA):</td><td style="padding: 6px 0; text-align: right; font-weight: 700;">${fmt(day.netTurnover)} kr</td></tr>
+        <tr><td style="padding: 4px 0; color: #4b5563;">Støttelinje Vipps-gebyr (KTO 7770):</td><td style="padding: 4px 0; text-align: right;">${fmt(day.vippsFee)} kr</td></tr>
+        <tr><td style="padding: 4px 0; color: #4b5563;">Estimert netto utbetaling fra Vipps:</td><td style="padding: 4px 0; text-align: right;">${fmt(day.estimatedVippsPayout)} kr</td></tr>
+      </table>
+      <p style="margin: 0; font-size: 12px; color: #6b7280;">
+        Fullstendig regnskapsbilag ligger vedlagt som PDF (${filename}). Bank og kortgebyrer føres mot KTO 7770 Bank- og kortgebyrer.
+      </p>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'KRS VR Arena Regnskap <booking@donotreply.krsvr.no>',
+      to,
+      subject: `Vipps Dagsoppgjør ${day.settlementCode} (${day.date}) – Krs VR Arena AS`,
+      html,
+      attachments: [
+        {
+          filename,
+          content: pdfBuffer,
+        },
+      ],
+    });
+
+    if (error) {
+      return { id: null, error: error.message || JSON.stringify(error) };
+    }
+    return { id: data?.id || null, error: null };
+  } catch (err: any) {
+    return { id: null, error: err?.message || 'Unknown Resend error' };
+  }
+}
+
 

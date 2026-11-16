@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Loader2, Receipt, Search, Printer, Download, CalendarDays, ChevronDown, ChevronRight, FileText } from "lucide-react";
+import { Loader2, Receipt, Search, Printer, Download, CalendarDays, ChevronDown, ChevronRight, FileText, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 function escapeHtml(value: unknown): string {
@@ -115,6 +116,37 @@ export default function TransactionsManager() {
   const [dailyPrintTarget, setDailyPrintTarget] = useState<{ mode: "all" } | { mode: "day"; day: any } | null>(null);
 
   const [refundingId, setRefundingId] = useState<string | null>(null);
+  const [dispatchingDate, setDispatchingDate] = useState<string | null>(null);
+
+  const handleDispatchToFiken = async (day: any, forceResend: boolean = false) => {
+    const code = day.settlementCode || `DO-${day.settlementNumber}`;
+    const targetEmail = dailyReport?.voucherEmail || "bilags-e-post";
+    if (forceResend) {
+      const ok = window.confirm(
+        `${code} (${day.date}) er allerede sendt til ${targetEmail}.\n\nVil du sende det på nytt?`
+      );
+      if (!ok) return;
+    }
+
+    setDispatchingDate(day.date);
+    try {
+      const res = await fetch('/api/admin/receipts/daily-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: day.date, forceResend }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `Kunne ikke sende ${code}`);
+      }
+      toast.success(`${code} (${day.date}) sendt som PDF til ${data.result?.recipientEmail || targetEmail}`);
+      await fetchTransactions();
+    } catch (err: any) {
+      toast.error(err?.message || `Feil ved utsending av ${code}`);
+    } finally {
+      setDispatchingDate(null);
+    }
+  };
 
   const fetchTransactions = async () => {
     try {
@@ -558,6 +590,11 @@ export default function TransactionsManager() {
                   ) : (
                     dailyReport.days.map((day: any) => {
                       const isExpanded = expandedDay === day.date;
+                      const dispatch = (dailyReport.dispatches || []).find(
+                        (d: any) => d.settlementDate === day.date
+                      );
+                      const isSent = dispatch?.status === "sent";
+                      const isFailed = dispatch?.status === "failed";
 
                       return (
                         <React.Fragment key={day.date}>
@@ -573,6 +610,23 @@ export default function TransactionsManager() {
                                   <ChevronRight className="w-4 h-4 text-zinc-400" />
                                 )}
                                 <span className="font-bold text-white">{day.settlementCode || `DO-${day.settlementNumber}`}</span>
+                                {isSent ? (
+                                  <span
+                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-sans text-[10px] font-semibold"
+                                    title={`Sendt til ${dispatch.recipientEmail} (${new Date(dispatch.sentAt).toLocaleString("nb-NO")})`}
+                                  >
+                                    <CheckCircle2 className="w-2.5 h-2.5" />
+                                    Sendt
+                                  </span>
+                                ) : isFailed ? (
+                                  <span
+                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/15 text-red-300 border border-red-500/30 font-sans text-[10px] font-semibold"
+                                    title={dispatch.errorMessage || "Sending feilet"}
+                                  >
+                                    <AlertCircle className="w-2.5 h-2.5" />
+                                    Feilet
+                                  </span>
+                                ) : null}
                               </div>
                             </td>
                             <td className="px-4 py-3.5 font-mono text-zinc-200">
@@ -637,14 +691,44 @@ export default function TransactionsManager() {
                                 >
                                   {isExpanded ? "Skjul" : `Kvitteringer (${day.receiptCount})`}
                                 </button>
+                                <a
+                                  href={`/api/admin/receipts/daily-summary?format=pdf&date=${day.date}`}
+                                  download
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-amber-300 text-xs rounded-md border border-zinc-700 transition-colors"
+                                  title={`Last ned offisielt bilag for ${day.settlementCode || day.date} som PDF`}
+                                >
+                                  <FileText className="w-3 h-3" />
+                                  Bilag PDF
+                                </a>
                                 <button
                                   type="button"
                                   onClick={() => setDailyPrintTarget({ mode: "day", day })}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-amber-300 text-xs rounded-md border border-zinc-700 transition-colors"
-                                  title={`Vis og skriv ut / lagre ${day.settlementCode || day.date} som PDF`}
+                                  className="inline-flex items-center gap-1 px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs rounded-md border border-zinc-700 transition-colors"
+                                  title={`Forhåndsvis / skriv ut ${day.settlementCode || day.date}`}
                                 >
-                                  <FileText className="w-3 h-3" />
-                                  PDF
+                                  <Printer className="w-3 h-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDispatchToFiken(day, isSent)}
+                                  disabled={dispatchingDate === day.date}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md border transition-colors disabled:opacity-50 ${
+                                    isSent
+                                      ? "bg-zinc-900 hover:bg-zinc-800 text-emerald-300 border-emerald-500/30"
+                                      : "bg-[#9C39FF]/20 hover:bg-[#9C39FF]/30 text-purple-200 border-[#9C39FF]/40"
+                                  }`}
+                                  title={
+                                    isSent
+                                      ? `Allerede sendt til ${dispatch.recipientEmail}. Klikk for å sende på nytt.`
+                                      : `Send ${day.settlementCode || day.date} som PDF til ${dailyReport?.voucherEmail || "bilags-e-post"}`
+                                  }
+                                >
+                                  {dispatchingDate === day.date ? (
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                  ) : (
+                                    <Send className="w-3 h-3" />
+                                  )}
+                                  {isSent ? "Sendt" : "Send"}
                                 </button>
                                 <a
                                   href={`/api/admin/receipts/daily-summary?format=csv&date=${day.date}`}
@@ -1008,10 +1092,10 @@ export default function TransactionsManager() {
                   <div className="header flex justify-between items-start border-b-2 border-zinc-900 pb-4">
                     <div>
                       <h2 className="header-title text-xl font-bold uppercase tracking-wide">
-                        Dagsoppgjør {code}
+                        Vipps Dagsoppgjør {code}
                       </h2>
                       <p className="header-sub text-xs text-zinc-600 mt-0.5">
-                        Krs VR Arena AS · Org.nr 936 318 878 · Nettbutikk (Vipps)
+                        Krs VR Arena AS · Org.nr 936 318 878 · Betalingsløsning: VIPPS (Nettbutikk)
                       </p>
                     </div>
                     <div className="text-right font-mono text-xs text-zinc-700">
@@ -1062,22 +1146,6 @@ export default function TransactionsManager() {
                     </div>
                   </div>
 
-                  <div className="border border-zinc-300 rounded-lg p-3 bg-zinc-50 text-xs space-y-1">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span>
-                        <strong>Støttelinje – Vipps-gebyrer (2,99 % + 1 kr per betaling):</strong>{" "}
-                        <span className="font-mono font-bold">{formatNok(day.vippsFee || 0)} kr</span>
-                      </span>
-                      <span>
-                        <span className="text-zinc-600">Forventet netto utbetaling fra Vipps:</span>{" "}
-                        <strong className="font-mono">{formatNok(day.estimatedVippsPayout ?? day.netTurnover)} kr</strong>
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-zinc-600">
-                      Bank og kortgebyrer føres mot KTO 7770 Bank- og kortgebyrer. Gebyret påvirker ikke brutto salg eller netto salg.
-                    </div>
-                  </div>
-
                   <table className="w-full text-xs border-collapse">
                     <thead>
                       <tr className="border-b border-zinc-300 bg-zinc-100 text-zinc-700">
@@ -1122,6 +1190,30 @@ export default function TransactionsManager() {
                       </tr>
                     </tfoot>
                   </table>
+
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wide text-zinc-900">GEBYRER (VIPPS)</h4>
+                      <span className="text-[11px] text-zinc-500">
+                        Støttelinje for bokføring &middot; {day.settlementNumber <= 102 ? "Vipps Handlekurv 1,75 %" : "2,99 % + 1 kr per salg"}
+                      </span>
+                    </div>
+                    <div className="border border-zinc-300 rounded-lg p-3 bg-zinc-50 text-xs space-y-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span>
+                          <strong>Sum Vipps-gebyrer:</strong>{" "}
+                          <span className="font-mono font-bold">{formatNok(day.vippsFee || 0)} kr</span>
+                        </span>
+                        <span>
+                          <span className="text-zinc-600">Estimert netto utbetaling fra Vipps:</span>{" "}
+                          <strong className="font-mono">{formatNok(day.estimatedVippsPayout ?? day.netTurnover)} kr</strong>
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-zinc-600">
+                        Bank og kortgebyrer føres mot KTO 7770 Bank- og kortgebyrer. Gebyret påvirker ikke brutto salg eller netto salg.
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="footer-note text-[10px] text-zinc-500 border-t border-dashed border-zinc-300 pt-3 flex justify-between">
                     <span>Ubrutt nummerserie · Kun godkjente Vipps-bilag i nettbutikk</span>

@@ -133,6 +133,26 @@ model StoreSettings {
   updatedAt              DateTime @updatedAt
 }
 
+model DailySettlementDispatch {
+  id                 String   @id @default(cuid())
+  settlementDate     String   @unique
+  settlementNumber   Int
+  settlementCode     String
+  firstReceiptNumber String
+  lastReceiptNumber  String
+  receiptCount       Int
+  netTurnover        Float
+  outgoingVat        Float
+  vippsFee           Float    @default(0)
+  recipientEmail     String
+  resendEmailId      String?
+  status             String   @default("sent") // 'sent' | 'failed'
+  errorMessage       String?
+  sentAt             DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
 model GiftCard {
   id              String               @id @default(cuid())
   code            String               @unique
