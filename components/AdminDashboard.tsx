@@ -77,6 +77,15 @@ const formatDateShort = (dateStr: string) => {
   return dateStr;
 };
 
+const getNorwegianWeekday = (dateStr: string) => {
+  if (!dateStr || !dateStr.includes('-')) return '';
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return '';
+  const dt = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 12, 0, 0));
+  const raw = new Intl.DateTimeFormat('nb-NO', { weekday: 'long', timeZone: 'UTC' }).format(dt);
+  return raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : '';
+};
+
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1081,7 +1090,9 @@ export default function AdminDashboard() {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <div className="flex items-center gap-2 text-xs text-zinc-400 font-mono">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-zinc-400 font-mono">
+                      <span className="font-sans font-semibold text-zinc-200">{getNorwegianWeekday(booking.date)}</span>
+                      <span>·</span>
                       <span>{formatDateShort(booking.date)}</span>
                       <span>·</span>
                       <span className="text-white font-semibold">{getBookingTimeRange(booking.time, booking.duration)}</span>
@@ -1197,6 +1208,9 @@ export default function AdminDashboard() {
                   return (
                 <tr key={booking.id} className={`transition-colors ${isExpired ? 'bg-red-950/10 opacity-70' : 'hover:bg-zinc-800/20'}`}>
                   <td className="px-3 sm:px-5 py-3.5 sm:py-4">
+                    <div className="text-xs font-semibold text-zinc-200 pl-5 mb-0.5">
+                      {getNorwegianWeekday(booking.date)}
+                    </div>
                     <div className="flex items-center gap-1.5 text-zinc-300 font-mono text-xs sm:text-sm">
                       <CalendarIcon className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
                       {formatDateShort(booking.date)}
