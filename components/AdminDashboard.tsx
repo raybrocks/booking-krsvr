@@ -111,8 +111,40 @@ export default function AdminDashboard() {
   const [redeemGiftCardBooking, setRedeemGiftCardBooking] = useState<any | null>(null);
   const [resendingEmailId, setResendingEmailId] = useState<string | null>(null);
   const [copiedBookingId, setCopiedBookingId] = useState<string | null>(null);
+  const [copiedNameKey, setCopiedNameKey] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const supabase = createClient();
+
+  const copyTextToClipboard = async (text: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+  };
+
+  const handleCopySingleName = async (key: string, rawName: string) => {
+    const cleanName = (rawName || "").trim();
+    if (!cleanName) return;
+    try {
+      await copyTextToClipboard(cleanName);
+      setCopiedNameKey(key);
+      toast.success(`Kopierte «${cleanName}»!`);
+      setTimeout(() => {
+        setCopiedNameKey((prev) => (prev === key ? null : prev));
+      }, 1500);
+    } catch (err) {
+      console.error("Feil ved kopiering av navn:", err);
+      toast.error("Kunne ikke kopiere navn");
+    }
+  };
 
   const handleCopyPlayerNames = async (bookingId: string, names: string[]) => {
     const validNames = (names || []).map((n) => (n || "").trim()).filter((n) => n.length > 0);
@@ -128,18 +160,7 @@ export default function AdminDashboard() {
     );
 
     try {
-      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(jsonOutput);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = jsonOutput;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      }
+      await copyTextToClipboard(jsonOutput);
       setCopiedBookingId(bookingId);
       toast.success(`Kopierte ${validNames.length} navn i JSON-format!`);
       setTimeout(() => {
@@ -150,6 +171,59 @@ export default function AdminDashboard() {
       toast.error("Kunne ikke kopiere til utklippstavle");
     }
   };
+
+  const renderCopyAllButton = (bookingId: string, validNames: string[]) => (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleCopyPlayerNames(bookingId, validNames);
+      }}
+      className="text-[10px] font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/70 hover:border-zinc-500 px-1.5 py-0.5 rounded flex items-center gap-1 transition-all active:scale-95 shadow-sm cursor-pointer"
+      title="Kopier alle navn i JSON-format"
+    >
+      {copiedBookingId === bookingId ? (
+        <>
+          <Check className="w-2.5 h-2.5 text-emerald-400" />
+          <span className="text-emerald-400 font-semibold">Kopiert!</span>
+        </>
+      ) : (
+        <>
+          <Copy className="w-2.5 h-2.5 text-zinc-400" />
+          <span>Kopier alle</span>
+        </>
+      )}
+    </button>
+  );
+
+  const renderPlayerNameChips = (bookingId: string, validNames: string[]) => (
+    <div className="mt-1 flex flex-wrap gap-1">
+      {validNames.map((name: string, idx: number) => {
+        const key = `${bookingId}-${idx}`;
+        const isCopied = copiedNameKey === key;
+        const cleanName = name.trim();
+        return (
+          <button
+            key={idx}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCopySingleName(key, cleanName);
+            }}
+            title={`Klikk for å kopiere «${cleanName}»`}
+            className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border transition-all active:scale-95 cursor-pointer ${
+              isCopied
+                ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40 font-semibold"
+                : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border-zinc-700/50 hover:border-zinc-500"
+            }`}
+          >
+            <span>{cleanName}</span>
+            {isCopied && <Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" />}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -1127,15 +1201,11 @@ export default function AdminDashboard() {
                     </div>
                   )}
                   {validNames.length > 0 && (
-                    <div className="mt-1.5 flex flex-wrap gap-1">
-                      {validNames.map((name: string, idx: number) => (
-                        <span
-                          key={idx}
-                          className="bg-zinc-800 text-zinc-300 text-[10px] px-1.5 py-0.5 rounded border border-zinc-700/50"
-                        >
-                          {name}
-                        </span>
-                      ))}
+                    <div className="mt-1.5 space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        {renderCopyAllButton(booking.id, validNames)}
+                      </div>
+                      {renderPlayerNameChips(booking.id, validNames)}
                     </div>
                   )}
                   {booking.internalNotes && (
@@ -1281,54 +1351,14 @@ export default function AdminDashboard() {
                               <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-1 group-hover:border-emerald-500/40">
                                 ✓ Navneliste ({validNames.length}/{booking.players})
                               </span>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopyPlayerNames(booking.id, validNames);
-                                }}
-                                className="text-[10px] font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/70 hover:border-zinc-500 px-1.5 py-0.5 rounded flex items-center gap-1 transition-all active:scale-95 shadow-sm"
-                                title="Kopier navneliste i JSON-format"
-                              >
-                                {copiedBookingId === booking.id ? (
-                                  <>
-                                    <Check className="w-2.5 h-2.5 text-emerald-400" />
-                                    <span className="text-emerald-400 font-semibold">Kopiert!</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="w-2.5 h-2.5 text-zinc-400" />
-                                    <span>Kopier JSON</span>
-                                  </>
-                                )}
-                              </button>
+                              {renderCopyAllButton(booking.id, validNames)}
                             </div>
                           ) : hasSome ? (
                             <div className="flex flex-wrap items-center gap-1.5">
                               <span className="text-[10px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded group-hover:border-amber-500/40">
                                 Delvis navneliste ({validNames.length}/{booking.players})
                               </span>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopyPlayerNames(booking.id, validNames);
-                                }}
-                                className="text-[10px] font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/70 hover:border-zinc-500 px-1.5 py-0.5 rounded flex items-center gap-1 transition-all active:scale-95 shadow-sm"
-                                title="Kopier navneliste i JSON-format"
-                              >
-                                {copiedBookingId === booking.id ? (
-                                  <>
-                                    <Check className="w-2.5 h-2.5 text-emerald-400" />
-                                    <span className="text-emerald-400 font-semibold">Kopiert!</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="w-2.5 h-2.5 text-zinc-400" />
-                                    <span>Kopier JSON</span>
-                                  </>
-                                )}
-                              </button>
+                              {renderCopyAllButton(booking.id, validNames)}
                             </div>
                           ) : isUpcomingSoon ? (
                             <div className="flex items-center gap-1">
@@ -1343,15 +1373,7 @@ export default function AdminDashboard() {
                             </div>
                           ) : null}
 
-                          {validNames.length > 0 && (
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              {validNames.map((name: string, idx: number) => (
-                                <span key={idx} className="bg-zinc-800 text-zinc-300 text-[10px] px-1.5 py-0.5 rounded border border-zinc-700/50 group-hover:border-purple-500/40">
-                                  {name}
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                          {validNames.length > 0 && renderPlayerNameChips(booking.id, validNames)}
                         </div>
                       );
                     })()}
