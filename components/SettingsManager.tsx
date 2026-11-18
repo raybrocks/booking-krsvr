@@ -669,7 +669,7 @@ export default function SettingsManager() {
               <button 
                 onClick={() => handleSave()}
                 disabled={saving}
-                className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors disabled:opacity-50 text-sm font-medium shadow-lg shadow-[#9C39FF]/20"
+                className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors disabled:opacity-50 text-sm font-medium"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Lagre Endringer
@@ -699,8 +699,8 @@ export default function SettingsManager() {
                 <div className="mb-6 bg-red-950/20 border border-red-900/50 p-6 rounded-2xl">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-medium text-red-400 mb-1">Emergency Booking Kill-Switch</h3>
-              <p className="text-sm text-zinc-400">When enabled, the final checkout button in the booking flow will be replaced with a message saying bookings are temporarily closed. Use this if you need to pause all incoming reservations immediately.</p>
+              <h3 className="text-lg font-medium text-red-400 mb-1">Nødbryter for booking (Steng nettbooking)</h3>
+              <p className="text-sm text-zinc-400">Når denne er aktivert, blir bekreftelsesknappen i bookingflyten erstattet av en beskjed om at nettbooking midlertidig er stengt. Bruk denne for å stanse alle nye reservasjoner umiddelbart.</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer ml-4 shrink-0">
               <input 
@@ -719,10 +719,10 @@ export default function SettingsManager() {
                       headers: {'Content-Type': 'application/json'},
                       body: JSON.stringify({ key: 'general', value: newSettings })
                     });
-                    toast.success(newValue ? "Bookings are now CLOSED" : "Bookings are now OPEN");
+                    toast.success(newValue ? "Nettbooking er nå STENGT" : "Nettbooking er nå ÅPEN");
                   } catch (error) {
                     console.error("Error saving emergency switch:", error);
-                    toast.error("Failed to update emergency switch");
+                    toast.error("Kunne ikke oppdatere nødbryteren");
                   }
                 }}
               />
@@ -732,20 +732,20 @@ export default function SettingsManager() {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Administrator Email</label>
-          <p className="text-zinc-500 text-xs mb-2">This email will receive contact form submissions, new booking notifications, and will be displayed in the footer.</p>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Administrator e-post</label>
+          <p className="text-zinc-400 text-xs mb-2">Denne adressen mottar henvendelser fra kontaktskjema og varsler om nye bookinger, og vises i bunnteksten på nettsiden.</p>
           <input 
             type="email"
             value={settings.adminEmail || "post@krsvr.no"} 
             onChange={(e) => setSettings({...settings, adminEmail: e.target.value})} 
-            placeholder="admin@example.com"
+            placeholder="post@krsvr.no"
             className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
           />
         </div>
 
         <div className="mb-6">
           <label htmlFor="voucher-email-input" className="block text-sm font-medium text-zinc-300 mb-2">E-postadresse for bilag (regnskap / dagsoppgjør)</label>
-          <p className="text-zinc-500 text-xs mb-2">E-postadresse som bilag og dagsoppgjør skal sendes til (for eksempel Fiken bilagsinnboks).</p>
+          <p className="text-zinc-400 text-xs mb-2">E-postadresse som bilag og dagsoppgjør skal sendes til (for eksempel Fiken bilagsinnboks).</p>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               id="voucher-email-input"
@@ -768,7 +768,7 @@ export default function SettingsManager() {
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-zinc-300 mb-2">Påminnelse om Navneliste (Dager før ankomst)</label>
-          <p className="text-zinc-500 text-xs mb-2">Hvor mange dager før arrangementsdatoen den daglige påminnelsesjobben skal begynne å purre kunden på e-post dersom navnelisten ikke er registrert (standard: 3 dager).</p>
+          <p className="text-zinc-400 text-xs mb-2">Hvor mange dager før arrangementsdatoen den daglige påminnelsesjobben skal begynne å purre kunden på e-post dersom navnelisten ikke er registrert (standard: 3 dager).</p>
           <input 
             type="number"
             min="1"
@@ -780,22 +780,22 @@ export default function SettingsManager() {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Booking Confirmation Email Text</label>
-          <p className="text-zinc-500 text-xs mb-2">This text will be included in the booking confirmation and receipt email sent to the customer.</p>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Tekst i bestillingsbekreftelse (e-post)</label>
+          <p className="text-zinc-400 text-xs mb-2">Valgfri melding som tas med i bekreftelsen og kvitteringen som sendes til kunden på e-post.</p>
           <textarea 
             value={settings.bookingConfirmationText || ""} 
             onChange={(e) => setSettings({...settings, bookingConfirmationText: e.target.value})} 
-            placeholder="Write the custom text for the booking confirmation email..."
+            placeholder="Skriv eventuell tilleggstekst til bestillingsbekreftelsen..."
             className="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
           />
         </div>
 
         <div className="mb-8">
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Terms of Service Content (Shown in booking step 5)</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Vilkår for bruk (vises i booking steg 5)</label>
           <textarea 
             value={settings.termsContent || ""} 
             onChange={(e) => setSettings({...settings, termsContent: e.target.value})} 
-            placeholder="Write your terms of service here..."
+            placeholder="Skriv vilkår og betingelser her..."
             className="w-full h-64 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:outline-none focus:border-[#9C39FF]"
           />
         </div>

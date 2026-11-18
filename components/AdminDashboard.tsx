@@ -808,71 +808,49 @@ export default function AdminDashboard() {
     const isFullySettled = !isPending && remaining === 0 && totalPrice > 0 && status !== 'EXPIRED' && status !== 'ABORTED';
 
     let badgeLabel = `GJENSTÅR: ${remaining} NOK`;
-    let badgeSub = 'ubetalt';
     let badgeClass = 'bg-red-500/15 text-red-300 border-red-500/40';
-    let subClass = 'text-red-400';
 
     if (isRefunded) {
-      badgeSub = 'refundert';
       badgeLabel = 'REFUNDERT (VIPPS)';
       badgeClass = 'bg-blue-500/20 text-blue-300 border-blue-500/30';
-      subClass = 'text-blue-400';
     } else if (isCancelledUnpaid) {
-      badgeSub = 'ikke betalt';
       badgeLabel = 'AVBRUTT / UTLØPT (0 KR)';
       badgeClass = 'bg-zinc-800 text-zinc-400 border-zinc-700/60';
-      subClass = 'text-zinc-400';
     } else if (isAuthorizedUncaptured) {
-      badgeSub = 'reservert i vipps';
-      badgeLabel = 'RESERVERT (MÅ TREKKES)';
+      badgeLabel = 'RESERVERT VIPPS (MÅ TREKKES)';
       badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-      subClass = 'text-amber-400';
     } else if (isPending) {
       if (isPendingExpired) {
-        badgeSub = 'ikke betalt';
         badgeLabel = 'UTLØPT (IKKE BETALT)';
         badgeClass = 'bg-red-500/15 text-red-300 border-red-500/30';
-        subClass = 'text-red-400';
       } else {
-        badgeSub = 'venter på vipps';
-        badgeLabel = 'VENTER PÅ BETALING';
+        badgeLabel = 'VENTER PÅ VIPPS';
         badgeClass = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
-        subClass = 'text-yellow-400';
       }
     } else if (isFree) {
-      badgeSub = 'gratis';
       badgeLabel = '0 KR';
       badgeClass = 'bg-zinc-800 text-zinc-400 border-zinc-700/50';
-      subClass = 'text-zinc-400';
     } else if (isFullySettled) {
       if (giftCardUsed > 0 && terminalPaid > 0) {
-        badgeSub = 'gavekort + terminal';
         badgeLabel = 'GAVEKORT + TERMINAL';
       } else if (giftCardUsed > 0 && vippsPaid > 0) {
-        badgeSub = 'gavekort + vipps';
         badgeLabel = 'GAVEKORT + VIPPS';
       } else if (giftCardUsed >= totalPrice) {
-        badgeSub = 'gavekort';
         badgeLabel = 'BETALT MED GAVEKORT';
       } else if (isTerminal) {
-        badgeSub = 'betalt (terminal)';
         badgeLabel = 'OPPGJORT (TERMINAL)';
       } else {
-        badgeSub = 'betalt (vipps)';
         badgeLabel = 'OPPGJORT (VIPPS)';
       }
       badgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-      subClass = 'text-emerald-400';
     } else if (isTerminal) {
-      badgeSub = giftCardUsed > 0 ? 'delbetalt med gavekort' : 'betales i arena';
-      badgeLabel = `BETALES I ARENA: ${remaining} NOK`;
+      badgeLabel = giftCardUsed > 0
+        ? `DELBETALT GAVEKORT · ARENA: ${remaining} NOK`
+        : `BETALES I ARENA: ${remaining} NOK`;
       badgeClass = 'bg-purple-500/20 text-purple-300 border-purple-500/40';
-      subClass = 'text-purple-400';
     } else if (amountPaid > 0 || giftCardUsed > 0) {
-      badgeSub = 'delbetalt';
-      badgeLabel = `GJENSTÅR: ${remaining} NOK`;
+      badgeLabel = `DELBETALT · GJENSTÅR: ${remaining} NOK`;
       badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-      subClass = 'text-amber-400';
     }
 
     const canCaptureOrCancel = isAuthorizedUncaptured;
@@ -886,10 +864,9 @@ export default function AdminDashboard() {
 
     return (
       <div className="flex flex-col gap-1.5 min-w-0">
-        <div className="flex flex-col gap-1">
-          <span className={`${subClass} font-medium text-xs`}>{badgeSub}</span>
+        <div>
           <span
-            className={`text-[10.5px] font-bold uppercase px-2 py-0.5 rounded-md inline-flex items-center border shadow-sm w-fit max-w-full whitespace-normal leading-tight ${badgeClass}`}
+            className={`text-[10.5px] font-bold uppercase px-2 py-0.5 rounded inline-flex items-center border w-fit max-w-full whitespace-normal leading-tight ${badgeClass}`}
           >
             {badgeLabel}
           </span>
@@ -937,7 +914,7 @@ export default function AdminDashboard() {
               </div>
             )}
             {!isTerminal && vippsPaid === 0 && giftCardUsed === 0 && remaining > 0 && (
-              <div className="text-zinc-500 text-[11px] italic">Innbetalt: 0 NOK</div>
+              <div className="text-zinc-400 text-[11px]">Innbetalt: 0 NOK</div>
             )}
           </div>
         )}
@@ -946,36 +923,36 @@ export default function AdminDashboard() {
           <div className="flex flex-wrap gap-1 mt-0.5">
             {booking.discountCode && (
               <span
-                className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/30 w-fit max-w-full"
+                className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-800/90 text-zinc-300 w-fit max-w-full"
                 title={`Rabattkode brukt: ${booking.discountCode}`}
               >
-                Rabattkode: <span className="font-mono">{booking.discountCode}</span>
+                Rabatt: <span className="font-mono text-zinc-100">{booking.discountCode}</span>
               </span>
             )}
             {booking.giftCardCode && (
               <span
-                className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 w-fit max-w-full"
+                className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-800/90 text-zinc-300 w-fit max-w-full"
                 title={`Gavekort brukt: ${booking.giftCardCode}${booking.giftCardAmount ? ` (${booking.giftCardAmount} NOK)` : ''}`}
               >
-                Gavekort: <span className="font-mono">{booking.giftCardCode}</span>
+                Gavekort: <span className="font-mono text-zinc-100">{booking.giftCardCode}</span>
               </span>
             )}
           </div>
         )}
 
         {(canCaptureOrCancel || canRefund) && (
-          <div className="flex flex-wrap gap-1 mt-1">
+          <div className="flex flex-wrap gap-1.5 mt-1">
             {canCaptureOrCancel && (
               <>
                 <button
                   onClick={() => handleVippsAction(booking.id, 'capture', booking.totalPrice)}
-                  className="text-[11px] bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-2 py-0.5 rounded transition-colors whitespace-nowrap"
+                  className="text-[11px] bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-2.5 py-1 rounded-lg font-medium transition-colors whitespace-nowrap"
                 >
-                  Complete (Capture)
+                  Fullfør trekk
                 </button>
                 <button
                   onClick={() => handleVippsAction(booking.id, 'cancel')}
-                  className="text-[11px] bg-red-500/20 hover:bg-red-500/30 text-red-300 px-2 py-0.5 rounded transition-colors whitespace-nowrap"
+                  className="text-[11px] bg-red-500/15 hover:bg-red-500/25 text-red-200 border border-red-500/35 px-2.5 py-1 rounded-lg font-medium transition-colors whitespace-nowrap"
                 >
                   Frigi (Avbryt)
                 </button>
@@ -994,7 +971,7 @@ export default function AdminDashboard() {
                     handleVippsAction(booking.id, 'refund', Number(amt.replace(',', '.')));
                   }
                 }}
-                className="text-[11px] bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium"
+                className="text-[11px] bg-orange-500/15 hover:bg-orange-500/25 text-orange-200 border border-orange-500/35 px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap font-medium"
                 title="Refunder via Vipps og send refusjonskvittering på e-post"
               >
                 Refunder (Vipps)
@@ -1004,11 +981,11 @@ export default function AdminDashboard() {
         )}
 
         {(canMarkTerminalPaid || (remaining > 0 && booking.status !== 'cancelled' && booking.bookingType !== 'system' && !booking.email?.includes('system@sperret'))) && (
-          <div className="flex flex-wrap gap-1 mt-1">
+          <div className="flex flex-wrap gap-1.5 mt-1">
             {canMarkTerminalPaid && (
               <button
                 onClick={() => handleMarkTerminalPaid(booking.id)}
-                className="text-[11px] bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium"
+                className="text-[11px] bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border border-emerald-500/40 px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap font-medium"
                 title="Registrer at kunden har betalt restbeløpet i kortterminalen"
               >
                 ✓ Registrer betalt ({remaining} kr)
@@ -1017,7 +994,7 @@ export default function AdminDashboard() {
             {remaining > 0 && booking.status !== 'cancelled' && booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') && (
               <button
                 onClick={() => setRedeemGiftCardBooking(booking)}
-                className="text-[11px] bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded transition-colors whitespace-nowrap font-medium inline-flex items-center gap-1"
+                className="text-[11px] bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 border border-amber-500/35 px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap font-medium inline-flex items-center gap-1"
                 title="Trekk hele eller deler av beløpet med gavekort"
               >
                 <Gift className="w-3 h-3" />
@@ -1107,13 +1084,13 @@ export default function AdminDashboard() {
           }`}
         >
           <option value="pending" className="bg-zinc-900 text-amber-400">
-            Pending
+            Venter
           </option>
           <option value="confirmed" className="bg-zinc-900 text-emerald-400">
-            Confirmed
+            Bekreftet
           </option>
           <option value="cancelled" className="bg-zinc-900 text-red-400">
-            Cancelled
+            Avbestilt
           </option>
         </select>
 
@@ -1121,15 +1098,15 @@ export default function AdminDashboard() {
           <button
             onClick={() => updateBookingStatus(booking.id, 'cancelled')}
             className="text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors"
-            title="Cancel Booking"
+            title="Avbestill booking"
           >
             <XCircle className="w-4 h-4" />
           </button>
         )}
         <button
           onClick={() => deleteBooking(booking.id)}
-          className="text-xs text-zinc-500 hover:text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors ml-1"
-          title="Permanently Delete Booking"
+          className="text-xs text-zinc-400 hover:text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors ml-1"
+          title="Slett booking permanent"
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -1139,14 +1116,14 @@ export default function AdminDashboard() {
 
   const renderBookingsTable = (tableBookings: any[], title?: string) => (
     <div className="mb-8 last:mb-0" key={title || 'table'}>
-      {title && <h2 className="text-xl font-medium mb-4 text-zinc-200">{title}</h2>}
-      {title === 'Today' && renderTodaySummary(tableBookings)}
+      {title && <h2 className="text-lg font-medium mb-3 text-zinc-200">{title}</h2>}
+      {title === 'I dag' && renderTodaySummary(tableBookings)}
 
       {/* Mobil-kortvisning (< lg) */}
       <div className="lg:hidden space-y-3">
         {tableBookings.length === 0 ? (
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center text-zinc-500 text-sm">
-            No bookings yet.
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 text-center text-zinc-400 text-sm">
+            Ingen bookinger ennå.
           </div>
         ) : (
           tableBookings.map((booking) => {
@@ -1209,7 +1186,7 @@ export default function AdminDashboard() {
                     </div>
                   )}
                   {booking.internalNotes && (
-                    <div className="mt-2 text-xs text-zinc-400 bg-zinc-950/60 p-2 rounded-lg border border-zinc-800 italic">
+                    <div className="mt-2 text-xs text-zinc-300 bg-zinc-950/60 p-2.5 rounded-lg border border-zinc-800 line-clamp-3">
                       {booking.internalNotes}
                     </div>
                   )}
@@ -1240,24 +1217,24 @@ export default function AdminDashboard() {
               <col className="w-[10%]" />
               <col className="w-[17%]" />
             </colgroup>
-            <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">
+            <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-300 sticky top-0 z-20">
               <tr>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[11%]" onClick={() => handleSort('dateTime')}>
-                  Date & Time {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[11%]" onClick={() => handleSort('dateTime')}>
+                  Dato & tid {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[17%]" onClick={() => handleSort('experienceId')}>
-                  Experience {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[17%]" onClick={() => handleSort('experienceId')}>
+                  Opplevelse {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[24%]" onClick={() => handleSort('customer')}>
-                  Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[24%]" onClick={() => handleSort('customer')}>
+                  Kunde {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[21%]" onClick={() => handleSort('totalPrice')}>
-                  Payment {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[21%]" onClick={() => handleSort('totalPrice')}>
+                  Betaling {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[10%]" onClick={() => handleSort('createdAt')}>
-                  Placed At {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[10%]" onClick={() => handleSort('createdAt')}>
+                  Bestilt {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-3 sm:px-5 py-4 font-medium cursor-pointer hover:text-zinc-200 transition-colors w-[17%]" onClick={() => handleSort('status')}>
+                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[17%]" onClick={() => handleSort('status')}>
                   Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </th>
               </tr>
@@ -1265,8 +1242,8 @@ export default function AdminDashboard() {
             <tbody className="divide-y divide-zinc-800/50">
               {tableBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">
-                    No bookings yet.
+                  <td colSpan={6} className="px-4 sm:px-6 py-8 text-left sm:text-center text-zinc-400 font-medium">
+                    Ingen bookinger ennå.
                   </td>
                 </tr>
               ) : (
@@ -1282,11 +1259,11 @@ export default function AdminDashboard() {
                       {getNorwegianWeekday(booking.date)}
                     </div>
                     <div className="flex items-center gap-1.5 text-zinc-300 font-mono text-xs sm:text-sm">
-                      <CalendarIcon className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                      <CalendarIcon className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                       {formatDateShort(booking.date)}
                     </div>
                     <div className="flex items-center gap-1 mt-1 text-zinc-200 text-xs font-semibold whitespace-nowrap">
-                      <Clock className="w-3 h-3 text-zinc-500 shrink-0" />
+                      <Clock className="w-3 h-3 text-zinc-400 shrink-0" />
                       {getBookingTimeRange(booking.time, booking.duration)}
                     </div>
                     <div className="flex items-center gap-1 mt-1 text-xs">
@@ -1322,14 +1299,14 @@ export default function AdminDashboard() {
                       title="Klikk for å endre opplevelse eller deltakere"
                     >
                       <span>{experiencesMap[booking.experienceId] || booking.experienceId}</span>
-                      <Pencil className="w-3 h-3 text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Pencil className="w-3 h-3 text-zinc-400 opacity-40 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <div 
                       className="flex items-center gap-1.5 mt-1 text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors w-fit"
                       onClick={() => setEditingBooking(booking)}
                       title="Klikk for å endre antall spillere"
                     >
-                      <Users className="w-3 h-3 text-zinc-500" /> {booking.players} {booking.players === 1 ? 'spiller' : 'spillere'}
+                      <Users className="w-3 h-3 text-zinc-400" /> {booking.players} {booking.players === 1 ? 'spiller' : 'spillere'}
                     </div>
                     {(() => {
                       if (!booking.players || booking.players <= 0 || booking.bookingType === 'system') return null;
@@ -1393,9 +1370,9 @@ export default function AdminDashboard() {
                       <span>
                         {booking.companyName ? `${booking.companyName} (${booking.firstName} ${booking.lastName})` : `${booking.firstName} ${booking.lastName}`}
                       </span>
-                      <Pencil className="w-3 h-3 text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Pencil className="w-3 h-3 text-zinc-400 opacity-40 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
+                    <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mt-1 text-xs text-zinc-400">
                       {booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') ? (
                         <>
                           <span className="flex items-center gap-1">
@@ -1405,21 +1382,21 @@ export default function AdminDashboard() {
                           <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
                         </>
                       ) : (
-                        <span className="text-[11px] text-zinc-500 italic">Blokkert tidspunkt (ikke tilgjengelig for kunder)</span>
+                        <span className="text-[11px] text-zinc-400 italic">Blokkert tidspunkt (ikke tilgjengelig for kunder)</span>
                       )}
                     </div>
                     {booking.internalNotes ? (
                        <div 
-                         className="mt-2 text-xs text-zinc-400 bg-zinc-800/40 p-2.5 rounded-lg border border-zinc-700/50 italic w-full whitespace-normal break-words cursor-pointer hover:bg-zinc-800 transition-colors"
+                         className="mt-2 text-xs text-zinc-300 bg-zinc-800/40 p-2.5 rounded-lg border border-zinc-700/50 w-full whitespace-normal break-words line-clamp-3 cursor-pointer hover:bg-zinc-800 transition-colors"
                          onClick={() => handleEditNote(booking.id, booking.internalNotes)}
-                         title="Klikk for å redigere kommentar"
+                         title={booking.internalNotes}
                        >
                           {booking.internalNotes}
                        </div>
                     ) : (
                        <button 
                          onClick={() => handleEditNote(booking.id, "")} 
-                         className="mt-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors underline decoration-dotted underline-offset-2"
+                         className="mt-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors underline decoration-dotted underline-offset-2"
                        >
                          + Legg til kommentar
                        </button>
@@ -1453,40 +1430,40 @@ export default function AdminDashboard() {
   return (
     <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 xl:px-12 pt-0 md:pt-4 pb-20">
       {/* Sticky header */}
-      <header className="mb-8 sticky top-0 md:top-4 z-40 bg-zinc-950/95 backdrop-blur-xl border border-zinc-800/80 rounded-2xl px-4 py-3 md:px-6 md:py-3.5 shadow-2xl">
-        <div className="flex items-center justify-between gap-4">
+      <header className="mb-8 sticky top-0 md:top-4 z-40 bg-zinc-950/95 border border-zinc-800/80 rounded-2xl px-4 py-3 md:px-5 md:py-3 shadow-xl">
+        <div className="flex items-center justify-between gap-3">
           {/* Left: Branding */}
           <div className="flex-shrink-0">
             <span className="text-[10px] font-bold tracking-[0.15em] text-zinc-950 uppercase bg-white px-2.5 py-0.5 rounded-full inline-block mb-1 shadow-sm">
               KRS VR Arena
             </span>
-            <h1 className="text-xl md:text-2xl font-light tracking-tight text-white">
+            <h1 className="text-lg md:text-xl font-light tracking-tight text-white whitespace-nowrap">
               Admin Dashboard
             </h1>
           </div>
 
           {/* Center: Desktop nav pill menu */}
-          <nav className="hidden xl:flex items-center bg-zinc-900/90 p-1.5 rounded-xl border border-zinc-800/80 shadow-inner gap-1 flex-wrap">
-            <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Upcoming</button>
-            <button onClick={() => setActiveTab("manual")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-4 h-4" /> Booking</button>
-            <button onClick={() => setActiveTab("inquiries")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'inquiries' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}>
-              <MailQuestion className="w-4 h-4" /> 
+          <nav className="hidden xl:flex items-center bg-zinc-900/90 p-1 rounded-xl border border-zinc-800/80 gap-0.5 overflow-x-auto hide-scrollbar">
+            <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); }} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-3.5 h-3.5 shrink-0" /> Kommende</button>
+            <button onClick={() => setActiveTab("manual")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-3.5 h-3.5 shrink-0" /> Booking</button>
+            <button onClick={() => setActiveTab("inquiries")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'inquiries' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}>
+              <MailQuestion className="w-3.5 h-3.5 shrink-0" /> 
               Forespørsler
               {newInquiriesCount > 0 && (
-                <span className="ml-1 bg-amber-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                <span className="ml-0.5 bg-amber-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full">
                   {newInquiriesCount}
                 </span>
               )}
             </button>
-            <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
-            <button onClick={() => setActiveTab("experiences")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-4 h-4" /> Spill</button>
-            <button onClick={() => setActiveTab("clients")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'clients' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Building2 className="w-4 h-4" /> Kunder</button>
-            <button onClick={() => setActiveTab("transactions")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
-            <button onClick={() => setActiveTab("giftcards")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'giftcards' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gift className="w-4 h-4" /> Gavekort</button>
-            <button onClick={() => setActiveTab("shifts")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
-            <button onClick={() => setActiveTab("employees")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
-            <button onClick={() => setActiveTab("settings")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
-            <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-purple-300 hover:text-white hover:bg-purple-900/20 border border-purple-500/20"><Mail className="w-4 h-4 text-purple-400" /> Nyhetsbrev</Link>
+            <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); }} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-3.5 h-3.5 shrink-0" /> Arkiv</button>
+            <button onClick={() => setActiveTab("experiences")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-3.5 h-3.5 shrink-0" /> Spill</button>
+            <button onClick={() => setActiveTab("clients")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'clients' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Building2 className="w-3.5 h-3.5 shrink-0" /> Kunder</button>
+            <button onClick={() => setActiveTab("transactions")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-3.5 h-3.5 shrink-0" /> Regnskap</button>
+            <button onClick={() => setActiveTab("giftcards")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'giftcards' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gift className="w-3.5 h-3.5 shrink-0" /> Gavekort</button>
+            <button onClick={() => setActiveTab("shifts")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-3.5 h-3.5 shrink-0" /> Vakter</button>
+            <button onClick={() => setActiveTab("employees")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-3.5 h-3.5 shrink-0" /> Ansatte</button>
+            <button onClick={() => setActiveTab("settings")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-3.5 h-3.5 shrink-0" /> Innstillinger</button>
+            <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors text-zinc-400 hover:text-zinc-200"><Mail className="w-3.5 h-3.5 shrink-0" /> Nyhetsbrev</Link>
           </nav>
 
           {/* Right: Push Notifications, Logout button + Mobile/Tablet Hamburger */}
@@ -1524,7 +1501,7 @@ export default function AdminDashboard() {
         {mobileMenuOpen && (
           <div className="xl:hidden mt-3 pt-3 border-t border-zinc-800/80">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-zinc-900/80 p-2 rounded-xl border border-zinc-800">
-              <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Upcoming</button>
+              <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Kommende</button>
               <button onClick={() => { setActiveTab("manual"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-4 h-4" /> Booking</button>
               <button onClick={() => { setActiveTab("inquiries"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'inquiries' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}>
                 <MailQuestion className="w-4 h-4" /> 
@@ -1636,10 +1613,30 @@ export default function AdminDashboard() {
             const upcomingBookings = filteredAndSortedBookings.filter(b => b.date > tomorrowStr);
 
             return (
-              <div className="space-y-8">
-                {renderBookingsTable(todayBookings, "Today")}
-                {renderBookingsTable(tomorrowBookings, "Tomorrow")}
-                {renderBookingsTable(upcomingBookings, "Upcoming")}
+              <div className="space-y-6">
+                {todayBookings.length === 0 && tomorrowBookings.length === 0 ? (
+                  <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between">
+                    <span>Ingen bookinger i dag eller i morgen.</span>
+                  </div>
+                ) : (
+                  <>
+                    {todayBookings.length > 0 ? (
+                      renderBookingsTable(todayBookings, "I dag")
+                    ) : (
+                      <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl px-4 py-2.5 text-xs text-zinc-400">
+                        <span className="font-medium text-zinc-300">I dag:</span> Ingen bookinger.
+                      </div>
+                    )}
+                    {tomorrowBookings.length > 0 ? (
+                      renderBookingsTable(tomorrowBookings, "I morgen")
+                    ) : (
+                      <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl px-4 py-2.5 text-xs text-zinc-400">
+                        <span className="font-medium text-zinc-300">I morgen:</span> Ingen bookinger.
+                      </div>
+                    )}
+                  </>
+                )}
+                {renderBookingsTable(upcomingBookings, "Kommende")}
               </div>
             );
           })()}

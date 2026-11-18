@@ -417,10 +417,10 @@ export default function ExperiencesManager() {
         body: JSON.stringify({ pricing: { pricing: globalPricing } })
       });
       if (!res.ok) throw new Error("Failed to save pricing");
-      toast.success("Global pricing updated successfully");
+      toast.success("Globale prisregler oppdatert");
     } catch (error) {
       console.error("Error saving pricing:", error);
-      toast.error("Failed to update pricing");
+      toast.error("Kunne ikke oppdatere prisregler");
     } finally {
       setSavingPricing(false);
     }
@@ -434,8 +434,8 @@ export default function ExperiencesManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-light">Global Pricing Rules</h2>
-          <p className="text-zinc-400 text-sm">Set the per-person price based on group size. This applies to all experiences.</p>
+          <h2 className="text-2xl font-light">Globale prisregler</h2>
+          <p className="text-zinc-400 text-sm">Angi pris per person basert på gruppestørrelse. Dette gjelder for alle opplevelser.</p>
         </div>
         <button 
           onClick={() => setShowPricing(!showPricing)}
@@ -451,7 +451,7 @@ export default function ExperiencesManager() {
             {[2, 3, 4, 5, 6, 7, 8].map(size => (
               <div key={size} className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-zinc-400">
-                  {size}{size === 8 ? '+' : ''} persons (kr/pers)
+                  {size}{size === 8 ? '+' : ''} pers (kr/pers)
                 </label>
                 <div className="relative">
                   <input 
@@ -487,8 +487,8 @@ export default function ExperiencesManager() {
 
       <div className="flex justify-between items-center mt-12">
         <div>
-          <h2 className="text-2xl font-light">VR Experiences</h2>
-          <p className="text-zinc-400 text-sm">Manage the games and experiences available for booking.</p>
+          <h2 className="text-2xl font-light">VR-opplevelser</h2>
+          <p className="text-zinc-400 text-sm">Administrer spillene og opplevelsene som er tilgjengelige for booking.</p>
         </div>
         <div className="flex gap-2">
           <button 
@@ -501,15 +501,15 @@ export default function ExperiencesManager() {
             onClick={handleAddNew}
             className="flex items-center gap-2 bg-[#9C39FF] text-white px-4 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors"
           >
-            <Plus className="w-4 h-4" /> Add New
+            <Plus className="w-4 h-4" /> Legg til ny
           </button>
         </div>
       </div>
 
       {editingId && (
-        <div className="bg-zinc-900 border border-[#9C39FF]/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(156,57,255,0.1)]">
+        <div className="bg-zinc-900 border border-[#9C39FF]/50 rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-medium">{editForm.id.startsWith('exp_') ? 'Add New Experience' : 'Edit Experience'}</h3>
+            <h3 className="text-xl font-medium">{editForm.id.startsWith('exp_') ? 'Legg til nytt spill' : 'Rediger spill'}</h3>
             <button onClick={() => setEditingId(null)} className="text-zinc-400 hover:text-white"><X className="w-5 h-5" /></button>
           </div>
           
@@ -1007,7 +1007,7 @@ export default function ExperiencesManager() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-2">Awards & Recognitions</label>
+                  <label className="block text-xs font-medium text-zinc-400 mb-2">Utmerkelser & priser</label>
                   <div className="flex flex-wrap gap-3">
                     {Array.isArray(editForm.awards) && editForm.awards.map((awardUrl: string, index: number) => (
                       <div key={index} className="relative w-20 h-20 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 flex items-center justify-center p-2">
@@ -1045,13 +1045,13 @@ export default function ExperiencesManager() {
               onClick={() => setEditingId(null)}
               className="px-4 py-2 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition-colors"
             >
-              Cancel
+              Avbryt
             </button>
             <button 
               onClick={handleSave}
               className="flex items-center gap-2 bg-[#9C39FF] text-white px-6 py-2 rounded-xl hover:bg-[#8b32e6] transition-colors"
             >
-              <Save className="w-4 h-4" /> Save Experience
+              <Save className="w-4 h-4" /> Lagre spill
             </button>
           </div>
         </div>
@@ -1064,12 +1064,12 @@ export default function ExperiencesManager() {
               <div className="relative w-full h-40 bg-zinc-950 border-b border-zinc-800">
                 <Image src={exp.images?.[0] || exp.picture} alt={exp.name} fill className="object-cover" />
                 {exp.isNew && (
-                  <span className="absolute top-2 left-2 bg-[#19EB5B] text-black text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md shadow-md">
+                  <span className="absolute top-2 left-2 bg-[#19EB5B] text-black text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md">
                     Nyhet
                   </span>
                 )}
                 {Array.isArray(exp.images) && exp.images.length > 1 && (
-                  <span className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-md border border-white/10">
+                  <span className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-medium px-2 py-0.5 rounded-md border border-white/15">
                     {exp.images.length} bilder
                   </span>
                 )}
@@ -1085,7 +1085,7 @@ export default function ExperiencesManager() {
                   <h3 className="text-lg font-medium text-white leading-tight">{exp.name}</h3>
                   <span className="text-[10px] font-medium tracking-wider uppercase bg-[#9C39FF] text-white px-2 py-0.5 rounded">{exp.type}</span>
                 </div>
-                {!exp.isActive && <span className="text-[10px] uppercase tracking-wider bg-red-500/20 text-red-400 px-2 py-1 rounded">Inactive</span>}
+                {!exp.isActive && <span className="text-[10px] uppercase tracking-wider bg-red-500/20 text-red-400 px-2 py-1 rounded">Inaktiv</span>}
               </div>
               
               <p className="text-sm text-zinc-400 line-clamp-2 mb-4 flex-1">{exp.shortDescription}</p>
@@ -1134,14 +1134,14 @@ export default function ExperiencesManager() {
                   <button 
                     onClick={() => moveExperience(index, 'up')}
                     disabled={index === 0}
-                    className="p-1 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded disabled:opacity-30 disabled:hover:bg-transparent"
+                    className="p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded disabled:opacity-30 disabled:hover:bg-transparent"
                   >
                     <ArrowUp className="w-3 h-3" />
                   </button>
                   <button 
                     onClick={() => moveExperience(index, 'down')}
                     disabled={index === experiences.length - 1}
-                    className="p-1 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded disabled:opacity-30 disabled:hover:bg-transparent"
+                    className="p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded disabled:opacity-30 disabled:hover:bg-transparent"
                   >
                     <ArrowDown className="w-3 h-3" />
                   </button>
@@ -1150,18 +1150,18 @@ export default function ExperiencesManager() {
                   onClick={() => handleEdit(exp)}
                   className="flex-1 flex justify-center items-center gap-2 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-sm transition-colors"
                 >
-                  <Edit className="w-3.5 h-3.5" /> Edit
+                  <Edit className="w-3.5 h-3.5" /> Rediger
                 </button>
                 <button 
                   onClick={() => handleDuplicate(exp)}
-                  title="Duplicate"
+                  title="Dupliser"
                   className="flex justify-center items-center p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-xl transition-colors"
                 >
                   <Copy className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => handleDelete(exp.id)}
-                  title="Delete"
+                  title="Slett"
                   className="flex justify-center items-center p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />

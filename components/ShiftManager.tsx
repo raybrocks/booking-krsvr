@@ -83,10 +83,10 @@ export default function ShiftManager() {
         await fetchData();
       } else {
         const err = await res.json();
-        alert(err.error || "Failed to register shift");
+        alert(err.error || "Kunne ikke registrere tilgjengelighet");
       }
     } catch (e) {
-      alert("Error saving shift");
+      alert("Feil ved lagring av tilgjengelighet");
     }
     setSubmitting(false);
   };
@@ -117,7 +117,7 @@ export default function ShiftManager() {
         await fetchData();
       } else {
         const err = await res.json();
-        alert(err.error || "Failed to log time");
+        alert(err.error || "Kunne ikke lagre timer");
       }
     } catch (e) {
       alert("Error logging time");
@@ -298,7 +298,7 @@ export default function ShiftManager() {
                 <tbody className="divide-y divide-zinc-800/50">
                   {shifts.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">Ingen tilgjengelighet registrert.</td>
+                      <td colSpan={4} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-400 font-medium">Ingen tilgjengelighet registrert.</td>
                     </tr>
                   ) : (
                     shifts.map((shift) => {
@@ -427,7 +427,7 @@ export default function ShiftManager() {
                 <tbody className="divide-y divide-zinc-800/50">
                   {timeEntries.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">Ingen timer registrert.</td>
+                      <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-400 font-medium">Ingen timer registrert.</td>
                     </tr>
                   ) : (
                     timeEntries.map((entry) => {

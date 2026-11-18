@@ -147,7 +147,7 @@ export default function EmployeesManager() {
           <tbody className="divide-y divide-zinc-800/50">
               {employees.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">
+                  <td colSpan={6} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-400 font-medium">
                     Ingen ansatte funnet.
                   </td>
                 </tr>
@@ -185,7 +185,7 @@ export default function EmployeesManager() {
                   <td className="px-6 py-4 text-right">
                     <button
                       onClick={() => handleDelete(emp.id, emp.email)}
-                      className="p-2 hover:bg-red-500/10 text-zinc-500 hover:text-red-400 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-400 rounded-lg transition-colors disabled:opacity-40"
                       title="Slett ansatt"
                       disabled={emp.email === "post@krsvr.no"}
                     >

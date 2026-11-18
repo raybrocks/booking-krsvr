@@ -366,7 +366,7 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
         // refresh booked times
         setBookedTimes([...bookedTimes, time, ...shadowTimes]);
       } else {
-        toast.error(data.error || "Failed to create booking");
+        toast.error(data.error || "Kunne ikke opprette booking");
       }
     } catch (error: any) {
       toast.error("Nettverksfeil: " + error.message);
@@ -467,7 +467,7 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
                      <option value="custom" hidden>Egendefinert</option>
                   )}
                 </select>
-                <span className="text-zinc-500 text-xs sm:text-sm text-center shrink-0">eller</span>
+                <span className="text-zinc-400 text-xs sm:text-sm text-center shrink-0">eller</span>
                 <input
                   type="time"
                   className="flex-1 min-w-0 max-w-full box-border block bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-white outline-none focus:border-[#9C39FF]"
@@ -490,7 +490,7 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
                  <option value={270}>270 Minutter (3 blokker)</option>
                  <option value={360}>360 Minutter (4 blokker)</option>
               </select>
-              <p className="text-xs leading-relaxed text-zinc-500 mt-1">
+              <p className="text-xs leading-relaxed text-zinc-400 mt-1">
                  Å velge mer enn 90 min vil automatisk blokkere de påfølgende tidspunktene {time ? "etter " + time : ""} denne dagen.
               </p>
             </div>
@@ -636,7 +636,7 @@ export default function ManualBookingManager({ initialData, onBookingCreated, on
               </div>
 
               {/* Global Pricing Reference Bar */}
-              <div className="pt-2 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-1 text-[11px] text-zinc-500">
+              <div className="pt-2 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-1 text-[11px] text-zinc-400">
                 <span>Globale pristrinn:</span>
                 <span>
                   2p: {globalPricing["2"] ?? 460},- · 3–4p: {globalPricing["3"] ?? 395},- · 5–7p: {globalPricing["5"] ?? 385},- · 8+p: {globalPricing["8"] ?? 375},-

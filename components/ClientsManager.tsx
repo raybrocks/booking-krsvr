@@ -565,7 +565,7 @@ export default function ClientsManager() {
                       unoptimized
                     />
                   ) : (
-                    <span className="text-[10px] text-zinc-600 font-medium">Ingen logo</span>
+                    <span className="text-[10px] text-zinc-400 font-medium">Ingen logo</span>
                   )}
                 </div>
 
@@ -580,7 +580,7 @@ export default function ClientsManager() {
                       unoptimized
                     />
                   ) : (
-                    <span className="text-[10px] text-zinc-600 font-medium">Kun logo</span>
+                    <span className="text-[10px] text-zinc-400 font-medium">Kun logo</span>
                   )}
                 </div>
 
@@ -611,7 +611,7 @@ export default function ClientsManager() {
                       </span>
                     )}
                     {!client.isActive && (
-                      <span className="text-[11px] font-medium text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">
+                      <span className="text-[11px] font-medium text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded-full">
                         Inaktiv
                       </span>
                     )}

@@ -284,7 +284,7 @@ export default function AdminGiftCardsTab() {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 rounded-xl bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-xs sm:text-sm font-bold transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer"
           >
             <Plus size={16} />
             Opprett manuelt
@@ -386,14 +386,14 @@ export default function AdminGiftCardsTab() {
             <tbody className="divide-y divide-zinc-800 text-zinc-300">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-500">
+                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-400">
                     <Loader2 className="animate-spin w-6 h-6 mx-auto mb-2 text-[#9C39FF]" />
                     Laster gavekort...
                   </td>
                 </tr>
               ) : filteredCards.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-500">
+                  <td colSpan={7} className="px-4 py-12 text-center text-zinc-400">
                     Ingen gavekort matcher søket.
                   </td>
                 </tr>

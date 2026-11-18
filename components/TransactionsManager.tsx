@@ -535,7 +535,7 @@ export default function TransactionsManager() {
               <div className="text-xl font-bold text-white mt-1">
                 {Number(dailyReport?.summary?.totalGrossSales || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
-              <div className="text-[11px] text-zinc-500 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1">
                 Refusjoner ({dailyReport?.summary?.totalRefunds || 0}): {Number(dailyReport?.summary?.totalRefundsAmount || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
             </div>
@@ -545,7 +545,7 @@ export default function TransactionsManager() {
               <div className="text-xl font-bold text-emerald-400 mt-1">
                 {Number(dailyReport?.summary?.totalNetTurnover || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
-              <div className="text-[11px] text-zinc-500 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1">
                 0 % MVA: {Number(dailyReport?.summary?.totalRevenue0Vat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · 12 % gr.l.: {Number(dailyReport?.summary?.totalRevenue12VatBasis || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · MVA: {Number(dailyReport?.summary?.totalOutgoingVat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
             </div>
@@ -555,7 +555,7 @@ export default function TransactionsManager() {
               <div className="text-xl font-bold text-zinc-200 mt-1">
                 {Number(dailyReport?.summary?.totalVippsFee || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
-              <div className="text-[11px] text-zinc-500 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1">
                 Estimert nettoutbetaling fra Vipps: {Number(dailyReport?.summary?.totalEstimatedVippsPayout || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
             </div>
@@ -583,7 +583,7 @@ export default function TransactionsManager() {
                 <tbody className="divide-y divide-zinc-800/50">
                   {!dailyReport?.days || dailyReport.days.length === 0 ? (
                     <tr>
-                      <td colSpan={12} className="px-6 py-10 text-center text-zinc-500">
+                      <td colSpan={12} className="px-6 py-10 text-center text-zinc-400">
                         Ingen godkjente Vipps-kvitteringer funnet.
                       </td>
                     </tr>
@@ -911,7 +911,7 @@ export default function TransactionsManager() {
                 <tbody className="divide-y divide-zinc-800/50">
                   {filteredTransactions.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-500 font-medium">
+                      <td colSpan={7} className="px-4 sm:px-6 py-8 sm:py-12 text-left sm:text-center text-zinc-400 font-medium">
                         Ingen kvitteringer eller transaksjoner funnet.
                       </td>
                     </tr>

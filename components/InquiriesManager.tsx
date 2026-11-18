@@ -187,7 +187,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "new":
-        return <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs px-2.5 py-1 rounded-md font-semibold inline-flex items-center gap-1.5 shadow-sm"><span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Ny</span>;
+        return <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs px-2.5 py-1 rounded-md font-semibold inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Ny</span>;
       case "contacted":
         return <span className="bg-blue-500/20 text-blue-300 border border-blue-500/40 text-xs px-2.5 py-1 rounded-md font-semibold inline-flex items-center gap-1.5 shadow-sm">Kontaktet</span>;
       case "booked":
@@ -468,7 +468,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
                 {item.internalNotes ? (
                   <span className="italic text-zinc-300">Notat: {item.internalNotes}</span>
                 ) : (
-                  <span className="text-zinc-500 underline decoration-dotted">+ Legg til internt notat</span>
+                  <span className="text-zinc-400 underline decoration-dotted">+ Legg til internt notat</span>
                 )}
               </div>
             </div>
@@ -482,7 +482,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
               <button
                 type="button"
                 onClick={() => onCreateBooking(item)}
-                className="px-4 py-2 bg-[#9C39FF] hover:bg-[#8A2BE2] text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md shadow-[#9C39FF]/20"
+                className="px-4 py-2 bg-[#9C39FF] hover:bg-[#8A2BE2] text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-colors"
                 title="Åpne manuell booking forhåndsutfylt med denne kundens data"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -502,7 +502,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
               <button
                 type="button"
                 onClick={() => handleUpdateStatus(item.id, "contacted")}
-                className="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm"
+                className="px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
                 title="Gjenåpne henvendelsen og flytt den tilbake til aktive henvendelser"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -515,7 +515,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
               <button
                 type="button"
                 onClick={() => handleUpdateStatus(item.id, "rejected")}
-                className="px-3 py-2 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700/60 text-xs font-medium rounded-xl flex items-center gap-1.5 transition-colors"
+                className="px-3 py-2 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/60 text-xs font-medium rounded-xl flex items-center gap-1.5 transition-colors"
                 title="Lukk eller arkiver henvendelsen (sett som avslått/avsluttet)"
               >
                 <Archive className="w-3.5 h-3.5" />
@@ -526,7 +526,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
 
           <button
             onClick={() => handleDelete(item.id)}
-            className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ml-auto"
+            className="p-2 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ml-auto"
             title="Slett henvendelse"
           >
             <Trash2 className="w-4 h-4" />
@@ -541,7 +541,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
       {/* Top filter toolbar */}
       <div className="flex flex-col md:flex-row gap-3 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 w-full">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
           <input
             type="text"
             placeholder="Søk i henvendelser (navn, e-post, bedrift, type)..."
@@ -588,7 +588,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
       {/* Main active inquiries list */}
       <div className="space-y-4">
         {activeInquiries.length === 0 ? (
-          <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-10 text-center text-zinc-500">
+          <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-10 text-center text-zinc-400">
             {searchQuery || statusFilter !== "all" || typeFilter !== "all"
               ? "Ingen henvendelser matchet søket/filteret."
               : "Ingen aktive henvendelser å behandle akkurat nå."}
