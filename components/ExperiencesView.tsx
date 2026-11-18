@@ -203,7 +203,7 @@ function MediaGallery({ experience, onPlayVideo }: { experience: any; onPlayVide
   );
 }
 
-function LanguageFlagsRow({ languages }: { languages: string[] }) {
+function LanguageFlagsRow({ languages, isEn = false }: { languages: string[]; isEn?: boolean }) {
   const [activeLang, setActiveLang] = useState<string | null>(null);
 
   if (!languages || languages.length === 0) return null;
@@ -212,7 +212,7 @@ function LanguageFlagsRow({ languages }: { languages: string[] }) {
     <div className="flex flex-wrap items-center justify-center gap-2 text-sm md:text-base">
       <div className="flex items-center gap-2">
         <Globe className="w-5 h-5 text-white shrink-0" />
-        <span>Available languages:</span>
+        <span>{isEn ? "Available languages:" : "Tilgjengelige språk:"}</span>
       </div>
       <div className="flex flex-wrap items-center gap-1.5">
         {languages.map((lang) => {
@@ -616,7 +616,8 @@ export function ExperiencesView({
             <div className="relative w-full max-w-6xl mx-auto flex items-center">
               <button 
                 onClick={scrollLeft} 
-                className="absolute -left-4 md:-left-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors"
+                aria-label={isEn ? "Previous experience" : "Forrige opplevelse"}
+                className="absolute -left-4 md:-left-12 z-10 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors"
               >
                 <ChevronLeft className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
               </button>
@@ -665,7 +666,7 @@ export function ExperiencesView({
                     </div>
                     <span 
                       className={`text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-wider px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
-                        isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-500 bg-zinc-900"
+                        isSelected ? "bg-[#9C39FF] text-white" : "text-zinc-400 bg-zinc-900"
                       }`}
                     >
                       {exp.displayType || exp.type}
@@ -678,7 +679,8 @@ export function ExperiencesView({
 
               <button 
                 onClick={scrollRight}
-                className="absolute -right-4 md:-right-12 z-10 p-2 text-zinc-500 hover:text-[#9C39FF] transition-colors"
+                aria-label={isEn ? "Next experience" : "Neste opplevelse"}
+                className="absolute -right-4 md:-right-12 z-10 p-2 text-zinc-400 hover:text-[#9C39FF] transition-colors"
               >
                 <ChevronRight className="w-10 h-10 md:w-16 md:h-16" strokeWidth={1} />
               </button>
@@ -719,21 +721,21 @@ export function ExperiencesView({
               )}
               <div className="flex items-center gap-2 flex-wrap justify-center mt-2">
                 {selected.isNew && (
-                  <span className="text-xs md:text-sm uppercase tracking-wider px-3.5 py-1.5 rounded bg-[#19EB5B] text-black font-extrabold shadow-[0_0_15px_rgba(25,235,91,0.3)]">
+                  <span className="text-xs uppercase tracking-wider px-3 py-1 rounded bg-[#19EB5B] text-black font-extrabold">
                     {isEn ? "New" : "Nyhet"}
                   </span>
                 )}
-                <span className="text-xs md:text-sm uppercase tracking-wider px-4 py-1.5 rounded bg-[#9C39FF] text-white font-medium">
+                <span className="text-xs uppercase tracking-wider px-3.5 py-1 rounded bg-[#9C39FF] text-white font-medium">
                   {selected.displayType || selected.type}
                 </span>
-                {selected.mixedReality && <span title={isEn ? "Physical movement blending the real arena with the virtual world" : "Fysisk bevegelse der det virkelige rommet blandes med den virtuelle verdenen"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Mixed Reality</span>}
-                {selected.cinematic && <span title={isEn ? "Cinematic experience with strong story and atmosphere" : "Filmatisk opplevelse med sterk historie og atmosfære"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Cinematic</span>}
-                {selected.action && <span title={isEn ? "Fast-paced action!" : "Høyt tempo og spenning!"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Action</span>}
-                {selected.jumpScare && <span title={isEn ? "Note: May contain sudden scary elements" : "Advarsel: Kan inneholde skremmende elementer"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Jump Scare</span>}
-                {selected.highscore && <span title={isEn ? "Compete for points and set new records!" : "Jakt på poeng og sett nye rekorder!"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Highscore</span>}
-                {selected.fantasy && <span title={isEn ? "Explore magical fantasy worlds" : "Opplev magiske og eventyrlige verdener"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">Fantasy</span>}
-                {selected.mystic && <span title={isEn ? "Mysterious puzzles await" : "Gåtefulle og spennende mysterier venter"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">{isEn ? "Mystery" : "Mystikk"}</span>}
-                {selected.codeSolving && <span title={isEn ? "Requires logic and teamwork to crack the codes" : "Krever kløkt og logisk tenkning for å løse kodene"} className="text-xs uppercase tracking-wider px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors text-zinc-300 font-medium cursor-help">{isEn ? "Code Solving" : "Kodeløsning"}</span>}
+                {selected.mixedReality && <span title={isEn ? "Physical movement blending the real arena with the virtual world" : "Fysisk bevegelse der det virkelige rommet blandes med den virtuelle verdenen"} className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 font-medium cursor-help">Mixed Reality</span>}
+                {selected.cinematic && <span title={isEn ? "Cinematic experience with strong story and atmosphere" : "Filmatisk opplevelse med sterk historie og atmosfære"} className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 font-medium cursor-help">Cinematic</span>}
+                {selected.action && <span title={isEn ? "Fast-paced action!" : "Høyt tempo og spenning!"} className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 font-medium cursor-help">Action</span>}
+                {selected.jumpScare && <span title={isEn ? "Note: May contain sudden scary elements" : "Advarsel: Kan inneholde skremmende elementer"} className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 font-medium cursor-help">Jump Scare</span>}
+                {selected.highscore && <span title={isEn ? "Compete for points and set new records!" : "Jakt på poeng og sett nye rekorder!"} className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 font-medium cursor-help">Highscore</span>}
+                {selected.fantasy && <span title={isEn ? "Explore magical fantasy worlds" : "Opplev magiske og eventyrlige verdener"} className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 font-medium cursor-help">Fantasy</span>}
+                {selected.mystic && <span title={isEn ? "Mysterious puzzles await" : "Gåtefulle og spennende mysterier venter"} className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 font-medium cursor-help">{isEn ? "Mystery" : "Mystikk"}</span>}
+                {selected.codeSolving && <span title={isEn ? "Requires logic and teamwork to crack the codes" : "Krever kløkt og logisk tenkning for å løse kodene"} className="text-xs uppercase tracking-wider px-2.5 py-1 rounded border border-zinc-800 bg-zinc-950 text-zinc-300 font-medium cursor-help">{isEn ? "Code Solving" : "Kodeløsning"}</span>}
               </div>
             </div>
 
@@ -806,7 +808,13 @@ export function ExperiencesView({
                 {selected.arenaSize && (
                   <div className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
                     <Maximize className="w-5 h-5 text-white shrink-0" />
-                    <span>{isEn ? selected.arenaSize.replace("kvm", "sqm") : selected.arenaSize}</span>
+                    <span>
+                      {/^\d+$/.test(String(selected.arenaSize).trim())
+                        ? `${String(selected.arenaSize).trim()} ${isEn ? "sqm" : "m²"}`
+                        : isEn
+                        ? String(selected.arenaSize).replace("kvm", "sqm")
+                        : selected.arenaSize}
+                    </span>
                   </div>
                 )}
 
@@ -845,7 +853,7 @@ export function ExperiencesView({
 
               {/* Line 3: Available languages */}
               {selected.languages && selected.languages.length > 0 && (
-                <LanguageFlagsRow key={`lang-${selected.id}`} languages={selected.languages} />
+                <LanguageFlagsRow key={`lang-${selected.id}`} languages={selected.languages} isEn={isEn} />
               )}
             </div>
 

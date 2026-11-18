@@ -213,7 +213,7 @@ export default async function VrTeambuildingPage() {
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-zinc-400 mb-6 px-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#19EB5B]" />
+            <span className="text-[#9C39FF] font-bold leading-none" aria-hidden="true">•</span>
             Kapasitet fra 2 til 64 personer &middot; EHF-faktura støttes
           </div>
           <div>Møt presist for å ikke miste spilletid.</div>
@@ -231,7 +231,7 @@ export default async function VrTeambuildingPage() {
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <Link
               href="/kontakt?type=bedrift"
-              className="px-7 sm:px-8 py-3 rounded-full text-sm font-semibold tracking-wide bg-[#9C39FF] hover:bg-[#8A30E0] text-white shadow-[0_0_20px_rgba(156,57,255,0.4)] transition-all hover:scale-105"
+              className="px-7 sm:px-8 py-3 rounded-full text-sm font-semibold tracking-wide bg-[#9C39FF] hover:bg-[#8A30E0] text-white transition-colors"
             >
               Send firmaforespørsel
             </Link>
@@ -302,26 +302,26 @@ export default async function VrTeambuildingPage() {
             <p className="text-zinc-300 text-sm md:text-base leading-relaxed mb-6 font-light">
               Mange som planlegger teambuilding er spente på om aktiviteten vil treffe hele avdelingen &mdash; spesielt de som aldri har prøvd VR før, eller kolleger som i utgangspunktet ikke er interessert i gaming.
             </p>
-            <div className="space-y-4 text-sm text-zinc-300 font-light">
-              <div className="flex items-start gap-3 bg-black/30 p-4 rounded-xl border border-white/5">
+            <div className="divide-y divide-white/10 text-sm text-zinc-300 font-light">
+              <div className="flex items-start gap-3.5 py-4 first:pt-0">
                 <Shield className="w-5 h-5 text-[#9C39FF] flex-shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white font-medium">Vi velger opplevelsene for dere:</strong> Våre erfarne spillverter skreddersyr og plukker spill som balanserer samarbeid og bevegelse, slik at arrangementet får en naturlig dynamikk og alle opplever mestring, spenning og engasjement &mdash; uansett erfaringsnivå.
                 </div>
               </div>
-              <div className="flex items-start gap-3 bg-black/30 p-4 rounded-xl border border-white/5">
+              <div className="flex items-start gap-3.5 py-4">
                 <Coffee className="w-5 h-5 text-[#9C39FF] flex-shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white font-medium">Sosialt samspill &ndash; også mellom rundene:</strong> For større grupper roterer lagene, og pausene er like sosiale som spilletiden. Kollegene følger med på hverandres kamper på storskjerm, sjekker egen statistikk på poengtavlen, tar en forfriskning og legger taktikk sammen før neste runde. Det er her latteren og praten virkelig sitter løst.
                 </div>
               </div>
-              <div className="flex items-start gap-3 bg-black/30 p-4 rounded-xl border border-white/5">
+              <div className="flex items-start gap-3.5 py-4">
                 <Users className="w-5 h-5 text-[#9C39FF] flex-shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white font-medium">En felles opplevelse sammen:</strong> Dette handler ikke om tradisjonell dataspilling alene foran en skjerm. Dere er i samme rom, snakker sammen, heier og løser utfordringene som et lag.
                 </div>
               </div>
-              <div className="flex items-start gap-3 bg-black/30 p-4 rounded-xl border border-white/5">
+              <div className="flex items-start gap-3.5 py-4">
                 <Check className="w-5 h-5 text-[#19EB5B] flex-shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white font-medium">Gode erfaringer og omtale i lokalpressen:</strong> Vår erfaring fra bedriftene som besøker oss (fra kommunale etater som Ingeniørvesenet til serveringssteder og private bedrifter) er at nettopp de som aldri har spilt før, ofte blir mest positivt overrasket.{" "}
@@ -336,7 +336,7 @@ export default async function VrTeambuildingPage() {
                   fra da 17 kolleger var inne til rullerende teambuilding hos oss.
                 </div>
               </div>
-              <div className="flex items-start gap-3 bg-black/30 p-4 rounded-xl border border-white/5">
+              <div className="flex items-start gap-3.5 py-4 last:pb-0">
                 <Check className="w-5 h-5 text-[#19EB5B] flex-shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white font-medium">Stolt partner i Visit Sørlandet:</strong> Som offisiell partner i landsdelens reiselivs- og destinasjonsselskap bidrar vi med sosiale innendørsaktiviteter og helårsopplevelser som samler bedrifter i Kristiansand.{" "}

@@ -56,29 +56,29 @@ export default function TestimonialsCarousel() {
                     src={testi.mainImage} 
                     alt={`${testi.companyName} på teambuilding hos KRS VR Arena i Kristiansand`} 
                     fill 
-                    className="object-cover object-[center_18%] group-hover:scale-105 transition-transform duration-700" 
+                    className="object-cover object-[center_18%]" 
                   />
                 ) : (
                   <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">Ingen bilde</div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 via-transparent to-transparent pointer-events-none" />
               </div>
-              <div className="p-6 flex flex-col flex-grow items-center text-center -mt-16 md:-mt-24 relative z-10">
+              <div className="px-6 pb-6 pt-3 flex flex-col flex-grow items-center text-center -mt-10 md:-mt-12 relative z-10">
                 {testi.logoImage ? (
-                  <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden bg-zinc-950 border-4 border-zinc-800 shadow-2xl flex items-center justify-center p-4 md:p-6 mb-4 group-hover:border-zinc-700 transition-colors">
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-zinc-950 border-2 border-zinc-700 shadow-lg flex items-center justify-center p-3 mb-3.5 group-hover:border-zinc-500 transition-colors">
                     <Image 
                       src={testi.logoImage} 
                       alt={`${testi.companyName} – Bedriftskunde hos KRS VR Arena i Kristiansand`} 
-                      width={192} 
-                      height={192} 
+                      width={96} 
+                      height={96} 
                       className="object-contain w-full h-full" 
                       unoptimized
                     />
                   </div>
                 ) : (
-                   <div className="w-32 h-32 md:w-48 md:h-48 rounded-full bg-zinc-800 border-4 border-zinc-900 mb-4" />
+                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-zinc-800 border-2 border-zinc-900 mb-3.5" />
                 )}
-                <h3 className="text-xl font-medium text-white">{testi.companyName}</h3>
+                <h3 className="text-lg md:text-xl font-medium text-white">{testi.companyName}</h3>
               </div>
             </div>
           </div>

@@ -3,7 +3,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Handshake, Crosshair, Skull, Mountain, Ghost, Gamepad2, Users } from "lucide-react";
-import Tilt from "react-parallax-tilt";
 import { slugify } from "@/lib/utils";
 import { localizeExperience } from "@/lib/i18n";
 
@@ -12,7 +11,6 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
   const scrollRef = useRef<HTMLDivElement>(null);
   const [experiences, setExperiences] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     async function fetchExperiences() {
@@ -42,25 +40,6 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
     }
     fetchExperiences();
   }, []);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (!isLoading && experiences.length > 0 && !isPaused) {
-      interval = setInterval(() => {
-        if (scrollRef.current) {
-          const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-          if (scrollLeft + clientWidth >= scrollWidth - 10) {
-            scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
-          } else {
-            scrollRef.current.scrollBy({ left: 280, behavior: "smooth" });
-          }
-        }
-      }, 3500);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isLoading, experiences, isPaused]);
 
   const scrollLeft = () => {
     if (scrollRef.current) {
@@ -97,13 +76,7 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
   if (!experiences || experiences.length === 0) return null;
 
   return (
-    <div 
-      className="relative w-full max-w-6xl mx-auto flex flex-col items-center mt-6"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={() => setIsPaused(true)}
-      onTouchEnd={() => setIsPaused(false)}
-    >
+    <div className="relative w-full max-w-6xl mx-auto flex flex-col items-center mt-6">
       <div className="relative w-full flex items-center">
         <button 
           onClick={scrollLeft} 
@@ -153,22 +126,13 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
               : null;
 
             return (
-              <Tilt
+              <div
                 key={exp.id}
-                tiltMaxAngleX={8}
-                tiltMaxAngleY={8}
-                glareEnable={true}
-                glareMaxOpacity={0.2}
-                glareColor="#ffffff"
-                glarePosition="all"
-                glareBorderRadius="24px"
-                scale={1.03}
-                transitionSpeed={1500}
                 className="flex-shrink-0 snap-center w-[250px] sm:w-[260px]"
               >
                 <Link
                   href={isEn ? `/en/experiences/${typeSlug}/${expSlug}` : `/vr-opplevelser/${typeSlug}/${expSlug}`}
-                  className="flex flex-col justify-between group w-full h-full rounded-3xl overflow-hidden border border-[#9C39FF]/40 bg-zinc-900/70 shadow-[0_0_20px_rgba(156,57,255,0.15)] hover:border-[#9C39FF] hover:shadow-[0_0_30px_rgba(156,57,255,0.35)] transition-all duration-300"
+                  className="flex flex-col justify-between group w-full h-full rounded-3xl overflow-hidden border border-zinc-800 bg-zinc-900/60 hover:border-[#9C39FF]/70 hover:bg-zinc-900 transition-colors duration-200"
                 >
                   {/* Cover Image or Icon Fallback */}
                   <div className="relative w-full aspect-[16/10] bg-zinc-950 overflow-hidden">
@@ -178,19 +142,19 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
                         <img
                           src={coverImage}
                           alt={`${exp.name} – ${typeBadge || (isEn ? "VR Experience" : "VR-opplevelse")} ${isEn ? "at KRS VR Arena" : "hos KRS VR Arena"}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
                       </>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-[#9C39FF]/10 text-white group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-full h-full flex items-center justify-center bg-[#9C39FF]/10 text-white">
                         {getIconForType(exp.type, exp.name)}
                       </div>
                     )}
 
                     {/* Genre Pill Top-Left */}
                     {typeBadge && (
-                      <span className="absolute top-3 left-3 text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-semibold shadow-md">
+                      <span className="absolute top-3 left-3 text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#9C39FF] text-white font-semibold">
                         {typeBadge}
                       </span>
                     )}
@@ -203,7 +167,7 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
                         {exp.name}
                       </h3>
                       {exp.subName && (
-                        <p className="text-xs text-zinc-400 font-light mt-1 line-clamp-1">
+                        <p className="text-xs text-zinc-400 font-light mt-1 line-clamp-2 leading-snug">
                           {exp.subName}
                         </p>
                       )}
@@ -215,14 +179,14 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
                         2–{maxPlayers >= 10 ? "10" : maxPlayers} {isEn ? "players" : "spillere"}
                       </span>
                       {ageLabel && (
-                        <span className="text-zinc-500 font-medium">
+                        <span className="text-zinc-300 font-medium">
                           {ageLabel}
                         </span>
                       )}
                     </div>
                   </div>
                 </Link>
-              </Tilt>
+              </div>
             );
           })}
           </div>
@@ -246,7 +210,7 @@ export default function HomeCarousel({ locale = "no" }: { locale?: "no" | "en" }
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-xs text-zinc-500">{isEn ? "Swipe to explore" : "Sveip for å utforske"}</span>
+        <span className="text-xs text-zinc-400">{isEn ? "Swipe to explore" : "Sveip for å utforske"}</span>
         <button
           onClick={scrollRight}
           aria-label={isEn ? "Scroll right" : "Bla til høyre"}

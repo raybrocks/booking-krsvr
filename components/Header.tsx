@@ -82,9 +82,9 @@ export default function Header() {
   const logoHref = locale === "no" ? "/" : "/en";
 
   return (
-    <header className="w-full relative md:sticky top-0 z-50 pointer-events-none flex flex-col md:pt-4">
+    <header className="w-full relative md:sticky top-0 z-50 pointer-events-none flex flex-col md:pt-3 pb-2">
       {/* Background container */}
-      <div className="absolute inset-0 bg-background/90 backdrop-blur-md border-b border-white/5 md:bg-gradient-to-b md:from-background md:via-background/90 md:to-transparent md:border-none md:h-[200px]" />
+      <div className="absolute inset-0 bg-background/90 backdrop-blur-md border-b border-white/5 md:bg-gradient-to-b md:from-background md:via-background/95 md:to-background/80 md:border-white/5" />
 
       {/* TOP ROW: Logo & Actions */}
       <div className="relative w-full px-4 md:px-8 py-4 md:py-2 flex justify-between items-center max-w-[1600px] mx-auto pointer-events-auto">
@@ -168,9 +168,12 @@ export default function Header() {
                   {navLinks.map((link) => {
                     const isBooking = link.href === "/booking" || link.href === "/en/booking";
                     const isArrangementer = link.hasDropdown;
-                    const isActive = isArrangementer
-                      ? pathname === link.href || pathname.startsWith("/arrangementer/")
-                      : pathname === link.href;
+                    const isActive =
+                      link.href === "/" || link.href === "/en"
+                        ? pathname === link.href
+                        : isArrangementer
+                        ? pathname === link.href || pathname.startsWith("/arrangementer/") || pathname.startsWith("/en/events")
+                        : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
                     if (isBooking) {
                       return (
@@ -192,7 +195,7 @@ export default function Header() {
                           <button
                             onClick={() => setMobileArrangementerOpen(!mobileArrangementerOpen)}
                             className={`flex items-center gap-2 text-2xl font-light tracking-wide transition-all ${
-                              isActive ? "text-white" : "text-zinc-500 hover:text-zinc-200"
+                              isActive ? "text-white" : "text-zinc-300 hover:text-white"
                             }`}
                           >
                             <span>{link.label}</span>
@@ -233,7 +236,7 @@ export default function Header() {
                         href={link.href}
                         onClick={() => setIsOpen(false)}
                         className={`text-2xl font-light tracking-wide transition-all ${
-                          isActive ? "text-white" : "text-zinc-500 hover:text-zinc-200"
+                          isActive ? "text-white" : "text-zinc-300 hover:text-white"
                         }`}
                       >
                         {isActive ? (
@@ -259,9 +262,12 @@ export default function Header() {
         <nav className="flex relative gap-1 md:gap-2">
           {navLinks.map((link) => {
             const isArrangementer = link.hasDropdown;
-            const isActive = isArrangementer
-              ? pathname === link.href || pathname.startsWith("/arrangementer/")
-              : pathname === link.href;
+            const isActive =
+              link.href === "/" || link.href === "/en"
+                ? pathname === link.href
+                : isArrangementer
+                ? pathname === link.href || pathname.startsWith("/arrangementer/") || pathname.startsWith("/en/events")
+                : pathname === link.href || pathname.startsWith(`${link.href}/`);
             const isBooking = link.href === "/booking" || link.href === "/en/booking";
 
             if (isBooking) {

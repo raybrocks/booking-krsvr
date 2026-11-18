@@ -13,7 +13,6 @@ export const viewport: Viewport = {
   themeColor: '#000000',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
 };
 
 export const metadata: Metadata = {
@@ -310,11 +309,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
             position="top-center" 
             toastOptions={{
               classNames: {
-                toast: 'bg-[#9C39FF] text-white border-[#8b32e6] shadow-[0_0_20px_rgba(156,57,255,0.3)]',
-                error: 'bg-[#9C39FF] text-white border-[#8b32e6]',
-                success: 'bg-[#9C39FF] text-white border-[#8b32e6]',
-                warning: 'bg-[#9C39FF] text-white border-[#8b32e6]',
-                info: 'bg-[#9C39FF] text-white border-[#8b32e6]',
+                toast: 'bg-zinc-900 text-white border border-zinc-700 shadow-xl',
+                error: 'bg-red-950/95 text-red-100 border border-red-500/40',
+                success: 'bg-emerald-950/95 text-emerald-100 border border-emerald-500/40',
+                warning: 'bg-amber-950/95 text-amber-100 border border-amber-500/40',
+                info: 'bg-[#9C39FF] text-white border border-[#8b32e6]',
               }
             }}
           />

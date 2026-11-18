@@ -147,7 +147,7 @@ export default function VrOnSitePage() {
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-zinc-400 mb-6 px-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#19EB5B]" />
+            <span className="text-[#9C39FF] font-bold leading-none" aria-hidden="true">•</span>
             Rigger opp i kantiner, konferansesaler, messehaller og gymsaler
           </div>
           <div>Komplett med instruktører og rigg</div>

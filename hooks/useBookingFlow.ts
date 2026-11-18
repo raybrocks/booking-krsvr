@@ -116,20 +116,33 @@ export function useBookingFlow(locale: "no" | "en" = "no") {
         
         if (expRes.ok) {
            const expData = await expRes.json();
-           const localizedExps: Experience[] = expData.map((e: any) => localizeExperience(e, locale));
-           setExperiences(localizedExps);
+           const allLocalizedExps: Experience[] = expData.map((e: any) => localizeExperience(e, locale));
 
            // Preselect experience if ?opplevelse= or ?experience= is in URL
+           let allowVippsTest = false;
            if (typeof window !== "undefined") {
              const params = new URLSearchParams(window.location.search);
              const preselectedId = params.get("opplevelse") || params.get("experience");
+             allowVippsTest = params.get("vipps_test") === "1";
              if (preselectedId) {
-               const found = localizedExps.find((e) => e.id === preselectedId);
+               const found = allLocalizedExps.find((e) => e.id === preselectedId);
                if (found) {
                  setSelectedExperience(found);
+                 if (found.type?.toLowerCase() === "vipps test") {
+                   allowVippsTest = true;
+                 }
                }
              }
            }
+
+           const visibleExps = allowVippsTest
+             ? allLocalizedExps
+             : allLocalizedExps.filter(
+                 (e) =>
+                   e.type?.toLowerCase() !== "vipps test" &&
+                   e.name?.toLowerCase() !== "vipps test"
+               );
+           setExperiences(visibleExps);
         }
         
         if (settingsRes.ok) {

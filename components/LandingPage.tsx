@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import HomeCarousel from "@/components/HomeCarousel";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
-import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -277,34 +277,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
         },
       ];
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  
-  const springConfig = { damping: 25, stiffness: 150 };
-  const springX = useSpring(mouseX, springConfig);
-  const springY = useSpring(mouseY, springConfig);
-
-  const bgX1 = useTransform(springX, [-1000, 1000], [50, -50]);
-  const bgY1 = useTransform(springY, [-1000, 1000], [50, -50]);
-
-  const bgX2 = useTransform(springX, [-1000, 1000], [-30, 30]);
-  const bgY2 = useTransform(springY, [-1000, 1000], [-30, 30]);
-
-  const abstractX1 = useTransform(springX, [-1000, 1000], [-80, 80]);
-  const abstractY1 = useTransform(springY, [-1000, 1000], [-80, 80]);
-  const abstractRotate1 = useTransform(springX, [-1000, 1000], [-45, 45]);
-
-  const abstractX2 = useTransform(springX, [-1000, 1000], [60, -60]);
-  const abstractY2 = useTransform(springY, [-1000, 1000], [60, -60]);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX - window.innerWidth / 2);
-      mouseY.set(e.clientY - window.innerHeight / 2);
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <main className="min-h-screen">
@@ -314,31 +287,15 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
       />
       {/* 1. Hero Section */}
       <section className="relative flex flex-col items-center justify-center text-center px-4 overflow-hidden pt-6 md:pt-12 pb-16">
-        <motion.div 
-          className="absolute inset-0 -z-10"
-          style={{ x: bgX1, y: bgY1 }}
-        >
-          <div className="absolute inset-[-100px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9C39FF]/15 via-black to-black"></div>
-        </motion.div>
-        <motion.div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#9C39FF]/5 rounded-full blur-3xl -z-10"
-          style={{ x: bgX2, y: bgY2 }}
-        ></motion.div>
-
-        {/* Abstract 2.5D Elements */}
-        <motion.div 
-          className="absolute top-1/4 left-1/4 w-[300px] h-[300px] rounded-full border border-[#9C39FF]/20 -z-10 opacity-50"
-          style={{ x: abstractX1, y: abstractY1, rotate: abstractRotate1 }}
-        ></motion.div>
-        <motion.div 
-          className="absolute bottom-1/4 right-1/4 w-[200px] h-[200px] rounded-full border border-[#9C39FF]/10 -z-10 opacity-30"
-          style={{ x: abstractX2, y: abstractY2 }}
-        ></motion.div>
+        <div
+          className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9C39FF]/12 via-black to-black pointer-events-none"
+          aria-hidden="true"
+        />
         
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.5 }}
           className="max-w-5xl mx-auto space-y-5 md:space-y-6"
         >
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tighter text-white leading-[1.12] max-w-4xl mx-auto">
@@ -374,7 +331,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
           </div>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-            <Button nativeButton={false} render={<Link href={isEn ? "/en/booking" : "/booking"} />} size="lg" className="h-13 md:h-14 px-8 text-base md:text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 min-w-[230px]">
+            <Button nativeButton={false} render={<Link href={isEn ? "/en/booking" : "/booking"} />} size="lg" className="h-13 md:h-14 px-8 text-base md:text-lg bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_20px_rgba(156,57,255,0.3)] transition-colors min-w-[230px]">
               {isEn ? "Book Experience" : "Book opplevelse"} <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button nativeButton={false} render={<Link href={isEn ? "/en/experiences" : "/vr-opplevelser"} />} size="lg" variant="outline" className="h-13 md:h-14 px-8 text-base md:text-lg border-zinc-700 hover:bg-zinc-800 rounded-full text-white min-w-[230px]">
@@ -386,7 +343,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 md:gap-5 pt-4 md:pt-6 max-w-5xl mx-auto text-left">
             <Link
               href={isEn ? "/en/experiences" : "/vr-opplevelser"}
-              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 hover:border-[#9C39FF]/60 transition-all duration-300 shadow-xl"
+              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 hover:border-[#9C39FF]/60 transition-colors duration-200 shadow-lg"
             >
               <Image
                 src="/images/vr-familiepakke-8-12-aar.jpg"
@@ -394,14 +351,14 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
                 fill
                 priority
                 sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                className="object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
               <div className="absolute bottom-3.5 left-4 right-4">
-                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-[#9C39FF] text-white font-medium mb-1.5 shadow">
+                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-[#9C39FF] text-white font-medium mb-1.5">
                   {isEn ? "2–10 players simultaneously" : "2–10 spillere samtidig"}
                 </span>
-                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-tight">
+                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#c48fff] transition-colors leading-tight">
                   {isEn ? "Families, Tourists & Friends" : "Familie eller vennegjeng"}
                 </div>
                 <div className="text-xs text-zinc-300 font-light mt-0.5">
@@ -412,7 +369,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
 
             <Link
               href={isEn ? "/en/events#teambuilding" : "/arrangementer/vr-teambuilding"}
-              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-[#9C39FF]/40 hover:border-[#9C39FF] transition-all duration-300 shadow-[0_0_25px_rgba(156,57,255,0.18)]"
+              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 hover:border-[#9C39FF]/60 transition-colors duration-200 shadow-lg"
             >
               <Image
                 src="/images/vr-teambuilding-firmaevent-kristiansand.jpg"
@@ -420,14 +377,14 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
                 fill
                 priority
                 sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                className="object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
               <div className="absolute bottom-3.5 left-4 right-4">
-                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-white font-medium mb-1.5">
+                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-black/80 border border-white/15 text-zinc-100 font-medium mb-1.5">
                   {isEn ? "2–64 players · Invoice & Bar" : "2–64 pers · EHF & Bar"}
                 </span>
-                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-tight">
+                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#c48fff] transition-colors leading-tight">
                   {isEn ? "Team Building & Corporate" : "Teambuilding & Bedrift"}
                 </div>
                 <div className="text-xs text-zinc-300 font-light mt-0.5">
@@ -438,7 +395,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
 
             <Link
               href={isEn ? "/en/events#bachelor-party" : "/arrangementer/vr-utdrikningslag"}
-              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 hover:border-[#9C39FF]/60 transition-all duration-300 shadow-xl"
+              className="group relative h-44 sm:h-48 md:h-56 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 hover:border-[#9C39FF]/60 transition-colors duration-200 shadow-lg"
             >
               <Image
                 src="/images/vr-utdrikningslag-kristiansand.jpg"
@@ -446,14 +403,14 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
                 fill
                 priority
                 sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                className="object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
               <div className="absolute bottom-3.5 left-4 right-4">
-                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-white font-medium mb-1.5">
+                <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-black/80 border border-white/15 text-zinc-100 font-medium mb-1.5">
                   {isEn ? "Private party lounge" : "Egen partylounge"}
                 </span>
-                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#9C39FF] transition-colors leading-tight">
+                <div className="text-base md:text-lg font-semibold text-white group-hover:text-[#c48fff] transition-colors leading-tight">
                   {isEn ? "Bachelor Parties & Birthdays" : "Utdrikningslag & Bursdag"}
                 </div>
                 <div className="text-xs text-zinc-300 font-light mt-0.5">
@@ -466,9 +423,9 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
 
         {/* 2. Tillitslinje (Trust Line) */}
         <motion.div 
-          initial={{ opacity: 0 }}
+          initial={shouldReduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
+          transition={{ delay: shouldReduceMotion ? 0 : 0.25, duration: shouldReduceMotion ? 0 : 0.5 }}
           className="mt-10 sm:mt-14 w-full max-w-6xl mx-auto flex flex-wrap justify-center gap-6 lg:gap-12 px-4"
         >
           <div className="flex flex-col items-center gap-2 text-zinc-400 p-2 w-[140px] md:w-[160px]">
@@ -505,9 +462,9 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
 
         {/* Trust Pill below feature icons */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.7 }}
+          transition={{ delay: shouldReduceMotion ? 0 : 0.3, duration: shouldReduceMotion ? 0 : 0.5 }}
           className="mt-8 sm:mt-10"
         >
           <div className="inline-flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-1 sm:gap-2 px-5 py-2.5 sm:px-4 sm:py-2 rounded-2xl sm:rounded-full bg-zinc-900/80 border border-white/10 text-xs sm:text-sm text-zinc-300">
@@ -617,10 +574,10 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
                       alt={card.alt}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
-                      className={`object-cover ${"imagePosition" in card && card.imagePosition ? card.imagePosition : "object-center"} group-hover:scale-105 transition-transform duration-700`}
+                      className={`object-cover ${"imagePosition" in card && card.imagePosition ? card.imagePosition : "object-center"}`}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
-                    <div className="absolute top-3.5 left-3.5 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-xs font-medium text-zinc-200">
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-transparent to-transparent" />
+                    <div className="absolute top-3.5 left-3.5 bg-black/80 px-3 py-1 rounded-full border border-white/15 text-xs font-medium text-zinc-100">
                       {card.badge}
                     </div>
                   </div>
@@ -628,10 +585,10 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
                   <div className="p-7 flex flex-col flex-grow justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#9C39FF]/15 flex items-center justify-center text-[#9C39FF] group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-9 h-9 rounded-xl bg-[#9C39FF]/15 flex items-center justify-center text-[#9C39FF]">
                           <Icon className="w-5 h-5" />
                         </div>
-                        <h3 className="text-xl font-medium text-white group-hover:text-[#9C39FF] transition-colors">
+                        <h3 className="text-xl font-medium text-white group-hover:text-[#c48fff] transition-colors">
                           {card.title}
                         </h3>
                       </div>
@@ -652,12 +609,10 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
       </section>
 
       {/* 5.5. Seksjon: Våre Opplevelser (Carousel) */}
-      <section className="py-28 relative overflow-hidden bg-zinc-950/80 border-y border-white/5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#9C39FF]/15 via-transparent to-transparent opacity-80 pointer-events-none" />
-        
-        {/* Subtle blur overlay at edges for smoother scrolling effect */}
-        <div className="hidden md:block absolute inset-y-0 left-0 w-28 bg-gradient-to-r from-zinc-950 via-zinc-950/70 to-transparent z-10 pointer-events-none" />
-        <div className="hidden md:block absolute inset-y-0 right-0 w-28 bg-gradient-to-l from-zinc-950 via-zinc-950/70 to-transparent z-10 pointer-events-none" />
+      <section className="py-24 relative overflow-hidden bg-zinc-950/80 border-y border-white/5">
+        {/* Subtle edge fades narrow enough to keep adjacent cards readable */}
+        <div className="hidden md:block absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-zinc-950 to-transparent z-10 pointer-events-none" />
+        <div className="hidden md:block absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-zinc-950 to-transparent z-10 pointer-events-none" />
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center mb-12">
@@ -697,9 +652,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
              <TestimonialsCarousel />
           </div>
 
-          <div className="max-w-5xl mx-auto bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 rounded-3xl p-6 sm:p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#9C39FF]/10 rounded-full blur-3xl -z-10 absolute-center translate-x-1/3 -translate-y-1/2"></div>
-            
+          <div className="max-w-5xl mx-auto bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 sm:p-10 md:p-14 text-center shadow-xl">
             <h3 className="text-2xl sm:text-3xl md:text-4xl font-light text-white mb-5 sm:mb-6">
               {isEn ? "Looking for an activity that strengthens team bonds?" : "Ser dere etter en aktivitet som virkelig bygger relasjoner?"}
             </h3>
@@ -708,7 +661,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
                 ? "In our experiences, participants must collaborate, communicate, and solve challenges together. For larger companies (10–64 players), we run a social tournament format with a big screen in the lounge, custom team wristbands, hot pizza delivery, pre-ordered bar, and corporate invoicing."
                 : "I våre opplevelser må deltakerne samarbeide, kommunisere og løse oppgaver i fellesskap. For større bedrifter (10–64 personer) kjører vi et sosialt turneringsformat med storskjerm i loungen, egne lag-armbånd, varm pizzalevering, forhåndsbestilt bar og EHF-faktura."}
             </p>
-            <Button nativeButton={false} render={<Link href={isEn ? "/en/events#teambuilding" : "/arrangementer/vr-teambuilding"} />} size="lg" className="w-full sm:w-auto max-w-full whitespace-normal h-auto min-h-12 sm:h-14 py-3 px-5 sm:px-8 text-sm sm:text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-transform hover:scale-105">
+            <Button nativeButton={false} render={<Link href={isEn ? "/en/events#teambuilding" : "/arrangementer/vr-teambuilding"} />} size="lg" className="w-full sm:w-auto max-w-full whitespace-normal h-auto min-h-12 sm:h-14 py-3 px-5 sm:px-8 text-sm sm:text-lg bg-white text-black hover:bg-zinc-200 rounded-full font-medium transition-colors">
               <span>{isEn ? "View Corporate & Group Packages" : "Se bedriftsopplegg og teambuilding"}</span>
               <ArrowRight className="ml-1.5 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
             </Button>
@@ -722,8 +675,8 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
           <h2 className="text-4xl font-light text-white mb-16 text-center">
             {isEn ? "Why Choose KRS VR Arena?" : "Hvorfor velge KRS VR Arena?"}
           </h2>
-          <div className="max-w-4xl mx-auto">
-            <ul className="space-y-4">
+          <div className="max-w-3xl mx-auto">
+            <ul className="divide-y divide-zinc-800/70">
               {(isEn
                 ? [
                     "Social team activities where up to 10 players play simultaneously across 143 sqm of free-roam arena space.",
@@ -744,8 +697,8 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
                     "Sentralt på Lund i Kristiansand (Industrigata 12) med gratis gateparkering i nærområdet."
                   ]
               ).map((item, idx) => (
-                <li key={idx} className="flex items-start gap-4 bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800/50 hover:border-zinc-700 transition-colors">
-                  <CheckCircle2 className="w-6 h-6 text-[#9C39FF] flex-shrink-0 mt-0.5" />
+                <li key={idx} className="flex items-start gap-4 py-5">
+                  <CheckCircle2 className="w-5 h-5 text-[#9C39FF] flex-shrink-0 mt-1" />
                   <span className="text-zinc-300 md:text-lg font-light leading-relaxed">{item}</span>
                 </li>
               ))}
@@ -768,11 +721,11 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
           
           <div className="grid sm:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
-              <Clock className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
+              <Clock className="w-7 h-7 text-[#9C39FF] flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">
+                <h3 className="text-xl font-medium text-white mb-2">
                   {isEn ? "Arrive on Time" : "Møt presist"}
-                </h4>
+                </h3>
                 <p className="text-zinc-400 font-light leading-relaxed">
                   {isEn
                     ? "Please arrive on time so you do not lose any game time. We begin registration and briefing at your scheduled start time."
@@ -781,11 +734,11 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
               </div>
             </div>
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
-              <Shirt className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
+              <Shirt className="w-7 h-7 text-[#9C39FF] flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">
+                <h3 className="text-xl font-medium text-white mb-2">
                   {isEn ? "Glasses & Clothing" : "Briller og klær"}
-                </h4>
+                </h3>
                 <p className="text-zinc-400 font-light leading-relaxed">
                   {isEn
                     ? "Normal eyeglasses fit inside the VR headsets, though contact lenses are even more comfortable. Wear comfortable clothes and flat shoes — you will walk freely around the arena."
@@ -794,11 +747,11 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
               </div>
             </div>
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
-              <Info className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
+              <Info className="w-7 h-7 text-[#9C39FF] flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">
+                <h3 className="text-xl font-medium text-white mb-2">
                   {isEn ? "48-Hour Cancellation" : "48 timer"}
-                </h4>
+                </h3>
                 <p className="text-zinc-400 font-light leading-relaxed">
                   {isEn
                     ? "Free cancellation up to 48 hours before your scheduled session. You can adjust player count and names anytime via your booking link."
@@ -807,11 +760,11 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
               </div>
             </div>
             <div className="flex gap-5 p-8 bg-zinc-950/50 rounded-3xl border border-zinc-800/50">
-              <Users className="w-10 h-10 text-[#9C39FF] flex-shrink-0" />
+              <Users className="w-7 h-7 text-[#9C39FF] flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xl font-medium text-white mb-2">
+                <h3 className="text-xl font-medium text-white mb-2">
                   {isEn ? "Groups Larger Than 10 Players" : "Grupper større enn 10 personer"}
-                </h4>
+                </h3>
                 <p className="text-zinc-400 font-light leading-relaxed">
                   {isEn
                     ? "Use our contact form for groups of 10–64 people. Up to 10 players play simultaneously, and larger groups enjoy a rolling tournament format so everyone shares the event together."
@@ -821,8 +774,8 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
             </div>
           </div>
           
-          <div className="mt-12 text-center">
-             <p className="text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
+          <div className="mt-10 pt-8 border-t border-white/10 max-w-2xl mx-auto text-center">
+             <p className="text-zinc-400 font-light leading-relaxed">
                {isEn
                  ? "Upon request, children up to 14 years receive a 10% discount and students receive a 20% discount Sunday–Thursday (in groups of 3+ players). International visitors can reserve online with 0 NOK upfront and pay by Visa, Mastercard, or Apple Pay on arrival."
                  : "Ved forespørsel får barn til og med 14 år 10 %, og studenter 20 %, rabatt alle dager, bortsett fra fredag og lørdag (i grupper på 3+ pers). Om du booker på nett refunderer vi rabatten ved forespørsel."}
@@ -843,7 +796,7 @@ export default function LandingPage({ locale = "no" }: { locale?: "no" | "en" })
             : "Reserver tid på nett, eller send oss en forespørsel for større grupper. Vi gleder oss til å ta imot dere."}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md sm:max-w-none mx-auto">
-          <Button nativeButton={false} render={<Link href={isEn ? "/en/booking" : "/booking"} />} size="lg" className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_30px_rgba(156,57,255,0.4)] transition-all hover:scale-105 sm:min-w-[300px]">
+          <Button nativeButton={false} render={<Link href={isEn ? "/en/booking" : "/booking"} />} size="lg" className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl bg-[#9C39FF] hover:bg-[#8b32e6] text-white rounded-full shadow-[0_0_20px_rgba(156,57,255,0.3)] transition-colors sm:min-w-[300px]">
             {isEn ? "Book Experience" : "Book opplevelse"}
           </Button>
           <Button nativeButton={false} render={<Link href={isEn ? "/en/contact" : "/kontakt"} />} size="lg" variant="outline" className="w-full sm:w-auto h-14 sm:h-16 px-6 sm:px-10 text-lg sm:text-xl border-zinc-700 hover:bg-zinc-800 rounded-full text-white sm:min-w-[300px]">

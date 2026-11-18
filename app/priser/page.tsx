@@ -49,7 +49,7 @@ export default function PriserPage() {
       
       <div className="container mx-auto px-4 max-w-4xl relative z-10 text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-light tracking-tighter text-white">
-          Priser <span className="text-sm font-medium text-zinc-500 uppercase tracking-widest ml-2 align-middle">Inkl. MVA</span>
+          Priser <span className="text-sm font-medium text-zinc-300 uppercase tracking-widest ml-2 align-middle">Inkl. MVA</span>
         </h1>
         <p className="mt-4 text-zinc-400 max-w-2xl mx-auto leading-relaxed">
           Prisen justeres automatisk etter hvor mange dere er. Samle venner, familie eller kollegaer i våre trådløse VR-arenaer på Lund.
@@ -58,7 +58,7 @@ export default function PriserPage() {
 
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Gift Card Callout Banner */}
-        <div className="mb-10 bg-gradient-to-r from-purple-950/40 via-zinc-900/60 to-purple-950/40 border border-[#9C39FF]/30 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_30px_rgba(156,57,255,0.15)]">
+        <div className="mb-10 bg-gradient-to-r from-purple-950/35 via-zinc-900/70 to-purple-950/35 border border-[#9C39FF]/30 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4 text-center sm:text-left">
             <div className="w-12 h-12 rounded-2xl bg-[#9C39FF]/20 border border-[#9C39FF]/40 flex items-center justify-center shrink-0 mx-auto sm:mx-0">
               <Gift className="w-6 h-6 text-[#c084fc]" />
@@ -72,7 +72,7 @@ export default function PriserPage() {
           </div>
           <Link
             href="/gavekort"
-            className="shrink-0 px-6 py-3 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(156,57,255,0.4)] hover:scale-105"
+            className="shrink-0 px-6 py-3 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors"
           >
             Kjøp gavekort nå
           </Link>
@@ -81,9 +81,7 @@ export default function PriserPage() {
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
           
           {/* Pricing Table */}
-          <div className="bg-zinc-900/40 border border-white/10 rounded-3xl p-8 backdrop-blur-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#9C39FF]/5 rounded-full blur-3xl -z-10 translate-x-12 -translate-y-12" />
-            
+          <div className="bg-zinc-900/40 border border-white/10 rounded-3xl p-8">
             <div className="flex items-center gap-3 mb-8">
               <Clock className="w-6 h-6 text-[#9C39FF]" />
               <div>
@@ -93,21 +91,14 @@ export default function PriserPage() {
 
             <div className="space-y-4">
               {[
-                { pers: "8 - 10 pers", price: "375 kr", popular: false },
-                { pers: "5 - 7 pers", price: "385 kr", popular: false },
-                { pers: "3 - 4 pers", price: "395 kr", popular: false },
-                { pers: "2 pers", price: "460 kr", popular: false },
+                { pers: "8 - 10 pers", price: "375 kr" },
+                { pers: "5 - 7 pers", price: "385 kr" },
+                { pers: "3 - 4 pers", price: "395 kr" },
+                { pers: "2 pers", price: "460 kr" },
               ].map((tier, idx) => (
-                <div key={idx} className={`flex items-center justify-between p-4 rounded-2xl border ${tier.popular ? 'border-[#9C39FF]/30 bg-[#9C39FF]/5' : 'border-zinc-800 bg-zinc-950/50'}`}>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-lg font-medium ${tier.popular ? 'text-white' : 'text-zinc-300'}`}>{tier.pers}</span>
-                    {tier.popular && (
-                      <span className="text-[10px] uppercase tracking-wider font-bold bg-[#9C39FF] text-white px-2 py-0.5 rounded-full">
-                        Mest populær
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xl font-bold text-white">{tier.price} <span className="text-sm font-normal text-zinc-500">per pers</span></span>
+                <div key={idx} className="flex items-center justify-between p-4 rounded-2xl border border-zinc-800 bg-zinc-950/60">
+                  <span className="text-lg font-medium text-zinc-200">{tier.pers}</span>
+                  <span className="text-xl font-bold text-white">{tier.price} <span className="text-sm font-normal text-zinc-400">per pers</span></span>
                 </div>
               ))}
             </div>
@@ -116,7 +107,7 @@ export default function PriserPage() {
               <Link href="/vr-opplevelser" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-zinc-700 hover:bg-zinc-800 text-white font-bold transition-colors">
                 Se VR opplevelser
               </Link>
-              <Link href="/booking" className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white font-bold transition-colors shadow-[0_0_15px_rgba(156,57,255,0.4)] hover:shadow-[0_0_25px_rgba(156,57,255,0.6)]">
+              <Link href="/booking" className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white font-bold transition-colors">
                 Book din opplevelse nå
               </Link>
             </div>
@@ -124,8 +115,8 @@ export default function PriserPage() {
 
           {/* Included Features */}
           <div className="flex flex-col h-full justify-center">
-            <h2 className="text-2xl font-light tracking-tight text-white mb-6">Dette er inkludert i prisen:</h2>
-            <ul className="space-y-5">
+            <h2 className="text-2xl font-light tracking-tight text-white mb-4">Dette er inkludert i prisen:</h2>
+            <ul className="divide-y divide-zinc-800/70">
               {[
                 "10-15 minutter forberedelse og introduksjon.",
                 "Rundt 60 minutter in-game session i VR.",
@@ -136,15 +127,15 @@ export default function PriserPage() {
                 "Tilgang til vår partylounge i 30 minutter etter spillet.",
                 "Mulighet for medbrakt kake ved barnebursdag (forhåndsbestilt servering ved teambuilding, voksenbursdag og utdrikningslag).",
               ].map((item, idx) => (
-                <li key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-zinc-900/20 border border-white/5 hover:border-white/10 hover:bg-zinc-900/40 transition-colors">
-                  <CheckCircle2 className="w-6 h-6 text-[#9C39FF] flex-shrink-0" />
+                <li key={idx} className="flex items-start gap-3.5 py-3.5">
+                  <CheckCircle2 className="w-5 h-5 text-[#9C39FF] flex-shrink-0 mt-0.5" />
                   <span className="text-zinc-300 leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>
             
-            <div className="mt-8 p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800 text-sm text-zinc-400 flex items-start gap-3">
-              <Info className="w-5 h-5 text-zinc-500 flex-shrink-0 mt-0.5" />
+            <div className="mt-6 pt-5 border-t border-zinc-800 text-sm text-zinc-400 flex items-start gap-3">
+              <Info className="w-5 h-5 text-zinc-400 flex-shrink-0 mt-0.5" />
               <p>For grupper med flere enn 10 personer kjøres opplegget i et sosialt turneringsformat, slik at alle får spille sammen med maksimal komfort og utstyr.</p>
             </div>
           </div>

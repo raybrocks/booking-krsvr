@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { format, isSameDay, getDay } from "date-fns";
+import { nb as dfNb } from "date-fns/locale";
+import { nb as rdpNb, enUS as rdpEnUS } from "react-day-picker/locale";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -89,7 +91,7 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
         <p className="text-zinc-300 mb-8">
           {isEn
             ? `Thank you, ${firstName}. Your VR experience is booked for ${selectedDate ? format(selectedDate, "MMMM do, yyyy") : ""} at ${selectedTime}. We have sent a confirmation email to ${email}.`
-            : `Takk, ${firstName}. VR opplevelsen er booket ${selectedDate ? format(selectedDate, "MMMM do, yyyy") : ""} kl. ${selectedTime}. Vi har sendt bekreftelse til ${email}.`}
+            : `Takk, ${firstName}. VR-opplevelsen er booket ${selectedDate ? format(selectedDate, "d. MMMM yyyy", { locale: dfNb }) : ""} kl. ${selectedTime}. Vi har sendt bekreftelse til ${email}.`}
         </p>
         <Button onClick={() => window.location.reload()} variant="outline" className="rounded-full border-zinc-700 hover:bg-zinc-800">
           {isEn ? "Make another booking" : "Book en ny"}
@@ -140,7 +142,7 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                   {isEn ? "Select Date & Time" : "Velg dato & tid"}
                 </h2>
                 <p className="text-zinc-400">
-                  {isEn ? "Choose when you would like to visit KRS VR Arena." : "Velg når dere vil besøke Krs VR Arena."}
+                  {isEn ? "Choose when you would like to visit KRS VR Arena." : "Velg når dere vil besøke KRS VR Arena."}
                 </p>
               </div>
               
@@ -173,6 +175,7 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                   <Calendar
                     mode="single"
                     weekStartsOn={1}
+                    locale={isEn ? rdpEnUS : rdpNb}
                     selected={selectedDate}
                     onSelect={(date) => {
                       setSelectedDate(date);
@@ -218,7 +221,7 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                               disabled={isBooked}
                               className={`py-3 px-4 rounded-xl border text-sm font-medium transition-all ${
                                 isBooked
-                                  ? "bg-zinc-900 border-zinc-800 text-zinc-600 opacity-50 cursor-not-allowed"
+                                  ? "bg-zinc-900/60 border-zinc-800/80 text-zinc-400 line-through decoration-zinc-500 cursor-not-allowed"
                                   : selectedTime === timeStr 
                                     ? "bg-[#9C39FF] text-white border-[#9C39FF] shadow-[0_0_15px_rgba(156,57,255,0.3)]" 
                                     : "border-zinc-800 hover:border-zinc-600 text-zinc-300"
@@ -348,11 +351,9 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                     .map(e => e.type)
                 )).map(category => (
                   <div key={category} className="space-y-5">
-                    {/* Category Banner */}
-                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 border border-zinc-700/50 flex items-center justify-center py-5 shadow-lg">
-                      <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')" }}></div>
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#9C39FF]/10 to-transparent"></div>
-                      <h3 className="relative text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-white/90 z-10">
+                    {/* Category Heading */}
+                    <div className="border-b border-zinc-800/80 pb-2.5 pt-2">
+                      <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-300">
                         {translateCategory(category)}
                       </h3>
                     </div>
@@ -384,46 +385,39 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
                           </div>
                           <CardContent className="p-5">
                             <h3 className="text-xl font-medium mb-2">{exp.name}</h3>
-                            <p className="text-zinc-400 text-sm mb-4">{exp.shortDescription}</p>
+                            <p className="text-zinc-400 text-sm mb-4 line-clamp-3 leading-relaxed">{exp.shortDescription}</p>
                             
-                            <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
-                              <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.duration || "90 min"}</span>
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-300">
+                              <span className="bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800">{exp.duration || "90 min"}</span>
                               {exp.age && (
-                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                                <span className="bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800">
                                   {isEn ? `Age ${exp.age.replace("+", "")}+` : `Fra ${exp.age} år`}
                                 </span>
                               )}
-                              <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                              <span className="bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800">
                                 {isEn ? `Max ${exp.maxPlayers} players` : `Maks ${exp.maxPlayers} spillere`}
                               </span>
-                              {exp.difficulty && <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{exp.difficulty}</span>}
-                              {Array.isArray(exp.suitableFor) && exp.suitableFor.map((audience: string) => (
-                                <span key={audience} className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{audience}</span>
-                              ))}
                               {exp.jumpScare && (
-                                <span className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">Jump Scare</span>
+                                <span className="bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800">Jump Scare</span>
                               )}
-                              {exp.tags && exp.tags.map((tag: string) => (
-                                <span key={tag} className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800">{tag}</span>
-                              ))}
                               {exp.languages && exp.languages.length > 0 && (
                                 <span
-                                  className="bg-zinc-900 px-2 py-1 rounded border border-zinc-800 inline-flex items-center gap-1"
-                                  title={`Available languages: ${exp.languages.join(', ')}`}
+                                  className="text-zinc-400 inline-flex items-center gap-1 ml-0.5"
+                                  title={`${isEn ? "Available languages" : "Tilgjengelige språk"}: ${exp.languages.join(", ")}`}
                                 >
-                                  🌐 {exp.languages.map((l: string) => getLanguageInfo(l).flag).join(' ')}
+                                  🌐 {exp.languages.map((l: string) => getLanguageInfo(l).flag).join(" ")}
                                 </span>
                               )}
                             </div>
                             
-                            <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end mt-auto">
+                            <div className="mt-5 pt-4 border-t border-zinc-800 flex justify-end">
                               <Button 
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedExperience(exp);
                                     setStep(4);
                                 }}
-                                className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-8 rounded-full shadow-[0_0_15px_rgba(156,57,255,0.3)] hover:scale-105 transition-all"
+                                className="bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-7 rounded-full transition-colors"
                               >
                                 {isEn ? "Select & Continue" : "Book nå"}
                               </Button>
@@ -942,7 +936,7 @@ export default function BookingFlow({ locale = "no" }: { locale?: "no" | "en" })
               variant="ghost" 
               onClick={handleBack} 
               disabled={step === 1 || isSubmitting}
-              className="text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full px-6"
+              className="text-zinc-300 hover:text-white hover:bg-zinc-800 disabled:text-zinc-600 disabled:opacity-60 rounded-full px-6"
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
               {isEn ? "Back" : "Tilbake"}

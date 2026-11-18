@@ -67,7 +67,7 @@ export default function EnglishPricesPage() {
       <div className="container mx-auto px-4 max-w-4xl relative z-10 text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-light tracking-tighter text-white">
           Prices{" "}
-          <span className="text-sm font-medium text-zinc-500 uppercase tracking-widest ml-2 align-middle">
+          <span className="text-sm font-medium text-zinc-300 uppercase tracking-widest ml-2 align-middle">
             Incl. VAT
           </span>
         </h1>
@@ -79,9 +79,7 @@ export default function EnglishPricesPage() {
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Pricing Table */}
-          <div className="bg-zinc-900/40 border border-white/10 rounded-3xl p-8 backdrop-blur-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#9C39FF]/5 rounded-full blur-3xl -z-10 translate-x-12 -translate-y-12" />
-
+          <div className="bg-zinc-900/40 border border-white/10 rounded-3xl p-8">
             <div className="flex items-center gap-3 mb-6">
               <Clock className="w-6 h-6 text-[#9C39FF]" />
               <div>
@@ -98,15 +96,15 @@ export default function EnglishPricesPage() {
               {privateTiers.map((tier, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-4 rounded-2xl border border-zinc-800 bg-zinc-950/50"
+                  className="flex items-center justify-between p-4 rounded-2xl border border-zinc-800 bg-zinc-950/60"
                 >
-                  <span className="text-lg font-medium text-zinc-300">
+                  <span className="text-lg font-medium text-zinc-200">
                     {tier.players}
                   </span>
                   <div className="text-right">
                     <span className="text-xl font-bold text-white">
                       {tier.nok} NOK{" "}
-                      <span className="text-sm font-normal text-zinc-500">
+                      <span className="text-sm font-normal text-zinc-400">
                         / person
                       </span>
                     </span>
@@ -135,7 +133,7 @@ export default function EnglishPricesPage() {
               </Link>
               <Link
                 href="/en/booking"
-                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white font-bold transition-colors shadow-[0_0_15px_rgba(156,57,255,0.4)] hover:shadow-[0_0_25px_rgba(156,57,255,0.6)]"
+                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white font-bold transition-colors"
               >
                 Book Your Experience Now
               </Link>
@@ -144,10 +142,10 @@ export default function EnglishPricesPage() {
 
           {/* Included Features */}
           <div className="flex flex-col h-full justify-center">
-            <h2 className="text-2xl font-light tracking-tight text-white mb-6">
+            <h2 className="text-2xl font-light tracking-tight text-white mb-4">
               Included in Every Booking:
             </h2>
-            <ul className="space-y-4">
+            <ul className="divide-y divide-zinc-800/70">
               {[
                 "10–15 minutes of welcome, registration, and safety briefing.",
                 "Approximately 60 minutes of active in-game time in wireless VR.",
@@ -160,9 +158,9 @@ export default function EnglishPricesPage() {
               ].map((item, idx) => (
                 <li
                   key={idx}
-                  className="flex items-start gap-4 p-4 rounded-2xl bg-zinc-900/20 border border-white/5 hover:border-white/10 hover:bg-zinc-900/40 transition-colors"
+                  className="flex items-start gap-3.5 py-3.5"
                 >
-                  <CheckCircle2 className="w-6 h-6 text-[#9C39FF] flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#9C39FF] flex-shrink-0 mt-0.5" />
                   <span className="text-zinc-300 leading-relaxed text-sm sm:text-base">
                     {item}
                   </span>
@@ -170,8 +168,8 @@ export default function EnglishPricesPage() {
               ))}
             </ul>
 
-            <div className="mt-6 p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800 text-sm text-zinc-400 flex items-start gap-3">
-              <Info className="w-5 h-5 text-zinc-500 flex-shrink-0 mt-0.5" />
+            <div className="mt-6 pt-5 border-t border-zinc-800 text-sm text-zinc-400 flex items-start gap-3">
+              <Info className="w-5 h-5 text-zinc-400 flex-shrink-0 mt-0.5" />
               <p>
                 For groups larger than 10 players (up to 64 people), we run a social tournament format with rolling rounds and a live spectator screen in the lounge so everyone participates together.
               </p>
