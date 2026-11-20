@@ -740,18 +740,18 @@ export default function AdminDashboard() {
         <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
           <div className="text-[11px] font-medium text-zinc-400">Dagens omsetning</div>
           <div className="text-lg sm:text-xl font-semibold text-white mt-0.5 tabular-nums">{fmt(totalValue)}</div>
-          <div className="text-[11px] text-zinc-500 mt-0.5">
+          <div className="text-[11px] text-zinc-400 mt-0.5">
             {active.length} {active.length === 1 ? 'booking' : 'bookinger'} · {totalPlayers} spillere
             {totalGoodwillGiftCard > 0 && (
-              <span className="text-zinc-400"> · ekskl. {fmt(totalGoodwillGiftCard)} goodwill</span>
+              <span className="text-zinc-300"> · ekskl. {fmt(totalGoodwillGiftCard)} goodwill</span>
             )}
           </div>
         </div>
 
         <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
-          <div className="text-[11px] font-medium text-zinc-400">Vipps (nett)</div>
+          <div className="text-[11px] font-medium text-zinc-400">Forhåndsbetalt (Webshop)</div>
           <div className="text-lg sm:text-xl font-semibold text-emerald-400 mt-0.5 tabular-nums">{fmt(totalVipps)}</div>
-          <div className="text-[11px] text-zinc-500 mt-0.5">
+          <div className="text-[11px] text-zinc-400 mt-0.5">
             {vippsCount} {vippsCount === 1 ? 'booking' : 'bookinger'}
           </div>
         </div>
@@ -759,7 +759,7 @@ export default function AdminDashboard() {
         <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
           <div className="text-[11px] font-medium text-zinc-400">Gavekort innløst (solgt)</div>
           <div className="text-lg sm:text-xl font-semibold text-amber-300 mt-0.5 tabular-nums">{fmt(totalGiftCard)}</div>
-          <div className="text-[11px] text-zinc-500 mt-0.5">
+          <div className="text-[11px] text-zinc-400 mt-0.5">
             {giftCardCount} {giftCardCount === 1 ? 'booking' : 'bookinger'}
             {totalGoodwillGiftCard > 0 && (
               <span className="text-sky-400"> · +{fmt(totalGoodwillGiftCard)} goodwill ({goodwillCount})</span>
@@ -770,7 +770,7 @@ export default function AdminDashboard() {
         <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
           <div className="text-[11px] font-medium text-zinc-400">Kortterminal (arena)</div>
           <div className="text-lg sm:text-xl font-semibold text-purple-300 mt-0.5 tabular-nums">{fmt(totalTerminal)}</div>
-          <div className="text-[11px] text-zinc-500 mt-0.5">
+          <div className="text-[11px] text-zinc-400 mt-0.5">
             {terminalCount} {terminalCount === 1 ? 'betaling' : 'betalinger'}
             {totalRemaining > 0 && (
               <span className="text-amber-400 font-medium"> · {fmt(totalRemaining)} gjenstår</span>
@@ -840,7 +840,7 @@ export default function AdminDashboard() {
       } else if (isTerminal) {
         badgeLabel = 'OPPGJORT (TERMINAL)';
       } else {
-        badgeLabel = 'OPPGJORT (VIPPS)';
+        badgeLabel = 'FORHÅNDSBETALT (WEBSHOP)';
       }
       badgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
     } else if (isTerminal) {
