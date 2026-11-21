@@ -276,54 +276,54 @@ export default function AdminGiftCardsTab() {
               setRedeemNote('');
               setShowRedeemModal(true);
             }}
-            className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs sm:text-sm font-semibold transition-all border border-zinc-700 flex items-center gap-2 cursor-pointer"
+            className="apple-press px-4 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white text-xs sm:text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
           >
-            <CreditCard size={16} className="text-[#c084fc]" />
+            <CreditCard size={15} className="text-[#9C39FF]" />
             Trekk over disk
           </button>
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 rounded-xl bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer"
+            className="apple-press px-4 py-2 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer"
           >
-            <Plus size={16} />
+            <Plus size={15} />
             Opprett manuelt
           </button>
         </div>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="apple-surface rounded-2xl p-4">
           <span className="text-xs text-zinc-400 block font-medium">Aktive gavekort</span>
-          <span className="text-2xl font-black text-white mt-1 block">{kpis.activeCount} stk</span>
-          <span className="text-[11px] text-emerald-400 mt-0.5 block">
+          <span className="apple-display text-2xl font-semibold text-white mt-1 block tabular-nums">{kpis.activeCount} stk</span>
+          <span className="text-[11px] text-zinc-400 mt-1 block">
             Klare for booking
             {kpis.activeGoodwillCount > 0 ? ` (${kpis.activeGoodwillCount} goodwill)` : ''}
           </span>
         </div>
-        <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
+        <div className="apple-surface rounded-2xl p-4">
           <span className="text-xs text-zinc-400 block font-medium">Utestående saldo (solgte)</span>
-          <span className="text-2xl font-black text-[#c084fc] mt-1 block">{kpis.outstandingBalance.toLocaleString('no-NO')} kr</span>
-          <span className="text-[11px] text-zinc-400 mt-0.5 block">
+          <span className="apple-display text-2xl font-semibold text-white mt-1 block tabular-nums">{kpis.outstandingBalance.toLocaleString('no-NO')} kr</span>
+          <span className="text-[11px] text-zinc-400 mt-1 block">
             {kpis.outstandingGoodwillBalance > 0
               ? `+ ${kpis.outstandingGoodwillBalance.toLocaleString('no-NO')} kr på goodwill-kort`
               : 'Kortsiktig kundeforpliktelse'}
           </span>
         </div>
-        <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
+        <div className="apple-surface rounded-2xl p-4">
           <span className="text-xs text-zinc-400 block font-medium">Innløst (solgte kort)</span>
-          <span className="text-2xl font-black text-emerald-400 mt-1 block">{kpis.totalRedeemed.toLocaleString('no-NO')} kr</span>
-          <span className="text-[11px] text-zinc-400 mt-0.5 block">
+          <span className="apple-display text-2xl font-semibold text-white mt-1 block tabular-nums">{kpis.totalRedeemed.toLocaleString('no-NO')} kr</span>
+          <span className="text-[11px] text-zinc-400 mt-1 block">
             {kpis.totalGoodwillRedeemed > 0
               ? `+ ${kpis.totalGoodwillRedeemed.toLocaleString('no-NO')} kr goodwill (0 kr oms.)`
               : 'Brukt i opplevelser'}
           </span>
         </div>
-        <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4">
+        <div className="apple-surface rounded-2xl p-4">
           <span className="text-xs text-zinc-400 block font-medium">Totalt salg</span>
-          <span className="text-2xl font-black text-white mt-1 block">{kpis.totalPurchased.toLocaleString('no-NO')} kr</span>
-          <span className="text-[11px] text-zinc-400 mt-0.5 block">
+          <span className="apple-display text-2xl font-semibold text-white mt-1 block tabular-nums">{kpis.totalPurchased.toLocaleString('no-NO')} kr</span>
+          <span className="text-[11px] text-zinc-400 mt-1 block">
             {kpis.soldCardCount} solgte kort
             {kpis.goodwillCardCount > 0
               ? ` · ${kpis.goodwillCardCount} goodwill (${kpis.goodwillTotalIssued.toLocaleString('no-NO')} kr, 0 kr oms.)`
@@ -333,7 +333,7 @@ export default function AdminGiftCardsTab() {
       </div>
 
       {/* Search & Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-3">
+      <div className="apple-surface flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-2xl p-3">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
           <input
@@ -341,11 +341,11 @@ export default function AdminGiftCardsTab() {
             placeholder="Søk på kode, kjøper, e-post eller mottaker..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#9C39FF]"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-black/50 border border-white/[0.07] text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#9C39FF]"
           />
         </div>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-black/40 overflow-x-auto pb-1 sm:pb-1">
           {[
             { id: 'all', label: 'Alle' },
             { id: 'active', label: 'Aktive' },
@@ -356,10 +356,10 @@ export default function AdminGiftCardsTab() {
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              className={`apple-press px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
                 statusFilter === tab.id
-                  ? 'bg-[#9C39FF] text-white'
-                  : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                  ? 'bg-white/[0.14] text-white'
+                  : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
               {tab.label}
@@ -369,7 +369,7 @@ export default function AdminGiftCardsTab() {
       </div>
 
       {/* Gift Cards Table */}
-      <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="apple-surface rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-zinc-950/80 text-zinc-400 uppercase text-[11px] tracking-wider border-b border-zinc-800">

@@ -141,3 +141,64 @@
 .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
 }
+
+/* Apple-inspired Admin Design System */
+.admin-apple {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  --apple-surface: #141417;
+  --apple-surface-raised: #1c1c20;
+  --apple-separator: rgba(255, 255, 255, 0.08);
+}
+
+.admin-apple .apple-display {
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.admin-apple .apple-chrome {
+  background: rgba(20, 20, 23, 0.78);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.admin-apple .apple-surface {
+  background: var(--apple-surface);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.admin-apple .apple-surface-raised {
+  background: var(--apple-surface-raised);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.admin-apple .apple-press {
+  transition: transform 100ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out, opacity 150ms ease-out;
+}
+
+.admin-apple .apple-press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-apple .apple-press:active:not(:disabled) {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .admin-apple .apple-chrome {
+    background: #141417 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .admin-apple .apple-surface,
+  .admin-apple .apple-surface-raised,
+  .admin-apple .apple-chrome {
+    border-color: rgba(255, 255, 255, 0.24) !important;
+  }
+}

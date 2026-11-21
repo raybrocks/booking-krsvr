@@ -43,34 +43,34 @@ export default async function AdminFeedbackPage() {
   const sadCount = submissions?.filter(s => s.rating === 'sad').length || 0;
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-6">
+    <div className="admin-apple min-h-screen bg-black p-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-light text-white mb-8">Tilbakemeldinger</h1>
+        <h1 className="apple-display text-3xl font-semibold text-white mb-8">Tilbakemeldinger</h1>
         
         {/* Stat-kort */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col items-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <div className="apple-surface rounded-2xl p-6 flex flex-col items-center">
             <div className="text-4xl mb-2">😄</div>
-            <div className="text-zinc-400 text-sm font-medium mb-1">Happy</div>
-            <div className="text-3xl text-white font-bold">{happyCount}</div>
+            <div className="text-zinc-400 text-xs font-medium mb-1">Fornøyd</div>
+            <div className="apple-display text-3xl text-white font-semibold tabular-nums">{happyCount}</div>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col items-center">
+          <div className="apple-surface rounded-2xl p-6 flex flex-col items-center">
             <div className="text-4xl mb-2">😐</div>
-            <div className="text-zinc-400 text-sm font-medium mb-1">Neutral</div>
-            <div className="text-3xl text-white font-bold">{neutralCount}</div>
+            <div className="text-zinc-400 text-xs font-medium mb-1">Nøytral</div>
+            <div className="apple-display text-3xl text-white font-semibold tabular-nums">{neutralCount}</div>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col items-center">
+          <div className="apple-surface rounded-2xl p-6 flex flex-col items-center">
             <div className="text-4xl mb-2">😞</div>
-            <div className="text-zinc-400 text-sm font-medium mb-1">Sad</div>
-            <div className="text-3xl text-white font-bold">{sadCount}</div>
+            <div className="text-zinc-400 text-xs font-medium mb-1">Misfornøyd</div>
+            <div className="apple-display text-3xl text-white font-semibold tabular-nums">{sadCount}</div>
           </div>
         </div>
 
         {/* Tabell */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div className="apple-surface rounded-2xl overflow-hidden">
           <div className="overflow-x-auto w-full">
             <table className="w-full text-left text-sm text-zinc-300 min-w-[650px]">
-              <thead className="bg-zinc-950/50 text-xs uppercase text-zinc-500 border-b border-zinc-800">
+              <thead className="bg-white/[0.03] text-xs uppercase text-zinc-400 border-b border-white/[0.07]">
                 <tr>
                   <th className="px-6 py-4 font-medium">Dato</th>
                   <th className="px-6 py-4 font-medium">Rating</th>

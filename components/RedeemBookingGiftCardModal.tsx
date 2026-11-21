@@ -129,30 +129,30 @@ export default function RedeemBookingGiftCardModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-[2px] overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-[#0e0e11] border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden my-auto"
+        className="relative w-full max-w-md bg-[#141417] border border-white/10 rounded-3xl shadow-2xl overflow-hidden my-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 bg-zinc-900/70">
+        <div className="apple-chrome flex items-center justify-between px-5 py-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-300">
+            <div className="w-8 h-8 rounded-xl bg-white/[0.07] flex items-center justify-center text-[#c48fff]">
               <Gift className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-white">Trekk gavekort på booking</h2>
-              <p className="text-xs text-zinc-400">
+              <h2 className="apple-display text-base font-semibold text-white">Trekk gavekort på booking</h2>
+              <p className="text-xs text-zinc-400 tabular-nums">
                 {booking.firstName} {booking.lastName} · Gjenstår{" "}
-                <span className="text-amber-300 font-semibold">{remainingDue} NOK</span>
+                <span className="text-white font-medium">{remainingDue} NOK</span>
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+            className="apple-press p-2 text-zinc-400 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

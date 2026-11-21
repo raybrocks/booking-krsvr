@@ -293,17 +293,17 @@ export default function EditBookingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/80 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/70 backdrop-blur-[2px] overflow-y-auto">
       <div 
-        className="relative w-full max-w-3xl bg-[#0e0e11] border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[92vh]"
+        className="relative w-full max-w-3xl bg-[#141417] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800/80 bg-zinc-900/60 sticky top-0 z-10">
+        <div className="apple-chrome flex items-center justify-between px-6 py-4 border-b border-white/[0.08] sticky top-0 z-10">
           <div>
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="apple-display text-lg font-semibold text-white flex items-center gap-2">
               Rediger booking
-              <span className="text-xs font-mono font-normal text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded">
+              <span className="text-xs font-mono font-normal text-zinc-400 bg-white/[0.06] px-2 py-0.5 rounded-md">
                 #{booking.id.substring(0, 8)}
               </span>
             </h2>
@@ -313,10 +313,10 @@ export default function EditBookingModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+            className="apple-press p-2 text-zinc-400 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] rounded-full transition-colors"
             title="Lukk"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 

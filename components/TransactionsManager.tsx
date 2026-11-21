@@ -455,10 +455,10 @@ export default function TransactionsManager() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="bg-[#9C39FF]/10 border border-[#9C39FF]/20 p-4 rounded-xl text-sm text-zinc-300 flex items-start gap-3">
-        <div className="w-5 h-5 rounded-full bg-[#9C39FF]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <span className="text-[#9C39FF] text-xs font-bold">i</span>
+    <div className="space-y-5">
+      <div className="apple-surface p-4 rounded-2xl text-xs sm:text-sm text-zinc-300 flex items-start gap-3">
+        <div className="w-5 h-5 rounded-full bg-white/[0.08] flex items-center justify-center flex-shrink-0 mt-0.5">
+          <span className="text-[#c48fff] text-xs font-bold">i</span>
         </div>
         <p>
           Her finner du kun bokføringspliktige <strong>salgskvitteringer</strong> og <strong>kreditnotaer</strong> fra faktiske Vipps-betalinger i nettbutikken. Kjøp betalt fysisk i kasse/kortterminal ved oppmøte bokføres direkte i kassasystemet etter kassasystemloven og skal ikke dobbeltføres her.
@@ -467,13 +467,13 @@ export default function TransactionsManager() {
 
       {/* View Mode Tabs & CSV Exports */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex bg-zinc-900/70 p-1 rounded-xl border border-zinc-800">
+        <div className="inline-flex bg-white/[0.05] p-1 rounded-xl">
           <button
             type="button"
             onClick={() => setViewMode("receipts")}
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+            className={`apple-press inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
               viewMode === "receipts"
-                ? "bg-[#9C39FF] text-white shadow-sm"
+                ? "bg-white/[0.14] text-white"
                 : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
@@ -483,9 +483,9 @@ export default function TransactionsManager() {
           <button
             type="button"
             onClick={() => setViewMode("daily")}
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+            className={`apple-press inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
               viewMode === "daily"
-                ? "bg-[#9C39FF] text-white shadow-sm"
+                ? "bg-white/[0.14] text-white"
                 : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
@@ -499,28 +499,28 @@ export default function TransactionsManager() {
             type="button"
             onClick={() => setDailyPrintTarget({ mode: "all" })}
             disabled={!dailyReport?.days || dailyReport.days.length === 0}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 text-zinc-200 border border-zinc-700 rounded-lg text-xs font-medium transition-colors"
+            className="apple-press inline-flex items-center gap-1.5 px-3.5 py-2 bg-white/[0.07] hover:bg-white/[0.12] disabled:opacity-40 text-zinc-100 rounded-xl text-xs font-medium transition-colors"
             title="Vis og skriv ut / lagre samlet dagsoppgjørsoversikt (DO-101..DO-xxx) som PDF"
           >
-            <Printer className="w-3.5 h-3.5 text-amber-400" />
+            <Printer className="w-3.5 h-3.5 text-zinc-300" />
             Dagsoppgjør (PDF)
           </button>
           <a
             href="/api/admin/receipts/daily-summary?format=csv"
             download
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-lg text-xs font-medium transition-colors"
+            className="apple-press inline-flex items-center gap-1.5 px-3.5 py-2 bg-white/[0.07] hover:bg-white/[0.12] text-zinc-100 rounded-xl text-xs font-medium transition-colors"
             title="Last ned dagsoppgjør gruppert per dato (semikolon-separert CSV for norsk Excel)"
           >
-            <Download className="w-3.5 h-3.5 text-[#9C39FF]" />
+            <Download className="w-3.5 h-3.5 text-zinc-300" />
             Last ned Dagsoppgjør (.csv)
           </a>
           <a
             href="/api/admin/receipts/daily-summary?format=csv&scope=receipts"
             download
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-lg text-xs font-medium transition-colors"
+            className="apple-press inline-flex items-center gap-1.5 px-3.5 py-2 bg-white/[0.07] hover:bg-white/[0.12] text-zinc-100 rounded-xl text-xs font-medium transition-colors"
             title="Last ned alle enkeltkvitteringer med dato, klokkeslett og løpende total (.csv)"
           >
-            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <Download className="w-3.5 h-3.5 text-zinc-300" />
             Last ned Enkeltkvitteringer (.csv)
           </a>
         </div>
@@ -530,38 +530,38 @@ export default function TransactionsManager() {
         <div className="space-y-4">
           {/* Summary KPI */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+            <div className="apple-surface rounded-2xl p-4">
               <div className="text-xs text-zinc-400">Brutto Vipps-salg ({dailyReport?.summary?.totalPayments || 0} salg)</div>
-              <div className="text-xl font-bold text-white mt-1">
+              <div className="apple-display text-2xl font-semibold text-white mt-1 tabular-nums">
                 {Number(dailyReport?.summary?.totalGrossSales || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
-              <div className="text-[11px] text-zinc-400 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1 tabular-nums">
                 Refusjoner ({dailyReport?.summary?.totalRefunds || 0}): {Number(dailyReport?.summary?.totalRefundsAmount || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
             </div>
 
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+            <div className="apple-surface rounded-2xl p-4">
               <div className="text-xs text-zinc-400">Netto Vipps-omsetning (inkl. MVA)</div>
-              <div className="text-xl font-bold text-emerald-400 mt-1">
+              <div className="apple-display text-2xl font-semibold text-white mt-1 tabular-nums">
                 {Number(dailyReport?.summary?.totalNetTurnover || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
-              <div className="text-[11px] text-zinc-400 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1 tabular-nums">
                 0 % MVA: {Number(dailyReport?.summary?.totalRevenue0Vat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · 12 % gr.l.: {Number(dailyReport?.summary?.totalRevenue12VatBasis || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr · MVA: {Number(dailyReport?.summary?.totalOutgoingVat || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
             </div>
 
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+            <div className="apple-surface rounded-2xl p-4">
               <div className="text-xs text-zinc-400">Vipps-gebyrer (Støtte KTO 7770)</div>
-              <div className="text-xl font-bold text-zinc-200 mt-1">
+              <div className="apple-display text-2xl font-semibold text-white mt-1 tabular-nums">
                 {Number(dailyReport?.summary?.totalVippsFee || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
-              <div className="text-[11px] text-zinc-400 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1 tabular-nums">
                 Estimert nettoutbetaling fra Vipps: {Number(dailyReport?.summary?.totalEstimatedVippsPayout || 0).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </div>
             </div>
           </div>
 
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col w-full max-w-full">
+          <div className="apple-surface rounded-2xl flex flex-col w-full max-w-full">
             <div className="overflow-x-auto max-h-[70vh] rounded-2xl relative w-full">
               <table className="w-full text-left text-sm whitespace-nowrap min-w-[1380px]">
                 <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-400 sticky top-0 z-20">

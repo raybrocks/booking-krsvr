@@ -18,15 +18,15 @@ export default function AdminClientsPage() {
             <div className="flex items-center gap-3">
               <Link 
                 href="/admin" 
-                className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-xl transition-colors"
+                className="apple-press flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white bg-white/[0.07] hover:bg-white/[0.12] px-3.5 py-2 rounded-full transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" /> Tilbake til Dashboard
+                <ArrowLeft className="w-3.5 h-3.5" /> Tilbake til Dashboard
               </Link>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#9C39FF]/10 flex items-center justify-center border border-[#9C39FF]/20">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white/[0.06] flex items-center justify-center">
                   <Building2 className="w-4 h-4 text-[#9C39FF]" />
                 </div>
-                <h1 className="text-xl font-bold text-white tracking-tight">Kunder & Referanser</h1>
+                <h1 className="apple-display text-xl font-semibold text-white">Kunder & Referanser</h1>
               </div>
             </div>
           </div>

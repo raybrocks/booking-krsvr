@@ -72,6 +72,7 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
   // Date editing
   const [editingDateId, setEditingDateId] = useState<string | null>(null);
   const [dateDraft, setDateDraft] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [timeDraft, setTimeDraft] = useState("");
 
   const fetchInquiries = React.useCallback(async (isManual = false) => {
@@ -157,12 +158,12 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Er du sikker på at du vil slette denne henvendelsen?")) return;
     try {
       const res = await fetch(`/api/admin/inquiries/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
+        setConfirmDeleteId(null);
         setInquiries(prev => prev.filter(item => item.id !== id));
         toast.success("Henvendelse slettet");
         if (onInquiriesUpdated) onInquiriesUpdated();
@@ -187,15 +188,15 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "new":
-        return <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs px-2.5 py-1 rounded-md font-semibold inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Ny</span>;
+        return <span className="bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs px-2.5 py-0.5 rounded-md font-medium inline-flex items-center gap-1.5">Ny</span>;
       case "contacted":
-        return <span className="bg-blue-500/20 text-blue-300 border border-blue-500/40 text-xs px-2.5 py-1 rounded-md font-semibold inline-flex items-center gap-1.5 shadow-sm">Kontaktet</span>;
+        return <span className="bg-white/[0.08] text-zinc-200 text-xs px-2.5 py-0.5 rounded-md font-medium inline-flex items-center">Kontaktet</span>;
       case "booked":
-        return <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs px-2.5 py-1 rounded-md font-semibold inline-flex items-center gap-1.5 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5" /> Booket</span>;
+        return <span className="bg-white/[0.1] text-white text-xs px-2.5 py-0.5 rounded-md font-medium inline-flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Booket</span>;
       case "rejected":
-        return <span className="bg-zinc-800 text-zinc-400 border border-zinc-700 text-xs px-2.5 py-1 rounded-md font-semibold inline-flex items-center gap-1.5 shadow-sm">Avslått</span>;
+        return <span className="bg-white/[0.04] text-zinc-400 text-xs px-2.5 py-0.5 rounded-md font-medium inline-flex items-center">Avslått</span>;
       default:
-        return <span className="bg-zinc-800 text-zinc-300 text-xs px-2.5 py-1 rounded-md font-semibold">{status}</span>;
+        return <span className="bg-white/[0.06] text-zinc-300 text-xs px-2.5 py-0.5 rounded-md font-medium">{status}</span>;
     }
   };
 
@@ -524,13 +525,20 @@ export default function InquiriesManager({ onCreateBooking, onInquiriesUpdated }
             )}
           </div>
 
-          <button
-            onClick={() => handleDelete(item.id)}
-            className="p-2 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ml-auto"
-            title="Slett henvendelse"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {confirmDeleteId === item.id ? (
+            <div className="inline-flex items-center gap-1.5 ml-auto">
+              <button type="button" onClick={() => setConfirmDeleteId(null)} className="apple-press px-2.5 py-1 text-xs rounded-lg bg-white/[0.08] text-zinc-300">Avbryt</button>
+              <button type="button" onClick={() => handleDelete(item.id)} className="apple-press px-3 py-1 text-xs rounded-lg bg-red-500/80 text-white font-medium">Slett</button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmDeleteId(item.id)}
+              className="apple-press p-2 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ml-auto"
+              title="Slett henvendelse"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     );

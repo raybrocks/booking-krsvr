@@ -2,7 +2,31 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Loader2, Calendar as CalendarIcon, Users, Clock, Mail, Phone, CheckCircle2, XCircle, Clock4, Settings, Gamepad2, ListOrdered, Receipt, Trash2, Plus, Wallet, Menu, X, LogOut, MailQuestion, Pencil, Star, Building2, Copy, Check, Bell, Gift } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import {
+  Loader2,
+  Calendar as CalendarIcon,
+  Clock4,
+  Settings,
+  Gamepad2,
+  ListOrdered,
+  Plus,
+  Wallet,
+  Menu,
+  X,
+  LogOut,
+  MailQuestion,
+  Star,
+  Building2,
+  Copy,
+  Check,
+  Bell,
+  Gift,
+  ChevronRight,
+  Users,
+  Search,
+  ArrowUpDown,
+} from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import SettingsManager from "./SettingsManager";
@@ -17,29 +41,42 @@ import EditBookingModal from "./EditBookingModal";
 import ReviewRequestModal from "./ReviewRequestModal";
 import AdminGiftCardsTab from "./AdminGiftCardsTab";
 import RedeemBookingGiftCardModal from "./RedeemBookingGiftCardModal";
-import { getBookingPaymentBreakdown } from "@/lib/booking-utils";
+import BookingInspectorSheet from "./BookingInspectorSheet";
+import { getBookingPaymentBreakdown, getPaymentDisplayFlags } from "@/lib/booking-utils";
+
+type AdminTab =
+  | "upcoming"
+  | "archive"
+  | "inquiries"
+  | "experiences"
+  | "clients"
+  | "transactions"
+  | "giftcards"
+  | "settings"
+  | "manual"
+  | "shifts"
+  | "employees";
 
 const playDing = () => {
   try {
     const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContext) return;
-    
+
     const context = new AudioContext();
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
-    
-    // Create a pleasant "ding" sound
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(800, context.currentTime); 
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(800, context.currentTime);
     oscillator.frequency.exponentialRampToValueAtTime(1200, context.currentTime + 0.1);
-    
+
     gainNode.gain.setValueAtTime(0, context.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.5, context.currentTime + 0.05);
     gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(context.destination);
-    
+
     oscillator.start();
     oscillator.stop(context.currentTime + 0.5);
   } catch (error) {
@@ -48,8 +85,8 @@ const playDing = () => {
 };
 
 const getBookingTimeRange = (startTime: string, durationMinutes?: number) => {
-  if (!startTime || !startTime.includes(':')) return startTime || '';
-  const [hoursStr, minutesStr] = startTime.split(':');
+  if (!startTime || !startTime.includes(":")) return startTime || "";
+  const [hoursStr, minutesStr] = startTime.split(":");
   const hours = parseInt(hoursStr, 10);
   const minutes = parseInt(minutesStr, 10);
   if (isNaN(hours) || isNaN(minutes)) return startTime;
@@ -59,14 +96,14 @@ const getBookingTimeRange = (startTime: string, durationMinutes?: number) => {
   const endHours = Math.floor(totalMinutes / 60) % 24;
   const endMinutes = totalMinutes % 60;
 
-  const endTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+  const endTime = `${String(endHours).padStart(2, "0")}:${String(endMinutes).padStart(2, "0")}`;
   return `${startTime}–${endTime}`;
 };
 
 const formatDateShort = (dateStr: string) => {
-  if (!dateStr) return '';
-  if (dateStr.includes('-')) {
-    const parts = dateStr.split('-');
+  if (!dateStr) return "";
+  if (dateStr.includes("-")) {
+    const parts = dateStr.split("-");
     if (parts.length === 3) {
       const year = parts[0].slice(-2);
       const month = parts[1];
@@ -78,18 +115,19 @@ const formatDateShort = (dateStr: string) => {
 };
 
 const getNorwegianWeekday = (dateStr: string) => {
-  if (!dateStr || !dateStr.includes('-')) return '';
-  const parts = dateStr.split('-').map(Number);
-  if (parts.length !== 3 || parts.some(isNaN)) return '';
+  if (!dateStr || !dateStr.includes("-")) return "";
+  const parts = dateStr.split("-").map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return "";
   const dt = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 12, 0, 0));
-  const raw = new Intl.DateTimeFormat('nb-NO', { weekday: 'long', timeZone: 'UTC' }).format(dt);
-  return raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : '';
+  const raw = new Intl.DateTimeFormat("nb-NO", { weekday: "long", timeZone: "UTC" }).format(dt);
+  return raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : "";
 };
 
 export default function AdminDashboard() {
+  const shouldReduceMotion = useReducedMotion();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "archive" | "inquiries" | "experiences" | "clients" | "transactions" | "giftcards" | "settings" | "manual" | "shifts" | "employees">("upcoming");
+  const [activeTab, setActiveTab] = useState<AdminTab>("upcoming");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isFirstLoad = useRef(true);
   const notifiedBookingIds = useRef<Set<string>>(new Set());
@@ -99,13 +137,19 @@ export default function AdminDashboard() {
   const [newInquiriesCount, setNewInquiriesCount] = useState<number>(0);
 
   // Sorting and Filtering State
-  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'dateTime', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({
+    key: "dateTime",
+    direction: "asc",
+  });
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [experiencesMap, setExperiencesMap] = useState<Record<string, string>>({});
   const [experiencesList, setExperiencesList] = useState<any[]>([]);
   const [pricingTiers, setPricingTiers] = useState<Record<string, number> | undefined>(undefined);
+
+  // Modals & Inspector
+  const [inspectedBookingId, setInspectedBookingId] = useState<string | null>(null);
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [reviewModalBooking, setReviewModalBooking] = useState<any | null>(null);
   const [redeemGiftCardBooking, setRedeemGiftCardBooking] = useState<any | null>(null);
@@ -113,7 +157,12 @@ export default function AdminDashboard() {
   const [copiedBookingId, setCopiedBookingId] = useState<string | null>(null);
   const [copiedNameKey, setCopiedNameKey] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const supabase = createClient();
+
+  const inspectedBooking = inspectedBookingId
+    ? bookings.find((b) => b.id === inspectedBookingId) || null
+    : null;
 
   const copyTextToClipboard = async (text: string) => {
     if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
@@ -130,13 +179,22 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleCopyPlainText = async (label: string, text: string) => {
+    try {
+      await copyTextToClipboard(text);
+      toast.success(`${label} kopiert`);
+    } catch {
+      toast.error(`Kunne ikke kopiere ${label.toLowerCase()}`);
+    }
+  };
+
   const handleCopySingleName = async (key: string, rawName: string) => {
     const cleanName = (rawName || "").trim();
     if (!cleanName) return;
     try {
       await copyTextToClipboard(cleanName);
       setCopiedNameKey(key);
-      toast.success(`Kopierte «${cleanName}»!`);
+      toast.success(`Kopierte «${cleanName}»`);
       setTimeout(() => {
         setCopiedNameKey((prev) => (prev === key ? null : prev));
       }, 1500);
@@ -162,7 +220,7 @@ export default function AdminDashboard() {
     try {
       await copyTextToClipboard(jsonOutput);
       setCopiedBookingId(bookingId);
-      toast.success(`Kopierte ${validNames.length} navn i JSON-format!`);
+      toast.success(`Kopierte ${validNames.length} navn i JSON-format`);
       setTimeout(() => {
         setCopiedBookingId((prev) => (prev === bookingId ? null : prev));
       }, 2000);
@@ -172,59 +230,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const renderCopyAllButton = (bookingId: string, validNames: string[]) => (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleCopyPlayerNames(bookingId, validNames);
-      }}
-      className="text-[10px] font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/70 hover:border-zinc-500 px-1.5 py-0.5 rounded flex items-center gap-1 transition-all active:scale-95 shadow-sm cursor-pointer"
-      title="Kopier alle navn i JSON-format"
-    >
-      {copiedBookingId === bookingId ? (
-        <>
-          <Check className="w-2.5 h-2.5 text-emerald-400" />
-          <span className="text-emerald-400 font-semibold">Kopiert!</span>
-        </>
-      ) : (
-        <>
-          <Copy className="w-2.5 h-2.5 text-zinc-400" />
-          <span>Kopier alle</span>
-        </>
-      )}
-    </button>
-  );
-
-  const renderPlayerNameChips = (bookingId: string, validNames: string[]) => (
-    <div className="mt-1 flex flex-wrap gap-1">
-      {validNames.map((name: string, idx: number) => {
-        const key = `${bookingId}-${idx}`;
-        const isCopied = copiedNameKey === key;
-        const cleanName = name.trim();
-        return (
-          <button
-            key={idx}
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCopySingleName(key, cleanName);
-            }}
-            title={`Klikk for å kopiere «${cleanName}»`}
-            className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border transition-all active:scale-95 cursor-pointer ${
-              isCopied
-                ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40 font-semibold"
-                : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border-zinc-700/50 hover:border-zinc-500"
-            }`}
-          >
-            <span>{cleanName}</span>
-            {isCopied && <Check className="w-2.5 h-2.5 text-emerald-400 shrink-0" />}
-          </button>
-        );
-      })}
-    </div>
-  );
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.reload();
@@ -232,12 +237,16 @@ export default function AdminDashboard() {
 
   const fetchInquiriesCount = async () => {
     try {
-      const res = await fetch('/api/admin/inquiries?t=' + Date.now());
+      const res = await fetch("/api/admin/inquiries?t=" + Date.now());
       if (res.ok) {
         const data = await res.json();
         const today = new Date().toISOString().split("T")[0];
         const openCount = data.filter((item: any) => {
-          const isClosed = item.status === 'booked' || !!item.bookingId || item.status === 'rejected' || (item.date && item.date < today);
+          const isClosed =
+            item.status === "booked" ||
+            !!item.bookingId ||
+            item.status === "rejected" ||
+            (item.date && item.date < today);
           return !isClosed;
         }).length;
         setNewInquiriesCount(openCount);
@@ -258,9 +267,14 @@ export default function AdminDashboard() {
       if (match) playersCount = parseInt(match[0], 10) || 1;
     }
 
-    // Match inquiry.eventType or packageType to arrangement
     let matchedExpId = "arrangement";
-    const eventLower = ((inquiry.eventType || "") + " " + (inquiry.packageType || "") + " " + (inquiry.message || "")).toLowerCase();
+    const eventLower = (
+      (inquiry.eventType || "") +
+      " " +
+      (inquiry.packageType || "") +
+      " " +
+      (inquiry.message || "")
+    ).toLowerCase();
     if (eventLower.includes("teambuilding")) matchedExpId = "teambuilding";
     else if (eventLower.includes("bursdag")) matchedExpId = "bursdag";
     else if (eventLower.includes("utdrikningslag")) matchedExpId = "utdrikningslag";
@@ -286,7 +300,7 @@ export default function AdminDashboard() {
       email: inquiry.email,
       phone: inquiry.phone || "",
       companyName: inquiry.companyName || "",
-      bookingType: (inquiry.groupType === "bedrift" || inquiry.companyName) ? "corporate" : "private",
+      bookingType: inquiry.groupType === "bedrift" || inquiry.companyName ? "corporate" : "private",
       experienceId: matchedExpId,
       date: inquiry.date || "",
       time: inquiry.time || "",
@@ -301,34 +315,44 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    // Pre-register service worker for Web Push if supported
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
     }
 
-    // Check URL parameters for tab (e.g. ?tab=inquiries from push notification)
     const syncTabFromUrl = () => {
-      if (typeof window === 'undefined') return;
+      if (typeof window === "undefined") return;
       const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get('tab');
-      const validTabs = ['upcoming', 'archive', 'inquiries', 'experiences', 'clients', 'transactions', 'giftcards', 'settings', 'manual', 'shifts', 'employees'];
-      if (tabParam && validTabs.includes(tabParam)) {
-        setActiveTab(tabParam as any);
+      const tabParam = params.get("tab");
+      const validTabs: AdminTab[] = [
+        "upcoming",
+        "archive",
+        "inquiries",
+        "experiences",
+        "clients",
+        "transactions",
+        "giftcards",
+        "settings",
+        "manual",
+        "shifts",
+        "employees",
+      ];
+      if (tabParam && validTabs.includes(tabParam as AdminTab)) {
+        setActiveTab(tabParam as AdminTab);
       }
-      const searchParam = params.get('search');
+      const searchParam = params.get("search");
       if (searchParam) {
         setSearchQuery(searchParam);
       }
     };
     syncTabFromUrl();
-    window.addEventListener('popstate', syncTabFromUrl);
+    window.addEventListener("popstate", syncTabFromUrl);
 
     const fetchData = async () => {
       try {
         const [bookingsRes, experiencesRes, settingsRes] = await Promise.all([
-          fetch('/api/admin/bookings'),
-          fetch('/api/experiences'),
-          fetch('/api/settings')
+          fetch("/api/admin/bookings"),
+          fetch("/api/experiences"),
+          fetch("/api/settings"),
         ]);
 
         if (bookingsRes.ok) {
@@ -340,8 +364,8 @@ export default function AdminDashboard() {
           let newlyConfirmedCount = 0;
 
           data.forEach((docData: any) => {
-            const isConfirmed = docData.status === 'confirmed' || docData.status === 'completed';
-            
+            const isConfirmed = docData.status === "confirmed" || docData.status === "completed";
+
             if (isConfirmed && !notifiedBookingIds.current.has(docData.id)) {
               notifiedBookingIds.current.add(docData.id);
               if (!isFirstLoad.current) {
@@ -353,7 +377,7 @@ export default function AdminDashboard() {
 
           if (newlyConfirmed) {
             playDing();
-            toast.success(`Ny bestilling bekreftet! / New booking confirmed! (${newlyConfirmedCount})`);
+            toast.success(`Ny bestilling bekreftet (${newlyConfirmedCount})`);
           }
           isFirstLoad.current = false;
         }
@@ -372,7 +396,7 @@ export default function AdminDashboard() {
           const sett = await settingsRes.json();
           if (sett?.pricing?.pricing) {
             setPricingTiers(sett.pricing.pricing);
-          } else if (sett?.pricing && typeof sett.pricing === 'object') {
+          } else if (sett?.pricing && typeof sett.pricing === "object") {
             setPricingTiers(sett.pricing);
           } else if (sett?.general?.pricing) {
             setPricingTiers(sett.general.pricing);
@@ -391,141 +415,138 @@ export default function AdminDashboard() {
     const intervalTime = setInterval(() => setCurrentTime(Date.now()), 5000);
 
     return () => {
-      window.removeEventListener('popstate', syncTabFromUrl);
+      window.removeEventListener("popstate", syncTabFromUrl);
       clearInterval(intervalData);
       clearInterval(intervalTime);
     };
   }, []);
 
-  const handleVippsAction = async (bookingId: string, action: 'capture' | 'cancel' | 'refund', amount?: number) => {
-    const loadingToastId = toast.loading(`Prøver å ${action} via Vipps...`);
+  const handleVippsAction = async (
+    bookingId: string,
+    action: "capture" | "cancel" | "refund",
+    amount?: number
+  ) => {
+    const loadingToastId = toast.loading(`Behandler Vipps (${action})...`);
     try {
       let res;
-      if (action === 'capture') {
+      if (action === "capture") {
         const amountOre = amount ? Math.round(amount * 100) : 0;
         res = await fetch("/api/vipps/capture", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ transactions: [{ bookingId, amount: amountOre }] })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transactions: [{ bookingId, amount: amountOre }] }),
         });
-      } else if (action === 'cancel') {
+      } else if (action === "cancel") {
         res = await fetch("/api/vipps/cancel", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookingId })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookingId }),
         });
-      } else if (action === 'refund') {
+      } else if (action === "refund") {
         const amountOre = amount ? Math.round(amount * 100) : 0;
         res = await fetch("/api/vipps/refund", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookingId, amount: amountOre })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookingId, amount: amountOre }),
         });
       }
 
       const data = await res?.json();
       if (res?.ok) {
-        toast.success(data?.message || `Vipps ${action} vellykket!`, { id: loadingToastId });
-        setBookings(prev => prev.map(b => {
-          if (b.id === bookingId) {
-            if (action === 'refund') {
-              return { ...b, vippsStatus: 'REFUNDED', status: 'cancelled' };
+        toast.success(data?.message || `Vipps ${action} fullført`, { id: loadingToastId });
+        setBookings((prev) =>
+          prev.map((b) => {
+            if (b.id === bookingId) {
+              if (action === "refund") return { ...b, vippsStatus: "REFUNDED", status: "cancelled" };
+              if (action === "capture")
+                return { ...b, vippsStatus: "CAPTURED", status: "confirmed", amountPaid: amount || b.totalPrice };
+              if (action === "cancel") return { ...b, vippsStatus: "CANCELLED", status: "cancelled", amountPaid: 0 };
             }
-            if (action === 'capture') {
-              return { ...b, vippsStatus: 'CAPTURED', status: 'confirmed', amountPaid: amount || b.totalPrice };
-            }
-            if (action === 'cancel') {
-              return { ...b, vippsStatus: 'CANCELLED', status: 'cancelled', amountPaid: 0 };
-            }
-          }
-          return b;
-        }));
+            return b;
+          })
+        );
       } else {
-        toast.error(`Feil: ${data?.error || data?.message || 'Ukjent feil'}`, { id: loadingToastId });
+        toast.error(`Feil: ${data?.error || data?.message || "Ukjent feil"}`, { id: loadingToastId });
       }
     } catch (e: any) {
-      toast.error(`Feil ved oppkobling: ${e.message}`, { id: loadingToastId });
+      toast.error(`Nettverksfeil: ${e.message}`, { id: loadingToastId });
     }
   };
 
   const handleMarkTerminalPaid = async (bookingId: string) => {
-    if (!confirm("Bekreft at kunden har betalt i kortterminalen i arenaen.")) return;
     const loadingToastId = toast.loading("Registrerer betaling...");
     try {
       const res = await fetch(`/api/admin/bookings/${bookingId}/mark-paid`, {
-        method: 'POST'
+        method: "POST",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Kunne ikke markere som betalt');
-      toast.success(data.message || 'Booking markert som fullt betalt i arenaen!', { id: loadingToastId });
-      setBookings(prev => prev.map(b => {
-        if (b.id === bookingId) {
-          return {
-            ...b,
-            amountPaid: data.booking?.amountPaid ?? b.totalPrice,
-            status: data.booking?.status || 'confirmed',
-            paymentType: data.booking?.paymentType || 'terminal',
-            vippsStatus: 'TERMINAL_BETALT',
-          };
-        }
-        return b;
-      }));
+      if (!res.ok) throw new Error(data.error || "Kunne ikke markere som betalt");
+      toast.success(data.message || "Betaling registrert i kortterminal", { id: loadingToastId });
+      setBookings((prev) =>
+        prev.map((b) => {
+          if (b.id === bookingId) {
+            return {
+              ...b,
+              amountPaid: data.booking?.amountPaid ?? b.totalPrice,
+              status: data.booking?.status || "confirmed",
+              paymentType: data.booking?.paymentType || "terminal",
+              vippsStatus: "TERMINAL_BETALT",
+            };
+          }
+          return b;
+        })
+      );
     } catch (err: any) {
-      toast.error(err.message || 'Feil ved registrering av betaling', { id: loadingToastId });
+      toast.error(err.message || "Feil ved registrering av betaling", { id: loadingToastId });
     }
   };
 
   const updateBookingStatus = async (id: string, newStatus: string) => {
     try {
-      await fetch(`/api/admin/bookings/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: newStatus })
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
       });
-      toast.success(`Booking marked as ${newStatus}`);
+      if (!res.ok) throw new Error("Failed");
+      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b)));
+      const label = newStatus === "confirmed" ? "Bekreftet" : newStatus === "pending" ? "Venter" : "Avbestilt";
+      toast.success(`Status satt til ${label}`);
     } catch (error) {
       console.error("Error updating status:", error);
-      toast.error("Failed to update status");
+      toast.error("Kunne ikke oppdatere status");
     }
   };
 
   const deleteBooking = async (id: string) => {
-    if (window.confirm("Are you sure you want to permanently delete this booking? This action cannot be undone.")) {
-      try {
-        await fetch(`/api/admin/bookings/${id}`, {
-          method: 'DELETE'
-        });
-        toast.success("Booking permanently deleted");
-      } catch (error) {
-        console.error("Error deleting booking:", error);
-        toast.error("Failed to delete booking");
-      }
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+      setBookings((prev) => prev.filter((b) => b.id !== id));
+      toast.success("Booking slettet permanent");
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+      toast.error("Kunne ikke slette booking");
     }
   };
 
   const handleResendConfirmation = async (booking: any) => {
-    if (!booking.email || booking.email.includes('system@sperret')) {
+    if (!booking.email || booking.email.includes("system@sperret")) {
       toast.error("Ingen gyldig e-post registrert på denne bookingen");
       return;
     }
-    const confirmSend = window.confirm(`Ønsker du å sende bestillingsbekreftelse på nytt til ${booking.email}?`);
-    if (!confirmSend) return;
 
     setResendingEmailId(booking.id);
     const loadingToastId = toast.loading(`Sender bekreftelse til ${booking.email}...`);
     try {
       const res = await fetch(`/api/admin/bookings/${booking.id}/send-confirmation`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isUpdate: false }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Kunne ikke sende bekreftelse");
-      }
-      toast.success(data.message || `Bekreftelse sendt til ${booking.email}!`, { id: loadingToastId });
+      if (!res.ok) throw new Error(data.error || "Kunne ikke sende bekreftelse");
+      toast.success(data.message || `Bekreftelse sendt til ${booking.email}`, { id: loadingToastId });
     } catch (err: any) {
       toast.error(err.message || "Kunne ikke sende e-post", { id: loadingToastId });
     } finally {
@@ -536,69 +557,67 @@ export default function AdminDashboard() {
   const extendBooking = async (id: string) => {
     try {
       const response = await fetch(`/api/admin/bookings/${id}/extend`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
       });
       const data = await response.json();
-      
       if (!response.ok) {
         toast.error(data.error || "Feilet ved utvidelse");
       } else {
-        toast.success(`Suksess! Utvidet med 90 minutter (${data.newDuration} min totalt).`);
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, duration: data.newDuration } : b));
+        toast.success(`Utvidet med 90 minutter (${data.newDuration} min totalt)`);
+        setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, duration: data.newDuration } : b)));
       }
-    } catch (error) {
-       toast.error("Nettverksfeil oppstod.");
+    } catch {
+      toast.error("Nettverksfeil oppstod.");
     }
   };
 
   const reduceBooking = async (id: string) => {
     try {
       const response = await fetch(`/api/admin/bookings/${id}/reduce`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
       });
       const data = await response.json();
-      
       if (!response.ok) {
         toast.error(data.error || "Feilet ved fjerning av utvidet tid");
       } else {
-        toast.success(`Suksess! Redusert med 90 minutter (${data.newDuration} min totalt).`);
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, duration: data.newDuration } : b));
+        toast.success(`Redusert med 90 minutter (${data.newDuration} min totalt)`);
+        setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, duration: data.newDuration } : b)));
       }
-    } catch (error) {
-       toast.error("Nettverksfeil oppstod.");
+    } catch {
+      toast.error("Nettverksfeil oppstod.");
     }
   };
 
-  const handleEditNote = async (id: string, currentNote: string) => {
-    const newNote = window.prompt("Rediger kommentar for booking:", currentNote || "");
-    if (newNote === null) return; // Avbrutt
-
+  const handleSaveNote = async (id: string, newNote: string): Promise<boolean> => {
     try {
       const response = await fetch(`/api/admin/bookings/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ internalNotes: newNote.trim() })
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ internalNotes: newNote.trim() }),
       });
-      
+
       if (!response.ok) {
         toast.error("Feilet ved oppdatering av kommentar");
+        return false;
       } else {
-        toast.success("Kommentar oppdatert!");
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, internalNotes: newNote.trim() } : b));
+        toast.success("Notat lagret");
+        setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, internalNotes: newNote.trim() } : b)));
+        return true;
       }
-    } catch (error) {
-       toast.error("Nettverksfeil oppstod.");
+    } catch {
+      toast.error("Nettverksfeil oppstod.");
+      return false;
     }
   };
 
   const handleSort = (key: string) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction: "asc" | "desc" = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
     setSortConfig({ key, direction });
   };
@@ -609,34 +628,31 @@ export default function AdminDashboard() {
     if (activeTab === "upcoming") {
       const now = new Date(currentTime);
       const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
       const todayStr = `${year}-${month}-${day}`;
 
-      result = result.filter(booking => {
-        return booking.status === "confirmed" && booking.date >= todayStr && booking.bookingType !== 'system';
-      });
+      result = result.filter(
+        (booking) => booking.status === "confirmed" && booking.date >= todayStr && booking.bookingType !== "system"
+      );
     } else {
-       result = result.filter(booking => booking.bookingType !== 'system');
+      result = result.filter((booking) => booking.bookingType !== "system");
     }
 
-    // Filter by status
     if (activeTab === "archive" && statusFilter !== "all") {
-      result = result.filter(booking => booking.status === statusFilter);
+      result = result.filter((booking) => booking.status === statusFilter);
     }
 
-    // Filter by date
     if (dateFilter) {
-      result = result.filter(booking => booking.date === dateFilter);
+      result = result.filter((booking) => booking.date === dateFilter);
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const queryWords = searchQuery.toLowerCase().trim().split(/\s+/);
-      result = result.filter(booking => {
+      result = result.filter((booking) => {
         const experienceTitle = booking.experienceName || experiencesMap[booking.experienceId] || "";
         const playersString = Array.isArray(booking.playerNames) ? booking.playerNames.join(" ") : "";
-        
+
         const searchableText = [
           booking.companyName,
           booking.firstName,
@@ -657,33 +673,33 @@ export default function AdminDashboard() {
           .join(" ")
           .toLowerCase();
 
-        return queryWords.every(word => searchableText.includes(word));
+        return queryWords.every((word) => searchableText.includes(word));
       });
     }
 
-    // Sort
     result.sort((a, b) => {
       let aValue = a[sortConfig.key];
       let bValue = b[sortConfig.key];
 
-      // Handle specific sorting cases
-      if (sortConfig.key === 'customer') {
-        aValue = (a.companyName ? `${a.companyName} ${a.firstName} ${a.lastName}` : `${a.firstName} ${a.lastName}`).toLowerCase();
-        bValue = (b.companyName ? `${b.companyName} ${b.firstName} ${b.lastName}` : `${b.firstName} ${b.lastName}`).toLowerCase();
-      } else if (sortConfig.key === 'dateTime') {
+      if (sortConfig.key === "customer") {
+        aValue = (a.companyName
+          ? `${a.companyName} ${a.firstName} ${a.lastName}`
+          : `${a.firstName} ${a.lastName}`
+        ).toLowerCase();
+        bValue = (b.companyName
+          ? `${b.companyName} ${b.firstName} ${b.lastName}`
+          : `${b.firstName} ${b.lastName}`
+        ).toLowerCase();
+      } else if (sortConfig.key === "dateTime") {
         aValue = new Date(`${a.date}T${a.time}`).getTime();
         bValue = new Date(`${b.date}T${b.time}`).getTime();
-      } else if (sortConfig.key === 'createdAt') {
+      } else if (sortConfig.key === "createdAt") {
         aValue = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         bValue = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       }
 
-      if (aValue < bValue) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
+      if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
       return 0;
     });
 
@@ -693,7 +709,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-[#9C39FF]" />
+        <Loader2 className="w-7 h-7 animate-spin text-[#9C39FF]" />
       </div>
     );
   }
@@ -733,47 +749,51 @@ export default function AdminDashboard() {
       if (p.terminalPaid > 0) terminalCount += 1;
     });
 
-    const fmt = (n: number) => `${Math.round(n).toLocaleString('nb-NO')} kr`;
+    const fmt = (n: number) => `${Math.round(n).toLocaleString("nb-NO")} kr`;
 
     return (
-      <div className="mb-4 grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
-        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
+      <div className="mb-5 grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+        <div className="apple-surface rounded-2xl p-3.5 sm:p-4">
           <div className="text-[11px] font-medium text-zinc-400">Dagens omsetning</div>
-          <div className="text-lg sm:text-xl font-semibold text-white mt-0.5 tabular-nums">{fmt(totalValue)}</div>
-          <div className="text-[11px] text-zinc-400 mt-0.5">
-            {active.length} {active.length === 1 ? 'booking' : 'bookinger'} · {totalPlayers} spillere
-            {totalGoodwillGiftCard > 0 && (
-              <span className="text-zinc-300"> · ekskl. {fmt(totalGoodwillGiftCard)} goodwill</span>
-            )}
+          <div className="apple-display text-lg sm:text-2xl font-semibold text-white mt-1 tabular-nums">
+            {fmt(totalValue)}
+          </div>
+          <div className="text-[11px] text-zinc-400 mt-1 tabular-nums">
+            {active.length} {active.length === 1 ? "booking" : "bookinger"} · {totalPlayers} spillere
+            {totalGoodwillGiftCard > 0 && ` · ekskl. ${fmt(totalGoodwillGiftCard)} goodwill`}
           </div>
         </div>
 
-        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
+        <div className="apple-surface rounded-2xl p-3.5 sm:p-4">
           <div className="text-[11px] font-medium text-zinc-400">Forhåndsbetalt (Webshop)</div>
-          <div className="text-lg sm:text-xl font-semibold text-emerald-400 mt-0.5 tabular-nums">{fmt(totalVipps)}</div>
-          <div className="text-[11px] text-zinc-400 mt-0.5">
-            {vippsCount} {vippsCount === 1 ? 'booking' : 'bookinger'}
+          <div className="apple-display text-lg sm:text-2xl font-semibold text-white mt-1 tabular-nums">
+            {fmt(totalVipps)}
+          </div>
+          <div className="text-[11px] text-zinc-400 mt-1 tabular-nums">
+            {vippsCount} {vippsCount === 1 ? "booking" : "bookinger"}
           </div>
         </div>
 
-        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
+        <div className="apple-surface rounded-2xl p-3.5 sm:p-4">
           <div className="text-[11px] font-medium text-zinc-400">Gavekort innløst (solgt)</div>
-          <div className="text-lg sm:text-xl font-semibold text-amber-300 mt-0.5 tabular-nums">{fmt(totalGiftCard)}</div>
-          <div className="text-[11px] text-zinc-400 mt-0.5">
-            {giftCardCount} {giftCardCount === 1 ? 'booking' : 'bookinger'}
-            {totalGoodwillGiftCard > 0 && (
-              <span className="text-sky-400"> · +{fmt(totalGoodwillGiftCard)} goodwill ({goodwillCount})</span>
-            )}
+          <div className="apple-display text-lg sm:text-2xl font-semibold text-white mt-1 tabular-nums">
+            {fmt(totalGiftCard)}
+          </div>
+          <div className="text-[11px] text-zinc-400 mt-1 tabular-nums">
+            {giftCardCount} {giftCardCount === 1 ? "booking" : "bookinger"}
+            {totalGoodwillGiftCard > 0 && ` · +${fmt(totalGoodwillGiftCard)} goodwill (${goodwillCount})`}
           </div>
         </div>
 
-        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-3">
+        <div className="apple-surface rounded-2xl p-3.5 sm:p-4">
           <div className="text-[11px] font-medium text-zinc-400">Kortterminal (arena)</div>
-          <div className="text-lg sm:text-xl font-semibold text-purple-300 mt-0.5 tabular-nums">{fmt(totalTerminal)}</div>
-          <div className="text-[11px] text-zinc-400 mt-0.5">
-            {terminalCount} {terminalCount === 1 ? 'betaling' : 'betalinger'}
+          <div className="apple-display text-lg sm:text-2xl font-semibold text-white mt-1 tabular-nums">
+            {fmt(totalTerminal)}
+          </div>
+          <div className="text-[11px] text-zinc-400 mt-1 tabular-nums">
+            {terminalCount} {terminalCount === 1 ? "betaling" : "betalinger"}
             {totalRemaining > 0 && (
-              <span className="text-amber-400 font-medium"> · {fmt(totalRemaining)} gjenstår</span>
+              <span className="text-amber-300 font-medium"> · {fmt(totalRemaining)} gjenstår</span>
             )}
           </div>
         </div>
@@ -781,892 +801,786 @@ export default function AdminDashboard() {
     );
   };
 
-  const renderPaymentDetails = (booking: any) => {
-    const {
-      totalPrice,
-      netRevenue,
-      amountPaid,
-      giftCardUsed,
-      paidGiftCardUsed,
-      goodwillGiftCardUsed,
-      vippsPaid,
-      terminalPaid,
-      remaining,
-      status,
-      isRefunded,
-      isPending,
-      isTerminal,
-    } = getBookingPaymentBreakdown(booking);
-
-    const isAuthorizedUncaptured =
-      (status === 'AUTHORIZED' || status.includes('RESERVED')) && status !== 'CAPTURED';
-    const isCancelledUnpaid = booking.status === 'cancelled' && amountPaid === 0 && giftCardUsed === 0;
-    const nowMs = new Date(currentTime).getTime();
-    const createdMs = booking.createdAt ? new Date(booking.createdAt).getTime() : nowMs;
-    const isPendingExpired = isPending && nowMs - createdMs > 15 * 60 * 1000;
-    const isFree = totalPrice === 0 && booking.status === 'confirmed';
-    const isFullySettled = !isPending && remaining === 0 && totalPrice > 0 && status !== 'EXPIRED' && status !== 'ABORTED';
-
-    let badgeLabel = `GJENSTÅR: ${remaining} NOK`;
-    let badgeClass = 'bg-red-500/15 text-red-300 border-red-500/40';
-
-    if (isRefunded) {
-      badgeLabel = 'REFUNDERT (VIPPS)';
-      badgeClass = 'bg-blue-500/20 text-blue-300 border-blue-500/30';
-    } else if (isCancelledUnpaid) {
-      badgeLabel = 'AVBRUTT / UTLØPT (0 KR)';
-      badgeClass = 'bg-zinc-800 text-zinc-400 border-zinc-700/60';
-    } else if (isAuthorizedUncaptured) {
-      badgeLabel = 'RESERVERT VIPPS (MÅ TREKKES)';
-      badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-    } else if (isPending) {
-      if (isPendingExpired) {
-        badgeLabel = 'UTLØPT (IKKE BETALT)';
-        badgeClass = 'bg-red-500/15 text-red-300 border-red-500/30';
-      } else {
-        badgeLabel = 'VENTER PÅ VIPPS';
-        badgeClass = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
-      }
-    } else if (isFree) {
-      badgeLabel = '0 KR';
-      badgeClass = 'bg-zinc-800 text-zinc-400 border-zinc-700/50';
-    } else if (isFullySettled) {
-      if (giftCardUsed > 0 && terminalPaid > 0) {
-        badgeLabel = 'GAVEKORT + TERMINAL';
-      } else if (giftCardUsed > 0 && vippsPaid > 0) {
-        badgeLabel = 'GAVEKORT + VIPPS';
-      } else if (giftCardUsed >= totalPrice) {
-        badgeLabel = 'BETALT MED GAVEKORT';
-      } else if (isTerminal) {
-        badgeLabel = 'OPPGJORT (TERMINAL)';
-      } else {
-        badgeLabel = 'FORHÅNDSBETALT (WEBSHOP)';
-      }
-      badgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-    } else if (isTerminal) {
-      badgeLabel = giftCardUsed > 0
-        ? `DELBETALT GAVEKORT · ARENA: ${remaining} NOK`
-        : `BETALES I ARENA: ${remaining} NOK`;
-      badgeClass = 'bg-purple-500/20 text-purple-300 border-purple-500/40';
-    } else if (amountPaid > 0 || giftCardUsed > 0) {
-      badgeLabel = `DELBETALT · GJENSTÅR: ${remaining} NOK`;
-      badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-    }
-
-    const canCaptureOrCancel = isAuthorizedUncaptured;
-    const canRefund =
-      ['vipps', 'reservation', 'full'].includes(booking.paymentType) &&
-      vippsPaid > 0 &&
-      status === 'CAPTURED' &&
-      !isPending;
-    const canMarkTerminalPaid =
-      isTerminal && remaining > 0 && booking.status !== 'cancelled';
-
-    return (
-      <div className="flex flex-col gap-1.5 min-w-0">
-        <div>
-          <span
-            className={`text-[10.5px] font-bold uppercase px-2 py-0.5 rounded inline-flex items-center border w-fit max-w-full whitespace-normal leading-tight ${badgeClass}`}
-          >
-            {badgeLabel}
+  const renderBookingRows = (tableBookings: any[], sectionTitle?: string) => (
+    <section className="mb-8 last:mb-0" key={sectionTitle || "list"}>
+      {sectionTitle && (
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h2 className="apple-display text-lg font-semibold text-white">{sectionTitle}</h2>
+          <span className="text-xs text-zinc-400 tabular-nums">
+            {tableBookings.length} {tableBookings.length === 1 ? "booking" : "bookinger"}
           </span>
         </div>
+      )}
 
-        {isPending ? (
-          <div className="text-xs font-medium">
-            {isPendingExpired ? (
-              <span className="text-zinc-500 text-[11px]">Ingen betaling mottatt (0 NOK)</span>
-            ) : (
-              <span className="text-amber-400">Venter på betaling fra kunde</span>
-            )}
-          </div>
-        ) : (
-          <div className="text-xs space-y-0.5">
-            <div className="text-zinc-200 font-medium">
-              Totalt: {totalPrice} NOK
-              {goodwillGiftCardUsed > 0 && (
-                <span className="text-zinc-400 font-normal"> (omsetning: {netRevenue} NOK)</span>
-              )}
-            </div>
-            {paidGiftCardUsed > 0 && (
-              <div className="text-amber-300 text-[11px] font-medium">
-                Gavekort: {paidGiftCardUsed} NOK
-              </div>
-            )}
-            {goodwillGiftCardUsed > 0 && (
-              <div className="text-sky-300 text-[11px] font-medium">
-                Goodwill-gavekort (0 kr oms.): {goodwillGiftCardUsed} NOK
-              </div>
-            )}
-            {terminalPaid > 0 && (
-              <div className="text-zinc-300 text-[11px]">
-                Kortterminal: <span className="text-purple-300 font-medium">{terminalPaid} NOK</span>
-              </div>
-            )}
-            {vippsPaid > 0 && (
-              <div className="text-zinc-300 text-[11px]">
-                Vipps: <span className="text-emerald-300 font-medium">{vippsPaid} NOK</span>
-              </div>
-            )}
-            {isTerminal && remaining > 0 && (
-              <div className="text-zinc-400 text-[11px]">
-                Gjenstår i arena: <span className="text-purple-300 font-medium">{remaining} NOK</span>
-              </div>
-            )}
-            {!isTerminal && vippsPaid === 0 && giftCardUsed === 0 && remaining > 0 && (
-              <div className="text-zinc-400 text-[11px]">Innbetalt: 0 NOK</div>
-            )}
-          </div>
-        )}
+      {sectionTitle === "I dag" && renderTodaySummary(tableBookings)}
 
-        {(booking.discountCode || booking.giftCardCode) && (
-          <div className="flex flex-wrap gap-1 mt-0.5">
-            {booking.discountCode && (
-              <span
-                className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-800/90 text-zinc-300 w-fit max-w-full"
-                title={`Rabattkode brukt: ${booking.discountCode}`}
-              >
-                Rabatt: <span className="font-mono text-zinc-100">{booking.discountCode}</span>
-              </span>
-            )}
-            {booking.giftCardCode && (
-              <span
-                className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-800/90 text-zinc-300 w-fit max-w-full"
-                title={`Gavekort brukt: ${booking.giftCardCode}${booking.giftCardAmount ? ` (${booking.giftCardAmount} NOK)` : ''}`}
-              >
-                Gavekort: <span className="font-mono text-zinc-100">{booking.giftCardCode}</span>
-              </span>
-            )}
-          </div>
-        )}
-
-        {(canCaptureOrCancel || canRefund) && (
-          <div className="flex flex-wrap gap-1.5 mt-1">
-            {canCaptureOrCancel && (
-              <>
-                <button
-                  onClick={() => handleVippsAction(booking.id, 'capture', booking.totalPrice)}
-                  className="text-[11px] bg-[#9C39FF] hover:bg-[#8A2BE2] text-white px-2.5 py-1 rounded-lg font-medium transition-colors whitespace-nowrap"
-                >
-                  Fullfør trekk
-                </button>
-                <button
-                  onClick={() => handleVippsAction(booking.id, 'cancel')}
-                  className="text-[11px] bg-red-500/15 hover:bg-red-500/25 text-red-200 border border-red-500/35 px-2.5 py-1 rounded-lg font-medium transition-colors whitespace-nowrap"
-                >
-                  Frigi (Avbryt)
-                </button>
-              </>
-            )}
-
-            {canRefund && (
-              <button
-                onClick={() => {
-                  const defaultAmt = vippsPaid || booking.totalPrice || 0;
-                  const amt = prompt(
-                    `Hvor mye ønsker du å refundere til ${booking.firstName} ${booking.lastName} via Vipps? (i NOK)\n\nKunden vil automatisk motta en refusjonskvittering på e-post.`,
-                    String(defaultAmt)
-                  );
-                  if (amt && !isNaN(Number(amt.replace(',', '.'))) && Number(amt.replace(',', '.')) > 0) {
-                    handleVippsAction(booking.id, 'refund', Number(amt.replace(',', '.')));
-                  }
-                }}
-                className="text-[11px] bg-orange-500/15 hover:bg-orange-500/25 text-orange-200 border border-orange-500/35 px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap font-medium"
-                title="Refunder via Vipps og send refusjonskvittering på e-post"
-              >
-                Refunder (Vipps)
-              </button>
-            )}
-          </div>
-        )}
-
-        {(canMarkTerminalPaid || (remaining > 0 && booking.status !== 'cancelled' && booking.bookingType !== 'system' && !booking.email?.includes('system@sperret'))) && (
-          <div className="flex flex-wrap gap-1.5 mt-1">
-            {canMarkTerminalPaid && (
-              <button
-                onClick={() => handleMarkTerminalPaid(booking.id)}
-                className="text-[11px] bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border border-emerald-500/40 px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap font-medium"
-                title="Registrer at kunden har betalt restbeløpet i kortterminalen"
-              >
-                ✓ Registrer betalt ({remaining} kr)
-              </button>
-            )}
-            {remaining > 0 && booking.status !== 'cancelled' && booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') && (
-              <button
-                onClick={() => setRedeemGiftCardBooking(booking)}
-                className="text-[11px] bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 border border-amber-500/35 px-2.5 py-1 rounded-lg transition-colors whitespace-nowrap font-medium inline-flex items-center gap-1"
-                title="Trekk hele eller deler av beløpet med gavekort"
-              >
-                <Gift className="w-3 h-3" />
-                Trekk gavekort
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderBookingActions = (booking: any) => {
-    const now = new Date(currentTime);
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const isEligibleForReview =
-      booking.status !== 'cancelled' &&
-      booking.bookingType !== 'system' &&
-      !booking.email?.includes('system@sperret') &&
-      booking.date <= todayStr;
-    const hasSentReview = !!booking.reviewEmailSentAt;
-    const platformLabel =
-      booking.reviewEmailType === 'tripadvisor'
-        ? 'TripAdvisor'
-        : booking.reviewEmailType === 'google'
-        ? 'Google'
-        : 'Begge';
-
-    return (
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <button
-          onClick={() => setEditingBooking(booking)}
-          className="text-xs text-purple-300 hover:text-white bg-[#9C39FF]/15 hover:bg-[#9C39FF]/30 border border-[#9C39FF]/30 px-2.5 py-1.5 rounded-lg transition-colors font-medium inline-flex items-center gap-1 shadow-sm"
-          title="Rediger opplevelse, deltakere, navneliste, tidspunkt og kundedetaljer"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-          <span>Rediger</span>
-        </button>
-
-        <button
-          onClick={() => handleResendConfirmation(booking)}
-          disabled={resendingEmailId === booking.id || !booking.email || booking.email.includes('system@sperret')}
-          className="text-xs text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800 border border-zinc-700/60 p-1.5 rounded-lg transition-colors inline-flex items-center gap-1 disabled:opacity-30"
-          title={booking.email ? `Send bestillingsbekreftelse på nytt til ${booking.email}` : 'Mangler e-post'}
-        >
-          {resendingEmailId === booking.id ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
-          ) : (
-            <Mail className="w-3.5 h-3.5" />
-          )}
-        </button>
-
-        {isEligibleForReview && (
-          <button
-            onClick={() => setReviewModalBooking(booking)}
-            className={`text-xs px-2 py-1.5 rounded-lg border transition-all inline-flex items-center gap-1 font-medium ${
-              hasSentReview
-                ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
-            }`}
-            title={
-              hasSentReview
-                ? `Omtale sendt (${platformLabel}) ${booking.reviewEmailSentAt ? new Intl.DateTimeFormat('no-NO', { dateStyle: 'short' }).format(new Date(booking.reviewEmailSentAt)) : ''}. Klikk for å se eller sende på nytt.`
-                : 'Send forespørsel om omtale (TripAdvisor / Google Reviews)'
-            }
-          >
-            <Star
-              className={`w-3.5 h-3.5 ${
-                hasSentReview ? 'fill-emerald-400 text-emerald-400' : 'fill-amber-300/30 text-amber-300'
-              }`}
-            />
-            <span className="hidden xl:inline">
-              {hasSentReview ? `Sendt (${platformLabel})` : 'Be om omtale'}
-            </span>
-          </button>
-        )}
-
-        <select
-          value={booking.status}
-          onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
-          className={`text-xs font-medium px-2.5 py-1.5 rounded-lg border focus:outline-none appearance-none cursor-pointer ${
-            booking.status === 'confirmed'
-              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-              : booking.status === 'pending'
-              ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-              : 'bg-red-500/10 text-red-400 border-red-500/20'
-          }`}
-        >
-          <option value="pending" className="bg-zinc-900 text-amber-400">
-            Venter
-          </option>
-          <option value="confirmed" className="bg-zinc-900 text-emerald-400">
-            Bekreftet
-          </option>
-          <option value="cancelled" className="bg-zinc-900 text-red-400">
-            Avbestilt
-          </option>
-        </select>
-
-        {booking.status !== 'cancelled' && (
-          <button
-            onClick={() => updateBookingStatus(booking.id, 'cancelled')}
-            className="text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors"
-            title="Avbestill booking"
-          >
-            <XCircle className="w-4 h-4" />
-          </button>
-        )}
-        <button
-          onClick={() => deleteBooking(booking.id)}
-          className="text-xs text-zinc-400 hover:text-red-400 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors ml-1"
-          title="Slett booking permanent"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-      </div>
-    );
-  };
-
-  const renderBookingsTable = (tableBookings: any[], title?: string) => (
-    <div className="mb-8 last:mb-0" key={title || 'table'}>
-      {title && <h2 className="text-lg font-medium mb-3 text-zinc-200">{title}</h2>}
-      {title === 'I dag' && renderTodaySummary(tableBookings)}
-
-      {/* Mobil-kortvisning (< lg) */}
-      <div className="lg:hidden space-y-3">
+      <div className="apple-surface rounded-2xl overflow-hidden divide-y divide-white/[0.06]">
         {tableBookings.length === 0 ? (
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 text-center text-zinc-400 text-sm">
-            Ingen bookinger ennå.
+          <div className="px-5 py-10 text-center text-sm text-zinc-400">
+            Ingen bookinger funnet.
           </div>
         ) : (
           tableBookings.map((booking) => {
-            const now = new Date(currentTime).getTime();
-            const createdAt = booking.createdAt ? new Date(booking.createdAt).getTime() : now;
-            const isExpired = booking.status === 'pending' && now - createdAt > 15 * 60 * 1000;
-            const validNames = (booking.playerNames || []).filter((n: string) => n && n.trim() !== '');
+            const p = getBookingPaymentBreakdown(booking);
+            const nowMs = new Date(currentTime).getTime();
+            const flags = getPaymentDisplayFlags(p, booking.createdAt, nowMs);
+            const isExpired = flags.isPendingExpired;
+            const isSystem = booking.bookingType === "system" || booking.email?.includes("system@sperret");
+            const validNames: string[] = (booking.playerNames || []).filter(
+              (n: string) => n && n.trim() !== ""
+            );
+            const isTodayOrFuture = booking.date >= new Date(currentTime).toISOString().split("T")[0];
+            const missingNames = !isSystem && isTodayOrFuture && validNames.length === 0 && booking.players > 0;
+            const hasPartialNames =
+              !isSystem && validNames.length > 0 && validNames.length < booking.players;
+
+            // Monochrome calm payment summary with color ONLY when action or attention is needed
+            let paymentLine = "";
+            let paymentTone = "text-zinc-300";
+            if (p.isRefunded) {
+              paymentLine = `Refundert (${p.totalPrice.toLocaleString("nb-NO")} kr)`;
+              paymentTone = "text-zinc-400";
+            } else if (flags.isCancelledUnpaid) {
+              paymentLine = "Avbrutt / 0 kr";
+              paymentTone = "text-zinc-500";
+            } else if (flags.isAuthorizedUncaptured) {
+              paymentLine = "Reservert (må trekkes)";
+              paymentTone = "text-amber-300";
+            } else if (p.isPending) {
+              paymentLine = flags.isPendingExpired ? "Utløpt (ikke betalt)" : "Venter på Vipps";
+              paymentTone = flags.isPendingExpired ? "text-red-300" : "text-amber-300";
+            } else if (flags.isFree) {
+              paymentLine = "0 kr";
+              paymentTone = "text-zinc-400";
+            } else if (flags.isFullySettled) {
+              paymentLine = p.isTerminal
+                ? `Oppgjort i terminal · ${p.totalPrice.toLocaleString("nb-NO")} kr`
+                : `Forhåndsbetalt (Webshop) · ${p.totalPrice.toLocaleString("nb-NO")} kr`;
+              paymentTone = "text-zinc-200";
+            } else if (p.isTerminal) {
+              paymentLine = `Betales i arena · ${p.remaining.toLocaleString("nb-NO")} kr`;
+              paymentTone = "text-zinc-200";
+            } else {
+              paymentLine = `Gjenstår · ${p.remaining.toLocaleString("nb-NO")} kr`;
+              paymentTone = "text-amber-300";
+            }
+
+            const expTitle = experiencesMap[booking.experienceId] || booking.experienceId;
+            const weekday = getNorwegianWeekday(booking.date);
+            const shortDate = formatDateShort(booking.date);
+            const timeRange = getBookingTimeRange(booking.time, booking.duration);
+            const isSelected = inspectedBookingId === booking.id;
 
             return (
               <div
-                key={`mobile-${booking.id}`}
-                className={`rounded-2xl border p-4 space-y-3 ${
-                  isExpired ? 'bg-red-950/10 border-red-900/30 opacity-75' : 'bg-zinc-900/60 border-zinc-800'
+                key={booking.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setInspectedBookingId(booking.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setInspectedBookingId(booking.id);
+                  }
+                }}
+                className={`group w-full text-left px-4 sm:px-5 py-4 transition-colors cursor-pointer flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-5 ${
+                  isSelected
+                    ? "bg-white/[0.07]"
+                    : isExpired
+                    ? "bg-red-950/10 hover:bg-red-950/20"
+                    : "hover:bg-white/[0.035]"
                 }`}
               >
-                <div className="flex items-start justify-between gap-2">
+                {/* 1. Date & Time Block */}
+                <div className="lg:w-44 shrink-0 flex lg:flex-col items-baseline lg:items-start justify-between gap-2">
                   <div>
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-zinc-400 font-mono">
-                      <span className="font-sans font-semibold text-zinc-200">{getNorwegianWeekday(booking.date)}</span>
-                      <span>·</span>
-                      <span>{formatDateShort(booking.date)}</span>
-                      <span>·</span>
-                      <span className="text-white font-semibold">{getBookingTimeRange(booking.time, booking.duration)}</span>
-                      <span className="text-zinc-500">({booking.duration || 90}m)</span>
+                    <div className="text-xs text-zinc-400 font-medium">
+                      {weekday} · <span className="tabular-nums">{shortDate}</span>
                     </div>
-                    <div
-                      className="text-base font-medium text-white mt-1 cursor-pointer"
-                      onClick={() => setEditingBooking(booking)}
-                    >
-                      {experiencesMap[booking.experienceId] || booking.experienceId}
-                      <span className="text-xs text-zinc-400 font-normal ml-2">
-                        ({booking.players} {booking.players === 1 ? 'spiller' : 'spillere'})
+                    <div className="text-base font-semibold text-white tabular-nums mt-0.5">
+                      {timeRange}
+                      <span className="text-xs font-normal text-zinc-400 ml-1.5">
+                        ({booking.duration || 90}m)
                       </span>
                     </div>
                   </div>
-                  {booking.bookingType === 'corporate' && booking.companyName && (
-                    <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0">
-                      Bedrift
+                </div>
+
+                {/* 2. Experience + Customer + Inline Player Copy Buttons */}
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+                    <span className="text-sm sm:text-base font-semibold text-white group-hover:text-[#c48fff] transition-colors">
+                      {expTitle}
                     </span>
-                  )}
-                </div>
-
-                <div className="text-sm">
-                  <div className="font-medium text-zinc-200">
-                    {booking.companyName
-                      ? `${booking.companyName} (${booking.firstName} ${booking.lastName})`
-                      : `${booking.firstName} ${booking.lastName}`}
+                    <span className="text-xs text-zinc-400">
+                      {booking.players} {booking.players === 1 ? "spiller" : "spillere"}
+                    </span>
+                    {booking.bookingType === "corporate" && booking.companyName && (
+                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/[0.08] text-zinc-300">
+                        Bedrift
+                      </span>
+                    )}
+                    {booking.status === "pending" && (
+                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300">
+                        Venter
+                      </span>
+                    )}
+                    {booking.status === "cancelled" && (
+                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-red-500/15 text-red-300">
+                        Avbestilt
+                      </span>
+                    )}
                   </div>
-                  {booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') && (
-                    <div className="text-xs text-zinc-400 mt-0.5 break-all">
-                      {booking.phone} · {booking.email}
+
+                  <div className="text-xs sm:text-sm text-zinc-200 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                    <span className="font-medium">
+                      {booking.companyName
+                        ? `${booking.companyName} (${booking.firstName} ${booking.lastName})`
+                        : `${booking.firstName} ${booking.lastName}`}
+                    </span>
+                    {!isSystem && booking.phone && (
+                      <span className="text-xs text-zinc-400 tabular-nums">· {booking.phone}</span>
+                    )}
+                    {!isSystem && booking.email && (
+                      <span className="text-xs text-zinc-400 hidden sm:inline">· {booking.email}</span>
+                    )}
+                  </div>
+
+                  {/* Quick Arena Name Copy Strip (preserved 1-tap workflow without heavy borders) */}
+                  {validNames.length > 0 ? (
+                    <div
+                      className="flex flex-wrap items-center gap-1 pt-0.5"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleCopyPlayerNames(booking.id, validNames)}
+                        title="Kopier alle navn i JSON-format"
+                        className="apple-press inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-white/[0.08] hover:bg-white/[0.14] text-zinc-200 mr-1"
+                      >
+                        {copiedBookingId === booking.id ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-300">Kopiert</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3 text-zinc-400" />
+                            <span>Kopier alle</span>
+                          </>
+                        )}
+                      </button>
+                      {hasPartialNames && (
+                        <span className="text-[11px] font-medium text-amber-300 mr-1">
+                          ({validNames.length}/{booking.players})
+                        </span>
+                      )}
+                      {validNames.map((rawName, idx) => {
+                        const cleanName = rawName.trim();
+                        const key = `${booking.id}-${idx}`;
+                        const isCopied = copiedNameKey === key;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => handleCopySingleName(key, cleanName)}
+                            title={`Klikk for å kopiere «${cleanName}»`}
+                            className={`apple-press inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md transition-colors ${
+                              isCopied
+                                ? "bg-emerald-500/20 text-emerald-200 font-medium"
+                                : "bg-white/[0.05] hover:bg-white/[0.12] text-zinc-200"
+                            }`}
+                          >
+                            <span>{cleanName}</span>
+                            {isCopied && <Check className="w-2.5 h-2.5 text-emerald-400" />}
+                          </button>
+                        );
+                      })}
                     </div>
-                  )}
-                  {validNames.length > 0 && (
-                    <div className="mt-1.5 space-y-1">
-                      <div className="flex items-center gap-1.5">
-                        {renderCopyAllButton(booking.id, validNames)}
-                      </div>
-                      {renderPlayerNameChips(booking.id, validNames)}
+                  ) : missingNames ? (
+                    <div className="text-[11px] font-medium text-amber-300 pt-0.5">
+                      Mangler navn (0/{booking.players})
+                      {booking.reminderCount > 0 ? ` · ${booking.reminderCount}x purret` : ""}
                     </div>
-                  )}
+                  ) : null}
+
                   {booking.internalNotes && (
-                    <div className="mt-2 text-xs text-zinc-300 bg-zinc-950/60 p-2.5 rounded-lg border border-zinc-800 line-clamp-3">
-                      {booking.internalNotes}
-                    </div>
+                    <p className="text-xs text-zinc-400 truncate max-w-2xl pt-0.5">
+                      Notat: <span className="text-zinc-300">{booking.internalNotes}</span>
+                    </p>
                   )}
                 </div>
 
-                <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-xl p-3">
-                  {renderPaymentDetails(booking)}
-                </div>
-
-                <div className="pt-1 flex items-center justify-between gap-2 flex-wrap border-t border-zinc-800/70">
-                  {renderBookingActions(booking)}
+                {/* 3. Right Summary + Inspector Arrow */}
+                <div className="flex lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-1.5 shrink-0 pt-1 lg:pt-0 border-t border-white/[0.05] lg:border-t-0">
+                  <div className={`text-xs sm:text-sm font-medium tabular-nums ${paymentTone}`}>
+                    {paymentLine}
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+                    {booking.discountCode && (
+                      <span className="font-mono text-zinc-400">{booking.discountCode}</span>
+                    )}
+                    <span className="inline-flex items-center gap-0.5 text-zinc-400 group-hover:text-white transition-colors">
+                      <span>Detaljer</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
                 </div>
               </div>
             );
           })
         )}
       </div>
-
-      {/* Desktop-tabell (>= lg) */}
-      <div className="hidden lg:flex bg-zinc-900/50 border border-zinc-800 rounded-2xl flex-col w-full max-w-full">
-        <div className="overflow-x-auto max-h-[70vh] rounded-2xl relative w-full">
-          <table className="w-full text-left text-sm table-fixed min-w-[1000px]">
-            <colgroup>
-              <col className="w-[11%]" />
-              <col className="w-[17%]" />
-              <col className="w-[24%]" />
-              <col className="w-[21%]" />
-              <col className="w-[10%]" />
-              <col className="w-[17%]" />
-            </colgroup>
-            <thead className="bg-zinc-900 shadow-[0_1px_0_0_#27272a] text-zinc-300 sticky top-0 z-20">
-              <tr>
-                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[11%]" onClick={() => handleSort('dateTime')}>
-                  Dato & tid {sortConfig.key === 'dateTime' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[17%]" onClick={() => handleSort('experienceId')}>
-                  Opplevelse {sortConfig.key === 'experienceId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[24%]" onClick={() => handleSort('customer')}>
-                  Kunde {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[21%]" onClick={() => handleSort('totalPrice')}>
-                  Betaling {sortConfig.key === 'totalPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[10%]" onClick={() => handleSort('createdAt')}>
-                  Bestilt {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-3 sm:px-5 py-3.5 font-medium cursor-pointer hover:text-white transition-colors w-[17%]" onClick={() => handleSort('status')}>
-                  Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800/50">
-              {tableBookings.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 sm:px-6 py-8 text-left sm:text-center text-zinc-400 font-medium">
-                    Ingen bookinger ennå.
-                  </td>
-                </tr>
-              ) : (
-                tableBookings.map((booking) => {
-                  const now = new Date(currentTime).getTime();
-                  const createdAt = booking.createdAt ? new Date(booking.createdAt).getTime() : now;
-                  const isExpired = booking.status === 'pending' && ((now - createdAt) > 15 * 60 * 1000);
-                  
-                  return (
-                <tr key={booking.id} className={`transition-colors ${isExpired ? 'bg-red-950/10 opacity-70' : 'hover:bg-zinc-800/20'}`}>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4">
-                    <div className="text-xs font-semibold text-zinc-200 pl-5 mb-0.5">
-                      {getNorwegianWeekday(booking.date)}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-zinc-300 font-mono text-xs sm:text-sm">
-                      <CalendarIcon className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                      {formatDateShort(booking.date)}
-                    </div>
-                    <div className="flex items-center gap-1 mt-1 text-zinc-200 text-xs font-semibold whitespace-nowrap">
-                      <Clock className="w-3 h-3 text-zinc-400 shrink-0" />
-                      {getBookingTimeRange(booking.time, booking.duration)}
-                    </div>
-                    <div className="flex items-center gap-1 mt-1 text-xs">
-                      <span className="text-[11px] text-zinc-400 font-medium pl-4">
-                        {booking.duration || 90}m
-                      </span>
-                      {booking.status !== 'cancelled' && (
-                        <div className="flex items-center gap-1">
-                          <button 
-                            onClick={() => extendBooking(booking.id)} 
-                            className="text-xs text-zinc-400 hover:text-white px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50 font-medium leading-none" 
-                            title="Legg til 90 minutter (+90 min)"
-                          >
-                            +
-                          </button>
-                          {booking.duration && booking.duration > 90 && (
-                            <button 
-                              onClick={() => reduceBooking(booking.id)} 
-                              className="text-xs text-zinc-400 hover:text-red-400 px-1.5 py-0.5 rounded transition-colors bg-zinc-800/80 border border-zinc-700/50 font-medium leading-none" 
-                              title="Trekk fra 90 minutter (-90 min)"
-                            >
-                              -
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4">
-                    <div 
-                      className="text-zinc-200 font-medium hover:text-[#9C39FF] cursor-pointer transition-colors flex items-center gap-1.5 group w-fit"
-                      onClick={() => setEditingBooking(booking)}
-                      title="Klikk for å endre opplevelse eller deltakere"
-                    >
-                      <span>{experiencesMap[booking.experienceId] || booking.experienceId}</span>
-                      <Pencil className="w-3 h-3 text-zinc-400 opacity-40 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                    <div 
-                      className="flex items-center gap-1.5 mt-1 text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors w-fit"
-                      onClick={() => setEditingBooking(booking)}
-                      title="Klikk for å endre antall spillere"
-                    >
-                      <Users className="w-3 h-3 text-zinc-400" /> {booking.players} {booking.players === 1 ? 'spiller' : 'spillere'}
-                    </div>
-                    {(() => {
-                      if (!booking.players || booking.players <= 0 || booking.bookingType === 'system') return null;
-                      const validNames = (booking.playerNames || []).filter((n: string) => n && n.trim() !== '');
-                      const isComplete = validNames.length >= booking.players;
-                      const hasSome = validNames.length > 0;
-                      
-                      const today = new Date().toISOString().split('T')[0];
-                      const isUpcomingSoon = booking.date >= today;
-
-                      return (
-                        <div 
-                          className="mt-1.5 space-y-1 cursor-pointer group"
-                          onClick={() => setEditingBooking(booking)}
-                          title="Klikk for å fylle ut eller redigere navneliste"
-                        >
-                          {isComplete ? (
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-1 group-hover:border-emerald-500/40">
-                                ✓ Navneliste ({validNames.length}/{booking.players})
-                              </span>
-                              {renderCopyAllButton(booking.id, validNames)}
-                            </div>
-                          ) : hasSome ? (
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="text-[10px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded group-hover:border-amber-500/40">
-                                Delvis navneliste ({validNames.length}/{booking.players})
-                              </span>
-                              {renderCopyAllButton(booking.id, validNames)}
-                            </div>
-                          ) : isUpcomingSoon ? (
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.5 rounded group-hover:border-amber-500/50">
-                                Mangler navn (0/{booking.players})
-                              </span>
-                              {booking.reminderCount > 0 && (
-                                <span className="text-[10px] text-zinc-500" title={`Purret ${booking.reminderCount}x, sist ${booking.lastReminderDate}`}>
-                                  ({booking.reminderCount}x purret)
-                                </span>
-                              )}
-                            </div>
-                          ) : null}
-
-                          {validNames.length > 0 && renderPlayerNameChips(booking.id, validNames)}
-                        </div>
-                      );
-                    })()}
-                  </td>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 whitespace-normal">
-                    <div 
-                      className="font-medium text-zinc-200 flex items-center flex-wrap gap-1.5 hover:text-[#9C39FF] cursor-pointer transition-colors group w-fit"
-                      onClick={() => setEditingBooking(booking)}
-                      title="Klikk for å redigere kundeinformasjon"
-                    >
-                      {booking.bookingType === 'corporate' && booking.companyName ? (
-                        <span className="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border border-amber-500/30">Bedrift</span>
-                      ) : null}
-                      {booking.bookingType === 'system' || booking.email?.includes('system@sperret') || booking.firstName === 'Sperret' ? (
-                        <span className="bg-red-500/20 text-red-300 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border border-red-500/30">Sperret</span>
-                      ) : null}
-                      <span>
-                        {booking.companyName ? `${booking.companyName} (${booking.firstName} ${booking.lastName})` : `${booking.firstName} ${booking.lastName}`}
-                      </span>
-                      <Pencil className="w-3 h-3 text-zinc-400 opacity-40 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                    <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mt-1 text-xs text-zinc-400">
-                      {booking.bookingType !== 'system' && !booking.email?.includes('system@sperret') ? (
-                        <>
-                          <span className="flex items-center gap-1">
-                            <Mail className={`w-3 h-3 ${booking.confirmationEmailSent ? "text-emerald-400" : ""}`} /> 
-                            {booking.email}
-                          </span>
-                          <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {booking.phone}</span>
-                        </>
-                      ) : (
-                        <span className="text-[11px] text-zinc-400 italic">Blokkert tidspunkt (ikke tilgjengelig for kunder)</span>
-                      )}
-                    </div>
-                    {booking.internalNotes ? (
-                       <div 
-                         className="mt-2 text-xs text-zinc-300 bg-zinc-800/40 p-2.5 rounded-lg border border-zinc-700/50 w-full whitespace-normal break-words line-clamp-3 cursor-pointer hover:bg-zinc-800 transition-colors"
-                         onClick={() => handleEditNote(booking.id, booking.internalNotes)}
-                         title={booking.internalNotes}
-                       >
-                          {booking.internalNotes}
-                       </div>
-                    ) : (
-                       <button 
-                         onClick={() => handleEditNote(booking.id, "")} 
-                         className="mt-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors underline decoration-dotted underline-offset-2"
-                       >
-                         + Legg til kommentar
-                       </button>
-                    )}
-                  </td>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 align-top whitespace-normal">
-                    {renderPaymentDetails(booking)}
-                  </td>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 text-xs text-zinc-400 align-top whitespace-nowrap">
-                    {booking.createdAt ? (
-                      <div>
-                        <div>{new Intl.DateTimeFormat("no-NO", { dateStyle: "short" }).format(new Date(booking.createdAt))}</div>
-                        <div className="mt-1 flex items-center gap-1"><Clock className="w-3 h-3" />{new Intl.DateTimeFormat("no-NO", { timeStyle: "short" }).format(new Date(booking.createdAt))}</div>
-                      </div>
-                    ) : "N/A"}
-                  </td>
-                  <td className="px-3 sm:px-5 py-3.5 sm:py-4 align-top">
-                    {renderBookingActions(booking)}
-                  </td>
-                </tr>
-                );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 
+  const navGroups: Array<{
+    title: string;
+    items: Array<{
+      id: AdminTab;
+      label: string;
+      icon: React.ComponentType<{ className?: string }>;
+      badge?: number;
+      onSelect?: () => void;
+    }>;
+  }> = [
+    {
+      title: "Daglig drift",
+      items: [
+        {
+          id: "upcoming",
+          label: "Kommende",
+          icon: Clock4,
+          onSelect: () => {
+            setActiveTab("upcoming");
+            setSortConfig({ key: "dateTime", direction: "asc" });
+          },
+        },
+        { id: "manual", label: "Ny booking", icon: Plus },
+        {
+          id: "inquiries",
+          label: "Forespørsler",
+          icon: MailQuestion,
+          badge: newInquiriesCount > 0 ? newInquiriesCount : undefined,
+        },
+        {
+          id: "archive",
+          label: "Arkiv",
+          icon: ListOrdered,
+          onSelect: () => {
+            setActiveTab("archive");
+            setSortConfig({ key: "dateTime", direction: "desc" });
+          },
+        },
+      ],
+    },
+    {
+      title: "Økonomi",
+      items: [
+        { id: "transactions", label: "Regnskap", icon: Wallet },
+        { id: "giftcards", label: "Gavekort", icon: Gift },
+      ],
+    },
+    {
+      title: "Arena & Team",
+      items: [
+        { id: "experiences", label: "Spill", icon: Gamepad2 },
+        { id: "clients", label: "Kunder", icon: Building2 },
+        { id: "shifts", label: "Vakter", icon: CalendarIcon },
+        { id: "employees", label: "Ansatte", icon: Users },
+        { id: "settings", label: "Innstillinger", icon: Settings },
+      ],
+    },
+  ];
+
+  const tabTitles: Record<AdminTab, string> = {
+    upcoming: "Kommende bookinger",
+    archive: "Arkiv",
+    inquiries: "Forespørsler & Arrangementer",
+    manual: "Manuell booking",
+    experiences: "Spill & Opplevelser",
+    clients: "Bedriftskunder, Logoer & Omtaler",
+    transactions: "Regnskap",
+    giftcards: "Gavekort",
+    shifts: "Vakter & Timeføring",
+    employees: "Ansatte",
+    settings: "Innstillinger",
+  };
+
+  const todayStrForReview = (() => {
+    const now = new Date(currentTime);
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
+      now.getDate()
+    ).padStart(2, "0")}`;
+  })();
+
+  const inspectedEligibleForReview =
+    !!inspectedBooking &&
+    inspectedBooking.status !== "cancelled" &&
+    inspectedBooking.bookingType !== "system" &&
+    !inspectedBooking.email?.includes("system@sperret") &&
+    inspectedBooking.date <= todayStrForReview;
+
   return (
-    <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 xl:px-12 pt-0 md:pt-4 pb-20">
-      {/* Sticky header */}
-      <header className="mb-8 sticky top-0 md:top-4 z-40 bg-zinc-950/95 border border-zinc-800/80 rounded-2xl px-4 py-3 md:px-5 md:py-3 shadow-xl">
-        <div className="flex items-center justify-between gap-3">
-          {/* Left: Branding */}
-          <div className="flex-shrink-0">
-            <span className="text-[10px] font-bold tracking-[0.15em] text-zinc-950 uppercase bg-white px-2.5 py-0.5 rounded-full inline-block mb-1 shadow-sm">
+    <div className="min-h-screen bg-black text-white flex flex-col xl:flex-row">
+      {/* Desktop Left Sidebar (Apple Finder / Mail pattern) */}
+      <aside className="hidden xl:flex flex-col w-60 shrink-0 border-r border-white/[0.08] bg-[#0b0b0d] sticky top-0 h-screen px-3 py-5 justify-between">
+        <div className="space-y-6 overflow-y-auto pr-1">
+          <div className="px-2.5">
+            <div className="text-[11px] font-semibold tracking-[0.14em] text-zinc-400 uppercase">
               KRS VR Arena
-            </span>
-            <h1 className="text-lg md:text-xl font-light tracking-tight text-white whitespace-nowrap">
-              Admin Dashboard
+            </div>
+            <div className="apple-display text-lg font-semibold text-white mt-0.5">
+              Kontrollpanel
+            </div>
+          </div>
+
+          <nav aria-label="Admin navigasjon" className="space-y-5">
+            {navGroups.map((group) => (
+              <div key={group.title} className="space-y-1">
+                <div className="px-2.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                  {group.title}
+                </div>
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        if (item.onSelect) item.onSelect();
+                        else setActiveTab(item.id);
+                      }}
+                      className={`apple-press w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-white/[0.11] text-white"
+                          : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05]"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className={`w-4 h-4 ${active ? "text-[#9C39FF]" : "text-zinc-400"}`} />
+                        <span>{item.label}</span>
+                      </span>
+                      {item.badge !== undefined && (
+                        <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 tabular-nums">
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+
+            <div className="space-y-1 pt-1 border-t border-white/[0.06]">
+              <Link
+                href="/admin/newsletter"
+                className="apple-press w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-sm font-medium text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05] transition-colors"
+              >
+                <span className="flex items-center gap-2.5">
+                  <Star className="w-4 h-4 text-zinc-400" />
+                  <span>Nyhetsbrev</span>
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 text-zinc-500" />
+              </Link>
+            </div>
+          </nav>
+        </div>
+
+        <div className="pt-3 border-t border-white/[0.08] space-y-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab("settings")}
+            className="apple-press w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.05]"
+          >
+            <Bell className="w-4 h-4 text-[#9C39FF]" />
+            <span>Push-varsler</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="apple-press w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-red-300 hover:bg-red-500/10"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logg ut</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 min-w-0 flex flex-col pb-24 xl:pb-16">
+        {/* Sticky Translucent Mobile/Tablet Chrome + Desktop Header */}
+        <header className="apple-chrome sticky top-0 z-30 border-b border-white/[0.08] px-4 sm:px-6 xl:px-8 py-3.5 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="xl:hidden text-[10px] font-semibold tracking-[0.14em] text-zinc-400 uppercase">
+              KRS VR Arena
+            </div>
+            <h1 className="apple-display text-xl sm:text-2xl font-semibold text-white truncate">
+              {tabTitles[activeTab]}
             </h1>
           </div>
 
-          {/* Center: Desktop nav pill menu */}
-          <nav className="hidden xl:flex items-center bg-zinc-900/90 p-1 rounded-xl border border-zinc-800/80 gap-0.5 overflow-x-auto hide-scrollbar">
-            <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); }} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-3.5 h-3.5 shrink-0" /> Kommende</button>
-            <button onClick={() => setActiveTab("manual")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-3.5 h-3.5 shrink-0" /> Booking</button>
-            <button onClick={() => setActiveTab("inquiries")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'inquiries' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}>
-              <MailQuestion className="w-3.5 h-3.5 shrink-0" /> 
-              Forespørsler
-              {newInquiriesCount > 0 && (
-                <span className="ml-0.5 bg-amber-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full">
-                  {newInquiriesCount}
-                </span>
-              )}
-            </button>
-            <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); }} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-3.5 h-3.5 shrink-0" /> Arkiv</button>
-            <button onClick={() => setActiveTab("experiences")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-3.5 h-3.5 shrink-0" /> Spill</button>
-            <button onClick={() => setActiveTab("clients")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'clients' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Building2 className="w-3.5 h-3.5 shrink-0" /> Kunder</button>
-            <button onClick={() => setActiveTab("transactions")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-3.5 h-3.5 shrink-0" /> Regnskap</button>
-            <button onClick={() => setActiveTab("giftcards")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'giftcards' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Gift className="w-3.5 h-3.5 shrink-0" /> Gavekort</button>
-            <button onClick={() => setActiveTab("shifts")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-3.5 h-3.5 shrink-0" /> Vakter</button>
-            <button onClick={() => setActiveTab("employees")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-3.5 h-3.5 shrink-0" /> Ansatte</button>
-            <button onClick={() => setActiveTab("settings")} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-3.5 h-3.5 shrink-0" /> Innstillinger</button>
-            <Link href="/admin/newsletter" className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-medium whitespace-nowrap transition-colors text-zinc-400 hover:text-zinc-200"><Mail className="w-3.5 h-3.5 shrink-0" /> Nyhetsbrev</Link>
-          </nav>
-
-          {/* Right: Push Notifications, Logout button + Mobile/Tablet Hamburger */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            {(activeTab === "upcoming" || activeTab === "archive") && (
+              <button
+                type="button"
+                onClick={() => setActiveTab("manual")}
+                className="apple-press hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-xs font-semibold"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Ny booking</span>
+              </button>
+            )}
             <button
+              type="button"
               onClick={() => setActiveTab("settings")}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-zinc-900/90 hover:bg-[#9C39FF]/15 hover:text-purple-300 hover:border-[#9C39FF]/30 text-zinc-300 border border-zinc-800 rounded-xl transition-all shadow-sm"
-              title="Push-varsler innstillinger"
+              aria-label="Push-varsler innstillinger"
+              className="apple-press xl:hidden p-2 rounded-full bg-white/[0.07] text-zinc-200 hover:bg-white/[0.12]"
             >
-              <Bell className="w-3.5 h-3.5 text-[#9C39FF]" />
-              <span className="hidden sm:inline">Push-varsler</span>
+              <Bell className="w-4 h-4 text-[#9C39FF]" />
             </button>
-
             <button
-              onClick={handleLogout}
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-zinc-900/90 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 text-zinc-300 border border-zinc-800 rounded-xl transition-all shadow-sm"
-              title="Logg ut av admin"
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Åpne meny"
+              className="apple-press xl:hidden p-2 rounded-full bg-white/[0.07] text-zinc-200 hover:bg-white/[0.12]"
             >
-              <LogOut className="w-4 h-4" />
-              <span>Logg ut</span>
-            </button>
-
-            {/* Hamburger button – mobile/tablet only */}
-            <button
-              className="xl:hidden p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800"
-              onClick={() => setMobileMenuOpen(prev => !prev)}
-              aria-label={mobileMenuOpen ? 'Lukk meny' : 'Åpne meny'}
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              <Menu className="w-4 h-4" />
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* Mobile / Tablet nav dropdown */}
-        {mobileMenuOpen && (
-          <div className="xl:hidden mt-3 pt-3 border-t border-zinc-800/80">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-zinc-900/80 p-2 rounded-xl border border-zinc-800">
-              <button onClick={() => { setActiveTab("upcoming"); setSortConfig({ key: 'dateTime', direction: 'asc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Clock4 className="w-4 h-4" /> Kommende</button>
-              <button onClick={() => { setActiveTab("manual"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-[#9C39FF]/20 text-[#9C39FF]' : 'text-zinc-400 hover:text-zinc-200'}`}><Plus className="w-4 h-4" /> Booking</button>
-              <button onClick={() => { setActiveTab("inquiries"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'inquiries' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}>
-                <MailQuestion className="w-4 h-4" /> 
-                Forespørsler
-                {newInquiriesCount > 0 && (
-                  <span className="ml-auto bg-amber-500 text-black text-[10px] font-bold px-1.5 py-0.2 rounded-full">
-                    {newInquiriesCount}
-                  </span>
-                )}
-              </button>
-              <button onClick={() => { setActiveTab("archive"); setSortConfig({ key: 'dateTime', direction: 'desc' }); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'archive' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><ListOrdered className="w-4 h-4" /> Arkiv</button>
-              <button onClick={() => { setActiveTab("experiences"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'experiences' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Gamepad2 className="w-4 h-4" /> Spill</button>
-              <button onClick={() => { setActiveTab("clients"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'clients' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Building2 className="w-4 h-4" /> Kunder</button>
-              <button onClick={() => { setActiveTab("transactions"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'transactions' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Wallet className="w-4 h-4" /> Regnskap</button>
-              <button onClick={() => { setActiveTab("giftcards"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'giftcards' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Gift className="w-4 h-4" /> Gavekort</button>
-              <button onClick={() => { setActiveTab("shifts"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'shifts' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><CalendarIcon className="w-4 h-4" /> Vakter</button>
-              <button onClick={() => { setActiveTab("employees"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employees' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Users className="w-4 h-4" /> Ansatte</button>
-              <button onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}><Settings className="w-4 h-4" /> Innstillinger</button>
-              <button onClick={() => { setActiveTab("settings"); setMobileMenuOpen(false); }} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-purple-300 hover:text-white bg-purple-900/10 border border-purple-500/20"><Bell className="w-4 h-4 text-purple-400" /> Push-varsler</button>
-              <Link href="/admin/newsletter" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-purple-300 hover:text-white bg-purple-900/10 border border-purple-500/20"><Mail className="w-4 h-4 text-purple-400" /> Nyhetsbrev</Link>
-              <button onClick={handleLogout} className="col-span-2 sm:col-span-4 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 border border-red-500/20 mt-1">
-                <LogOut className="w-4 h-4" /> Logg ut
-              </button>
+        <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 xl:px-8 pt-6 space-y-6">
+          {(activeTab === "upcoming" || activeTab === "archive") && (
+            <div className="space-y-5">
+              {/* Calm Search & Filter Bar */}
+              <div className="apple-surface rounded-2xl p-3 flex flex-col md:flex-row gap-2.5 items-stretch md:items-center">
+                <div className="relative flex-1 min-w-0">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Søk navn, bedrift, e-post, tlf, kode..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-black/50 border border-white/[0.07] rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-[#9C39FF]"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="flex items-center gap-2 bg-black/50 border border-white/[0.07] rounded-xl px-3 py-1.5 text-sm text-white focus-within:border-[#9C39FF]">
+                    <span className="text-xs text-zinc-400 shrink-0">Dato</span>
+                    <input
+                      type="date"
+                      value={dateFilter}
+                      onChange={(e) => setDateFilter(e.target.value)}
+                      className="bg-transparent text-xs sm:text-sm text-white focus:outline-none min-w-0"
+                    />
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSort("dateTime")}
+                    className="apple-press inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/50 border border-white/[0.07] text-xs font-medium text-zinc-300 hover:text-white"
+                  >
+                    <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400" />
+                    <span>Tid {sortConfig.key === "dateTime" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}</span>
+                  </button>
+
+                  {activeTab === "archive" && (
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="bg-black/50 border border-white/[0.07] rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-[#9C39FF]"
+                    >
+                      <option value="all">Alle statuser</option>
+                      <option value="pending">Venter</option>
+                      <option value="confirmed">Bekreftet</option>
+                      <option value="cancelled">Avbestilt</option>
+                    </select>
+                  )}
+
+                  {(searchQuery || dateFilter || (activeTab === "archive" && statusFilter !== "all")) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setDateFilter("");
+                        setStatusFilter("all");
+                      }}
+                      className="apple-press text-xs font-medium text-zinc-300 hover:text-white px-2.5 py-2 bg-white/[0.07] rounded-xl"
+                    >
+                      Nullstill
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {(() => {
+                if (activeTab === "archive") {
+                  return renderBookingRows(filteredAndSortedBookings);
+                }
+
+                const now = new Date(currentTime);
+                const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+                  2,
+                  "0"
+                )}-${String(now.getDate()).padStart(2, "0")}`;
+
+                const tomorrow = new Date(currentTime);
+                tomorrow.setDate(now.getDate() + 1);
+                const tomorrowStr = `${tomorrow.getFullYear()}-${String(
+                  tomorrow.getMonth() + 1
+                ).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+
+                const todayBookings = filteredAndSortedBookings.filter((b) => b.date === todayStr);
+                const tomorrowBookings = filteredAndSortedBookings.filter((b) => b.date === tomorrowStr);
+                const upcomingBookings = filteredAndSortedBookings.filter((b) => b.date > tomorrowStr);
+
+                return (
+                  <div className="space-y-6">
+                    {todayBookings.length === 0 && tomorrowBookings.length === 0 ? (
+                      <div className="apple-surface rounded-2xl px-4 py-3 text-sm text-zinc-400">
+                        Ingen bookinger i dag eller i morgen.
+                      </div>
+                    ) : (
+                      <>
+                        {todayBookings.length > 0 ? (
+                          renderBookingRows(todayBookings, "I dag")
+                        ) : (
+                          <div className="apple-surface rounded-2xl px-4 py-2.5 text-xs text-zinc-400">
+                            <span className="font-medium text-zinc-200">I dag:</span> Ingen bookinger.
+                          </div>
+                        )}
+                        {tomorrowBookings.length > 0 ? (
+                          renderBookingRows(tomorrowBookings, "I morgen")
+                        ) : (
+                          <div className="apple-surface rounded-2xl px-4 py-2.5 text-xs text-zinc-400">
+                            <span className="font-medium text-zinc-200">I morgen:</span> Ingen bookinger.
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {renderBookingRows(upcomingBookings, "Kommende")}
+                  </div>
+                );
+              })()}
             </div>
+          )}
+
+          {activeTab === "inquiries" && (
+            <InquiriesManager
+              onCreateBooking={handleCreateBookingFromInquiry}
+              onInquiriesUpdated={fetchInquiriesCount}
+            />
+          )}
+          {activeTab === "experiences" && <ExperiencesManager />}
+          {activeTab === "clients" && <ClientsManager />}
+          {activeTab === "transactions" && <TransactionsManager />}
+          {activeTab === "giftcards" && <AdminGiftCardsTab />}
+          {activeTab === "settings" && <SettingsManager />}
+          {activeTab === "manual" && (
+            <ManualBookingManager
+              initialData={manualBookingInitialData}
+              onClearInitialData={() => setManualBookingInitialData(null)}
+              onBookingCreated={() => {
+                fetchInquiriesCount();
+              }}
+            />
+          )}
+          {activeTab === "shifts" && <ShiftManager />}
+          {activeTab === "employees" && <EmployeesManager />}
+        </main>
+      </div>
+
+      {/* Mobile Translucent Bottom Tab Bar (Apple iOS pattern) */}
+      <nav
+        aria-label="Mobil navigasjon"
+        className="xl:hidden fixed bottom-0 inset-x-0 z-30 apple-chrome border-t border-white/[0.09] px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex items-center justify-around"
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("upcoming");
+            setSortConfig({ key: "dateTime", direction: "asc" });
+          }}
+          className={`apple-press flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[11px] font-medium ${
+            activeTab === "upcoming" ? "text-[#c48fff]" : "text-zinc-400"
+          }`}
+        >
+          <Clock4 className="w-5 h-5" />
+          <span>Kommende</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("manual")}
+          className={`apple-press flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[11px] font-medium ${
+            activeTab === "manual" ? "text-[#c48fff]" : "text-zinc-400"
+          }`}
+        >
+          <Plus className="w-5 h-5" />
+          <span>Booking</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("inquiries")}
+          className={`relative apple-press flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[11px] font-medium ${
+            activeTab === "inquiries" ? "text-[#c48fff]" : "text-zinc-400"
+          }`}
+        >
+          <MailQuestion className="w-5 h-5" />
+          <span>Forespørsler</span>
+          {newInquiriesCount > 0 && (
+            <span className="absolute top-0.5 right-2 min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-black text-[10px] font-bold flex items-center justify-center tabular-nums">
+              {newInquiriesCount}
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          className="apple-press flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[11px] font-medium text-zinc-400"
+        >
+          <Menu className="w-5 h-5" />
+          <span>Meny</span>
+        </button>
+      </nav>
+
+      {/* Mobile Full Navigation Spring Sheet */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <div className="xl:hidden fixed inset-0 z-50 flex items-end">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-[2px]"
+            />
+            <motion.div
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 56 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 56 }}
+              transition={{ type: "spring", bounce: 0, duration: 0.32 }}
+              className="relative z-10 w-full max-h-[85vh] bg-[#141417] border-t border-white/10 rounded-t-3xl p-5 overflow-y-auto space-y-5"
+            >
+              <div className="flex items-center justify-between">
+                <span className="apple-display text-lg font-semibold text-white">Alle seksjoner</span>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Lukk meny"
+                  className="apple-press p-2 rounded-full bg-white/[0.08] text-zinc-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {navGroups.map((group) => (
+                <div key={group.title} className="space-y-1.5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 px-1">
+                    {group.title}
+                  </div>
+                  <div className="apple-surface-raised rounded-2xl divide-y divide-white/[0.06] overflow-hidden">
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = activeTab === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => {
+                            if (item.onSelect) item.onSelect();
+                            else setActiveTab(item.id);
+                            setMobileMenuOpen(false);
+                          }}
+                          className={`apple-press w-full flex items-center justify-between px-4 py-3 text-sm font-medium ${
+                            active ? "text-[#c48fff] bg-white/[0.05]" : "text-zinc-200"
+                          }`}
+                        >
+                          <span className="flex items-center gap-3">
+                            <Icon className="w-4 h-4 text-zinc-400" />
+                            <span>{item.label}</span>
+                          </span>
+                          {item.badge !== undefined ? (
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">
+                              {item.badge}
+                            </span>
+                          ) : (
+                            <ChevronRight className="w-4 h-4 text-zinc-500" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              <div className="apple-surface-raised rounded-2xl divide-y divide-white/[0.06] overflow-hidden">
+                <Link
+                  href="/admin/newsletter"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="apple-press w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-zinc-200"
+                >
+                  <span className="flex items-center gap-3">
+                    <Star className="w-4 h-4 text-zinc-400" />
+                    <span>Nyhetsbrev</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-zinc-500" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="apple-press w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-300"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logg ut</span>
+                </button>
+              </div>
+            </motion.div>
           </div>
         )}
-      </header>
+      </AnimatePresence>
 
-      {/* Section heading */}
-      {{
-        upcoming: <h2 className="text-xl font-semibold text-white mb-6">Kommende bookinger</h2>,
-        archive: <h2 className="text-xl font-semibold text-white mb-6">Arkiv</h2>,
-        inquiries: <h2 className="text-xl font-semibold text-white mb-6">Forespørsler & Arrangementer</h2>,
-        manual: <h2 className="text-xl font-semibold text-white mb-6">Manuell booking</h2>,
-        experiences: <h2 className="text-xl font-semibold text-white mb-6">Spill & Opplevelser</h2>,
-        clients: <h2 className="text-xl font-semibold text-white mb-6">Bedriftskunder, Logoer & Omtaler</h2>,
-        transactions: <h2 className="text-xl font-semibold text-white mb-6">Regnskap</h2>,
-        giftcards: <h2 className="text-xl font-semibold text-white mb-6">Gavekort</h2>,
-        shifts: <h2 className="text-xl font-semibold text-white mb-6">Vakter & Timeføring</h2>,
-        employees: <h2 className="text-xl font-semibold text-white mb-6">Ansatte</h2>,
-        settings: <h2 className="text-xl font-semibold text-white mb-6">Innstillinger</h2>,
-      }[activeTab]}
+      {/* Apple Slide-in Booking Inspector / Draggable Mobile Sheet */}
+      <BookingInspectorSheet
+        booking={inspectedBooking}
+        experienceName={
+          inspectedBooking
+            ? experiencesMap[inspectedBooking.experienceId] || inspectedBooking.experienceId
+            : ""
+        }
+        weekday={inspectedBooking ? getNorwegianWeekday(inspectedBooking.date) : ""}
+        formattedDate={inspectedBooking ? formatDateShort(inspectedBooking.date) : ""}
+        timeRange={
+          inspectedBooking ? getBookingTimeRange(inspectedBooking.time, inspectedBooking.duration) : ""
+        }
+        isEligibleForReview={inspectedEligibleForReview}
+        resendingEmail={!!inspectedBooking && resendingEmailId === inspectedBooking.id}
+        copiedAll={!!inspectedBooking && copiedBookingId === inspectedBooking.id}
+        copiedNameKey={copiedNameKey}
+        onClose={() => setInspectedBookingId(null)}
+        onEditFull={(b) => setEditingBooking(b)}
+        onCopyAllNames={handleCopyPlayerNames}
+        onCopySingleName={handleCopySingleName}
+        onCopyText={handleCopyPlainText}
+        onResendConfirmation={handleResendConfirmation}
+        onOpenReviewModal={(b) => setReviewModalBooking(b)}
+        onExtendDuration={extendBooking}
+        onReduceDuration={reduceBooking}
+        onUpdateStatus={updateBookingStatus}
+        onSaveNote={handleSaveNote}
+        onMarkTerminalPaid={handleMarkTerminalPaid}
+        onOpenRedeemGiftCard={(b) => setRedeemGiftCardBooking(b)}
+        onVippsAction={handleVippsAction}
+        onDeleteBooking={deleteBooking}
+      />
 
-      {(activeTab === "upcoming" || activeTab === "archive") && (
-        <div className="space-y-4">
-          {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-4 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 w-full max-w-full">
-            <div className="flex-1 w-full min-w-0">
-              <input
-                type="text"
-                placeholder="Søk navn, bedrift, e-post, tlf, kode..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF]"
-              />
-            </div>
-            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-              <label className="w-full sm:w-auto flex items-center justify-between gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-white focus-within:border-[#9C39FF]">
-                <span className="text-xs text-zinc-400 shrink-0">Dato:</span>
-                <input
-                  type="date"
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  className="bg-transparent text-sm text-white focus:outline-none min-w-0"
-                />
-              </label>
-              {activeTab === "archive" && (
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full sm:w-auto max-w-full box-border bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9C39FF] min-w-[120px]"
-                >
-                  <option value="all">Alle statuser</option>
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Bekreftet</option>
-                  <option value="cancelled">Kansellert</option>
-                </select>
-              )}
-              {(searchQuery || dateFilter || (activeTab === "archive" && statusFilter !== 'all')) && (
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setDateFilter("");
-                    setStatusFilter("all");
-                  }}
-                  className="text-xs text-zinc-400 hover:text-white px-2 py-1 bg-zinc-800 rounded-md transition-colors"
-                >
-                  Nullstill
-                </button>
-              )}
-            </div>
-          </div>
-
-          {(() => {
-            if (activeTab === "archive") {
-              return renderBookingsTable(filteredAndSortedBookings);
-            }
-
-            // For upcoming tab, split into Today, Tomorrow, Upcoming
-            const now = new Date(currentTime);
-            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-            
-            const tomorrow = new Date(currentTime);
-            tomorrow.setDate(now.getDate() + 1);
-            const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
-
-            const todayBookings = filteredAndSortedBookings.filter(b => b.date === todayStr);
-            const tomorrowBookings = filteredAndSortedBookings.filter(b => b.date === tomorrowStr);
-            const upcomingBookings = filteredAndSortedBookings.filter(b => b.date > tomorrowStr);
-
-            return (
-              <div className="space-y-6">
-                {todayBookings.length === 0 && tomorrowBookings.length === 0 ? (
-                  <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl px-4 py-3 text-sm text-zinc-400 flex items-center justify-between">
-                    <span>Ingen bookinger i dag eller i morgen.</span>
-                  </div>
-                ) : (
-                  <>
-                    {todayBookings.length > 0 ? (
-                      renderBookingsTable(todayBookings, "I dag")
-                    ) : (
-                      <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl px-4 py-2.5 text-xs text-zinc-400">
-                        <span className="font-medium text-zinc-300">I dag:</span> Ingen bookinger.
-                      </div>
-                    )}
-                    {tomorrowBookings.length > 0 ? (
-                      renderBookingsTable(tomorrowBookings, "I morgen")
-                    ) : (
-                      <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl px-4 py-2.5 text-xs text-zinc-400">
-                        <span className="font-medium text-zinc-300">I morgen:</span> Ingen bookinger.
-                      </div>
-                    )}
-                  </>
-                )}
-                {renderBookingsTable(upcomingBookings, "Kommende")}
-              </div>
-            );
-          })()}
-        </div>
-      )}
-
-      {activeTab === "inquiries" && (
-        <InquiriesManager 
-          onCreateBooking={handleCreateBookingFromInquiry} 
-          onInquiriesUpdated={fetchInquiriesCount} 
-        />
-      )}
-      {activeTab === "experiences" && <ExperiencesManager />}
-      {activeTab === "clients" && <ClientsManager />}
-      {activeTab === "transactions" && <TransactionsManager />}
-      {activeTab === "giftcards" && <AdminGiftCardsTab />}
-      {activeTab === "settings" && <SettingsManager />}
-      {activeTab === "manual" && (
-        <ManualBookingManager 
-          initialData={manualBookingInitialData} 
-          onClearInitialData={() => setManualBookingInitialData(null)}
-          onBookingCreated={() => {
-            fetchInquiriesCount();
-          }} 
-        />
-      )}
-      {activeTab === "shifts" && <ShiftManager />}
-      {activeTab === "employees" && <EmployeesManager />}
-
-      {/* Edit Booking Modal */}
+      {/* Full Edit Booking Modal */}
       <EditBookingModal
         booking={editingBooking}
         isOpen={!!editingBooking}

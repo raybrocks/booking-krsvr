@@ -76,19 +76,19 @@ export default function ReviewRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-[2px]">
       <div 
-        className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col"
+        className="bg-[#141417] border border-white/10 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-zinc-800 flex items-center justify-between sticky top-0 bg-zinc-950/95 backdrop-blur z-10">
+        <div className="apple-chrome p-5 sm:p-6 border-b border-white/[0.08] flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#9C39FF]/15 border border-[#9C39FF]/30 flex items-center justify-center text-[#9C39FF]">
-              <Star className="w-5 h-5 fill-[#9C39FF]/20" />
+            <div className="w-9 h-9 rounded-xl bg-white/[0.07] flex items-center justify-center text-[#9C39FF]">
+              <Star className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Be om omtale fra gjest</h2>
+              <h2 className="apple-display text-lg font-semibold text-white">Be om omtale fra gjest</h2>
               <p className="text-xs text-zinc-400">
                 Send til <span className="text-zinc-200 font-medium">{booking.firstName} {booking.lastName}</span> ({booking.email})
               </p>
@@ -97,9 +97,9 @@ export default function ReviewRequestModal({
           <button
             onClick={onClose}
             disabled={sending}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+            className="apple-press p-2 rounded-full text-zinc-400 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 

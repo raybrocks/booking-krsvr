@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Mail, User, Shield, Check, Trash2, UserPlus, Info } from "lucide-react";
+import { toast } from "sonner";
 
 export default function EmployeesManager() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,31 +44,36 @@ export default function EmployeesManager() {
       if (res.ok) {
         setName("");
         setEmail("");
+        toast.success("Ansatt lagt til");
         await fetchEmployees();
       } else {
         const err = await res.json();
-        alert(err.error || "Kunne ikke opprette ansatt");
+        toast.error(err.error || "Kunne ikke opprette ansatt");
       }
     } catch (e) {
       console.error(e);
-      alert("En feil oppstod");
+      toast.error("En feil oppstod");
     }
     setSubmitting(false);
   };
 
   const handleDelete = async (id: string, empEmail: string) => {
     if (empEmail === "post@krsvr.no") {
-       alert("Du kan ikke slette hovedkontoen.");
-       return;
+      toast.error("Du kan ikke slette hovedkontoen.");
+      return;
     }
-    if (!confirm("Er du sikker på at du vil slette denne ansatte?")) return;
     try {
       const res = await fetch(`/api/admin/employees/${id}`, { method: 'DELETE' });
       if (res.ok) {
+        setConfirmDeleteId(null);
+        toast.success("Ansatt slettet");
         await fetchEmployees();
+      } else {
+        toast.error("Kunne ikke slette ansatt");
       }
     } catch (e) {
       console.error(e);
+      toast.error("Feil ved sletting");
     }
   };
 
@@ -183,14 +190,21 @@ export default function EmployeesManager() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleDelete(emp.id, emp.email)}
-                      className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-400 rounded-lg transition-colors disabled:opacity-40"
-                      title="Slett ansatt"
-                      disabled={emp.email === "post@krsvr.no"}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {confirmDeleteId === emp.id ? (
+                      <div className="inline-flex items-center gap-1.5">
+                        <button type="button" onClick={() => setConfirmDeleteId(null)} className="apple-press px-2 py-1 text-xs rounded-md bg-white/[0.08] text-zinc-300">Avbryt</button>
+                        <button type="button" onClick={() => handleDelete(emp.id, emp.email)} className="apple-press px-2.5 py-1 text-xs rounded-md bg-red-500/80 text-white font-medium">Slett</button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDeleteId(emp.id)}
+                        className="apple-press p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-400 rounded-lg transition-colors disabled:opacity-40"
+                        title="Slett ansatt"
+                        disabled={emp.email === "post@krsvr.no"}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))

@@ -15,18 +15,18 @@ export default function AdminNewsletterPage() {
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Top Bar with Breadcrumbs */}
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <Link 
                 href="/admin" 
-                className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-xl transition-colors"
+                className="apple-press flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white bg-white/[0.07] hover:bg-white/[0.12] px-3.5 py-2 rounded-full transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" /> Tilbake til Dashboard
+                <ArrowLeft className="w-3.5 h-3.5" /> Tilbake til Dashboard
               </Link>
               <Link 
                 href="/admin/emails" 
-                className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-xl transition-colors"
+                className="apple-press flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white bg-white/[0.07] hover:bg-white/[0.12] px-3.5 py-2 rounded-full transition-colors"
               >
-                <Mail className="w-4 h-4 text-purple-400" /> Alle E-postmaler
+                <Mail className="w-3.5 h-3.5 text-[#9C39FF]" /> Alle E-postmaler
               </Link>
             </div>
 
@@ -34,10 +34,10 @@ export default function AdminNewsletterPage() {
               href="https://resend.com/broadcasts"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white bg-zinc-950 border border-zinc-800 px-3.5 py-2 rounded-xl transition-colors"
+              className="apple-press flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white bg-white/[0.06] hover:bg-white/[0.11] px-3.5 py-2 rounded-full transition-colors"
             >
               <span>Gå til Resend Broadcasts</span>
-              <ExternalLink className="w-3.5 h-3.5 text-zinc-500" />
+              <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
             </a>
           </div>
 

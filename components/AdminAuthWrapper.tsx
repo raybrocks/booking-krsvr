@@ -164,13 +164,13 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   // If user is not logged in, show login form
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <div className="w-full max-w-md p-8 space-y-6 bg-zinc-900 border border-zinc-800 rounded-2xl">
+      <div className="admin-apple flex items-center justify-center min-h-screen bg-black px-4">
+        <div className="apple-surface w-full max-w-md p-8 space-y-6 rounded-3xl shadow-2xl">
           <div className="flex flex-col items-center justify-center space-y-2">
-            <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mb-2">
-              <Lock className="w-6 h-6 text-[#9C39FF]" />
+            <div className="w-12 h-12 bg-white/[0.06] rounded-2xl flex items-center justify-center mb-2">
+              <Lock className="w-5 h-5 text-[#9C39FF]" />
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Krs VR Arena</h1>
+            <h1 className="apple-display text-2xl font-semibold text-white">KRS VR Arena</h1>
             <p className="text-zinc-400 text-sm">
               {isSignUp ? "Registrer ny bruker" : "Logg inn for å få tilgang"}
             </p>
@@ -178,41 +178,41 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
 
           <form onSubmit={handleAuth} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg">
+              <div className="p-3 text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-xl">
                 {error}
               </div>
             )}
             {successMsg && (
-              <div className="p-3 text-sm text-green-400 bg-green-400/10 border border-green-400/20 rounded-lg">
+              <div className="p-3 text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 rounded-xl">
                 {successMsg}
               </div>
             )}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">E-post</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-zinc-400">E-post</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-[#9C39FF] transition-colors"
-                placeholder="admin@example.com"
+                className="w-full px-3.5 py-2.5 bg-black/60 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-[#9C39FF] transition-colors"
+                placeholder="navn@krsvr.no"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Passord</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-zinc-400">Passord</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-[#9C39FF] transition-colors"
+                className="w-full px-3.5 py-2.5 bg-black/60 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-[#9C39FF] transition-colors"
                 placeholder="••••••••"
               />
             </div>
             <button
               type="submit"
               disabled={isLoggingIn}
-              className="w-full py-2.5 bg-[#9C39FF] hover:bg-[#8A2BE2] text-white font-medium rounded-lg transition-colors flex items-center justify-center disabled:opacity-50"
+              className="apple-press w-full py-2.5 bg-[#9C39FF] hover:bg-[#8A30E0] text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center disabled:opacity-50"
             >
               {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : (isSignUp ? "Registrer deg" : "Logg inn")}
             </button>
@@ -221,7 +221,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
               <button 
                 type="button" 
                 onClick={() => { setIsSignUp(!isSignUp); setError(""); setSuccessMsg(""); }}
-                className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="text-sm text-zinc-400 hover:text-white transition-colors"
               >
                 {isSignUp ? "Har du allerede en bruker? Logg inn" : "Ny ansatt? Registrer deg her"}
               </button>
@@ -235,13 +235,13 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   // Strict check: Is this the authorized admin email?
   if (user.accessDenied) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-4 text-center">
-        <Lock className="w-12 h-12 text-red-500" />
-        <h2 className="text-xl font-bold text-white">Ingen tilgang</h2>
-        <p className="text-zinc-400">Kontoen din har ikke administratorrettigheter, eller er ikke aktivert.</p>
+      <div className="admin-apple flex flex-col items-center justify-center min-h-[80vh] space-y-4 text-center px-4">
+        <Lock className="w-12 h-12 text-red-400" />
+        <h2 className="apple-display text-xl font-semibold text-white">Ingen tilgang</h2>
+        <p className="text-zinc-400 text-sm">Kontoen din har ikke administratorrettigheter, eller er ikke aktivert.</p>
         <button 
           onClick={handleLogout}
-          className="mt-4 px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors"
+          className="apple-press mt-4 px-6 py-2.5 bg-white/[0.08] hover:bg-white/[0.12] text-white text-sm font-medium rounded-xl transition-colors"
         >
           Logg ut
         </button>
@@ -250,7 +250,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="admin-apple min-h-screen bg-black text-white">
       {children}
     </div>
   );

@@ -18,21 +18,21 @@ export default function AdminEmailsPage() {
             <div className="flex items-center gap-3">
               <Link 
                 href="/admin" 
-                className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-xl transition-colors"
+                className="apple-press flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white bg-white/[0.07] hover:bg-white/[0.12] px-3.5 py-2 rounded-full transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" /> Tilbake til Dashboard
+                <ArrowLeft className="w-3.5 h-3.5" /> Tilbake til Dashboard
               </Link>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#9C39FF]/10 flex items-center justify-center border border-[#9C39FF]/20">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white/[0.06] flex items-center justify-center">
                   <Mail className="w-4 h-4 text-[#9C39FF]" />
                 </div>
-                <h1 className="text-xl font-bold text-white tracking-tight">Forhåndsvisning av E-postmaler</h1>
+                <h1 className="apple-display text-xl font-semibold text-white">Forhåndsvisning av E-postmaler</h1>
               </div>
             </div>
 
             <Link
               href="/admin/newsletter"
-              className="flex items-center gap-1.5 text-xs text-white bg-[#9C39FF] hover:bg-[#8A2BE2] px-4 py-2 rounded-xl transition-all font-medium shadow-md shadow-[#9C39FF]/20 cursor-pointer"
+              className="apple-press flex items-center gap-1.5 text-xs text-white bg-[#9C39FF] hover:bg-[#8A30E0] px-4 py-2 rounded-full transition-colors font-semibold cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Åpne Nyhetsbrev Designer</span>

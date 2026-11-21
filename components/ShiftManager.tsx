@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Calendar as CalendarIcon, Clock, Plus, Trash2, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 
 function formatDateShort(dateStr: string | Date) {
   if (!dateStr) return "";
@@ -32,6 +33,7 @@ export default function ShiftManager() {
   // Summary offsets
   const [weekOffset, setWeekOffset] = useState(0);
   const [monthOffset, setMonthOffset] = useState(0);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   async function fetchData() {
     setLoading(true);
@@ -80,24 +82,31 @@ export default function ShiftManager() {
       });
       if (res.ok) {
         setDate(""); setStartTime(""); setEndTime("");
+        toast.success("Tilgjengelighet registrert");
         await fetchData();
       } else {
         const err = await res.json();
-        alert(err.error || "Kunne ikke registrere tilgjengelighet");
+        toast.error(err.error || "Kunne ikke registrere tilgjengelighet");
       }
-    } catch (e) {
-      alert("Feil ved lagring av tilgjengelighet");
+    } catch {
+      toast.error("Feil ved lagring av tilgjengelighet");
     }
     setSubmitting(false);
   };
 
   const handleDeleteAvailability = async (id: string) => {
-    if (!confirm("Er du sikker på at du vil slette denne tilgjengeligheten?")) return;
     try {
       const res = await fetch(`/api/admin/shifts/${id}`, { method: 'DELETE' });
-      if (res.ok) await fetchData();
+      if (res.ok) {
+        setConfirmDeleteId(null);
+        toast.success("Tilgjengelighet slettet");
+        await fetchData();
+      } else {
+        toast.error("Kunne ikke slette tilgjengelighet");
+      }
     } catch (e) {
       console.error(e);
+      toast.error("Feil ved sletting");
     }
   };
 
@@ -114,24 +123,31 @@ export default function ShiftManager() {
       });
       if (res.ok) {
         setDate(""); setStartTime(""); setEndTime(""); setTimeNote("");
+        toast.success("Timer lagret");
         await fetchData();
       } else {
         const err = await res.json();
-        alert(err.error || "Kunne ikke lagre timer");
+        toast.error(err.error || "Kunne ikke lagre timer");
       }
-    } catch (e) {
-      alert("Error logging time");
+    } catch {
+      toast.error("Feil ved registrering av timer");
     }
     setSubmitting(false);
   };
 
   const handleDeleteTimeEntry = async (id: string) => {
-    if (!confirm("Er du sikker på at du vil slette denne timeføringen?")) return;
     try {
       const res = await fetch(`/api/admin/time-entries/${id}`, { method: 'DELETE' });
-      if (res.ok) await fetchData();
+      if (res.ok) {
+        setConfirmDeleteId(null);
+        toast.success("Timeføring slettet");
+        await fetchData();
+      } else {
+        toast.error("Kunne ikke slette timeføring");
+      }
     } catch (e) {
       console.error(e);
+      toast.error("Feil ved sletting");
     }
   };
 
@@ -321,9 +337,16 @@ export default function ShiftManager() {
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
                             {(isMine || currentUser?.email === 'post@krsvr.no') && (
-                              <button onClick={() => handleDeleteAvailability(shift.id)} className="p-2 hover:bg-red-500/10 text-zinc-500 hover:text-red-400 rounded-lg transition-colors" title="Slett">
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              confirmDeleteId === shift.id ? (
+                                <div className="inline-flex items-center gap-1.5">
+                                  <button type="button" onClick={() => setConfirmDeleteId(null)} className="apple-press px-2 py-1 text-xs rounded-md bg-white/[0.08] text-zinc-300">Avbryt</button>
+                                  <button type="button" onClick={() => handleDeleteAvailability(shift.id)} className="apple-press px-2.5 py-1 text-xs rounded-md bg-red-500/80 text-white font-medium">Slett</button>
+                                </div>
+                              ) : (
+                                <button type="button" onClick={() => setConfirmDeleteId(shift.id)} className="apple-press p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-400 rounded-lg transition-colors" title="Slett">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )
                             )}
                           </td>
                         </tr>
@@ -456,9 +479,16 @@ export default function ShiftManager() {
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
                             {(isMine || currentUser?.email === 'post@krsvr.no') && (
-                              <button onClick={() => handleDeleteTimeEntry(entry.id)} className="p-2 hover:bg-red-500/10 text-zinc-500 hover:text-red-400 rounded-lg transition-colors" title="Slett">
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              confirmDeleteId === entry.id ? (
+                                <div className="inline-flex items-center gap-1.5">
+                                  <button type="button" onClick={() => setConfirmDeleteId(null)} className="apple-press px-2 py-1 text-xs rounded-md bg-white/[0.08] text-zinc-300">Avbryt</button>
+                                  <button type="button" onClick={() => handleDeleteTimeEntry(entry.id)} className="apple-press px-2.5 py-1 text-xs rounded-md bg-red-500/80 text-white font-medium">Slett</button>
+                                </div>
+                              ) : (
+                                <button type="button" onClick={() => setConfirmDeleteId(entry.id)} className="apple-press p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-400 rounded-lg transition-colors" title="Slett">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )
                             )}
                           </td>
                         </tr>
@@ -472,38 +502,38 @@ export default function ShiftManager() {
           
           {/* Summary Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+            <div className="apple-surface rounded-2xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-zinc-400 text-sm font-medium">Ukesoversikt (Uke {displayWeekData.week}{displayWeekData.year !== (new Date()).getFullYear() ? ` ${displayWeekData.year}` : ''})</h3>
                 <div className="flex items-center gap-1">
-                  <button type="button" onClick={() => setWeekOffset(prev => prev - 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronLeft className="w-4 h-4"/></button>
-                  <button type="button" onClick={() => setWeekOffset(0)} className="text-xs font-medium text-zinc-500 hover:text-white px-2">I dag</button>
-                  <button type="button" onClick={() => setWeekOffset(prev => prev + 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronRight className="w-4 h-4"/></button>
+                  <button type="button" onClick={() => setWeekOffset(prev => prev - 1)} className="apple-press p-1 text-zinc-400 hover:text-white rounded hover:bg-white/10"><ChevronLeft className="w-4 h-4"/></button>
+                  <button type="button" onClick={() => setWeekOffset(0)} className="apple-press text-xs font-medium text-zinc-400 hover:text-white px-2">I dag</button>
+                  <button type="button" onClick={() => setWeekOffset(prev => prev + 1)} className="apple-press p-1 text-zinc-400 hover:text-white rounded hover:bg-white/10"><ChevronRight className="w-4 h-4"/></button>
                 </div>
               </div>
               <div className="flex items-end gap-3">
-                <span className="text-3xl font-bold text-white">{weekHours.toFixed(1)}t</span>
+                <span className="apple-display text-3xl font-semibold text-white tabular-nums">{weekHours.toFixed(1)}t</span>
                 {weekEvening > 0 && (
-                  <span className="text-sm font-medium text-amber-400 mb-1.5">
+                  <span className="text-sm font-medium text-zinc-400 mb-1">
                     Hvorav {weekEvening.toFixed(1)}t kveldstillegg
                   </span>
                 )}
               </div>
             </div>
             
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+            <div className="apple-surface rounded-2xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-zinc-400 text-sm font-medium capitalize">Månedsoversikt ({displayMonthData.monthName} {displayMonthData.year})</h3>
                 <div className="flex items-center gap-1">
-                  <button type="button" onClick={() => setMonthOffset(prev => prev - 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronLeft className="w-4 h-4"/></button>
-                  <button type="button" onClick={() => setMonthOffset(0)} className="text-xs font-medium text-zinc-500 hover:text-white px-2">I dag</button>
-                  <button type="button" onClick={() => setMonthOffset(prev => prev + 1)} className="p-1 text-zinc-500 hover:text-white rounded hover:bg-zinc-800"><ChevronRight className="w-4 h-4"/></button>
+                  <button type="button" onClick={() => setMonthOffset(prev => prev - 1)} className="apple-press p-1 text-zinc-400 hover:text-white rounded hover:bg-white/10"><ChevronLeft className="w-4 h-4"/></button>
+                  <button type="button" onClick={() => setMonthOffset(0)} className="apple-press text-xs font-medium text-zinc-400 hover:text-white px-2">I dag</button>
+                  <button type="button" onClick={() => setMonthOffset(prev => prev + 1)} className="apple-press p-1 text-zinc-400 hover:text-white rounded hover:bg-white/10"><ChevronRight className="w-4 h-4"/></button>
                 </div>
               </div>
               <div className="flex items-end gap-3">
-                <span className="text-3xl font-bold text-[#9C39FF]">{monthHours.toFixed(1)}t</span>
+                <span className="apple-display text-3xl font-semibold text-white tabular-nums">{monthHours.toFixed(1)}t</span>
                 {monthEvening > 0 && (
-                  <span className="text-sm font-medium text-amber-400 mb-1.5">
+                  <span className="text-sm font-medium text-zinc-400 mb-1">
                     Hvorav {monthEvening.toFixed(1)}t kveldstillegg
                   </span>
                 )}

@@ -119,3 +119,25 @@ export function getBookingPaymentBreakdown(booking: {
     isSystem,
   };
 }
+
+export function getPaymentDisplayFlags(
+  p: BookingPaymentBreakdown,
+  createdAt?: string | Date | null,
+  nowMs: number = Date.now()
+) {
+  const isCancelledUnpaid = p.isCancelled && p.settledTotal === 0;
+  const isAuthorizedUncaptured = p.status === 'AUTHORIZED' && p.amountPaid === 0;
+  const isFree = p.totalPrice <= 0 && !p.isRefunded && !isCancelledUnpaid;
+  const isFullySettled =
+    p.totalPrice > 0 && p.remaining === 0 && !p.isPending && !p.isRefunded && !isCancelledUnpaid;
+  const createdMs = createdAt ? new Date(createdAt).getTime() : nowMs;
+  const isPendingExpired = p.isPending && nowMs - createdMs > 15 * 60 * 1000;
+
+  return {
+    isCancelledUnpaid,
+    isAuthorizedUncaptured,
+    isFree,
+    isFullySettled,
+    isPendingExpired,
+  };
+}
